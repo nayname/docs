@@ -1,0 +1,16 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/cosmos/docs",
+  "author": "Cordt H <Cordt@interchainlabs.io>",
+  "license": "MIT",
+  "scripts": {
+    "build": "mint build",
+    "dev": "npx mint dev"
+  },
+  "dependencies": {
+    "@mintlify/scraping": "^4.0.253",
+    "mint": "^4.1.41"
+  }
+}
