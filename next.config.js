@@ -6,8 +6,9 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
   i18n: {
-    locales: ['en'],
+    locales: ['en', 'en-US'],
     defaultLocale: 'en',
+    localeDetection: false
   },
   poweredByHeader: false,
   compress: true,

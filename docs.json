@@ -1,0 +1,69 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "palm",
+  "name": "Cosmos Documentation",
+  "description": "Build the future of interoperable blockchains with Cosmos",
+  "colors": {
+    "primary": "#6976af",
+    "light": "#8791bf",
+    "dark": "#545e8c"
+  },
+  "favicon": "/assets/favicon.ico",
+  "logo": {
+    "light": "/assets/cosmos-light.svg",
+    "dark": "/assets/cosmos-dark.svg",
+    "href": "https://cosmos.network"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Home",
+        "icon": "house",
+        "pages": [
+          "docs/index"
+        ]
+      },
+      {
+        "tab": "Cosmos EVM",
+        "icon": "lightning",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "docs/evm/index",
+              "docs/evm/quickstart",
+              "docs/evm/integrate"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "docs/api-reference/evm/evm-json-rpc",
+              "docs/api-reference/evm/opcodes"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "search": {
+    "prompt": "Search Cosmos EVM docs..."
+  },
+  "seo": {
+    "indexing": "navigable"
+  },
+  "footer": {
+    "socials": {
+      "twitter": "https://twitter.com/cosmos",
+      "github": "https://github.com/cosmos",
+      "discord": "https://discord.gg/cosmosnetwork",
+      "website": "https://cosmos.network"
+    }
+  },
+  "integrations": {
+    "gtm": {
+      "tagId": "GTM-XXXXXXX"
+    }
+  },
+  "redirects": []
+}
