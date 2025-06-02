@@ -49,6 +49,7 @@ coverage/
 
 dist/
 build/
+.yarn/
 
 # Markdown lint cache
 
