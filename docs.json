@@ -43,6 +43,23 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "API Reference",
+        "icon": "terminal",
+        "pages": [
+          "docs/api-reference/cosmos/api",
+          "docs/api-reference/cosmos/cli",
+          "docs/api-reference/evm/evm-json-rpc",
+          "docs/api-reference/evm/opcodes"
+        ]
+      },
+      {
+        "tab": "Learn",
+        "icon": "book",
+        "pages": [
+          "docs/learn/frontend-apps"
+        ]
       }
     ]
   },

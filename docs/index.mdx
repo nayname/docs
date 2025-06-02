@@ -1,6 +1,42 @@
 ---
-mode: "center"
+mode: "custom"
 ---
+
+import { Cards } from '../snippets/Cards'
+
+{/* Custom top-right links bar */}
+<div className="absolute top-6 right-8 flex gap-6 z-50">
+  <a href="/network-info" className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:underline">Network Info</a>
+  <a href="/status" className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:underline">Status</a>
+  <a href="/blog" className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:underline">Blog</a>
+  <a href="/about" className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:underline">About</a>
+</div>
+
+<div className="relative flex flex-col items-center justify-center py-16 md:py-24 min-h-screen">
+  {/* Hero/Header */}
+  <div className="w-full max-w-4xl text-center mb-16">
+    <h1 className="text-5xl md:text-6xl font-bold text-gradient mb-6">Cosmos Documentation Hub</h1>
+    <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-6">
+      Build the future of interoperable blockchains with Cosmos. Explore our products, APIs, and guides to get started.
+    </p>
+    <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-6">
+      <a href="/docs/evm/quickstart" className="btn">Get Started</a>
+      <a href="https://discord.gg/cosmosnetwork" target="_blank" rel="noopener noreferrer" className="btn border border-[#6976af] bg-transparent text-[#6976af] dark:text-[#8791bf] hover:bg-[#6976af] hover:text-white">Join Discord</a>
+    </div>
+  </div>
+  {/* Cards Grid */}
+  <div className="w-full max-w-7xl">
+    <Cards />
+  </div>
+  {/* Bottom Left Info Box (absolute on desktop, below on mobile) */}
+  <div className="absolute left-0 bottom-0 m-6 hidden md:block">
+    <div className="callout">
+      <strong>Network Info:</strong> <br />
+      <a href="https://cosmos.network" className="underline text-[#6976af]">cosmos.network</a> <br />
+      <a href="https://forum.cosmos.network" className="underline text-[#6976af]">Forum</a> | <a href="https://discord.gg/cosmosnetwork" className="underline text-[#6976af]">Discord</a>
+    </div>
+  </div>
+</div>
 
 # Cosmos Documentation Hub
 
