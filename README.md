@@ -58,7 +58,7 @@ This repository is the central documentation hub for the Cosmos Stack product.
   mint openapi-check <file-or-url>
   ```
 
-This documentation is built using [Mintlify](https://mintlify.com/docs). Contributions can be made by [making a PR](https://github.com/cosmos/docs/compare) on the [Github repo](https://github.com/cosmos/docs).
+This documentation is built using [Mintlify](https://mintlify.com/docs). Contributions can be made by [making a PR](https://github.com/cosmos/docs/compare) on this repo.
 
 ## Getting Started
 
