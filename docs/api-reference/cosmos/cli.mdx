@@ -1,0 +1,227 @@
+---
+title: "Cosmos CLI"
+description: "Command-line interface reference for Cosmos SDK chains"
+---
+
+# Cosmos CLI Reference
+
+The Cosmos SDK provides a powerful command-line interface for interacting with blockchain networks.
+
+## Installation
+
+Install the Cosmos CLI (replace `gaiad` with your chain's binary):
+
+```bash
+# Install from source
+git clone https://github.com/cosmos/gaia.git
+cd gaia
+make install
+
+# Or download pre-built binary
+curl -L https://github.com/cosmos/gaia/releases/latest/download/gaiad-linux-amd64 -o gaiad
+chmod +x gaiad
+sudo mv gaiad /usr/local/bin/
+```
+
+## Configuration
+
+### Initialize Configuration
+
+```bash
+gaiad config chain-id cosmoshub-4
+gaiad config keyring-backend os
+gaiad config node https://rpc.cosmos.network:443
+```
+
+## Key Management
+
+### Create a New Key
+
+```bash
+gaiad keys add mykey
+```
+
+### Import an Existing Key
+
+```bash
+# From mnemonic
+gaiad keys add mykey --recover
+
+# From private key file
+gaiad keys import mykey keyfile.json
+```
+
+### List Keys
+
+```bash
+gaiad keys list
+```
+
+### Show Key Information
+
+```bash
+gaiad keys show mykey --address
+gaiad keys show mykey --pubkey
+```
+
+## Account Queries
+
+### Check Account Balance
+
+```bash
+gaiad query bank balances cosmos1abcdef...
+```
+
+### View Account Information
+
+```bash
+gaiad query auth account cosmos1abcdef...
+```
+
+## Staking Operations
+
+### Delegate Tokens
+
+```bash
+gaiad tx staking delegate cosmosvaloper1... 1000000uatom \
+  --from mykey \
+  --gas auto \
+  --gas-adjustment 1.5 \
+  --fees 5000uatom
+```
+
+### Undelegate Tokens
+
+```bash
+gaiad tx staking unbond cosmosvaloper1... 1000000uatom \
+  --from mykey \
+  --gas auto \
+  --gas-adjustment 1.5 \
+  --fees 5000uatom
+```
+
+### Redelegate Tokens
+
+```bash
+gaiad tx staking redelegate cosmosvaloper1source... cosmosvaloper1dest... 1000000uatom \
+  --from mykey \
+  --gas auto \
+  --gas-adjustment 1.5 \
+  --fees 5000uatom
+```
+
+### Claim Staking Rewards
+
+```bash
+gaiad tx distribution withdraw-rewards cosmosvaloper1... \
+  --from mykey \
+  --gas auto \
+  --gas-adjustment 1.5 \
+  --fees 5000uatom
+```
+
+## Governance
+
+### View Proposals
+
+```bash
+# List all proposals
+gaiad query gov proposals
+
+# View specific proposal
+gaiad query gov proposal 1
+```
+
+### Submit a Proposal
+
+```bash
+gaiad tx gov submit-proposal \
+  --title "Test Proposal" \
+  --description "A test governance proposal" \
+  --type Text \
+  --deposit 10000000uatom \
+  --from mykey \
+  --gas auto \
+  --gas-adjustment 1.5 \
+  --fees 5000uatom
+```
+
+### Vote on a Proposal
+
+```bash
+gaiad tx gov vote 1 yes \
+  --from mykey \
+  --gas auto \
+  --gas-adjustment 1.5 \
+  --fees 5000uatom
+```
+
+## Token Transfers
+
+### Send Tokens
+
+```bash
+gaiad tx bank send mykey cosmos1recipient... 1000000uatom \
+  --gas auto \
+  --gas-adjustment 1.5 \
+  --fees 5000uatom
+```
+
+### Multi-send Tokens
+
+```bash
+gaiad tx bank multi-send mykey cosmos1addr1...,cosmos1addr2... 1000000uatom,500000uatom \
+  --gas auto \
+  --gas-adjustment 1.5 \
+  --fees 5000uatom
+```
+
+## Advanced Commands
+
+### Query Transaction
+
+```bash
+gaiad query tx A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3
+```
+
+### Simulate Transaction
+
+```bash
+gaiad tx bank send mykey cosmos1recipient... 1000000uatom \
+  --dry-run \
+  --gas auto \
+  --gas-adjustment 1.5
+```
+
+### Export State
+
+```bash
+gaiad export > genesis_export.json
+```
+
+### Validate Genesis
+
+```bash
+gaiad validate-genesis genesis.json
+```
+
+## Common Flags
+
+| Flag | Description |
+|------|-------------|
+| `--from` | Key name or address to sign with |
+| `--gas` | Gas limit for transaction |
+| `--gas-adjustment` | Adjustment factor for gas estimation |
+| `--fees` | Fees to pay for transaction |
+| `--chain-id` | Chain ID to connect to |
+| `--node` | RPC node to connect to |
+| `--dry-run` | Simulate transaction without broadcasting |
+| `--yes` | Skip confirmation prompts |
+
+## Environment Variables
+
+```bash
+export GAIAD_CHAIN_ID=cosmoshub-4
+export GAIAD_NODE=https://rpc.cosmos.network:443
+export GAIAD_KEYRING_BACKEND=os
+```

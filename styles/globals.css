@@ -1,69 +1,213 @@
 @tailwind base;
-@tailwind components;
+@tailwind components;  
 @tailwind utilities;
 
-/* =========================================================
-   Design tokens (CSS variables) – single source of truth
-   ========================================================= */
+/* Cosmos Design System Color Variables */
 :root {
-  --cosmos-primary:   #6976af;
-  --cosmos-primary-2: #8791bf;
-  --cosmos-accent:    #545e8c;
-  --cosmos-bg:        #ffffff;
-  --cosmos-surface:   #ffffff;
-  --cosmos-border:    #e2e8f0;
+  --cosmos-primary: #4B47CA;
+  --cosmos-primary-light: #7552FF;
+  --cosmos-accent: #22E2A8;
+  --cosmos-background: #FAFBFC;
+  --cosmos-surface: #FFFFFF;
+  --cosmos-border: #E5E7EB;
+  --cosmos-text: #111827;
+  --cosmos-text-muted: #6B7280;
 }
+
 [data-theme='dark'] {
-  --cosmos-bg:      #0a0b0d;
-  --cosmos-surface: #1a1b23;
-  --cosmos-border:  #2a2b33;
+  --cosmos-background: #0D0E11;
+  --cosmos-surface: #1F2937;
+  --cosmos-border: #374151;
+  --cosmos-text: #F9FAFB;
+  --cosmos-text-muted: #D1D5DB;
 }
 
-body {
-  @apply bg-[color:var(--cosmos-bg)] text-cosmos-800 dark:text-cosmos-100 font-sans antialiased leading-relaxed;
+/* Custom Landing Page Overrides for Palm Theme */
+[data-mode="custom"] {
+  /* Override default palm theme for custom landing page */
+  background: var(--cosmos-background) !important;
+  color: var(--cosmos-text) !important;
 }
 
-/* =========================================================
-   Typography via @tailwindcss/typography (prose classes)
-   ========================================================= */
-.prose {
-  @apply max-w-none;
-  color: inherit;
+[data-mode="custom"] .min-h-screen {
+  background: linear-gradient(135deg, var(--cosmos-background) 0%, #F3F4F6 100%) !important;
 }
-.prose h1   {@apply text-4xl font-bold mt-8 mb-4 text-gradient;}
-.prose h2   {@apply text-3xl font-semibold mt-8 mb-3;}
-.prose h3   {@apply text-2xl font-semibold mt-6 mb-2;}
-.prose p    {@apply my-4;}
-.prose a    {@apply underline decoration-primary transition hover:text-primary-dark;}
-.prose strong {@apply font-semibold text-cosmos-900 dark:text-cosmos-100;}
 
-/* =========================================================
-   Code blocks – auto‑contained, modern, accessible
-   ========================================================= */
-/* outer wrapper produced by rehype‑pretty‑code / Mintlify */
-pre, div[role='presentation'] > pre {
-  @apply relative w-full overflow-x-auto rounded-md border p-4 text-sm leading-relaxed shadow-soft font-mono bg-[color:var(--cosmos-surface)] border-[color:var(--cosmos-border)];
-  transition: border-color .15s ease, box-shadow .15s ease;
+[data-theme='dark'][data-mode="custom"] .min-h-screen {
+  background: linear-gradient(135deg, var(--cosmos-background) 0%, #1F2937 100%) !important;
 }
-pre:hover {
-  border-color: var(--cosmos-primary);
-  box-shadow: 0 0 0 2px var(--cosmos-primary-2);
-}
-pre > code { @apply whitespace-pre-wrap break-words; }
-/* thin accent‑coloured scrollbar */
-pre::-webkit-scrollbar { height: .5rem; }              
-pre::-webkit-scrollbar-thumb {                           
-  background: var(--cosmos-accent); border-radius: .25rem;
-}
-pre { scrollbar-width: thin; scrollbar-color: var(--cosmos-accent) transparent; }
 
-/* =========================================================
-   Utility helpers outside Tailwind’s scope
-   ========================================================= */
-html { scroll-behavior: smooth; }
-*:focus-visible { outline: 2px solid var(--cosmos-primary); outline-offset: 2px; border-radius: 4px; }
+/* Global Palm theme color overrides */
+.mintlify-primary {
+  color: var(--cosmos-primary) !important;
+}
 
-/* =========================================================
-   Component classes supplied via tailwind.config plugin
-   ========================================================= */
-/* ( .btn  .card  .callout ) already defined with @apply */
+.mintlify-accent {
+  color: var(--cosmos-accent) !important;
+}
+
+/* Link colors to match Cosmos brand */
+a {
+  color: var(--cosmos-primary);
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--cosmos-primary-light);
+}
+
+/* Button overrides for consistency */
+.mintlify-button-primary {
+  background: linear-gradient(135deg, var(--cosmos-primary), var(--cosmos-primary-light)) !important;
+  border: none !important;
+}
+
+.mintlify-button-secondary {
+  border: 2px solid var(--cosmos-primary) !important;
+  color: var(--cosmos-primary) !important;
+  background: transparent !important;
+}
+
+.mintlify-button-secondary:hover {
+  background: var(--cosmos-primary) !important;
+  color: white !important;
+}
+
+/* Code block styling to match Cosmos brand */
+pre {
+  background: var(--cosmos-surface) !important;
+  border: 1px solid var(--cosmos-border) !important;
+}
+
+[data-theme='dark'] pre {
+  background: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+/* Navigation tab styling */
+.mintlify-tab {
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.mintlify-tab.active {
+  border-bottom-color: var(--cosmos-accent) !important;
+  color: var(--cosmos-primary) !important;
+}
+
+/* Search bar styling */
+.mintlify-search {
+  border: 1px solid var(--cosmos-border) !important;
+  background: var(--cosmos-surface) !important;
+}
+
+.mintlify-search:focus {
+  border-color: var(--cosmos-primary) !important;
+  box-shadow: 0 0 0 3px rgba(75, 71, 202, 0.1) !important;
+}
+
+/* Sidebar styling for consistency */
+.mintlify-sidebar {
+  background: var(--cosmos-surface) !important;
+  border-right: 1px solid var(--cosmos-border) !important;
+}
+
+.mintlify-sidebar-item:hover {
+  background: rgba(75, 71, 202, 0.05) !important;
+  color: var(--cosmos-primary) !important;
+}
+
+.mintlify-sidebar-item.active {
+  background: rgba(75, 71, 202, 0.1) !important;
+  color: var(--cosmos-primary) !important;
+  border-right: 2px solid var(--cosmos-accent) !important;
+}
+
+/* Table styling */
+table {
+  border: 1px solid var(--cosmos-border) !important;
+}
+
+th {
+  background: rgba(75, 71, 202, 0.05) !important;
+  color: var(--cosmos-primary) !important;
+  border-bottom: 2px solid var(--cosmos-border) !important;
+}
+
+td {
+  border-bottom: 1px solid var(--cosmos-border) !important;
+}
+
+/* Card component styling */
+.mintlify-card {
+  border: 1px solid var(--cosmos-border) !important;
+  background: var(--cosmos-surface) !important;
+  transition: all 0.2s ease !important;
+}
+
+.mintlify-card:hover {
+  border-color: var(--cosmos-primary) !important;
+  box-shadow: 0 4px 12px rgba(75, 71, 202, 0.15) !important;
+}
+
+/* Alert/callout styling */
+.mintlify-callout {
+  border-left: 4px solid var(--cosmos-accent) !important;
+  background: rgba(34, 226, 168, 0.05) !important;
+}
+
+.mintlify-callout.warning {
+  border-left-color: #F59E0B !important;
+  background: rgba(245, 158, 11, 0.05) !important;
+}
+
+.mintlify-callout.error {
+  border-left-color: #EF4444 !important;
+  background: rgba(239, 68, 68, 0.05) !important;
+}
+
+/* Scroll behavior and focus styles */
+html {
+  scroll-behavior: smooth;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--cosmos-primary) !important;
+  outline-offset: 2px !important;
+  border-radius: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  [data-mode="custom"] .text-6xl {
+    font-size: 2.5rem !important;
+  }
+  
+  [data-mode="custom"] .grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Dark mode specific adjustments */
+[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+[data-theme='dark'] .mintlify-card {
+  background: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme='dark'] .mintlify-sidebar {
+  background: #111827 !important;
+  border-color: #374151 !important;
+}
+
+/* Ensure proper contrast in dark mode */
+[data-theme='dark'] .text-gray-600 {
+  color: #D1D5DB !important;
+}
+
+[data-theme='dark'] .text-blue-600 {
+  color: var(--cosmos-primary-light) !important;
+}

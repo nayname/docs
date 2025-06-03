@@ -1,0 +1,149 @@
+---
+title: "Cosmos API"
+description: "REST API reference for Cosmos SDK chains"
+---
+
+# Cosmos API Reference
+
+The Cosmos SDK provides a comprehensive REST API for interacting with blockchain data and submitting transactions.
+
+## Base URL
+
+```
+https://rest.cosmos.network
+```
+
+## Authentication
+
+Most endpoints require no authentication for read operations. Write operations require signed transactions.
+
+## Core Endpoints
+
+### Bank Module
+
+<Accordion title="GET /cosmos/bank/v1beta1/balances/{address}">
+Get account balances for a specific address.
+
+**Parameters:**
+- `address` (string): The account address
+
+**Response:**
+```json
+{
+  "balances": [
+    {
+      "denom": "uatom",
+      "amount": "1000000"
+    }
+  ],
+  "pagination": {
+    "next_key": null,
+    "total": "1"
+  }
+}
+```
+</Accordion>
+
+### Staking Module
+
+<Accordion title="GET /cosmos/staking/v1beta1/delegations/{delegator_addr}">
+Get delegations for a specific delegator.
+
+**Parameters:**
+- `delegator_addr` (string): The delegator address
+
+**Response:**
+```json
+{
+  "delegation_responses": [
+    {
+      "delegation": {
+        "delegator_address": "cosmos1...",
+        "validator_address": "cosmosvaloper1...",
+        "shares": "1000000.000000000000000000"
+      },
+      "balance": {
+        "denom": "uatom",
+        "amount": "1000000"
+      }
+    }
+  ]
+}
+```
+</Accordion>
+
+### Governance Module
+
+<Accordion title="GET /cosmos/gov/v1beta1/proposals">
+Get all governance proposals.
+
+**Query Parameters:**
+- `proposal_status` (optional): Filter by proposal status
+- `voter` (optional): Filter by voter address
+- `depositor` (optional): Filter by depositor address
+
+**Response:**
+```json
+{
+  "proposals": [
+    {
+      "proposal_id": "1",
+      "content": {
+        "@type": "/cosmos.gov.v1beta1.TextProposal",
+        "title": "Test Proposal",
+        "description": "A test governance proposal"
+      },
+      "status": "PROPOSAL_STATUS_VOTING_PERIOD",
+      "final_tally_result": {
+        "yes": "0",
+        "abstain": "0", 
+        "no": "0",
+        "no_with_veto": "0"
+      }
+    }
+  ]
+}
+```
+</Accordion>
+
+## Transaction Broadcasting
+
+### POST /cosmos/tx/v1beta1/txs
+
+Submit a signed transaction to the network.
+
+**Request Body:**
+```json
+{
+  "tx_bytes": "CowBCokB...",
+  "mode": "BROADCAST_MODE_SYNC"
+}
+```
+
+**Response:**
+```json
+{
+  "tx_response": {
+    "height": "12345",
+    "txhash": "A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3",
+    "code": 0,
+    "raw_log": "[{\"events\":[...]}]"
+  }
+}
+```
+
+## Error Handling
+
+All API endpoints return errors in the following format:
+
+```json
+{
+  "code": 3,
+  "message": "account not found",
+  "details": []
+}
+```
+
+## Rate Limiting
+
+Public endpoints are rate limited to 100 requests per minute per IP address.

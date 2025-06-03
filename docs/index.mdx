@@ -1,75 +1,107 @@
 ---
+title: "Cosmos Documentation"
+description: "Build the future of interoperable blockchains with Cosmos"
 mode: "custom"
 ---
 
-import { Cards } from '../snippets/Cards'
+<div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 py-16 px-4">
+  <div className="max-w-6xl mx-auto">
+    
+    <div className="text-center mb-16">
+      <div className="flex justify-center mb-8">
+        <img 
+          src="/assets/brand/cosmos.svg" 
+          alt="Cosmos Logo" 
+          className="w-24 h-24 block dark:hidden"
+        />
+        <img 
+          src="/assets/brand/cosmos-dark.svg" 
+          alt="Cosmos Logo" 
+          className="w-24 h-24 hidden dark:block"
+        />
+      </div>
+      
+      <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-green-500 bg-clip-text text-transparent">
+        Build on Cosmos
+      </h1>
+      <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+        The complete toolkit for building interoperable blockchain applications with EVM compatibility, native IBC support, and the power and flexibility of the Cosmos SDK.
+      </p>
+      <div className="flex gap-4 justify-center flex-wrap">
+        <a href="/docs/evm/index" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
+          Get Started
+        </a>
+        <a href="/docs/api-reference/cosmos/api" className="border-2 border-blue-600 text-blue-600 dark:border-purple-400 dark:text-purple-400 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 dark:hover:bg-slate-800 transition-all">
+          API Reference
+        </a>
+      </div>
+    </div>
 
-{/* Custom top-right links bar */}
-<div className="absolute top-6 right-8 flex gap-6 z-50">
-  <a href="/network-info" className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:underline">Network Info</a>
-  <a href="/status" className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:underline">Status</a>
-  <a href="/blog" className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:underline">Blog</a>
-  <a href="/about" className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:underline">About</a>
-</div>
+    <div className="grid md:grid-cols-3 gap-8 mb-16">
+      <a href="/docs/evm/index" className="border-none shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm hover:shadow-xl transition-all p-6 rounded-xl cursor-pointer block">
+        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </div>
+        <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-3">EVM Compatibility</h3>
+        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+          Deploy Solidity contracts with full EVM compatibility while benefiting from Cosmos' parallel transaction processing and rich interoperability.
+        </p>
+      </a>
 
-<div className="relative flex flex-col items-center justify-center py-16 md:py-24 min-h-screen">
-  {/* Hero/Header */}
-  <div className="w-full max-w-4xl text-center mb-16">
-    <h1 className="text-5xl md:text-6xl font-bold text-gradient mb-6">Cosmos Documentation Hub</h1>
-    <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-6">
-      Build the future of interoperable blockchains with Cosmos. Explore our products, APIs, and guides to get started.
-    </p>
-    <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-6">
-      <a href="/docs/evm/quickstart" className="btn">Get Started</a>
-      <a href="https://discord.gg/cosmosnetwork" target="_blank" rel="noopener noreferrer" className="btn border border-[#6976af] bg-transparent text-[#6976af] dark:text-[#8791bf] hover:bg-[#6976af] hover:text-white">Join Discord</a>
+      <a href="/docs/ibc/index" className="border-none shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm hover:shadow-xl transition-all p-6 rounded-xl cursor-pointer block">
+        <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-green-500 rounded-xl flex items-center justify-center mb-4">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-3">IBC Protocol</h3>
+        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+          Connect your blockchain to dozens of ecosystems and enable secure cross-chain messaging and token transfers.
+        </p>
+      </a>
+
+      <a href="/docs/sdk/index" className="border-none shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm hover:shadow-xl transition-all p-6 rounded-xl cursor-pointer block">
+        <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+            <path d="M18 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2z"/>
+            <path d="M15 2v4M9 2v4M15 18v4M9 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>
+          </svg>
+        </div>
+        <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-3">Modular Architecture</h3>
+        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+          Build exactly what you need with the Cosmos SDK's flexible, composable design. Add or remove functionality without compromising security or performance.
+        </p>
+      </a>
+    </div>
+
+    <div className="text-center">
+      <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        Connect with the Community
+      </h2>
+      <div className="flex gap-6 justify-center flex-wrap">
+        <a href="https://github.com/cosmos" target="_blank" rel="noopener noreferrer" className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+          </svg>
+        </a>
+        <a href="https://twitter.com/cosmos" target="_blank" rel="noopener noreferrer" className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.054 10.054 0 01-3.127 1.184 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+          </svg>
+        </a>
+        <a href="https://discord.gg/cosmosnetwork" target="_blank" rel="noopener noreferrer" className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/>
+          </svg>
+        </a>
+        <a href="https://cosmos.network" target="_blank" rel="noopener noreferrer" className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
+          </svg>
+        </a>
+      </div>
     </div>
   </div>
-  {/* Cards Grid */}
-  <div className="w-full max-w-7xl">
-    <Cards />
-  </div>
-  {/* Bottom Left Info Box (absolute on desktop, below on mobile) */}
-  <div className="absolute left-0 bottom-0 m-6 hidden md:block">
-    <div className="callout">
-      <strong>Network Info:</strong> <br />
-      <a href="https://cosmos.network" className="underline text-[#6976af]">cosmos.network</a> <br />
-      <a href="https://forum.cosmos.network" className="underline text-[#6976af]">Forum</a> | <a href="https://discord.gg/cosmosnetwork" className="underline text-[#6976af]">Discord</a>
-    </div>
-  </div>
 </div>
-
-# Cosmos Documentation Hub
-
-<Warning>
-🚧 Work in progress
-
-These docs are under active construction. New content will exclusively live here, and existing content will be migrated in order to better serve all developers within the ecosystem.
-</Warning>
-
-Welcome to the Cosmos knowledge base. This hub is the single entry point and source of truth to every major component of the Cosmos stack.
-
-— Join our [Discord](https://discord.gg/cosmosnetwork) to be notified when new pages land.
-- To make suggestions, or request fixes or changes please [open an issue](https://github.com/cosmos/docs/issues/new) or [submit a PR](https://github.com/cosmos/docs/compare) with your contributions.
-
-> **Looking for the Cosmos SDK?** Jump directly to the [Cosmos SDK landing page](./sdk/).
-
-## Core concepts
-
-- **[Cosmos SDK](./sdk/)** – Build sovereign, application-specific blockchains in Go with a modular architecture.
-- **[Cosmos EVM](./evm/)** – Deploy Solidity smart contracts that inter-operate natively with Cosmos.
-- **[IBC Protocol](./ibc/)** – Secure, trust-minimised cross-chain communication.
-
-## Quick‑start guides *(more coming soon)*
-
-* [Deploy your first smart contract](./evm/quickstart)
-* [Build a Cosmos app](./sdk/quickstart)
-* [Set up an IBC connection](./ibc/quickstart)
-* [Explore the ecosystem](./ecosystem)
-
-## Community & support
-
-* **Discord** – `https://discord.gg/cosmosnetwork`
-* **Forum** – `https://forum.cosmos.network`
-* **Twitter** – `https://twitter.com/cosmos`
-* **Blog** – `https://blog.cosmos.network`
-

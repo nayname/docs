@@ -4,80 +4,128 @@ const config = {
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './docs/**/*.{js,ts,jsx,tsx,mdx}',
+    './snippets/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   darkMode: 'class',
   theme: {
-    container: { center: true, padding: '1rem' },
+    container: { 
+      center: true, 
+      padding: '1rem' 
+    },
     extend: {
       colors: {
         cosmos: {
-          50:  '#f8f9fa',
-          100: '#f1f3f4',
-          200: '#e8eaed',
-          300: '#dadce0',
-          400: '#bdc1c6',
-          500: '#9aa0a6',
-          600: '#80868b',
-          700: '#5f6368',
-          800: '#3c4043',
-          900: '#202124',
+          50:  '#F8F9FF',
+          100: '#F1F3FF', 
+          200: '#E8EAFF',
+          300: '#D4D8FF',
+          400: '#A8AFFF',
+          500: '#7552FF',
+          600: '#4B47CA',
+          700: '#3D3BA3',
+          800: '#2F2D7C',
+          900: '#212055',
         },
         primary: {
-          DEFAULT: '#6976af',   // main cosmos blue
-          dark:    '#4a5a8c',
-          light:   '#8b9ad1',
+          DEFAULT: '#4B47CA',
+          light:   '#7552FF',
+          dark:    '#3D3BA3',
         },
-        accent:   '#545e8c',
+        accent: {
+          DEFAULT: '#22E2A8',
+          light:   '#4AE8B8',
+          dark:    '#1BC799',
+        },
+        mint: {
+          DEFAULT: '#22E2A8',
+          50:  '#F0FDF9',
+          100: '#DCFDF1',
+          200: '#BBF9E3',
+          300: '#86F0CC',
+          400: '#4AE8B8',
+          500: '#22E2A8',
+          600: '#1BC799',
+          700: '#189C7F',
+          800: '#187D67',
+          900: '#176756',
+        },
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
         soft: '0 1px 2px rgba(0,0,0,.04), 0 2px 4px rgba(0,0,0,.06)',
-        glow: '0 0 15px rgba(105,118,175,.35)',
+        glow: '0 0 15px rgba(75,71,202,.25)',
+        'glow-mint': '0 0 15px rgba(34,226,168,.25)',
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: 0 },
-          '100%': { opacity: 1 },
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideIn: {
+          '0%': { opacity: '0', transform: 'translateX(-10px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        scaleIn: {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
         },
       },
       animation: {
-        'fade-in': 'fadeIn .4s ease-in forwards',
+        'fade-in': 'fadeIn 0.4s ease-out forwards',
+        'slide-in': 'slideIn 0.3s ease-out forwards',
+        'scale-in': 'scaleIn 0.2s ease-out forwards',
+      },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '100': '25rem',
+        '112': '28rem',
+        '128': '32rem',
+      },
+      borderRadius: {
+        '4xl': '2rem',
+      },
+      backdropBlur: {
+        xs: '2px',
       },
     },
   },
   plugins: [
     require('@tailwindcss/typography'),
-    // minimal helper classes
-    function ({ addUtilities, addComponents }) {
-      addUtilities({
+    function({ addUtilities }) {
+      const newUtilities = {
         '.text-gradient': {
-          background: 'linear-gradient(135deg,#6976af 0%,#8791bf 100%)',
+          'background': 'linear-gradient(135deg, #4B47CA 0%, #7552FF 50%, #22E2A8 100%)',
           '-webkit-background-clip': 'text',
           '-webkit-text-fill-color': 'transparent',
           'background-clip': 'text',
         },
-      });
-
-      addComponents({
-        '.btn': {
-          '@apply inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white shadow-soft transition': {},
-          background: 'linear-gradient(135deg,#6976af 0%,#8791bf 100%)',
-          '&:hover': { boxShadow: '0 4px 12px rgba(105,118,175,.35)' },
+        '.bg-gradient-cosmos': {
+          'background': 'linear-gradient(135deg, #4B47CA 0%, #7552FF 50%, #22E2A8 100%)',
         },
-        '.card': {
-          '@apply rounded-lg border border-cosmos-200 dark:border-cosmos-700 bg-white dark:bg-cosmos-800 shadow-soft transition': {},
-          '&:hover': { boxShadow: '0 8px 20px rgba(0,0,0,.08)' },
+        '.border-gradient': {
+          'border': '1px solid transparent',
+          'background-image': 'linear-gradient(white, white), linear-gradient(135deg, #4B47CA, #22E2A8)',
+          'background-origin': 'border-box',
+          'background-clip': 'content-box, border-box',
         },
-        '.callout': {
-          '@apply border-l-4 px-4 py-3 my-6 rounded-md bg-cosmos-50 dark:bg-cosmos-800/40': {},
-          borderLeftColor: '#6976af',
+        '.glass': {
+          'background': 'rgba(255, 255, 255, 0.1)',
+          'backdrop-filter': 'blur(10px)',
+          'border': '1px solid rgba(255, 255, 255, 0.2)',
         },
-      });
-    },
+        '.dark .glass': {
+          'background': 'rgba(0, 0, 0, 0.1)',
+          'border': '1px solid rgba(255, 255, 255, 0.1)',
+        },
+      };
+      addUtilities(newUtilities);
+    }
   ],
-}
+};
 
-export default config
+export default config;
