@@ -4,9 +4,14 @@
   "description": "Build the future of interoperable blockchains with Cosmos",
   "theme": "palm",
   "colors": {
-    "primary": "#2D4CC8",
-    "light": "#4B47CA", 
+    "primary": "#4B47CA",
+    "light": "#7552FF", 
     "dark": "#22E2A8"
+  },
+  "styling": {
+    "icons": {
+      "library": "lucide"
+    }
   },
   "codeBlock": {
     "mode": "auto"
@@ -24,10 +29,10 @@
     "name": "Get Started",
     "url": "/docs/evm/index"
   },
-  "favicon": "/assets/brand/cosmos.png",
+  "favicon": "/assets/cosmos.png",
   "logo": {
-    "light": "/assets/brand/cosmos-wordmark.png",
-    "dark": "/assets/brand/cosmos-wordmark-dark.png",
+    "light": "/assets/cosmos-wordmark.png",
+    "dark": "/assets/cosmos-wordmark-dark.png",
     "href": "https://cosmos.network"
   },
   "navigation": {
@@ -36,7 +41,7 @@
         "tab": "Overview",
         "groups": [
           {
-            "group": "Getting Started",
+            "group": "Home",
             "pages": ["docs/index"]
           }
         ]
@@ -46,6 +51,7 @@
         "groups": [
           {
             "group": "EVM Development",
+            "icon": "ethereum",
             "pages": [
               "docs/evm/index",
               "docs/evm/quickstart",
@@ -59,6 +65,7 @@
         "groups": [
           {
             "group": "Cosmos SDK",
+            "icon": "cosmos",
             "pages": ["docs/sdk/index"]
           }
         ]
@@ -68,6 +75,7 @@
         "groups": [
           {
             "group": "IBC Protocol",
+            "icon": "globe",
             "pages": ["docs/ibc/index"]
           }
         ]
@@ -77,6 +85,7 @@
         "groups": [
           {
             "group": "Cosmos API",
+            "icon": "code",
             "pages": [
               "docs/api-reference/cosmos/api",
               "docs/api-reference/cosmos/cli"

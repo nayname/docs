@@ -4,17 +4,15 @@ description: "Build the future of interoperable blockchains with Cosmos"
 mode: "custom"
 ---
 
+import { CosmosIcon, EthereumIcon, IBCIcon, SDKIcon, APIIcon, IconWrapper } from '/snippets/icons.mdx'
+
 <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-16 px-4">
   <div className="max-w-6xl mx-auto">
     
     <div className="text-center mb-16">
       <div className="flex justify-center mb-8">
         <div className="p-4 rounded-2xl bg-white/70 dark:bg-slate-800/70 shadow-lg backdrop-blur-sm">
-          <img 
-            src="/assets/brand/atom.png" 
-            alt="Cosmos Atom Logo" 
-            className="w-16 h-16"
-          />
+          <CosmosIcon size={64} color="#4B47CA" />
         </div>
       </div>
       
@@ -43,7 +41,7 @@ mode: "custom"
       <div className="group relative border-none shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm hover:shadow-xl hover:shadow-indigo-500/10 dark:hover:shadow-emerald-500/10 transition-all duration-300 p-8 rounded-2xl border border-slate-200/50 dark:border-slate-700/50">
         <a href="/docs/evm/index" className="block">
           <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-            <span className="text-2xl text-white">⚡</span>
+            <EthereumIcon size={28} color="white" />
           </div>
           <h3 className="text-xl font-semibold text-indigo-700 dark:text-indigo-300 mb-4">EVM Compatibility</h3>
           <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
@@ -68,7 +66,7 @@ mode: "custom"
       <div className="group relative border-none shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm hover:shadow-xl hover:shadow-purple-500/10 dark:hover:shadow-emerald-500/10 transition-all duration-300 p-8 rounded-2xl border border-slate-200/50 dark:border-slate-700/50">
         <a href="/docs/ibc/index" className="block">
           <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-            <span className="text-2xl text-white">🌐</span>
+            <IBCIcon size={28} color="white" />
           </div>
           <h3 className="text-xl font-semibold text-purple-700 dark:text-purple-300 mb-4">IBC Protocol</h3>
           <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
@@ -93,7 +91,7 @@ mode: "custom"
       <div className="group relative border-none shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm hover:shadow-xl hover:shadow-emerald-500/10 dark:hover:shadow-emerald-500/10 transition-all duration-300 p-8 rounded-2xl border border-slate-200/50 dark:border-slate-700/50">
         <a href="/docs/sdk/index" className="block">
           <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-            <img src="/assets/brand/atom.png" alt="Cosmos Atom" className="w-8 h-8" />
+            <SDKIcon size={28} color="white" />
           </div>
           <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4">Cosmos SDK</h3>
           <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">

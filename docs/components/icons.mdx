@@ -1,0 +1,160 @@
+---
+title: "Custom Icon Library"
+description: "Reusable SVG icons and components for the Cosmos documentation"
+---
+
+import { CosmosIcon, EthereumIcon, IBCIcon, SDKIcon, APIIcon, IconWrapper } from '/snippets/icons.mdx'
+
+# Custom Icon Library
+
+This page demonstrates the custom icon components available throughout the documentation. These icons are designed to be scalable, themeable, and consistent with the Cosmos brand.
+
+## Available Icons
+
+### Cosmos Icon
+The official Cosmos atom logo, perfect for representing Cosmos SDK and core functionality.
+
+<div className="flex items-center gap-4 p-6 bg-slate-50 dark:bg-slate-900 rounded-lg mb-6">
+  <CosmosIcon size={32} color="#4B47CA" />
+  <CosmosIcon size={48} color="#7552FF" />
+  <CosmosIcon size={64} color="#22E2A8" />
+</div>
+
+```jsx
+import { CosmosIcon } from '/snippets/icons.mdx'
+
+<CosmosIcon size={32} color="#4B47CA" />
+```
+
+### Ethereum Icon
+Represents EVM compatibility and Ethereum-related features.
+
+<div className="flex items-center gap-4 p-6 bg-slate-50 dark:bg-slate-900 rounded-lg mb-6">
+  <EthereumIcon size={32} />
+  <EthereumIcon size={48} color="#627EEA" />
+  <EthereumIcon size={64} color="#2D4CC8" />
+</div>
+
+```jsx
+import { EthereumIcon } from '/snippets/icons.mdx'
+
+<EthereumIcon size={48} color="#627EEA" />
+```
+
+### IBC Icon
+Represents Inter-Blockchain Communication and cross-chain functionality.
+
+<div className="flex items-center gap-4 p-6 bg-slate-50 dark:bg-slate-900 rounded-lg mb-6">
+  <IBCIcon size={32} />
+  <IBCIcon size={48} color="#22E2A8" />
+  <IBCIcon size={64} color="#1BC799" />
+</div>
+
+```jsx
+import { IBCIcon } from '/snippets/icons.mdx'
+
+<IBCIcon size={48} color="#22E2A8" />
+```
+
+### SDK Icon
+Represents Cosmos SDK modules and development tools.
+
+<div className="flex items-center gap-4 p-6 bg-slate-50 dark:bg-slate-900 rounded-lg mb-6">
+  <SDKIcon size={32} />
+  <SDKIcon size={48} color="#7552FF" />
+  <SDKIcon size={64} color="#4B47CA" />
+</div>
+
+```jsx
+import { SDKIcon } from '/snippets/icons.mdx'
+
+<SDKIcon size={48} color="#7552FF" />
+```
+
+### API Icon
+Represents API endpoints and developer tools.
+
+<div className="flex items-center gap-4 p-6 bg-slate-50 dark:bg-slate-900 rounded-lg mb-6">
+  <APIIcon size={32} />
+  <APIIcon size={48} color="#FF5628" />
+  <APIIcon size={64} color="#E14D28" />
+</div>
+
+```jsx
+import { APIIcon } from '/snippets/icons.mdx'
+
+<APIIcon size={48} color="#FF5628" />
+```
+
+## Icon Wrapper
+
+The `IconWrapper` component provides a consistent background and hover effects for icons.
+
+<div className="flex items-center gap-4 p-6 bg-slate-50 dark:bg-slate-900 rounded-lg mb-6">
+  <IconWrapper color="#4B47CA" size="sm">
+    <CosmosIcon size={16} color="white" />
+  </IconWrapper>
+  
+  <IconWrapper color="#627EEA" size="md" gradient>
+    <EthereumIcon size={20} color="white" />
+  </IconWrapper>
+  
+  <IconWrapper color="#22E2A8" size="lg">
+    <IBCIcon size={24} color="white" />
+  </IconWrapper>
+  
+  <IconWrapper color="#7552FF" size="xl" gradient>
+    <SDKIcon size={28} color="white" />
+  </IconWrapper>
+</div>
+
+```jsx
+import { IconWrapper, CosmosIcon } from '/snippets/icons.mdx'
+
+<IconWrapper color="#4B47CA" size="md" gradient>
+  <CosmosIcon size={20} color="white" />
+</IconWrapper>
+```
+
+## Props Reference
+
+### Icon Components
+
+All icon components accept these props:
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `size` | `number` | `24` | Size in pixels |
+| `color` | `string` | `"currentColor"` | Icon color (hex, rgb, or CSS color) |
+| `className` | `string` | `""` | Additional CSS classes |
+
+### IconWrapper Component
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | - | Icon component to wrap |
+| `color` | `string` | `"#4B47CA"` | Background color |
+| `size` | `"sm" | "md" | "lg" | "xl"` | Wrapper size |
+| `gradient` | `boolean` | `false` | Enable gradient background |
+
+## Color Palette
+
+Use these Cosmos brand colors for consistency:
+
+- **Primary**: `#4B47CA` (Cosmos Deep Blue)
+- **Light**: `#7552FF` (Cosmos Purple)  
+- **Accent**: `#22E2A8` (Cosmos Mint Green)
+- **Ethereum**: `#627EEA` (Ethereum Blue)
+- **API**: `#FF5628` (Orange Red)
+
+## Usage in Documentation
+
+These icons are used throughout the documentation site, including:
+
+- Homepage feature cards
+- Navigation menu icons  
+- Section headers
+- Quick reference guides
+- Interactive examples
+
+The icons are designed to be accessible, scalable, and maintain visual consistency across different themes and screen sizes. 
