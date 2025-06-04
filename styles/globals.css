@@ -58,18 +58,6 @@
   box-shadow: 0 2px 8px rgba(75, 71, 202, 0.3);
 }
 
-/* Sidebar section headers */
-[data-theme='light'] #sidebar .sidebar-section-title {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--cosmos-deep-purple);
-  margin: 1.5rem 1rem 0.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(117, 34, 181, 0.2);
-}
-
 /* Sidebar links general styling */
 [data-theme='light'] #sidebar a {
   text-decoration: none;
