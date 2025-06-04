@@ -2,514 +2,208 @@
 @tailwind components;  
 @tailwind utilities;
 
-/* Cosmos Design System Color Variables */
+/* Official Cosmos Brand Colors */
 :root {
-  --cosmos-primary: #4B47CA;
-  --cosmos-primary-light: #7552FF;
-  --cosmos-accent: #22E2A8;
-  --cosmos-background: #FAFBFC;
-  --cosmos-surface: #FFFFFF;
-  --cosmos-border: #E5E7EB;
-  --cosmos-text: #111827;
-  --cosmos-text-muted: #6B7280;
+  --cosmos-deep-blue: #4B47CA;
+  --cosmos-mint: #22E2A8;
+  --cosmos-cobalt: #4251FA;
+  --cosmos-deep-purple: #7522B5;
+  --cosmos-orange: #FF5628;
+  --cosmos-pink: #E64F8F;
+  --cosmos-cyan: #40B3FF;
 }
 
-[data-theme='dark'] {
-  --cosmos-background: #0D0E11;
-  --cosmos-surface: #1F2937;
-  --cosmos-border: #374151;
-  --cosmos-text: #F9FAFB;
-  --cosmos-text-muted: #D1D5DB;
+/* Light Mode Enhancements - Soften the harsh white backgrounds */
+[data-theme='light'] {
+  /* Main background with subtle gradient */
+  --background: linear-gradient(135deg, #fefefe 0%, #f8fafc 25%, #f1f5f9 100%);
+  --sidebar-background: linear-gradient(to bottom, #fcfcfd, #f8fafc);
+  --content-background: rgba(255, 255, 255, 0.85);
 }
 
-/* Custom Landing Page Overrides for Palm Theme */
-[data-mode="custom"] {
-  /* Override default palm theme for custom landing page */
-  background: var(--cosmos-background) !important;
-  color: var(--cosmos-text) !important;
+/* Main page background enhancement */
+[data-theme='light'] body {
+  background: linear-gradient(135deg, #fefefe 0%, #f8fafc 25%, #f1f5f9 100%);
 }
 
-[data-mode="custom"] .min-h-screen {
-  background: linear-gradient(135deg, var(--cosmos-background) 0%, #F3F4F6 100%) !important;
+/* Sidebar enhancements */
+[data-theme='light'] #sidebar {
+  background: linear-gradient(to bottom, #fcfcfd, #f8fafc);
+  border-right: 1px solid #e2e8f0;
+  backdrop-filter: blur(10px);
 }
 
-[data-theme='dark'][data-mode="custom"] .min-h-screen {
-  background: linear-gradient(135deg, var(--cosmos-background) 0%, #1F2937 100%) !important;
+/* Content area softer background */
+[data-theme='light'] #content-area {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
 }
 
-/* Global Palm theme color overrides */
-.mintlify-primary {
-  color: var(--cosmos-primary) !important;
+/* Cards and components with subtle accents */
+[data-theme='light'] .mintlify-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
 }
 
-.mintlify-accent {
-  color: var(--cosmos-accent) !important;
+/* Navigation with cyan gradient */
+[data-theme='light'] #navbar {
+  background: linear-gradient(135deg, var(--cosmos-cyan) 0%, var(--cosmos-mint) 50%, rgba(64, 179, 255, 0.8) 100%);
+  border-bottom: 1px solid rgba(64, 179, 255, 0.3);
+  backdrop-filter: blur(15px);
+  color: white;
 }
 
-/* Link colors to match Cosmos brand */
-a {
-  color: var(--cosmos-primary);
+/* Header text color */
+[data-theme='light'] #navbar * {
+  color: white !important;
+}
+
+/* Code blocks - softer appearance */
+[data-theme='light'] pre {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  border: 1px solid rgba(117, 82, 255, 0.15) !important;
+  box-shadow: 0 2px 4px rgba(75, 71, 202, 0.08);
+}
+
+/* Inline code with purple accent */
+[data-theme='light'] code:not(pre code) {
+  background: linear-gradient(135deg, rgba(117, 34, 181, 0.08), rgba(75, 71, 202, 0.05)) !important;
+  color: var(--cosmos-deep-purple) !important;
+  border: 1px solid rgba(117, 34, 181, 0.2) !important;
+}
+
+/* Table of contents accent */
+[data-theme='light'] #table-of-contents {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9));
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  backdrop-filter: blur(10px);
+}
+
+/* Links with better visibility */
+[data-theme='light'] a {
+  color: var(--cosmos-deep-blue);
   transition: color 0.2s ease;
 }
 
-a:hover {
-  color: var(--cosmos-primary-light);
+[data-theme='light'] a:hover {
+  color: var(--cosmos-deep-purple);
 }
 
-/* Button overrides for consistency */
-.mintlify-button-primary {
-  background: linear-gradient(135deg, var(--cosmos-primary), var(--cosmos-primary-light)) !important;
-  border: none !important;
+/* Light/secondary buttons with orange border */
+[data-theme='light'] button:not(.primary):not(.solid),
+[data-theme='light'] .btn:not(.primary):not(.solid),
+[data-theme='light'] .button-secondary {
+  background: transparent;
+  border: 2px solid var(--cosmos-orange);
+  color: var(--cosmos-orange);
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
-.mintlify-button-secondary {
-  border: 2px solid var(--cosmos-primary) !important;
-  color: var(--cosmos-primary) !important;
-  background: transparent !important;
+[data-theme='light'] button:not(.primary):not(.solid):hover,
+[data-theme='light'] .btn:not(.primary):not(.solid):hover,
+[data-theme='light'] .button-secondary:hover {
+  background: var(--cosmos-orange);
+  color: white;
+  transform: translateY(-1px);
 }
 
-.mintlify-button-secondary:hover {
-  background: var(--cosmos-primary) !important;
-  color: white !important;
+/* Solid darker buttons with orange text/icons */
+[data-theme='light'] button.primary,
+[data-theme='light'] button.solid,
+[data-theme='light'] .btn-primary,
+[data-theme='light'] .btn-solid,
+[data-theme='light'] #topbar-cta-button {
+  background: var(--cosmos-deep-blue);
+  border: none;
+  color: var(--cosmos-orange) !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.3);
+  transition: all 0.2s ease;
 }
 
-/* Code block styling to match Cosmos brand */
-pre {
-  background: var(--cosmos-surface) !important;
-  border: 1px solid var(--cosmos-border) !important;
+[data-theme='light'] button.primary:hover,
+[data-theme='light'] button.solid:hover,
+[data-theme='light'] .btn-primary:hover,
+[data-theme='light'] .btn-solid:hover,
+[data-theme='light'] #topbar-cta-button:hover {
+  background: var(--cosmos-deep-purple);
+  color: var(--cosmos-orange) !important;
+  box-shadow: 0 4px 12px rgba(117, 34, 181, 0.4);
+  transform: translateY(-1px);
 }
 
-[data-theme='dark'] pre {
-  background: #1F2937 !important;
-  border-color: #374151 !important;
+/* Search box enhancement */
+[data-theme='light'] input[type="search"] {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(117, 82, 255, 0.2);
+  backdrop-filter: blur(10px);
 }
 
-/* Navigation tab styling */
-.mintlify-tab {
-  border-bottom: 2px solid transparent;
-  transition: border-color 0.2s ease;
-}
-
-.mintlify-tab.active {
-  border-bottom-color: var(--cosmos-accent) !important;
-  color: var(--cosmos-primary) !important;
-}
-
-/* Search bar styling */
-.mintlify-search {
-  border: 1px solid var(--cosmos-border) !important;
-  background: var(--cosmos-surface) !important;
-}
-
-.mintlify-search:focus {
-  border-color: var(--cosmos-primary) !important;
-  box-shadow: 0 0 0 3px rgba(75, 71, 202, 0.1) !important;
-}
-
-/* Sidebar styling for consistency */
-.mintlify-sidebar {
-  background: var(--cosmos-surface) !important;
-  border-right: 1px solid var(--cosmos-border) !important;
-}
-
-.mintlify-sidebar-item:hover {
-  background: rgba(75, 71, 202, 0.05) !important;
-  color: var(--cosmos-primary) !important;
-}
-
-.mintlify-sidebar-item.active {
-  background: rgba(75, 71, 202, 0.1) !important;
-  color: var(--cosmos-primary) !important;
-  border-right: 2px solid var(--cosmos-accent) !important;
-}
-
-/* Table styling */
-table {
-  border: 1px solid var(--cosmos-border) !important;
-}
-
-th {
-  background: rgba(75, 71, 202, 0.05) !important;
-  color: var(--cosmos-primary) !important;
-  border-bottom: 2px solid var(--cosmos-border) !important;
-}
-
-td {
-  border-bottom: 1px solid var(--cosmos-border) !important;
-}
-
-/* Card component styling */
-.mintlify-card {
-  border: 1px solid var(--cosmos-border) !important;
-  background: var(--cosmos-surface) !important;
-  transition: all 0.2s ease !important;
-}
-
-.mintlify-card:hover {
-  border-color: var(--cosmos-primary) !important;
-  box-shadow: 0 4px 12px rgba(75, 71, 202, 0.15) !important;
-}
-
-/* Alert/callout styling */
-.mintlify-callout {
-  border-left: 4px solid var(--cosmos-accent) !important;
-  background: rgba(34, 226, 168, 0.05) !important;
-}
-
-.mintlify-callout.warning {
-  border-left-color: #F59E0B !important;
-  background: rgba(245, 158, 11, 0.05) !important;
-}
-
-.mintlify-callout.error {
-  border-left-color: #EF4444 !important;
-  background: rgba(239, 68, 68, 0.05) !important;
-}
-
-/* Scroll behavior and focus styles */
-html {
-  scroll-behavior: smooth;
-}
-
-*:focus-visible {
-  outline: 2px solid var(--cosmos-primary) !important;
-  outline-offset: 2px !important;
-  border-radius: 4px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  [data-mode="custom"] .text-6xl {
-    font-size: 2.5rem !important;
-  }
-  
-  [data-mode="custom"] .grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* Dark mode specific adjustments */
-[data-theme='dark'] {
-  color-scheme: dark;
-}
-
-[data-theme='dark'] .mintlify-card {
-  background: #1F2937 !important;
-  border-color: #374151 !important;
-}
-
-[data-theme='dark'] .mintlify-sidebar {
-  background: #111827 !important;
-  border-color: #374151 !important;
-}
-
-/* Ensure proper contrast in dark mode */
-[data-theme='dark'] .text-gray-600 {
-  color: #D1D5DB !important;
-}
-
-[data-theme='dark'] .text-blue-600 {
-  color: var(--cosmos-primary-light) !important;
-}
-
-/* Enhanced Mintlify Theme Customizations */
-
-/* Root Variables for Consistent Theming */
-:root {
-  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  --secondary-gradient: linear-gradient(135deg, #8b5cf6 0%, #10b981 100%);
-  --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-  --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-heavy: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-/* Light Mode Improvements */
-[data-theme="light"] {
-  --background-primary: #fafafa;
-  --background-secondary: #f8fafc;
-  --background-tertiary: #ffffff;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --border-light: #e2e8f0;
-  --accent-color: rgba(99, 102, 241, 0.1);
-}
-
-/* Dark Mode Improvements */
-[data-theme="dark"] {
-  --background-primary: #0f172a;
-  --background-secondary: #1e293b;
-  --background-tertiary: #334155;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --border-light: #334155;
-  --accent-color: rgba(16, 185, 129, 0.1);
-}
-
-/* Code Block Styling */
-pre {
-  background: var(--background-secondary) !important;
-  border: 1px solid var(--border-light) !important;
-  border-radius: 12px !important;
-  padding: 1.5rem !important;
-  margin: 1.5rem 0 !important;
-  overflow-x: auto !important;
-  box-shadow: var(--shadow-light) !important;
+/* Active tab indicator */
+[data-theme='light'] .tab-active,
+[data-theme='light'] .active-tab,
+[data-theme='light'] [aria-selected="true"],
+[data-theme='light'] .mintlify-tab[data-state="active"] {
   position: relative;
 }
 
-code {
-  background: var(--background-secondary) !important;
-  color: var(--text-primary) !important;
-  border-radius: 6px !important;
-  padding: 0.25rem 0.5rem !important;
-  font-size: 0.875rem !important;
-  font-family: 'Fira Code', 'Monaco', 'Consolas', monospace !important;
-  border: 1px solid var(--border-light) !important;
+[data-theme='light'] .tab-active::after,
+[data-theme='light'] .active-tab::after,
+[data-theme='light'] [aria-selected="true"]::after,
+[data-theme='light'] .mintlify-tab[data-state="active"]::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cosmos-orange) 0%, #ff6b3d 50%, #ff8562 100%);
+  border-radius: 2px 2px 0 0;
+  animation: slideIn 0.3s ease-out;
 }
 
-/* Inline code styling */
-p code, li code, td code {
-  background: var(--accent-color) !important;
-  border: 1px solid var(--border-light) !important;
-  padding: 0.125rem 0.375rem !important;
-  border-radius: 4px !important;
-  font-size: 0.85em !important;
-}
-
-/* Syntax highlighting improvements */
-.token.comment,
-.token.prolog,
-.token.doctype,
-.token.cdata {
-  color: #64748b !important;
-  font-style: italic;
-}
-
-.token.property,
-.token.tag,
-.token.boolean,
-.token.number,
-.token.constant,
-.token.symbol,
-.token.deleted {
-  color: #ef4444 !important;
-}
-
-.token.selector,
-.token.attr-name,
-.token.string,
-.token.char,
-.token.builtin,
-.token.inserted {
-  color: #10b981 !important;
-}
-
-.token.operator,
-.token.entity,
-.token.url,
-.language-css .token.string,
-.style .token.string {
-  color: #06b6d4 !important;
-}
-
-.token.atrule,
-.token.attr-value,
-.token.keyword {
-  color: #8b5cf6 !important;
-  font-weight: 600;
-}
-
-.token.function,
-.token.class-name {
-  color: #f59e0b !important;
-  font-weight: 600;
-}
-
-.token.regex,
-.token.important,
-.token.variable {
-  color: #6366f1 !important;
-}
-
-/* Enhanced Button Styling */
-button, .button, a[class*="button"] {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  border-radius: 8px !important;
-}
-
-button:hover, .button:hover, a[class*="button"]:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: var(--shadow-medium) !important;
-}
-
-/* Primary buttons with gradient */
-.button-primary, button[class*="primary"] {
-  background: var(--primary-gradient) !important;
-  border: none !important;
-  color: white !important;
-}
-
-.button-primary:hover, button[class*="primary"]:hover {
-  background: linear-gradient(135deg, #5855eb 0%, #7c3aed 100%) !important;
-  box-shadow: var(--shadow-heavy) !important;
-}
-
-/* Card and Section Enhancements */
-.card, [class*="card"] {
-  background: var(--background-tertiary) !important;
-  border: 1px solid var(--border-light) !important;
-  border-radius: 12px !important;
-  box-shadow: var(--shadow-light) !important;
-  transition: all 0.3s ease !important;
-}
-
-.card:hover, [class*="card"]:hover {
-  box-shadow: var(--shadow-medium) !important;
-  transform: translateY(-2px) !important;
-  border-color: rgba(99, 102, 241, 0.3) !important;
-}
-
-/* Navigation Enhancements */
-nav a, .nav-link {
-  transition: all 0.3s ease !important;
-  border-radius: 6px !important;
-  padding: 0.5rem 0.75rem !important;
-}
-
-nav a:hover, .nav-link:hover {
-  background: var(--accent-color) !important;
-  color: var(--text-primary) !important;
-}
-
-/* Active nav states */
-nav a.active, .nav-link.active {
-  background: var(--primary-gradient) !important;
-  color: white !important;
-  box-shadow: var(--shadow-light) !important;
-}
-
-/* Table Styling */
-table {
-  border-collapse: separate !important;
-  border-spacing: 0 !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  box-shadow: var(--shadow-light) !important;
-  border: 1px solid var(--border-light) !important;
-}
-
-th {
-  background: var(--background-secondary) !important;
-  color: var(--text-primary) !important;
-  font-weight: 600 !important;
-  padding: 1rem !important;
-  border-bottom: 2px solid var(--border-light) !important;
-}
-
-td {
-  padding: 0.875rem 1rem !important;
-  border-bottom: 1px solid var(--border-light) !important;
-  background: var(--background-tertiary) !important;
-}
-
-tr:hover td {
-  background: var(--accent-color) !important;
-}
-
-/* Alert/Callout Styling */
-.alert, [class*="callout"], .note, .warning, .info {
-  border-radius: 12px !important;
-  border-left: 4px solid var(--primary-gradient) !important;
-  background: var(--accent-color) !important;
-  padding: 1rem 1.5rem !important;
-  margin: 1.5rem 0 !important;
-  box-shadow: var(--shadow-light) !important;
-}
-
-.alert.warning, .warning {
-  border-left-color: #f59e0b !important;
-  background: rgba(245, 158, 11, 0.1) !important;
-}
-
-.alert.error, .error {
-  border-left-color: #ef4444 !important;
-  background: rgba(239, 68, 68, 0.1) !important;
-}
-
-.alert.success, .success {
-  border-left-color: #10b981 !important;
-  background: rgba(16, 185, 129, 0.1) !important;
-}
-
-/* Search Styling */
-.search-input, input[type="search"] {
-  background: var(--background-tertiary) !important;
-  border: 1px solid var(--border-light) !important;
-  border-radius: 8px !important;
-  padding: 0.75rem 1rem !important;
-  transition: all 0.3s ease !important;
-}
-
-.search-input:focus, input[type="search"]:focus {
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
-  outline: none !important;
-}
-
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--background-secondary);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-light);
-  border-radius: 4px;
-  transition: background 0.3s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #6366f1;
-}
-
-/* Responsive Improvements */
-@media (max-width: 768px) {
-  pre {
-    padding: 1rem !important;
-    margin: 1rem 0 !important;
-    border-radius: 8px !important;
-  }
-  
-  .card, [class*="card"] {
-    border-radius: 8px !important;
-  }
-}
-
-/* Animation Utilities */
-@keyframes fadeInUp {
+@keyframes slideIn {
   from {
-    opacity: 0;
-    transform: translateY(20px);
+    width: 0;
+    left: 50%;
   }
   to {
-    opacity: 1;
-    transform: translateY(0);
+    width: 100%;
+    left: 0;
   }
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+/* Tab navigation area styling */
+[data-theme='light'] .tabs-nav,
+[data-theme='light'] .mintlify-tabs-nav {
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95));
 }
 
-/* Focus states for accessibility */
-*:focus-visible {
-  outline: 2px solid #6366f1 !important;
-  outline-offset: 2px !important;
-  border-radius: 4px !important;
+/* Minimal code block improvements - work with Palm theme */
+pre {
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Inline code styling that complements the theme */
+code:not(pre code) {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 0.875em;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+}
+
+/* Enhanced hover effects for cards */
+.group:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }

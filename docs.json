@@ -2,22 +2,17 @@
   "$schema": "https://mintlify.com/docs.json",
   "name": "Cosmos Documentation",
   "description": "Build the future of interoperable blockchains with Cosmos",
-  "theme": "prism",
+  "theme": "palm",
   "colors": {
-    "primary": "#6366F1",
-    "light": "#8B5CF6",
-    "dark": "#10B981",
-    "background": {
-      "light": "#FAFAFA",
-      "dark": "#0F172A"
-    },
-    "anchors": {
-      "from": "#6366F1",
-      "to": "#8B5CF6"
-    }
+    "primary": "#2D4CC8",
+    "light": "#4B47CA", 
+    "dark": "#22E2A8"
+  },
+  "codeBlock": {
+    "mode": "auto"
   },
   "customCss": [
-    "/styles/globals.css"
+    "styles/globals.css"
   ],
   "topbarLinks": [
     {
@@ -29,74 +24,75 @@
     "name": "Get Started",
     "url": "/docs/evm/index"
   },
-  "favicon": "/assets/brand/cosmos.svg",
+  "favicon": "/assets/brand/cosmos.png",
   "logo": {
-    "light": "/assets/brand/cosmos-wordmark.svg",
-    "dark": "/assets/brand/cosmos-wordmark-dark.svg",
+    "light": "/assets/brand/cosmos-wordmark.png",
+    "dark": "/assets/brand/cosmos-wordmark-dark.png",
     "href": "https://cosmos.network"
   },
-  "tabs": [
-    {
-      "name": "EVM",
-      "url": "evm"
-    },
-    {
-      "name": "SDK",
-      "url": "sdk"
-    },
-    {
-      "name": "IBC",
-      "url": "ibc"
-    },
-    {
-      "name": "API Reference",
-      "url": "api-reference"
-    }
-  ],
-  "navigation": [
-    {
-      "group": "Getting Started",
-      "pages": ["docs/index"]
-    }
-  ],
-  "evm": [
-    {
-      "group": "EVM Development",
-      "pages": [
-        "docs/evm/index",
-        "docs/evm/quickstart",
-        "docs/evm/integrate"
-      ]
-    }
-  ],
-  "sdk": [
-    {
-      "group": "Cosmos SDK",
-      "pages": ["docs/sdk/index"]
-    }
-  ],
-  "ibc": [
-    {
-      "group": "IBC Protocol",
-      "pages": ["docs/ibc/index"]
-    }
-  ],
-  "api-reference": [
-    {
-      "group": "Cosmos API",
-      "pages": [
-        "docs/api-reference/cosmos/api",
-        "docs/api-reference/cosmos/cli"
-      ]
-    },
-    {
-      "group": "EVM API",
-      "pages": [
-        "docs/api-reference/evm/evm-json-rpc",
-        "docs/api-reference/evm/opcodes"
-      ]
-    }
-  ],
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Overview",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["docs/index"]
+          }
+        ]
+      },
+      {
+        "tab": "EVM",
+        "groups": [
+          {
+            "group": "EVM Development",
+            "pages": [
+              "docs/evm/index",
+              "docs/evm/quickstart",
+              "docs/evm/integrate"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "SDK",
+        "groups": [
+          {
+            "group": "Cosmos SDK",
+            "pages": ["docs/sdk/index"]
+          }
+        ]
+      },
+      {
+        "tab": "IBC",
+        "groups": [
+          {
+            "group": "IBC Protocol",
+            "pages": ["docs/ibc/index"]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Cosmos API",
+            "pages": [
+              "docs/api-reference/cosmos/api",
+              "docs/api-reference/cosmos/cli"
+            ]
+          },
+          {
+            "group": "EVM API",
+            "pages": [
+              "docs/api-reference/evm/evm-json-rpc",
+              "docs/api-reference/evm/opcodes"
+            ]
+          }
+        ]
+      }
+    ]
+  },
   "footerSocials": {
     "twitter": "https://twitter.com/cosmos",
     "github": "https://github.com/cosmos",

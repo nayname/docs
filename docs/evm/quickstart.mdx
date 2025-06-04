@@ -1,190 +1,180 @@
-# Quick Start Guide
+---
+title: "EVM Quickstart"
+description: "Get started with EVM development on Cosmos in minutes"
+---
 
-Get up and running with Cosmos EVM in just a few minutes. This guide will walk you through deploying your first smart contract.
+# EVM Quickstart Guide
+
+This guide will help you deploy your first smart contract on Cosmos EVM in just a few minutes.
 
 ## Prerequisites
 
-Before we begin, ensure you have:
+Before you begin, make sure you have:
 
-- **Node.js** (v18 or later)
-- **Git** for version control
-- **A code editor** (VS Code recommended)
-- **MetaMask** or another Ethereum wallet
+- Node.js (v16 or higher)
+- npm or yarn
+- A code editor (VS Code recommended)
 
 ## Step 1: Set Up Your Environment
 
-### Install Development Tools
-
-<CodeGroup>
-
-```bash npm
-# Install Hardhat globally
-npm install -g hardhat
-
-# Install Foundry (alternative)
-curl -L https://foundry.paradigm.xyz | bash
-foundryup
-```
-
-```bash yarn
-# Install Hardhat globally
-yarn global add hardhat
-
-# Install Foundry (alternative)
-curl -L https://foundry.paradigm.xyz | bash
-foundryup
-```
-
-</CodeGroup>
-
-### Configure MetaMask
-
-Add the Cosmos EVM network to your MetaMask:
-
-1. **Network Name**: Cosmos EVM Testnet
-2. **RPC URL**: `https://evm-rpc-testnet.cosmos.network`
-3. **Chain ID**: `9000`
-4. **Currency Symbol**: `ATOM`
-5. **Block Explorer**: `https://explorer-evm-testnet.cosmos.network`
-
-## Step 2: Create Your First Project
-
-### Using Hardhat
+First, create a new directory for your project:
 
 ```bash
-# Create a new directory
-mkdir my-cosmos-contract
-cd my-cosmos-contract
+mkdir cosmos-evm-quickstart
+cd cosmos-evm-quickstart
+npm init -y
+```
 
-# Initialize Hardhat project
+Install the required dependencies:
+
+```bash
+npm install --save-dev hardhat @nomicfoundation/hardhat-toolbox
+npm install --save ethers dotenv
+```
+
+## Step 2: Initialize Hardhat
+
+Create a new Hardhat project:
+
+```bash
 npx hardhat init
-
-# Install dependencies
-npm install @openzeppelin/contracts
 ```
 
-### Project Structure
+Select "Create a TypeScript project" when prompted.
 
-Your project should look like this:
+## Step 3: Configure for Cosmos EVM
 
+Update your `hardhat.config.ts` file:
+
+```typescript
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
+const config: HardhatUserConfig = {
+  solidity: {
+    version: "0.8.19",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
+  networks: {
+    "cosmos-testnet": {
+      url: "https://rpc-evm-testnet.cosmos.network",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 9000,
+      gas: 2100000,
+      gasPrice: 8000000000,
+    },
+  },
+};
+
+export default config;
 ```
-my-cosmos-contract/
-├── contracts/
-├── scripts/
-├── test/
-├── hardhat.config.js
-└── package.json
+
+Create a `.env` file in your project root:
+
+```bash
+PRIVATE_KEY=your_private_key_here
 ```
 
-## Step 3: Write Your Smart Contract
+<Warning>
+Never commit your private key to version control. Add `.env` to your `.gitignore` file.
+</Warning>
 
-Create a simple ERC20 token contract:
+## Step 4: Write Your Smart Contract
 
-```solidity contracts/MyToken.sol
+Create a simple contract in `contracts/HelloCosmos.sol`:
+
+```solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.19;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-
-contract MyToken is ERC20, Ownable {
-    constructor(address initialOwner)
-        ERC20("My Token", "MTK")
-        Ownable(initialOwner)
-    {
-        _mint(msg.sender, 1000000 * 10 ** decimals());
+contract HelloCosmos {
+    string public message;
+    address public owner;
+    uint256 public updateCount;
+    
+    event MessageUpdated(string newMessage, address updatedBy, uint256 timestamp);
+    
+    constructor(string memory _initialMessage) {
+        message = _initialMessage;
+        owner = msg.sender;
+        updateCount = 0;
     }
-
-    function mint(address to, uint256 amount) public onlyOwner {
-        _mint(to, amount);
+    
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this function");
+        _;
+    }
+    
+    function updateMessage(string memory _newMessage) public {
+        message = _newMessage;
+        updateCount++;
+        emit MessageUpdated(_newMessage, msg.sender, block.timestamp);
+    }
+    
+    function updateMessageOwnerOnly(string memory _newMessage) public onlyOwner {
+        message = _newMessage;
+        updateCount++;
+        emit MessageUpdated(_newMessage, msg.sender, block.timestamp);
+    }
+    
+    function getMessage() public view returns (string memory) {
+        return message;
+    }
+    
+    function getContractInfo() public view returns (
+        string memory currentMessage,
+        address contractOwner,
+        uint256 totalUpdates,
+        uint256 blockTimestamp
+    ) {
+        return (message, owner, updateCount, block.timestamp);
     }
 }
 ```
 
-## Step 4: Configure Hardhat for Cosmos EVM
+## Step 5: Write Deployment Script
 
-Update your `hardhat.config.js`:
+Create `scripts/deploy.ts`:
 
-```javascript hardhat.config.js
-require("@nomicfoundation/hardhat-toolbox");
-require("dotenv").config();
-
-const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000000";
-
-/** @type import('hardhat/config').HardhatUserConfig */
-module.exports = {
-  solidity: {
-    version: "0.8.20",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200
-      }
-    }
-  },
-  networks: {
-    cosmosTestnet: {
-      url: "https://evm-rpc-testnet.cosmos.network",
-      accounts: [PRIVATE_KEY],
-      chainId: 9000,
-      gasPrice: 2000000000 // 2 gwei
-    },
-    cosmosMainnet: {
-      url: "https://evm-rpc.cosmos.network",
-      accounts: [PRIVATE_KEY],
-      chainId: 9001,
-      gasPrice: 2000000000 // 2 gwei
-    }
-  }
-};
-```
-
-Create a `.env` file with your private key:
-
-```bash .env
-PRIVATE_KEY=your_private_key_here
-```
-
-<div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 my-6">
-  <div className="flex items-start">
-    <div className="flex-shrink-0">
-      <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
-      </svg>
-    </div>
-    <div className="ml-3">
-      <p className="text-sm text-yellow-800 dark:text-yellow-200">
-        <strong>Security Note:</strong> Never commit your private key to version control. Add `.env` to your `.gitignore` file.
-      </p>
-    </div>
-  </div>
-</div>
-
-## Step 5: Deploy Your Contract
-
-### Compile Your Contract
-
-```bash
-npx hardhat compile
-```
-
-### Create a Deployment Script
-
-```javascript scripts/deploy.js
-const { ethers } = require("hardhat");
+```typescript
+import { ethers } from "hardhat";
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
+  const HelloCosmos = await ethers.getContractFactory("HelloCosmos");
   
-  console.log("Deploying contracts with the account:", deployer.address);
-  console.log("Account balance:", (await deployer.provider.getBalance(deployer.address)).toString());
-
-  const MyToken = await ethers.getContractFactory("MyToken");
-  const myToken = await MyToken.deploy(deployer.address);
-
-  await myToken.waitForDeployment();
-
-  console.log("MyToken deployed to:", await myToken.getAddress());
+  console.log("Deploying HelloCosmos contract...");
+  
+  const helloCosmos = await HelloCosmos.deploy("Hello from Cosmos EVM!");
+  
+  await helloCosmos.deployed();
+  
+  console.log(`HelloCosmos deployed to: ${helloCosmos.address}`);
+  console.log(`Transaction hash: ${helloCosmos.deployTransaction.hash}`);
+  
+  // Wait for a few block confirmations
+  await helloCosmos.deployTransaction.wait(3);
+  
+  console.log("Contract deployed and confirmed!");
+  
+  // Test the contract
+  const message = await helloCosmos.getMessage();
+  console.log(`Initial message: ${message}`);
+  
+  const info = await helloCosmos.getContractInfo();
+  console.log(`Contract info:`, {
+    message: info.currentMessage,
+    owner: info.contractOwner,
+    updateCount: info.totalUpdates.toString(),
+    timestamp: new Date(info.blockTimestamp.toNumber() * 1000).toISOString()
+  });
 }
 
 main()
@@ -195,151 +185,107 @@ main()
   });
 ```
 
-### Deploy to Testnet
+## Step 6: Deploy Your Contract
+
+Compile your contract:
 
 ```bash
-npx hardhat run scripts/deploy.js --network cosmosTestnet
+npx hardhat compile
+```
+
+Deploy to Cosmos EVM testnet:
+
+```bash
+npx hardhat run scripts/deploy.ts --network cosmos-testnet
 ```
 
 You should see output similar to:
 
 ```
-Deploying contracts with the account: 0x742d35Cc6734C0532925a3b8D65C3c08Cc8Cf31c
-Account balance: 1000000000000000000
-MyToken deployed to: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+Deploying HelloCosmos contract...
+HelloCosmos deployed to: 0x1234567890123456789012345678901234567890
+Transaction hash: 0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890
+Contract deployed and confirmed!
+Initial message: Hello from Cosmos EVM!
+Contract info: {
+  message: 'Hello from Cosmos EVM!',
+  owner: '0x...',
+  updateCount: '0',
+  timestamp: '2024-01-15T10:30:00.000Z'
+}
 ```
 
-## Step 6: Interact with Your Contract
+## Step 7: Interact with Your Contract
 
-### Using Hardhat Console
+Create `scripts/interact.ts`:
+
+```typescript
+import { ethers } from "hardhat";
+
+async function main() {
+  const contractAddress = "0x1234567890123456789012345678901234567890"; // Replace with your deployed address
+  
+  const HelloCosmos = await ethers.getContractFactory("HelloCosmos");
+  const helloCosmos = HelloCosmos.attach(contractAddress);
+  
+  // Read current message
+  console.log("Current message:", await helloCosmos.getMessage());
+  
+  // Update message
+  console.log("Updating message...");
+  const tx = await helloCosmos.updateMessage("Updated from TypeScript!");
+  await tx.wait();
+  
+  console.log("New message:", await helloCosmos.getMessage());
+  
+  // Get contract info
+  const info = await helloCosmos.getContractInfo();
+  console.log("Update count:", info.totalUpdates.toString());
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+```
+
+Run the interaction script:
 
 ```bash
-npx hardhat console --network cosmosTestnet
-```
-
-```javascript
-// In the console
-const MyToken = await ethers.getContractFactory("MyToken");
-const myToken = MyToken.attach("YOUR_CONTRACT_ADDRESS");
-
-// Check token details
-await myToken.name();        // "My Token"
-await myToken.symbol();      // "MTK"
-await myToken.totalSupply(); // 1000000000000000000000000
-
-// Check your balance
-const [owner] = await ethers.getSigners();
-await myToken.balanceOf(owner.address);
-```
-
-### Using a Frontend
-
-You can also interact with your contract using a simple HTML page:
-
-```html index.html
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Token DApp</title>
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
-</head>
-<body>
-    <h1>My Token DApp</h1>
-    <button onclick="connectWallet()">Connect Wallet</button>
-    <button onclick="getBalance()">Get Balance</button>
-    <div id="balance"></div>
-
-    <script>
-        const contractAddress = "YOUR_CONTRACT_ADDRESS";
-        const contractABI = [
-            "function name() view returns (string)",
-            "function symbol() view returns (string)",
-            "function balanceOf(address) view returns (uint256)",
-            "function transfer(address to, uint256 amount)"
-        ];
-
-        let provider, signer, contract;
-
-        async function connectWallet() {
-            if (window.ethereum) {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                signer = provider.getSigner();
-                contract = new ethers.Contract(contractAddress, contractABI, signer);
-                console.log("Connected!");
-            }
-        }
-
-        async function getBalance() {
-            if (contract && signer) {
-                const address = await signer.getAddress();
-                const balance = await contract.balanceOf(address);
-                document.getElementById("balance").innerText = 
-                    `Balance: ${ethers.utils.formatEther(balance)} MTK`;
-            }
-        }
-    </script>
-</body>
-</html>
+npx hardhat run scripts/interact.ts --network cosmos-testnet
 ```
 
 ## Next Steps
 
-Congratulations! You've successfully deployed your first smart contract on Cosmos EVM. Here's what you can explore next:
+Congratulations! You've successfully deployed and interacted with a smart contract on Cosmos EVM. Here's what you can explore next:
 
-<div className="grid md:grid-cols-2 gap-4 my-8">
-  <a href="/docs/cosmos-evm/smart-contracts/hardhat" className="block p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
-    <div className="font-semibold mb-2">📚 Advanced Hardhat Guide</div>
-    <div className="text-sm text-gray-600 dark:text-gray-400">Learn advanced development patterns and testing strategies</div>
-  </a>
-  
-  <a href="/docs/cosmos-evm/frontend" className="block p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
-    <div className="font-semibold mb-2">🎨 Frontend Integration</div>
-    <div className="text-sm text-gray-600 dark:text-gray-400">Build user interfaces with React, Ethers.js, and Wagmi</div>
-  </a>
-  
-  <a href="/docs/cosmos-evm/advanced/precompiles" className="block p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
-    <div className="font-semibold mb-2">⚡ Precompiled Contracts</div>
-    <div className="text-sm text-gray-600 dark:text-gray-400">Access Cosmos SDK functionality from your smart contracts</div>
-  </a>
-  
-  <a href="/docs/cosmos-evm/smart-contracts/foundry" className="block p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
-    <div className="font-semibold mb-2">🔨 Foundry Development</div>
-    <div className="text-sm text-gray-600 dark:text-gray-400">Alternative toolchain for advanced Solidity development</div>
-  </a>
-</div>
+<CardGroup cols={2}>
+  <Card title="Integration Guide" href="/docs/evm/integrate" icon="link">
+    Learn how to integrate with Cosmos-specific features
+  </Card>
+  <Card title="IBC Protocol" href="/docs/ibc/index" icon="arrows-left-right">
+    Enable cross-chain functionality
+  </Card>
+  <Card title="API Reference" href="/docs/api-reference/evm/evm-json-rpc" icon="code">
+    Explore the full EVM JSON-RPC API
+  </Card>
+  <Card title="Advanced Examples" href="/docs/evm/integrate" icon="rocket">
+    Build more complex applications
+  </Card>
+</CardGroup>
 
 ## Troubleshooting
 
-### Common Issues
-
-**Network Connection Errors**
-- Verify your RPC URL is correct
-- Check if you have sufficient testnet tokens
-- Ensure your wallet is connected to the right network
-
-**Gas Estimation Failures**
-- Try increasing the gas limit in your transaction
-- Check if your contract has any require statements that might fail
-
-**Compilation Errors**
-- Ensure you're using compatible Solidity versions
-- Check for missing imports or dependencies
-
-### Getting Help
-
-- **Discord**: Join our [developer community](https://discord.gg/cosmosnetwork)
-- **GitHub**: Check out [example projects](https://github.com/cosmos/evm-examples)
-- **Forum**: Ask questions on the [Cosmos Developer Forum](https://forum.cosmos.network)
-
-## Summary
-
-You've learned how to:
-
-✅ Set up a development environment for Cosmos EVM  
-✅ Create and compile a smart contract  
-✅ Configure Hardhat for Cosmos networks  
-✅ Deploy a contract to testnet  
-✅ Interact with your deployed contract  
-
-You're now ready to build more complex applications on Cosmos EVM!
+<AccordionGroup>
+  <Accordion title="Transaction Failed">
+    Check that you have sufficient funds and the correct network configuration.
+  </Accordion>
+  <Accordion title="Contract Not Found">
+    Verify the contract address and ensure the deployment was successful.
+  </Accordion>
+  <Accordion title="RPC Connection Issues">
+    Check your network configuration and RPC endpoint availability.
+  </Accordion>
+</AccordionGroup>
