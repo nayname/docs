@@ -1,0 +1,244 @@
+---
+title: "Architecture"
+description: "Technical architecture and design of Cosmos EVM"
+---
+
+# Cosmos EVM Architecture
+
+This document provides technical architecture information for Cosmos EVM.
+
+{/*
+############################
+NOTE: Implementation details, exact API structures, 
+and code examples require verification from actual codebase
+############################
+*/}
+
+## System Overview
+
+Cosmos EVM is built as a collection of Cosmos SDK modules that work together to provide comprehensive EVM functionality within a Cosmos SDK chain. The design maintains the security and consensus properties of Cosmos while enabling full Ethereum compatibility.
+
+The system provides a comprehensive blockchain development framework through integration with the Cosmos SDK.
+
+## Core Modules
+
+### x/vm Module
+
+The `x/vm` module is the core EVM implementation module (renamed from `x/evm` in the original evmOS) that provides Ethereum compatibility.
+
+**Capabilities:**
+- Provides Ethereum Virtual Machine compatibility
+- Handles contract deployment and execution
+- Manages EVM state transitions
+- Supports Ethereum opcodes
+
+{/*
+############################
+RESEARCH REQUIRED
+- Specific implementation details
+- Exact API methods
+- State management structures
+- Gas metering specifics
+############################
+*/}
+
+### x/feemarket Module
+
+The `x/feemarket` module implements EIP-1559 fee market mechanism for transaction fee handling.
+
+**Parameters:**
+- Base fee change denominator
+- Elasticity multiplier
+- Min gas price
+- Min gas multiplier
+
+**Features:**
+- EIP-1559 dynamic fee market mechanism
+- Transaction fee handling
+
+{/*
+############################
+RESEARCH REQUIRED
+- Exact parameter structures
+- Fee calculation algorithms
+- Integration details with VM module
+############################
+*/}
+
+### x/erc20 Module
+
+The `x/erc20` module enables interoperability between Cosmos SDK coins and ERC-20 tokens.
+
+**Capability:**
+- Provides interoperability between Cosmos SDK coins and ERC-20 tokens
+
+{/*
+############################
+RESEARCH REQUIRED
+- Token registration processes
+- Conversion mechanisms
+- Implementation details
+############################
+*/}
+
+## Module Relationships
+
+These modules are designed to work together to provide a seamless EVM experience within the Cosmos SDK framework.
+
+{/*
+############################
+RESEARCH REQUIRED
+- Detailed module interaction flows
+- Dependency relationships
+- Communication protocols between modules
+############################
+*/}
+
+## Parameter Management
+
+Both the VM and FeeMarket modules maintain their own sets of parameters that govern their behavior. These parameters can be updated through governance proposals.
+
+### VM Module Parameters
+- EVM denomination
+- Extra EIPs enabled
+- Chain configuration (fork schedule)
+- Active precompiled contracts
+
+### FeeMarket Module Parameters
+- Base fee change denominator
+- Elasticity multiplier
+- Min gas price
+- Min gas multiplier
+
+<Note>
+The ability to update parameters through governance proposals maintains the decentralized governance model of Cosmos chains.
+</Note>
+
+## Transaction Processing
+
+{/*
+############################
+RESEARCH REQUIRED
+Referenced in sources as rpc/backend/tx_info.go (lines 26-91, 142-273)
+- Specific transaction types
+- Processing steps
+- Flow diagrams
+############################
+*/}
+
+### Known Transaction Support
+Based on forward compatibility claims, Cosmos EVM should support:
+- Standard Ethereum transactions
+- Forward-compatible enhancements beyond standard EVM
+
+## Integration with Cosmos SDK
+
+Cosmos EVM integrates with the Cosmos SDK to provide a comprehensive blockchain development framework. The system maintains compatibility with existing Ethereum tools and applications while adding Cosmos-specific capabilities.
+
+{/*
+############################
+RESEARCH REQUIRED
+Referenced in sources as README.md38-45 and go.mod1-270
+- Specific integration points
+- SDK module interactions
+- State synchronization mechanisms
+############################
+*/}
+
+## Client Interfaces
+
+{/*
+############################
+RESEARCH REQUIRED
+- JSON-RPC API endpoint specifications
+- gRPC method definitions
+- CLI command syntax and options
+- WebSocket support details
+############################
+*/}
+
+### Expected Interface Types
+Based on standard Cosmos SDK and Ethereum patterns:
+- JSON-RPC API (for Ethereum compatibility)
+- gRPC Gateway (for Cosmos SDK integration)
+- Command Line Interface (CLI)
+
+## State Management
+
+{/*
+############################
+RESEARCH REQUIRED
+- EVM state integration with Cosmos SDK state
+- Storage mechanisms
+- State synchronization details
+############################
+*/}
+
+## Security and Upgradeability
+
+### Governance Integration
+- Parameter changes through governance proposals
+- Maintains decentralized governance model
+
+{/*
+############################
+RESEARCH REQUIRED
+- Specific upgrade mechanisms
+- State migration procedures
+- Security considerations
+############################
+*/}
+
+## Development and Testing
+
+{/*
+############################
+RESEARCH REQUIRED
+- Testing frameworks
+- Development tools
+- Debugging capabilities
+- Build system and testing infrastructure
+############################
+*/}
+
+{/*
+############################
+COMPLETE RESEARCH AREAS
+
+Implementation Details:
+- Exact module APIs and method signatures
+- State storage mechanisms and data structures  
+- Transaction processing algorithms
+- Gas calculation and metering details
+
+Integration Specifics:
+- Cosmos SDK module interaction patterns
+- IBC integration capabilities
+- Cross-chain communication mechanisms
+- State synchronization procedures
+
+Client Interfaces:
+- JSON-RPC API endpoint specifications
+- gRPC method definitions
+- CLI command syntax and options
+- WebSocket support details
+
+Testing and Development:
+- Build system targets and procedures
+- Testing framework architecture
+- Debugging tools and capabilities
+- Performance monitoring systems
+############################
+*/}
+
+## Research Sources
+
+The following source files should be consulted for detailed implementation information:
+
+- `README.md` (lines 13-31, 38-45, 55-69, 95-100, 128-143)
+- `CHANGELOG.md` (lines 22-26)
+- `LICENSE` (lines 189-190)
+- `go.mod` (lines 1-270)
+- `rpc/backend/tx_info.go` (lines 26-91, 142-273)
+- `x/vm/keeper/params.go` (lines 16-93)
+- `x/vm/keeper/keeper.go` (lines 278-286) 

@@ -1,50 +1,47 @@
 ---
-title: "EVM Quickstart"
-description: "Get started with EVM development on Cosmos in minutes"
+title: "Cosmos EVM Quickstart"
+description: "Getting started with Cosmos EVM development"
 ---
 
-# EVM Quickstart Guide
+# Cosmos EVM Quickstart Guide
 
-This guide will help you deploy your first smart contract on Cosmos EVM in just a few minutes.
+This guide provides a foundation for getting started with Cosmos EVM development based on standard Ethereum development practices.
+
+{/*
+############################
+IMPORTANT: Specific installation procedures, repository locations, 
+CLI commands, and network configurations require verification from official sources
+############################
+*/}
 
 ## Prerequisites
 
-Before you begin, make sure you have:
+Standard development environment requirements:
 
-- Node.js (v16 or higher)
+- Go 1.21+ (for building from source, if needed)
+- Node.js (v18 or higher) 
 - npm or yarn
 - A code editor (VS Code recommended)
+- Git
 
-## Step 1: Set Up Your Environment
+<Note>
+Cosmos EVM is built on Cosmos SDK which requires Go, and EVM compatibility suggests Node.js tooling support.
+</Note>
 
-First, create a new directory for your project:
+## Development Approach
+
+### Smart Contract Development
+
+Since Cosmos EVM aims to be forward-compatible with Ethereum, standard Ethereum development tools should work:
 
 ```bash
-mkdir cosmos-evm-quickstart
-cd cosmos-evm-quickstart
-npm init -y
-```
-
-Install the required dependencies:
-
-```bash
+# Standard Ethereum development dependencies
 npm install --save-dev hardhat @nomicfoundation/hardhat-toolbox
-npm install --save ethers dotenv
+npm install --save ethers
+npm install --save @cosmjs/stargate @cosmjs/proto-signing
 ```
 
-## Step 2: Initialize Hardhat
-
-Create a new Hardhat project:
-
-```bash
-npx hardhat init
-```
-
-Select "Create a TypeScript project" when prompted.
-
-## Step 3: Configure for Cosmos EVM
-
-Update your `hardhat.config.ts` file:
+### Hardhat Configuration Template
 
 ```typescript
 import { HardhatUserConfig } from "hardhat/config";
@@ -64,12 +61,12 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
-    "cosmos-testnet": {
-      url: "https://rpc-evm-testnet.cosmos.network",
+    local: {
+      url: "http://localhost:8545", // Standard EVM JSON-RPC port
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 9000,
-      gas: 2100000,
-      gasPrice: 8000000000,
+      // ############################
+      // # VERIFY: Chain ID
+      // ############################
     },
   },
 };
@@ -77,35 +74,41 @@ const config: HardhatUserConfig = {
 export default config;
 ```
 
-Create a `.env` file in your project root:
+{/*
+############################
+RESEARCH REQUIRED: 
+- Actual network endpoints
+- Chain IDs 
+- Connection parameters
+############################
+*/}
 
-```bash
-PRIVATE_KEY=your_private_key_here
-```
+## Smart Contract Development
 
-<Warning>
-Never commit your private key to version control. Add `.env` to your `.gitignore` file.
-</Warning>
+### Basic Contract Example
 
-## Step 4: Write Your Smart Contract
-
-Create a simple contract in `contracts/HelloCosmos.sol`:
+Standard Solidity contracts should work with Cosmos EVM due to forward compatibility:
 
 ```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-contract HelloCosmos {
+contract CosmosEVMExample {
     string public message;
     address public owner;
     uint256 public updateCount;
     
-    event MessageUpdated(string newMessage, address updatedBy, uint256 timestamp);
+    event MessageUpdated(
+        string indexed newMessage, 
+        address indexed updatedBy, 
+        uint256 timestamp
+    );
     
-    constructor(string memory _initialMessage) {
-        message = _initialMessage;
+    constructor(string memory _message) {
+        message = _message;
         owner = msg.sender;
         updateCount = 0;
+        emit MessageUpdated(_message, msg.sender, block.timestamp);
     }
     
     modifier onlyOwner() {
@@ -114,178 +117,193 @@ contract HelloCosmos {
     }
     
     function updateMessage(string memory _newMessage) public {
+        require(bytes(_newMessage).length > 0, "Message cannot be empty");
+        
         message = _newMessage;
         updateCount++;
+        
         emit MessageUpdated(_newMessage, msg.sender, block.timestamp);
     }
     
     function updateMessageOwnerOnly(string memory _newMessage) public onlyOwner {
+        require(bytes(_newMessage).length > 0, "Message cannot be empty");
+        
         message = _newMessage;
         updateCount++;
+        
         emit MessageUpdated(_newMessage, msg.sender, block.timestamp);
     }
     
-    function getMessage() public view returns (string memory) {
-        return message;
-    }
-    
-    function getContractInfo() public view returns (
+    function getInfo() public view returns (
         string memory currentMessage,
         address contractOwner,
         uint256 totalUpdates,
+        uint256 blockNumber,
         uint256 blockTimestamp
     ) {
-        return (message, owner, updateCount, block.timestamp);
+        return (
+            message,
+            owner,
+            updateCount,
+            block.number,
+            block.timestamp
+        );
     }
 }
 ```
 
-## Step 5: Write Deployment Script
-
-Create `scripts/deploy.ts`:
+### Deployment Script Template
 
 ```typescript
 import { ethers } from "hardhat";
 
 async function main() {
-  const HelloCosmos = await ethers.getContractFactory("HelloCosmos");
+  console.log("Deploying to Cosmos EVM...");
   
-  console.log("Deploying HelloCosmos contract...");
+  // Get deployer account
+  const [deployer] = await ethers.getSigners();
+  console.log("Deploying with account:", deployer.address);
   
-  const helloCosmos = await HelloCosmos.deploy("Hello from Cosmos EVM!");
+  // Check balance
+  const balance = await deployer.getBalance();
+  console.log("Account balance:", ethers.utils.formatEther(balance), "tokens");
   
-  await helloCosmos.deployed();
+  // Deploy contract
+  const CosmosEVMExample = await ethers.getContractFactory("CosmosEVMExample");
+  const contract = await CosmosEVMExample.deploy("Hello Cosmos EVM!");
   
-  console.log(`HelloCosmos deployed to: ${helloCosmos.address}`);
-  console.log(`Transaction hash: ${helloCosmos.deployTransaction.hash}`);
+  await contract.deployed();
   
-  // Wait for a few block confirmations
-  await helloCosmos.deployTransaction.wait(3);
-  
-  console.log("Contract deployed and confirmed!");
+  console.log(`✅ Contract deployed to: ${contract.address}`);
+  console.log(`📝 Transaction hash: ${contract.deployTransaction.hash}`);
   
   // Test the contract
-  const message = await helloCosmos.getMessage();
-  console.log(`Initial message: ${message}`);
+  const message = await contract.message();
+  console.log(`📄 Initial message: "${message}"`);
   
-  const info = await helloCosmos.getContractInfo();
-  console.log(`Contract info:`, {
+  const info = await contract.getInfo();
+  console.log("📊 Contract info:", {
     message: info.currentMessage,
     owner: info.contractOwner,
     updateCount: info.totalUpdates.toString(),
-    timestamp: new Date(info.blockTimestamp.toNumber() * 1000).toISOString()
+    blockNumber: info.blockNumber.toString(),
   });
 }
 
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error(error);
+    console.error("❌ Deployment failed:", error);
     process.exit(1);
   });
 ```
 
-## Step 6: Deploy Your Contract
+{/*
+############################
+RESEARCH REQUIRED - Complete sections below
 
-Compile your contract:
+Installation and Setup:
+- Official repository URL and location
+- Installation procedures (binary releases vs building from source)
+- CLI tool names and installation methods
+- Local node initialization commands
+
+Network Configuration:
+- Available networks (mainnet, testnet, local)
+- RPC endpoints and connection details
+- Chain ID formats and conventions
+- Account setup and key management procedures
+
+Development Tools:
+- CLI command syntax and options
+- Local development node setup
+- Build system integration
+- Testing framework specifics
+
+Module Integration:
+- x/erc20 module usage for token conversions
+- Cosmos SDK integration patterns
+- IBC functionality access from smart contracts
+- Governance parameter interaction
+############################
+*/}
+
+## Known Architecture
+
+Based on available information, Cosmos EVM includes:
+
+### Core Modules
+- **x/vm Module**: Core EVM implementation (renamed from x/evm)
+- **x/feemarket Module**: EIP-1559 fee market mechanism  
+- **x/erc20 Module**: Cosmos SDK coin ↔ ERC-20 token interoperability
+
+### Capabilities
+- Forward-compatible with Ethereum
+- Can run any valid Ethereum smart contract
+- Implements features beyond standard EVM
+- Integrates with Cosmos SDK for governance and IBC
+
+## Development Workflow Template
+
+Once official documentation is verified, the typical workflow would be:
+
+<Steps>
+  <Step title="Environment Setup">
+    Install required tools and set up development environment using verified procedures.
+  </Step>
+  <Step title="Local Node">
+    Initialize and start a local Cosmos EVM node for development testing.
+  </Step>
+  <Step title="Smart Contracts">
+    Develop and test smart contracts using standard Ethereum tooling.
+  </Step>
+  <Step title="Deployment">
+    Deploy contracts to local, testnet, or mainnet environments.
+  </Step>
+  <Step title="Integration">
+    Explore Cosmos-specific features like IBC and governance integration.
+  </Step>
+</Steps>
+
+## Critical Research Areas
+
+{/*
+############################
+CRITICAL RESEARCH AREAS:
+
+1. Official Documentation: Locate and verify official Cosmos EVM repository and documentation
+2. Installation Guide: Confirm installation procedures and CLI tools
+3. Network Details: Verify available networks, endpoints, and configuration
+4. Examples: Find official examples and tutorials
+5. Module Usage: Research how to interact with x/erc20 and other Cosmos-specific features
+############################
+*/}
+
+## Placeholder Commands
+
+<Note>
+**These commands are typical patterns but need verification:**
 
 ```bash
+# Typical installation pattern (NEEDS VERIFICATION)
+go install github.com/cosmos/cosmos-evm/cmd/evmd@latest
+
+# Typical node initialization (NEEDS VERIFICATION) 
+evmd init mynode --chain-id cosmos_9000-1
+
+# Typical account creation (NEEDS VERIFICATION)
+evmd keys add mykey
+
+# Standard compilation
 npx hardhat compile
+
+# Standard deployment (network needs verification)
+npx hardhat run scripts/deploy.ts --network local
 ```
+</Note>
 
-Deploy to Cosmos EVM testnet:
+## Resources for Research
 
-```bash
-npx hardhat run scripts/deploy.ts --network cosmos-testnet
-```
-
-You should see output similar to:
-
-```
-Deploying HelloCosmos contract...
-HelloCosmos deployed to: 0x1234567890123456789012345678901234567890
-Transaction hash: 0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890
-Contract deployed and confirmed!
-Initial message: Hello from Cosmos EVM!
-Contract info: {
-  message: 'Hello from Cosmos EVM!',
-  owner: '0x...',
-  updateCount: '0',
-  timestamp: '2024-01-15T10:30:00.000Z'
-}
-```
-
-## Step 7: Interact with Your Contract
-
-Create `scripts/interact.ts`:
-
-```typescript
-import { ethers } from "hardhat";
-
-async function main() {
-  const contractAddress = "0x1234567890123456789012345678901234567890"; // Replace with your deployed address
-  
-  const HelloCosmos = await ethers.getContractFactory("HelloCosmos");
-  const helloCosmos = HelloCosmos.attach(contractAddress);
-  
-  // Read current message
-  console.log("Current message:", await helloCosmos.getMessage());
-  
-  // Update message
-  console.log("Updating message...");
-  const tx = await helloCosmos.updateMessage("Updated from TypeScript!");
-  await tx.wait();
-  
-  console.log("New message:", await helloCosmos.getMessage());
-  
-  // Get contract info
-  const info = await helloCosmos.getContractInfo();
-  console.log("Update count:", info.totalUpdates.toString());
-}
-
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
-```
-
-Run the interaction script:
-
-```bash
-npx hardhat run scripts/interact.ts --network cosmos-testnet
-```
-
-## Next Steps
-
-Congratulations! You've successfully deployed and interacted with a smart contract on Cosmos EVM. Here's what you can explore next:
-
-<CardGroup cols={2}>
-  <Card title="Integration Guide" href="/docs/evm/integrate" icon="link">
-    Learn how to integrate with Cosmos-specific features
-  </Card>
-  <Card title="IBC Protocol" href="/docs/ibc/index" icon="arrows-left-right">
-    Enable cross-chain functionality
-  </Card>
-  <Card title="API Reference" href="/docs/api-reference/evm/evm-json-rpc" icon="code">
-    Explore the full EVM JSON-RPC API
-  </Card>
-  <Card title="Advanced Examples" href="/docs/evm/integrate" icon="rocket">
-    Build more complex applications
-  </Card>
-</CardGroup>
-
-## Troubleshooting
-
-<AccordionGroup>
-  <Accordion title="Transaction Failed">
-    Check that you have sufficient funds and the correct network configuration.
-  </Accordion>
-  <Accordion title="Contract Not Found">
-    Verify the contract address and ensure the deployment was successful.
-  </Accordion>
-  <Accordion title="RPC Connection Issues">
-    Check your network configuration and RPC endpoint availability.
-  </Accordion>
-</AccordionGroup>
+- **[Architecture Guide](/docs/evm/architecture)** - Technical architecture information
+- **[Local Development](/docs/evm/local-development)** - Development setup (needs verification)
+- **[Integration Guide](/docs/evm/integrate)** - Chain integration steps

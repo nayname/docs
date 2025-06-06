@@ -55,6 +55,8 @@
             "pages": [
               "docs/evm/index",
               "docs/evm/quickstart",
+              "docs/evm/architecture",
+              "docs/evm/local-development",
               "docs/evm/integrate"
             ]
           }

@@ -1,0 +1,354 @@
+---
+title: "Local Development"
+description: "Development setup and workflows for Cosmos EVM"
+---
+
+# Local Development Guide
+
+This guide outlines development approaches for Cosmos EVM based on architectural information and standard blockchain development practices.
+
+{/*
+############################
+IMPORTANT: This guide combines architectural information with standard development practices. 
+Specific CLI commands, configuration details, and setup procedures require verification 
+from official Cosmos EVM documentation.
+############################
+*/}
+
+## Development Environment Setup
+
+### Prerequisites
+
+```bash
+# Requirements based on Cosmos SDK and EVM compatibility
+go version      # Go 1.21+ (for Cosmos SDK development)
+node --version  # Node.js 18+ (for smart contract development)
+npm --version   # npm 8+ (for package management)
+git --version   # Git (for version control)
+make --version  # GNU Make (common for Go projects)
+```
+
+<Note>
+Cosmos EVM is built on Cosmos SDK (requires Go) and provides EVM compatibility (suggests Node.js tooling support).
+</Note>
+
+{/*
+############################
+RESEARCH REQUIRED: 
+- Repository location and clone procedures
+- Build system specifics (Make targets)
+- CLI tool names and installation methods
+- Configuration file locations and formats
+############################
+*/}
+
+## Architecture-Based Development
+
+### Core Modules
+
+Based on available documentation, development involves three main modules:
+
+<CardGroup cols={3}>
+  <Card title="x/vm Module" icon="microchip">
+    Core EVM implementation providing Ethereum compatibility
+  </Card>
+  <Card title="x/feemarket Module" icon="chart-line">
+    EIP-1559 fee market mechanism for transaction fee handling
+  </Card>
+  <Card title="x/erc20 Module" icon="arrows-rotate">
+    Interoperability between Cosmos SDK coins and ERC-20 tokens
+  </Card>
+</CardGroup>
+
+### Parameter Management
+
+Both VM and FeeMarket modules maintain parameters that can be updated through governance:
+
+**VM Module Parameters:**
+- EVM denomination
+- Extra EIPs enabled
+- Chain configuration (fork schedule)
+- Active precompiled contracts
+
+**FeeMarket Module Parameters:**
+- Base fee change denominator
+- Elasticity multiplier
+- Min gas price
+- Min gas multiplier
+
+## Smart Contract Development
+
+### Standard Ethereum Development
+
+Since Cosmos EVM is forward-compatible with Ethereum, standard tooling should work:
+
+```bash
+# Standard Ethereum development setup
+npm install --save-dev hardhat @nomicfoundation/hardhat-toolbox
+npm install --save ethers
+npm install --save @cosmjs/stargate @cosmjs/proto-signing
+```
+
+### Configuration Template
+
+```typescript
+// hardhat.config.ts
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+
+const config: HardhatUserConfig = {
+  solidity: {
+    version: "0.8.19",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
+  networks: {
+    local: {
+      url: "http://localhost:8545", // Standard EVM JSON-RPC port
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      // ############################
+      // # VERIFY: Chain ID and other parameters
+      // ############################
+    },
+  },
+};
+
+export default config;
+```
+
+### Development Workflow (Template)
+
+```bash
+# Standard smart contract workflow
+npx hardhat compile
+npx hardhat test
+npx hardhat run scripts/deploy.ts --network local
+```
+
+{/*
+############################
+RESEARCH REQUIRED - Critical Areas
+
+Installation and Setup:
+- Official repository URL and location
+- CLI binary names (e.g., evmd, cosmos-evmd, etc.)
+- Installation procedures (binary releases vs source builds)
+- Build system Make targets and commands
+- Configuration file locations and formats
+
+Local Node Configuration:
+- Node initialization commands and syntax
+- Genesis configuration procedures
+- Account creation and key management
+- Network configuration and ports
+- Chain ID formats and conventions
+
+Development Commands:
+- CLI command syntax and options
+- Query commands for modules (vm, feemarket, erc20)
+- Transaction submission procedures
+- Local development scripts and utilities
+
+Testing and Debugging:
+- Testing framework integration
+- Debugging tools and procedures
+- Performance monitoring capabilities
+- Log analysis and troubleshooting
+############################
+*/}
+
+## Placeholder Development Commands
+
+<Note>
+**These are typical patterns that need verification:**
+
+```bash
+# Typical Cosmos SDK patterns (VERIFY BEFORE USE)
+# Installation
+go install github.com/cosmos/cosmos-evm/cmd/evmd@latest
+
+# Node initialization  
+evmd init mynode --chain-id cosmos_9000-1
+
+# Account management
+evmd keys add mykey
+evmd keys list
+
+# Node operation
+evmd start
+evmd status
+
+# Queries (verify module names and commands)
+evmd query vm params
+evmd query feemarket params
+evmd query erc20 params
+
+# Build system (verify Make targets)
+make build
+make install
+make test
+make lint
+```
+</Note>
+
+## Module Integration
+
+### x/erc20 Module Usage
+
+{/*
+############################
+RESEARCH REQUIRED: 
+- Token pair registration procedures
+- Conversion between Cosmos coins and ERC-20 tokens
+- Query commands for token pairs
+- Integration with smart contracts
+############################
+*/}
+
+### Governance Integration
+
+**Known Capability**: Parameters can be updated through governance proposals.
+
+{/*
+############################
+RESEARCH REQUIRED: 
+- Parameter change proposal formats
+- Voting procedures
+- Implementation details for parameter updates
+############################
+*/}
+
+## Development Environment Templates
+
+### Project Structure Template
+
+```
+cosmos-evm-project/
+├── contracts/                 # Solidity contracts
+├── scripts/                   # Deployment scripts
+├── test/                      # Contract tests
+├── hardhat.config.ts         # Hardhat configuration
+├── package.json              # Dependencies
+└── .env                      # Environment variables
+```
+
+### VS Code Configuration Template
+
+```json
+// .vscode/settings.json
+{
+  "go.testFlags": ["-v"],
+  "go.testTimeout": "60s",
+  "go.lintTool": "golangci-lint",
+  "solidity.defaultCompiler": "remote",
+  "solidity.compileUsingRemoteVersion": "v0.8.19+commit.7dd6d404"
+}
+```
+
+## Testing Approaches
+
+### Smart Contract Testing
+
+```javascript
+// Standard Hardhat testing pattern
+const { expect } = require("chai");
+const { ethers } = require("hardhat");
+
+describe("CosmosEVMContract", function () {
+  let contract;
+  let owner;
+
+  beforeEach(async function () {
+    [owner] = await ethers.getSigners();
+    
+    const Contract = await ethers.getContractFactory("CosmosEVMContract");
+    contract = await Contract.deploy("Hello World");
+    await contract.deployed();
+  });
+
+  it("Should deploy with correct initial state", async function () {
+    expect(await contract.message()).to.equal("Hello World");
+  });
+});
+```
+
+### Integration Testing
+
+{/*
+############################
+RESEARCH REQUIRED: Integration testing patterns for:
+- Module interactions (vm, feemarket, erc20)
+- Cosmos SDK integration
+- IBC functionality (if available)
+- Governance parameter updates
+############################
+*/}
+
+## Debugging and Monitoring
+
+### JSON-RPC Debugging (Standard Ethereum)
+
+```bash
+# Standard Ethereum JSON-RPC calls (should work with Cosmos EVM)
+curl -X POST -H "Content-Type: application/json" \
+  --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' \
+  http://localhost:8545
+
+curl -X POST -H "Content-Type: application/json" \
+  --data '{"jsonrpc":"2.0","method":"eth_getBalance","params":["0x...","latest"],"id":1}' \
+  http://localhost:8545
+```
+
+### Cosmos SDK Debugging
+
+{/*
+############################
+RESEARCH REQUIRED: Cosmos SDK specific debugging:
+- RPC endpoint configurations
+- Query command syntax for modules
+- Transaction analysis tools
+- State inspection procedures
+############################
+*/}
+
+## Next Steps for Developers
+
+<Steps>
+  <Step title="Verify Official Documentation">
+    Locate and confirm official Cosmos EVM repository and documentation sources.
+  </Step>
+  <Step title="Test Installation">
+    Verify installation procedures and CLI tools using official sources.
+  </Step>
+  <Step title="Set Up Development Environment">
+    Configure development environment using verified procedures.
+  </Step>
+  <Step title="Explore Module Features">
+    Research and test x/vm, x/feemarket, and x/erc20 module capabilities.
+  </Step>
+  <Step title="Build Integration Examples">
+    Create examples combining EVM and Cosmos SDK features.
+  </Step>
+</Steps>
+
+## Research Resources
+
+### Information Sources
+- **Architectural information** - Module descriptions and relationships
+- **Standard Ethereum tooling** - Hardhat, ethers.js, Solidity development
+- **Cosmos SDK patterns** - General development approaches
+
+{/*
+############################
+INFORMATION GAPS REQUIRING RESEARCH:
+- Official repository and documentation location
+- CLI tool specifications and usage
+- Network configurations and endpoints  
+- Module-specific integration examples
+- Testing and debugging procedures
+############################
+*/} 
