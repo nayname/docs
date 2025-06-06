@@ -10,7 +10,7 @@ For chains that are already live, adding EVM compatibility is more complex and i
 - **Tokenomics:** For live chains, decimal place changes are not recommended due to impact on existing balances.
 - **Asset Migration:** Existing assets need to be initialized and mirrored in the EVM.
 
-Detailed instructions for upgrading existing chains are still in development and will be provided in a future guide.
+Detailed instructions for upgrading existing chains are still in development and will be provided in the future.
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ Current Limitation: This step relies on an SDK fork. Resolution is pending via P
 require (
     github.com/cosmos/cosmos-sdk v0.50.13
 	github.com/ethereum/go-ethereum v1.10.26
-	
+
 	// for ibc functionality in EVM
     github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8 v8.1.1
 	github.com/cosmos/ibc-go/modules/capability v1.0.1
@@ -60,7 +60,7 @@ Before deciding on an EVM chain-id, confirm that is it not already taken! See [c
 
 **Changes:**
 
-1.  **Chain ID Format:** For new chains only - Ethereum tools often expect chain IDs in a specific format (e.g., `name_number-version`). 
+1.  **Chain ID Format:** For new chains only - Ethereum tools often expect chain IDs in a specific format (e.g., `name_number-version`).
     *   **Example:** `"mychain-1"` -> `"mychain_9000-1"`
     *   **Locations & Examples:**
         *   `app/app.go`: `const ChainID = "mychain_9000-1"`
@@ -338,7 +338,7 @@ func NewAvailableStaticPrecompiles(
 
 ### Required Keepers:
 1. **x/feemarket** - Will change existing fee accrual patterns
-2. **x/vm** - Core EVM functionality  
+2. **x/vm** - Core EVM functionality
 3. **x/erc20** - ERC20 token support
 4. **Embedded IBC transfer keeper** - Enhanced IBC functionality
 
@@ -364,14 +364,14 @@ import (
     feemarketkeeper "github.com/cosmos/evm/x/feemarket/keeper"
     feemarkettypes "github.com/cosmos/evm/x/feemarket/types"
     evm "github.com/cosmos/evm/x/vm"
-    
+
     // TODO: Evaluate if these tracer imports are necessary
     _ "github.com/cosmos/evm/x/vm/core/tracers/js"
     _ "github.com/cosmos/evm/x/vm/core/tracers/native"
     "github.com/cosmos/evm/x/vm/core/vm"
     evmkeeper "github.com/cosmos/evm/x/vm/keeper"
     evmtypes "github.com/cosmos/evm/x/vm/types"
-    
+
 	// Replace default transfer with EVM's transfer (if using IBC)
 	transfer "github.com/cosmos/evm/x/ibc/transfer"
 	ibctransferkeeper "github.com/cosmos/evm/x/ibc/transfer/keeper"
@@ -399,7 +399,7 @@ type ChainApp struct {
     FeeMarketKeeper     feemarketkeeper.Keeper
     EVMKeeper           *evmkeeper.Keeper
     Erc20Keeper         erc20keeper.Keeper
-    
+
     // ... existing fields
 }
 ```
@@ -521,7 +521,7 @@ Note that the IBC keeper is an extended version from the `x/ibc` module from Cos
 // import "github.com/cosmos/ibc-go/v8/modules/apps/transfer"
 // import ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 
-// Add 
+// Add
 import transfer "github.com/cosmos/evm/x/ibc/transfer"
 import ibctransferkeeper "github.com/cosmos/evm/x/ibc/transfer/keeper"
 ```
@@ -573,7 +573,7 @@ app.ModuleManager.SetOrderEndBlockers(
     erc20types.ModuleName,
     // ... existing modules
 )
-// ... 
+// ...
 
 // Add to SetOrderInitGenesis
 genesisModuleOrder := []string{
@@ -591,7 +591,7 @@ genesisModuleOrder := []string{
 options := chainante.HandlerOptions{
     // Add these options
     FeeMarketKeeper: app.FeeMarketKeeper,
-	
+
     EvmKeeper:              app.EVMKeeper,
     ExtensionOptionChecker: cosmosevmtypes.HasDynamicFeeExtensionOption,
     SigGasConsumer:         evmante.SigVerificationGasConsumer,
@@ -618,7 +618,7 @@ func BlockedAddresses() map[string]bool {
     for _, precompile := range blockedPrecompilesHex {
         blockedAddrs[evmutils.EthHexToCosmosAddr(precompile).String()] = true
     }
-    
+
     return blockedAddrs
 }
 ```
@@ -940,7 +940,7 @@ srvflags "github.com/cosmos/evm/server/flags"
 // Update CustomAppConfig struct
 type CustomAppConfig struct {
     serverconfig.Config
-    
+
     // Add these fields
     EVM     evmserverconfig.EVMConfig
     JSONRPC evmserverconfig.JSONRPCConfig
@@ -956,10 +956,10 @@ func initAppConfig() (string, interface{}) {
         JSONRPC: *evmserverconfig.DefaultJSONRPCConfig(),
         TLS:     *evmserverconfig.DefaultTLSConfig(),
     }
-    
+
     // Add EVM template to existing config
     customAppTemplate += evmserverconfig.DefaultEVMConfigTemplate
-    
+
     return customAppTemplate, customAppConfig
 }
 
@@ -975,13 +975,13 @@ func initRootCmd(
         appExport,
         addModuleInitFlags,
     )
-    
+
     // Optional: Add EVM key commands (evaluate if needed)
     rootCmd.AddCommand(
 		// ... existing commands
         evmcmd.KeyCommands(app.DefaultNodeHome, true),
     )
-    
+
     // Add tx flags
     var err error
     rootCmd, err = srvflags.AddTxFlags(rootCmd)

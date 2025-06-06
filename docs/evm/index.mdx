@@ -5,206 +5,33 @@ description: "Ethereum Virtual Machine compatibility for Cosmos SDK chains"
 
 # Cosmos EVM
 
-Cosmos EVM is a plug-and-play solution that adds Ethereum Virtual Machine (EVM) compatibility and customizability to Cosmos SDK chains. Based on Ethermint, this implementation enables developers to build application-specific blockchains with the control and extensibility of the Cosmos SDK while providing native EVM support and seamless interoperability between Ethereum and Cosmos ecosystems.
+Cosmos EVM brings Ethereum compatibility to Cosmos SDK chains through a modular, plug-and-play architecture. Built on Ethermint, it lets developers create application-specific blockchains that combine the flexibility of Cosmos SDK with the familiarity and collective mindshare of the EVM ecosystem.
 
-<Note>
-**Project Status**: Cosmos EVM is a fork of evmOS maintained by Interchain Labs and the Interchain Foundation. The project is fully open-source under the Apache 2.0 license. The codebase is undergoing changes in preparation for a new audit, with the first v1 release targeted for late Q2.
-</Note>
+For detailed information about the overall concept and architecture, please refer to the [Architecture](/evm/architecture) documentation.
 
-## Project Overview
 
-Cosmos EVM enables developers to build application-specific blockchains with the control and extensibility of the Cosmos SDK while providing native EVM support and seamless interoperability between Ethereum and Cosmos ecosystems.
-
-**Key Characteristics:**
-- **Forward-compatible** with Ethereum - can run any valid Ethereum smart contract and implement new features not yet available in standard EVM
-- **Cosmos SDK native** - built as Cosmos modules with full integration
-- **Modular architecture** - extensive customization options and tight integration with the broader Cosmos ecosystem
-- **Apache 2.0 licensed** - fully open-source
-
-## Core Architecture
-
-Cosmos EVM consists of several key modules that work together to provide EVM compatibility within the Cosmos SDK framework:
-
-### Core Modules
-
-<CardGroup cols={3}>
-  <Card title="x/vm Module" icon="microchip" color="#7c3aed">
-    The core EVM implementation module (renamed from x/evm in the original evmOS) that provides Ethereum compatibility
-  </Card>
-  <Card title="x/feemarket Module" icon="chart-line" color="#059669">
-    Implements EIP-1559 fee market mechanism for transaction fee handling
-  </Card>
-  <Card title="x/erc20 Module" icon="arrows-rotate" color="#ea580c">
-    Enables interoperability between Cosmos SDK coins and ERC-20 tokens
-  </Card>
-</CardGroup>
-
-These modules work together to provide a seamless EVM experience within the Cosmos SDK framework.
-
-## Quick Start
-
-### Basic Development Approach
-
-Standard Ethereum development tools should work with Cosmos EVM:
-
-```bash
-# Standard Ethereum development tools should work
-npm install --save ethers hardhat
-npm install --save @cosmjs/stargate @cosmjs/proto-signing
-```
-
-### Smart Contract Example
-
-Since Cosmos EVM aims to be forward-compatible with Ethereum, standard Solidity contracts should work:
-
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
-
-contract CosmosEVMExample {
-    string public message;
-    address public owner;
-    uint256 public updateCount;
-    
-    event MessageUpdated(string newMessage, address updatedBy, uint256 timestamp);
-    
-    constructor(string memory _message) {
-        message = _message;
-        owner = msg.sender;
-        updateCount = 0;
-    }
-    
-    function updateMessage(string memory _newMessage) public {
-        message = _newMessage;
-        updateCount++;
-        emit MessageUpdated(_newMessage, msg.sender, block.timestamp);
-    }
-    
-    function getInfo() public view returns (
-        string memory currentMessage,
-        address contractOwner,
-        uint256 totalUpdates
-    ) {
-        return (message, owner, updateCount);
-    }
-}
-```
 
 ## Key Features
 
 <CardGroup cols={2}>
-  <Card title="Forward Compatibility" icon="rocket" color="#7c3aed">
-    Can run any valid smart contract from Ethereum plus implement new features not yet available in standard EVM
+  <Card title="Forward Compatibility" icon="rightarrow" color="#7c3aed">
+    Deploy any EVM smart contract, with access to additional functionality not available through standard EVM
   </Card>
   <Card title="Cosmos Integration" icon="globe" color="#4f46e5">
-    Tight integration with the broader Cosmos ecosystem for interoperability
+    Using the Cosmos SDK as a foundation provides flexibility in interoperability
   </Card>
   <Card title="Modular Design" icon="puzzle-piece" color="#059669">
-    Extensive customization options through the modular architecture
+    Limitless customization through modular architecture
   </Card>
-  <Card title="EIP-1559 Support" icon="chart-bar" color="#ea580c">
-    Dynamic fee market mechanism through the x/feemarket module
+  <Card title="Developer Experience" icon="code" color="#ea580c">
+    Seamless integration with standard EVM development tools and workflows
   </Card>
 </CardGroup>
 
-## Development Environment
 
-### Hardhat Configuration Template
-
-```typescript
-import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
-
-const config: HardhatUserConfig = {
-  solidity: {
-    version: "0.8.19",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200,
-      },
-    },
-  },
-  networks: {
-    "cosmos-local": {
-      url: "http://localhost:8545", // Standard EVM JSON-RPC port
-      accounts: [process.env.PRIVATE_KEY!],
-      // ############################
-      // # VERIFY: Chain ID
-      // ############################
-    },
-  },
-};
-
-export default config;
-```
-
-## Module Parameters
-
-Both the VM and FeeMarket modules maintain their own sets of parameters:
-
-### VM Module Parameters
-- EVM denomination
-- Extra EIPs enabled
-- Chain configuration (fork schedule)
-- Active precompiled contracts
-
-### FeeMarket Module Parameters
-- Base fee change denominator
-- Elasticity multiplier
-- Min gas price
-- Min gas multiplier
-
-<Note>
-Parameters can be updated through governance proposals, maintaining the decentralized nature of Cosmos chains.
-</Note>
-
-## Next Steps
-
-<Steps>
-  <Step title="Verify Installation">
-    Research and verify the actual installation process and repository location from official sources.
-  </Step>
-  <Step title="Explore Architecture">
-    Review the detailed architecture documentation to understand module interactions.
-  </Step>
-  <Step title="Set Up Development">
-    Follow verified setup procedures once official documentation is confirmed.
-  </Step>
-  <Step title="Deploy Contracts">
-    Test smart contract deployment using verified network configurations.
-  </Step>
-</Steps>
-
-{/*
-############################
-RESEARCH REQUIRED - Complete sections below
-
-Repository and Installation:
-- Official repository URL and location
-- Installation procedures and CLI tools
-- Build system details and Make targets
-
-Network Configuration:
-- Available networks and endpoints
-- Chain ID formats and conventions
-- Node setup and configuration procedures
-
-Development Tools:
-- Specific CLI commands and syntax
-- Local development setup procedures
-- Testing framework details
-
-Technical Details:
-- Parameter structures
-- Transaction flow implementation
-- State management specifics
-############################
-*/}
-
-## Resources
+## Additional Resources
 
 - **[Architecture Guide](/docs/evm/architecture)** - Technical architecture and design
-- **[Quickstart Guide](/docs/evm/quickstart)** - Getting started (needs verification)
-- **[Local Development](/docs/evm/local-development)** - Development setup (needs verification)
+- **[Quickstart Guide](/docs/evm/quickstart)** - Getting started as a developer
+- **[Local Development](/docs/evm/local-development)** - Set up your development environemnt
 - **[Integration Guide](/docs/evm/integrate)** - Chain integration steps
