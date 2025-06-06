@@ -5,33 +5,75 @@ description: "Ethereum Virtual Machine compatibility for Cosmos SDK chains"
 
 # Cosmos EVM
 
-Cosmos EVM brings Ethereum compatibility to Cosmos SDK chains through a modular, plug-and-play architecture. Built on Ethermint, it lets developers create application-specific blockchains that combine the flexibility of Cosmos SDK with the familiarity and collective mindshare of the EVM ecosystem.
+Cosmos EVM is a plug-and-play solution that adds EVM compatibility and customizability to your Cosmos SDK chain. Build an app-chain with the control and extensibility of the Cosmos SDK, with native support for EVM and seamless EVM↔Cosmos wallet/token/user experience.
 
-For detailed information about the overall concept and architecture, please refer to the [Architecture](/evm/architecture) documentation.
+<Note>
+**Project Status**: Cosmos EVM is undergoing changes in preparation for a new audit. The first v1 release is targeted for late Q2. While the original evmOS repo is used in production on several chains, this repository will be marked as stable after the audit is completed.
+</Note>
 
-
-
-## Key Features
+## What Makes Cosmos EVM Different?
 
 <CardGroup cols={2}>
-  <Card title="Forward Compatibility" icon="rightarrow" color="#7c3aed">
-    Deploy any EVM smart contract, with access to additional functionality not available through standard EVM
+  <Card title="EVM Compatibility" icon="ethereum" color="#627EEA">
+    Forward-compatible with Ethereum - run any valid smart contract from Ethereum plus new features not yet available in standard EVM.
   </Card>
-  <Card title="Cosmos Integration" icon="globe" color="#4f46e5">
-    Using the Cosmos SDK as a foundation provides flexibility in interoperability
+  <Card title="Cosmos Integration" icon="globe" color="#4B47CA">
+    Native IBC support, seamless integration with Cosmos SDK modules, and extensible architecture.
   </Card>
-  <Card title="Modular Design" icon="puzzle-piece" color="#059669">
-    Limitless customization through modular architecture
+  <Card title="Customizable Features" icon="settings" color="#22E2A8">
+    EVM extensions, custom precompiles, and permissioned/restricted EVM capabilities.
   </Card>
-  <Card title="Developer Experience" icon="code" color="#ea580c">
-    Seamless integration with standard EVM development tools and workflows
+  <Card title="Token Unification" icon="coins" color="#FF5628">
+    Single Token Representation v2 and ERC-20 module eliminate liquidity fragmentation.
   </Card>
 </CardGroup>
 
+---
 
-## Additional Resources
+## Choose Your Path
 
-- **[Architecture Guide](/docs/evm/architecture)** - Technical architecture and design
-- **[Quickstart Guide](/docs/evm/quickstart)** - Getting started as a developer
-- **[Local Development](/docs/evm/local-development)** - Set up your development environemnt
-- **[Integration Guide](/docs/evm/integrate)** - Chain integration steps
+### 🔍 **New to Cosmos EVM?** → [Explore & Compare](/docs/evm/explore)
+*Understand what Cosmos EVM offers and how it compares to other solutions*
+
+### ⚡ **Ready to Build?** → [Practice with Tutorials](/docs/evm/practice)
+*Step-by-step guides to deploy your first contracts and build applications*
+
+### 🔧 **Need Integration Help?** → [Develop & Integrate](/docs/evm/develop)
+*Convert existing chains or build custom integrations*
+
+### 📚 **Looking for References?** → [Remember & Reference](/docs/evm/reference)
+*APIs, configurations, and technical specifications*
+
+### 🚨 **Having Issues?** → [Troubleshoot & Solve](/docs/evm/troubleshoot)
+*Common problems and their solutions*
+
+---
+
+## Popular Starting Points
+
+<CardGroup cols={3}>
+  <Card title="Deploy a Smart Contract" href="/docs/evm/practice#deploy-contract">
+    Get your Solidity contracts running in 5 minutes
+  </Card>
+  <Card title="Compare Solutions" href="/docs/evm/explore#comparison">
+    See how Cosmos EVM stacks against alternatives
+  </Card>
+  <Card title="Convert Your Chain" href="/docs/evm/develop#chain-conversion">
+    Add EVM compatibility to existing Cosmos chains
+  </Card>
+</CardGroup>
+
+---
+
+## Community & Support
+
+<CardGroup cols={2}>
+  <Card title="Developer Discord" icon="discord" href="https://discord.gg/cosmosnetwork">
+    Join the conversation with other developers
+  </Card>
+  <Card title="GitHub Repository" icon="github" href="https://github.com/cosmos/evm">
+    Contribute to the codebase and report issues
+  </Card>
+</CardGroup>
+
+*Want to dive deeper into the technical architecture? Check out our [Architecture Overview](/docs/evm/reference#architecture).*

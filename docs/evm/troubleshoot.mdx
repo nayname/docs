@@ -1,0 +1,321 @@
+---
+title: "Troubleshoot & Solve"
+description: "Common problems, debugging techniques, and solutions for Cosmos EVM"
+---
+
+# Troubleshoot & Solve
+
+General guidance for diagnosing and resolving issues with Cosmos EVM development and operations.
+
+## Quick Problem Categories
+
+<CardGroup cols={2}>
+  <Card title="Development Issues" icon="code" href="#development-issues">
+    Smart contract development and testing problems
+  </Card>
+  <Card title="Integration Issues" icon="puzzle" href="#integration-issues">
+    Chain integration and module configuration
+  </Card>
+  <Card title="Node Operation" icon="server" href="#node-operation">
+    Running and maintaining Cosmos EVM nodes
+  </Card>
+  <Card title="Network Connectivity" icon="wifi" href="#network-connectivity">
+    RPC connections and network access
+  </Card>
+</CardGroup>
+
+---
+
+## General Troubleshooting Approach
+
+### Step 1: Verify Project Status
+
+<Warning>
+**Important**: Remember that Cosmos EVM is undergoing changes in preparation for a new audit. The first v1 release is targeted for late Q2. Issues may be related to the pre-audit state of the codebase.
+</Warning>
+
+### Step 2: Check Official Resources
+
+Before troubleshooting, consult:
+- **GitHub Repository**: [cosmos/evm](https://github.com/cosmos/evm) for latest issues and discussions
+- **Official Documentation**: Watch for updates from Interchain Labs team
+- **Community Channels**: #cosmos-tech in Cosmos Network Slack
+
+### Step 3: Isolate the Problem
+
+Determine which component is affected:
+- **EVM Module (x/vm)**: Smart contract execution issues
+- **FeeMarket Module (x/feemarket)**: Transaction fee problems
+- **ERC-20 Module (x/erc20)**: Token conversion issues
+- **JSON-RPC**: API connectivity problems
+- **IBC Integration**: Cross-chain functionality issues
+
+---
+
+## Development Issues {#development-issues}
+
+### Smart Contract Development
+
+**Common Problem Areas:**
+- Contract deployment failures
+- Unexpected behavior differences from Ethereum
+- Gas estimation issues
+- Integration with Cosmos-specific features
+
+**General Debugging Approach:**
+
+1. **Test on Local Development Node**
+   ```bash
+   # Use the official local development setup
+   ./local_node.sh
+   ```
+
+2. **Verify EVM Compatibility**
+   - Ensure contracts work on standard Ethereum first
+   - Check for Cosmos EVM-specific features being used
+   - Review forward-compatibility implications
+
+3. **Check Module Parameters**
+   - Verify current VM module configuration
+   - Check if custom EIPs are enabled
+   - Review precompiled contract availability
+
+### Testing Framework Issues
+
+The official repository provides several testing commands:
+
+```bash
+# Unit testing
+make test-unit
+
+# Solidity contract testing
+make test-solidity
+
+# Coverage testing
+make test-unit-cover
+```
+
+If tests are failing, check:
+- Go version compatibility
+- Dependency versions
+- Local environment setup
+
+---
+
+## Integration Issues {#integration-issues}
+
+### Module Integration Problems
+
+**Common Areas:**
+- Incorrect module registration
+- Parameter configuration errors
+- Genesis state issues
+- Upgrade path problems
+
+**Debugging Steps:**
+
+1. **Review Module Documentation**
+   - Check deepwiki documentation for module details
+   - Verify parameter requirements
+   - Understand module dependencies
+
+2. **Check Chain Configuration**
+   - Verify chain ID format compatibility
+   - Review denomination settings
+   - Check decimal precision settings (for new chains)
+
+3. **Test Module Functionality**
+   - Test each module independently
+   - Verify governance parameter updates work
+   - Check cross-module interactions
+
+### Migration Considerations
+
+**For Existing Chains:**
+- Migration requires careful planning
+- Community coordination necessary
+- Chain ID format impacts
+- Asset migration requirements
+
+**For New Chains:**
+- Simpler integration process
+- Full configuration flexibility
+- Optimal setup possible from start
+
+---
+
+## Node Operation {#node-operation}
+
+### Local Development Node
+
+The official repository provides a local node script:
+
+```bash
+./local_node.sh
+```
+
+**If the local node fails to start:**
+1. Check port availability
+2. Verify dependencies are installed
+3. Review any error messages in logs
+4. Ensure proper permissions
+
+### Build System Issues
+
+The project uses Make for building:
+
+```bash
+# Build the project
+make build
+
+# Run linting
+make lint
+
+# Format code
+make format
+```
+
+**Common Build Problems:**
+- Go version incompatibility
+- Missing dependencies
+- Environment variable issues
+- Permission problems
+
+---
+
+## Network Connectivity {#network-connectivity}
+
+### JSON-RPC Access
+
+Cosmos EVM provides JSON-RPC compatibility for Ethereum tooling:
+
+**Connection Issues:**
+- Verify node is running and synced
+- Check RPC endpoint configuration
+- Test basic connectivity
+- Verify network/firewall settings
+
+### EVM Tool Integration
+
+**MetaMask and Wallet Issues:**
+- Verify chain ID format
+- Check RPC endpoint configuration
+- Ensure proper network configuration
+- Test with simple transactions first
+
+**Development Tool Issues:**
+- Verify JSON-RPC compatibility
+- Check for Cosmos-specific differences
+- Test with standard Ethereum tools first
+- Review any custom extensions needed
+
+---
+
+## Debugging Strategies
+
+### Systematic Approach
+
+1. **Reproduce the Issue**
+   - Document exact steps
+   - Note environment details
+   - Record error messages
+
+2. **Check Logs**
+   - Review node logs
+   - Check application logs
+   - Look for module-specific errors
+
+3. **Test Incrementally**
+   - Start with minimal setup
+   - Add complexity gradually
+   - Test each component separately
+
+4. **Compare with Known Working Setup**
+   - Use the official local development node
+   - Compare configurations
+   - Test with provided examples
+
+### Tools and Commands
+
+**For Node Debugging:**
+```bash
+# Check node status
+make status
+
+# View logs (implementation-specific)
+tail -f logs/node.log
+
+# Test basic functionality
+make test-unit
+```
+
+**For Contract Debugging:**
+- Use standard Ethereum debugging tools
+- Test on local development node first
+- Compare behavior with Ethereum mainnet
+
+---
+
+## Getting Help
+
+### Community Support
+
+<CardGroup cols={2}>
+  <Card title="Technical Discussions" icon="message-circle">
+    **Slack**: #cosmos-tech channel in [Cosmos Network Slack](https://cosmos.network/community)
+  </Card>
+  <Card title="Development Issues" icon="github">
+    **GitHub**: Report issues at [cosmos/evm repository](https://github.com/cosmos/evm)
+  </Card>
+</CardGroup>
+
+### Professional Support
+
+For complex integration issues, the Interchain Labs team provides:
+- Integration guides
+- Core protocol support
+- Custom configuration assistance
+
+Contact them for expert consultation on Cosmos EVM implementation.
+
+### When Reporting Issues
+
+**Include:**
+- Cosmos EVM version/commit
+- Operating system and architecture
+- Go version
+- Complete error messages
+- Steps to reproduce
+- Expected vs actual behavior
+
+**For Smart Contract Issues:**
+- Contract source code
+- Deployment transaction hash
+- Network configuration
+- Comparison with Ethereum behavior
+
+---
+
+## Best Practices
+
+### Development
+- Always test on local development node first
+- Use the official testing framework
+- Follow standard Ethereum development patterns
+- Understand Cosmos-specific extensions before using
+
+### Integration
+- Review official documentation thoroughly
+- Test each module independently
+- Use governance for parameter updates
+- Plan migrations carefully for live chains
+
+### Operations
+- Monitor both EVM and Cosmos metrics
+- Keep up with official updates
+- Maintain proper backups
+- Follow security best practices
+
+---
+
+*For ongoing support and updates, monitor the [official GitHub repository](https://github.com/cosmos/evm) and join the community discussions in the Cosmos Network Slack.*

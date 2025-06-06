@@ -5,7 +5,7 @@
   "theme": "palm",
   "colors": {
     "primary": "#4B47CA",
-    "light": "#7552FF", 
+    "light": "#7552FF",
     "dark": "#22E2A8"
   },
   "styling": {
@@ -21,8 +21,20 @@
   ],
   "topbarLinks": [
     {
+      "name": "Ecosystem",
+      "url": "https://cosmos.network/ecosystem"
+    },
+    {
+      "name": "Community",
+      "url": "https://discord.gg/cosmosnetwork"
+    },
+    {
       "name": "GitHub",
       "url": "https://github.com/cosmos"
+    },
+    {
+      "name": "Blog",
+      "url": "https://blog.cosmos.network"
     }
   ],
   "topbarCtaButton": {
@@ -50,14 +62,28 @@
         "tab": "EVM",
         "groups": [
           {
-            "group": "EVM Development",
+            "group": "Getting Started",
             "icon": "ethereum",
             "pages": [
               "docs/evm/index",
-              "docs/evm/quickstart",
-              "docs/evm/architecture",
-              "docs/evm/local-development",
-              "docs/evm/integrate"
+              "docs/evm/explore",
+              "docs/evm/practice"
+            ]
+          },
+          {
+            "group": "Development",
+            "icon": "code",
+            "pages": [
+              "docs/evm/develop",
+              "docs/evm/local-development"
+            ]
+          },
+          {
+            "group": "Reference",
+            "icon": "book",
+            "pages": [
+              "docs/evm/reference",
+              "docs/evm/troubleshoot"
             ]
           }
         ]

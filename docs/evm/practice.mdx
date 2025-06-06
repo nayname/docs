@@ -1,0 +1,206 @@
+---
+title: "Practice with Tutorials"
+description: "Step-by-step guides to deploy contracts and build applications on Cosmos EVM"
+---
+
+# Practice with Tutorials
+
+Learn Cosmos EVM by understanding its core concepts and capabilities. These guides help you understand how to work with EVM compatibility in the Cosmos ecosystem.
+
+## Getting Started with Cosmos EVM Development
+
+### Prerequisites
+
+To develop on Cosmos EVM, you'll need:
+
+- **EVM Development Tools**: Any Ethereum development toolchain (Hardhat, Remix, etc.)
+- **Wallet Compatibility**: MetaMask and other EVM wallets work seamlessly
+- **JSON-RPC Support**: Full compatibility with Ethereum JSON-RPC endpoints
+
+### Core Concepts
+
+<CardGroup cols={2}>
+  <Card title="EVM Compatibility" icon="ethereum">
+    Any valid Solidity contract can be deployed unchanged. Forward-compatible with Ethereum while supporting additional features.
+  </Card>
+  <Card title="Cosmos Integration" icon="atom">
+    Access Cosmos SDK functionality through precompiled contracts.
+  </Card>
+</CardGroup>
+
+---
+
+## Development Patterns
+
+### Smart Contract Deployment
+
+Cosmos EVM supports standard EVM tooling and workflows:
+
+- **Solidity Contracts**: Deploy unchanged from Ethereum
+- **EVM Tools**: Use Hardhat, Remix, Foundry, and other familiar tools
+- **Wallet Integration**: MetaMask, Rabby, and other EVM wallets work natively
+
+### Configuration Considerations
+
+When setting up your development environment:
+
+```javascript
+// Example network configuration
+{
+  url: "YOUR_RPC_ENDPOINT",
+  accounts: [...],
+  chainId: YOUR_CHAIN_ID, // Cosmos chain ID format
+}
+```
+
+<Note>
+**Chain ID Format**: Cosmos EVM chains may use different chain ID formats. Check your specific chain's documentation.
+</Note>
+
+---
+
+## Key Features to Explore
+
+### EVM Extensions
+
+Cosmos EVM provides extensions to access Cosmos SDK functionality:
+
+<AccordionGroup>
+  <Accordion title="Precompiled Contracts">
+    Custom precompiled contracts allow Solidity smart contracts to interact with Cosmos SDK modules directly.
+
+    **Benefits:**
+    - Access native Cosmos functionality
+    - Maintain Solidity development workflow
+    - Bridge EVM and Cosmos ecosystems
+  </Accordion>
+
+  <Accordion title="IBC Integration">
+    Native Inter-Blockchain Communication protocol support enables:
+    - Cross-chain token transfers
+    - Cross-chain smart contract calls
+    - Access to the broader Cosmos ecosystem
+
+    **Use Cases:**
+    - Multi-chain applications
+    - Cross-chain DeFi protocols
+    - Asset management across ecosystems
+  </Accordion>
+
+  <Accordion title="Token Unification">
+    The ERC-20 module provides:
+    - Unified representation of Cosmos SDK coins and ERC-20 tokens
+    - Elimination of liquidity fragmentation
+    - Seamless user experience across token types
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Development Approaches
+
+### Option 1: Pure EVM Development
+
+**Best for:** Existing Ethereum projects, standard DeFi/NFT applications
+
+**Approach:**
+- Deploy existing Solidity contracts unchanged
+- Use standard Ethereum tooling and workflows
+- Benefit from lower fees and different consensus parameters
+
+### Option 2: Hybrid EVM + Cosmos
+
+**Best for:** Applications needing Cosmos-specific features
+
+**Approach:**
+- Combine Solidity smart contracts with Cosmos SDK modules
+- Use EVM extensions to access native functionality
+- Leverage IBC for cross-chain capabilities
+
+### Option 3: Cross-Chain Applications
+
+**Best for:** Multi-chain protocols and applications
+
+**Approach:**
+- Design for IBC compatibility from the start
+- Use unified token representation
+- Build for the broader Cosmos ecosystem
+
+---
+
+## Testing and Development
+
+### Local Development
+
+According to the official repository, you can run a local development node:
+
+```bash
+# From the Cosmos EVM repository
+./local_node.sh
+```
+
+This provides a local testing environment for development and experimentation.
+
+### Testing Framework
+
+The official repository includes comprehensive testing:
+
+- **Unit Testing**: `make test-unit`
+- **Solidity Tests**: `make test-solidity`
+- **Integration Tests**: Available through the build system
+
+---
+
+## Key Considerations
+
+### Parameter Management
+
+<Warning>
+Both VM and FeeMarket modules have configurable parameters that can be updated through governance proposals. Understand your chain's specific configuration before building applications.
+</Warning>
+
+### Fee Market
+
+Cosmos EVM implements EIP-1559 fee market mechanism:
+- Dynamic base fees
+- Configurable fee structures
+- Chain-specific fee parameters
+
+### Permissioned Features
+
+Some Cosmos EVM implementations may include:
+- Permissioned deployment of precompiled contracts
+- Address whitelisting/blacklisting
+- Custom access controls
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Integration Guide" href="/docs/evm/develop">
+    Learn how to integrate EVM into your chain
+  </Card>
+  <Card title="Technical Reference" href="/docs/evm/reference">
+    Detailed API and module documentation
+  </Card>
+  <Card title="Troubleshooting" href="/docs/evm/troubleshoot">
+    Common issues and solutions
+  </Card>
+  <Card title="GitHub Repository" href="https://github.com/cosmos/evm">
+    Access the source code and examples
+  </Card>
+</CardGroup>
+
+---
+
+## Community Resources
+
+<Note>
+For technical support and development discussions:
+- **Slack**: #cosmos-tech channel in [Cosmos Network Slack](https://cosmos.network/community)
+- **Telegram**: [Cosmos Project Telegram Group](https://t.me/cosmosproject)
+- **GitHub**: [cosmos/evm repository](https://github.com/cosmos/evm)
+</Note>
+
+*Remember: Cosmos EVM is undergoing changes in preparation for audit. Check the latest repository status before building production applications.*

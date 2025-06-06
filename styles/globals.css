@@ -1,5 +1,5 @@
 @tailwind base;
-@tailwind components;  
+@tailwind components;
 @tailwind utilities;
 
 /* Official Cosmos Brand Colors */
@@ -151,17 +151,149 @@
   backdrop-filter: blur(10px);
 }
 
-/* Navigation with cyan gradient */
-[data-theme='light'] #navbar {
-  background: linear-gradient(135deg, var(--cosmos-cyan) 0%, var(--cosmos-mint) 50%, rgba(64, 179, 255, 0.8) 100%);
-  border-bottom: 1px solid rgba(64, 179, 255, 0.3);
-  backdrop-filter: blur(15px);
-  color: white;
+/* Enhanced Navigation Header */
+[data-theme='light'] #navbar,
+[data-theme='light'] .mintlify-header,
+[data-theme='light'] header {
+  background: linear-gradient(135deg, var(--cosmos-deep-blue) 0%, var(--cosmos-deep-purple) 50%, var(--cosmos-cobalt) 100%);
+  border-bottom: 2px solid rgba(117, 34, 181, 0.3);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 4px 20px rgba(75, 71, 202, 0.15);
+  position: relative;
+  z-index: 100;
+  padding: 0.75rem 1.5rem;
+}
+
+/* Header overlay for extra depth */
+[data-theme='light'] #navbar::before,
+[data-theme='light'] .mintlify-header::before,
+[data-theme='light'] header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* Header text color */
-[data-theme='light'] #navbar * {
+[data-theme='light'] #navbar *,
+[data-theme='light'] .mintlify-header *,
+[data-theme='light'] header * {
   color: white !important;
+}
+
+/* Logo styling */
+[data-theme='light'] .mintlify-logo,
+[data-theme='light'] .logo {
+  filter: brightness(1.1) contrast(1.1);
+  transition: transform 0.2s ease;
+}
+
+[data-theme='light'] .mintlify-logo:hover,
+[data-theme='light'] .logo:hover {
+  transform: scale(1.05);
+}
+
+/* Header navigation links */
+[data-theme='light'] .mintlify-header-nav a,
+[data-theme='light'] .header-nav a,
+[data-theme='light'] .topbar-links a {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  position: relative;
+}
+
+[data-theme='light'] .mintlify-header-nav a:hover,
+[data-theme='light'] .header-nav a:hover,
+[data-theme='light'] .topbar-links a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Search bar positioning and styling */
+[data-theme='light'] .mintlify-search-wrapper,
+[data-theme='light'] .search-wrapper {
+  margin-left: auto;
+  margin-right: 25%;
+  max-width: 400px;
+  flex: 1;
+}
+
+[data-theme='light'] .mintlify-search input,
+[data-theme='light'] .search-input,
+[data-theme='light'] input[type="search"] {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
+  backdrop-filter: blur(10px);
+  border-radius: 12px !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.95rem !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme='light'] .mintlify-search input:focus,
+[data-theme='light'] .search-input:focus,
+[data-theme='light'] input[type="search"]:focus {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  outline: none !important;
+}
+
+[data-theme='light'] .mintlify-search input::placeholder,
+[data-theme='light'] .search-input::placeholder,
+[data-theme='light'] input[type="search"]::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* CTA Button enhanced styling */
+[data-theme='light'] .mintlify-cta-button,
+[data-theme='light'] .topbar-cta-button,
+[data-theme='light'] #topbar-cta-button {
+  background: var(--cosmos-orange) !important;
+  color: white !important;
+  border: none !important;
+  font-weight: 700 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 10px !important;
+  box-shadow: 0 3px 12px rgba(255, 86, 40, 0.4) !important;
+  transition: all 0.2s ease !important;
+  margin-left: 1rem !important;
+}
+
+[data-theme='light'] .mintlify-cta-button:hover,
+[data-theme='light'] .topbar-cta-button:hover,
+[data-theme='light'] #topbar-cta-button:hover {
+  background: var(--cosmos-pink) !important;
+  color: white !important;
+  box-shadow: 0 5px 20px rgba(230, 79, 143, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Mobile responsive header */
+@media (max-width: 768px) {
+  [data-theme='light'] .mintlify-search-wrapper,
+  [data-theme='light'] .search-wrapper {
+    margin-right: 1rem;
+    max-width: 200px;
+  }
+
+  [data-theme='light'] .mintlify-header-nav,
+  [data-theme='light'] .header-nav {
+    display: none;
+  }
 }
 
 /* Code blocks - softer appearance */
@@ -239,11 +371,47 @@
   transform: translateY(-1px);
 }
 
-/* Search box enhancement */
-[data-theme='light'] input[type="search"] {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(117, 82, 255, 0.2);
-  backdrop-filter: blur(10px);
+/* Additional header targeting for different Mintlify versions */
+[data-theme='light'] .mintlify-navbar,
+[data-theme='light'] .mintlify-topbar,
+[data-theme='light'] nav[role="navigation"] {
+  background: linear-gradient(135deg, var(--cosmos-deep-blue) 0%, var(--cosmos-deep-purple) 50%, var(--cosmos-cobalt) 100%) !important;
+  border-bottom: 2px solid rgba(117, 34, 181, 0.3) !important;
+  backdrop-filter: blur(20px) !important;
+  box-shadow: 0 4px 20px rgba(75, 71, 202, 0.15) !important;
+}
+
+/* Header layout improvements */
+[data-theme='light'] .mintlify-header .flex,
+[data-theme='light'] .mintlify-navbar .flex,
+[data-theme='light'] .mintlify-topbar .flex {
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Dark mode header styling */
+[data-theme='dark'] #navbar,
+[data-theme='dark'] .mintlify-header,
+[data-theme='dark'] header,
+[data-theme='dark'] .mintlify-navbar,
+[data-theme='dark'] .mintlify-topbar {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%) !important;
+  border-bottom: 2px solid rgba(34, 226, 168, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme='dark'] .mintlify-search input,
+[data-theme='dark'] input[type="search"] {
+  background: rgba(34, 226, 168, 0.1) !important;
+  border: 1px solid rgba(34, 226, 168, 0.3) !important;
+  color: var(--cosmos-mint) !important;
+}
+
+[data-theme='dark'] .mintlify-cta-button,
+[data-theme='dark'] #topbar-cta-button {
+  background: var(--cosmos-mint) !important;
+  color: #1a1a2e !important;
 }
 
 /* Active tab indicator */
