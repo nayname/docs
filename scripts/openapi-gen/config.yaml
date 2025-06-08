@@ -1,0 +1,91 @@
+# OpenAPI Generation Configuration
+name: "Cosmos Documentation OpenAPI Generator"
+version: "1.0.0"
+
+# Source repositories to monitor for changes
+sources:
+  cosmos-evm:
+    repo: "cosmos/evm"
+    branch: "main"
+    paths:
+      - "x/evm/types/*.proto"
+      - "rpc/apis/*.go"
+      - "rpc/backend/*.go"
+    output: "docs/api-specs/cosmos-evm.json"
+    type: "evm-jsonrpc"
+
+  cosmos-sdk:
+    repo: "cosmos/cosmos-sdk"
+    branch: "main"
+    paths:
+      - "proto/cosmos/**/*.proto"
+      - "x/*/types/*.proto"
+    output: "docs/api-specs/cosmos-sdk.json"
+    type: "grpc-gateway"
+
+  ibc:
+    repo: "cosmos/ibc-go"
+    branch: "main"
+    paths:
+      - "proto/ibc/**/*.proto"
+      - "modules/*/types/*.proto"
+    output: "docs/api-specs/ibc-core.json"
+    type: "grpc-gateway"
+
+# Generation settings
+generation:
+  # Auto-generate MDX pages for each endpoint
+  auto_generate_pages: true
+
+  # Output directory for generated MDX files
+  pages_output: "docs/api-reference"
+
+  # Include code examples for these languages
+  code_examples:
+    - curl
+    - typescript
+    - go
+    - rust
+    - python
+
+  # CLI examples to include
+  cli_examples:
+    - cosmos-cli
+    - direct-rpc
+
+  # Server configurations
+  servers:
+    mainnet:
+      cosmos_rpc: "https://rpc.cosmos.network"
+      cosmos_api: "https://api.cosmos.network"
+      evm_rpc: "https://evm-rpc.cosmos.network"
+    testnet:
+      cosmos_rpc: "https://testnet-rpc.cosmos.network"
+      cosmos_api: "https://testnet-api.cosmos.network"
+      evm_rpc: "https://testnet-evm-rpc.cosmos.network"
+    local:
+      cosmos_rpc: "http://localhost:26657"
+      cosmos_api: "http://localhost:1317"
+      evm_rpc: "http://localhost:8545"
+
+# Webhook configuration for automatic updates
+webhooks:
+  enabled: true
+  secret_name: "OPENAPI_WEBHOOK_SECRET"
+  allowed_repos:
+    - "cosmos/evm"
+    - "cosmos/cosmos-sdk"
+    - "cosmos/ibc-go"
+
+# Documentation metadata
+metadata:
+  title: "Cosmos API Documentation"
+  description: "Comprehensive API documentation for Cosmos blockchain ecosystem"
+  version: "1.0.0"
+  contact:
+    name: "Cosmos Documentation Team"
+    url: "https://docs.cosmos.network"
+    email: "docs@cosmos.network"
+  license:
+    name: "Apache 2.0"
+    url: "https://www.apache.org/licenses/LICENSE-2.0.html"
