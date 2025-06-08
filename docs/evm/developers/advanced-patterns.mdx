@@ -1,0 +1,508 @@
+---
+title: "Advanced Patterns: Building Hybrid Applications"
+description: "Sophisticated development patterns that leverage both EVM and Cosmos capabilities."
+---
+
+Once you've mastered the basics, these advanced patterns unlock the full potential of Cosmos EVM. These techniques combine EVM smart contracts with native Cosmos functionality for powerful hybrid applications.
+
+## Cross-Chain Patterns
+
+### 1. Cross-Chain Arbitrage Contracts
+
+Leverage IBC for automated arbitrage across Cosmos chains:
+
+```solidity
+contract CrossChainArbitrage {
+    IIBCTransfer constant IBC = IIBCTransfer(0x0000000000000000000000000000000000000802);
+
+    struct ArbitrageRoute {
+        string sourceChannel;
+        string targetChain;
+        address targetDEX;
+        uint256 minProfitBps; // Basis points
+    }
+
+    mapping(bytes32 => ArbitrageRoute) public routes;
+
+    function executeArbitrage(
+        address tokenA,
+        address tokenB,
+        uint256 amountIn,
+        bytes32 routeId
+    ) external {
+        ArbitrageRoute memory route = routes[routeId];
+
+        // Execute local swap
+        uint256 localOutput = localDEX.swap(tokenA, tokenB, amountIn);
+
+        // Calculate expected profit on target chain
+        uint256 expectedRemotePrice = getRemotePrice(route.targetChain, tokenA, tokenB);
+        uint256 expectedProfit = (localOutput * expectedRemotePrice / 1e18) - amountIn;
+
+        require(expectedProfit >= amountIn * route.minProfitBps / 10000, "Insufficient profit");
+
+        // IBC transfer to target chain
+        IBC.transfer(route.sourceChannel, route.targetDEX, localOutput);
+
+        emit ArbitrageExecuted(routeId, amountIn, localOutput, expectedProfit);
+    }
+}
+```
+
+**Cosmos SDK Comparison:**
+In native Cosmos SDK, this would require:
+- Custom module with IBC packet handling
+- Complex state management across chains
+- Go implementation with extensive testing
+
+### 2. Liquid Staking with IBC Yield
+
+Combine staking rewards with cross-chain yield opportunities:
+
+```solidity
+contract CrossChainLiquidStaking {
+    IStaking constant STAKING = IStaking(0x0000000000000000000000000000000000000800);
+    IDistribution constant DISTRIBUTION = IDistribution(0x0000000000000000000000000000000000000801);
+    IIBCTransfer constant IBC = IIBCTransfer(0x0000000000000000000000000000000000000802);
+
+    struct YieldStrategy {
+        string targetChain;
+        string channel;
+        address yieldContract;
+        uint256 allocationBps;
+    }
+
+    YieldStrategy[] public yieldStrategies;
+    uint256 public totalStaked;
+    mapping(address => uint256) public userShares;
+
+    function stake() external payable {
+        require(msg.value > 0, "Must stake positive amount");
+
+        // Stake locally
+        uint256 localAllocation = msg.value * 7000 / 10000; // 70% local
+        STAKING.delegate(primaryValidator, localAllocation);
+
+        // Distribute remaining to cross-chain strategies
+        uint256 remainingAmount = msg.value - localAllocation;
+        for (uint i = 0; i < yieldStrategies.length; i++) {
+            YieldStrategy memory strategy = yieldStrategies[i];
+            uint256 strategyAmount = remainingAmount * strategy.allocationBps / 10000;
+
+            if (strategyAmount > 0) {
+                IBC.transfer(strategy.channel, strategy.yieldContract, strategyAmount);
+            }
+        }
+
+        // Mint shares
+        uint256 shares = calculateShares(msg.value);
+        userShares[msg.sender] += shares;
+        totalStaked += msg.value;
+
+        emit Staked(msg.sender, msg.value, shares);
+    }
+
+    function harvestRewards() external {
+        // Harvest local staking rewards
+        DISTRIBUTION.withdrawDelegatorReward(address(this), primaryValidator);
+
+        // Cross-chain reward harvesting would be triggered by relayers
+        // or through IBC acknowledgment packets
+    }
+}
+```
+
+### 3. Governance-Controlled Protocol Parameters
+
+Bridge Cosmos governance with smart contract parameters:
+
+```solidity
+contract GovernanceControlledDEX {
+    address public constant GOVERNANCE_MODULE = 0x0000000000000000000000000000000000001000; // Hypothetical
+
+    struct PoolParams {
+        uint256 swapFeeBps;
+        uint256 protocolFeeBps;
+        bool isActive;
+    }
+
+    mapping(address => PoolParams) public poolParams;
+
+    modifier onlyGovernance() {
+        require(msg.sender == GOVERNANCE_MODULE, "Only governance");
+        _;
+    }
+
+    function updatePoolParams(
+        address pool,
+        uint256 swapFeeBps,
+        uint256 protocolFeeBps,
+        bool isActive
+    ) external onlyGovernance {
+        require(swapFeeBps <= 1000, "Fee too high"); // Max 10%
+        require(protocolFeeBps <= 500, "Protocol fee too high"); // Max 5%
+
+        poolParams[pool] = PoolParams({
+            swapFeeBps: swapFeeBps,
+            protocolFeeBps: protocolFeeBps,
+            isActive: isActive
+        });
+
+        emit PoolParamsUpdated(pool, swapFeeBps, protocolFeeBps, isActive);
+    }
+
+    function swap(address pool, address tokenIn, address tokenOut, uint256 amountIn) external {
+        PoolParams memory params = poolParams[pool];
+        require(params.isActive, "Pool inactive");
+
+        uint256 fee = amountIn * params.swapFeeBps / 10000;
+        uint256 protocolFee = fee * params.protocolFeeBps / 10000;
+        uint256 amountAfterFees = amountIn - fee;
+
+        // Execute swap with governance-controlled parameters
+        _executeSwap(pool, tokenIn, tokenOut, amountAfterFees);
+
+        // Send protocol fees to community pool
+        if (protocolFee > 0) {
+            IDistribution(0x0000000000000000000000000000000000000801)
+                .fundCommunityPool(protocolFee);
+        }
+    }
+}
+```
+
+## State Synchronization Patterns
+
+### 1. Multi-Chain State Oracle
+
+Synchronize state across multiple chains using IBC:
+
+```solidity
+contract MultiChainPriceOracle {
+    struct ChainPrice {
+        uint256 price;
+        uint256 timestamp;
+        uint256 confidence;
+    }
+
+    mapping(string => mapping(address => ChainPrice)) public chainPrices; // chainId => token => price
+    mapping(address => uint256) public aggregatedPrices;
+
+    event PriceUpdate(string chainId, address token, uint256 price, uint256 timestamp);
+
+    function updatePriceFromChain(
+        string calldata sourceChain,
+        address token,
+        uint256 price,
+        uint256 confidence
+    ) external {
+        // In practice, this would be called by IBC relayers
+        // with cryptographic proof of the price from source chain
+
+        chainPrices[sourceChain][token] = ChainPrice({
+            price: price,
+            timestamp: block.timestamp,
+            confidence: confidence
+        });
+
+        // Update aggregated price with confidence weighting
+        _updateAggregatedPrice(token);
+
+        emit PriceUpdate(sourceChain, token, price, block.timestamp);
+    }
+
+    function _updateAggregatedPrice(address token) internal {
+        // Simplified confidence-weighted average
+        uint256 weightedSum = 0;
+        uint256 totalWeight = 0;
+
+        // Iterate through all chains (in practice, maintain a chain list)
+        string[3] memory chains = ["osmosis-1", "juno-1", "terra-2"];
+
+        for (uint i = 0; i < chains.length; i++) {
+            ChainPrice memory chainPrice = chainPrices[chains[i]][token];
+
+            if (chainPrice.timestamp > block.timestamp - 3600) { // 1 hour freshness
+                weightedSum += chainPrice.price * chainPrice.confidence;
+                totalWeight += chainPrice.confidence;
+            }
+        }
+
+        if (totalWeight > 0) {
+            aggregatedPrices[token] = weightedSum / totalWeight;
+        }
+    }
+}
+```
+
+**CosmWasm Comparison:**
+CosmWasm would handle this through:
+```rust
+#[cw_serde]
+pub struct IbcMsg {
+    pub channel: String,
+    pub data: Binary,
+    pub timeout: IbcTimeout,
+}
+
+// Native IBC packet handling with built-in verification
+pub fn ibc_packet_receive(
+    deps: DepsMut,
+    env: Env,
+    msg: IbcPacketReceiveMsg,
+) -> Result<IbcReceiveResponse, ContractError> {
+    let packet: PricePacket = from_slice(&msg.packet.data)?;
+    // Update price with automatic verification
+}
+```
+
+### 2. Escrow with Cross-Chain Conditions
+
+Create escrows that release based on conditions on other chains:
+
+```solidity
+contract CrossChainEscrow {
+    struct Escrow {
+        address depositor;
+        address beneficiary;
+        uint256 amount;
+        string conditionChain;
+        bytes32 conditionHash;
+        bool released;
+        uint256 timeout;
+    }
+
+    mapping(uint256 => Escrow) public escrows;
+    uint256 public nextEscrowId;
+
+    event EscrowCreated(uint256 escrowId, address depositor, address beneficiary, uint256 amount);
+    event EscrowReleased(uint256 escrowId, bytes32 proof);
+
+    function createEscrow(
+        address beneficiary,
+        string calldata conditionChain,
+        bytes32 conditionHash,
+        uint256 timeoutBlocks
+    ) external payable returns (uint256) {
+        uint256 escrowId = nextEscrowId++;
+
+        escrows[escrowId] = Escrow({
+            depositor: msg.sender,
+            beneficiary: beneficiary,
+            amount: msg.value,
+            conditionChain: conditionChain,
+            conditionHash: conditionHash,
+            released: false,
+            timeout: block.number + timeoutBlocks
+        });
+
+        emit EscrowCreated(escrowId, msg.sender, beneficiary, msg.value);
+        return escrowId;
+    }
+
+    function releaseEscrow(uint256 escrowId, bytes calldata proof) external {
+        Escrow storage escrow = escrows[escrowId];
+        require(!escrow.released, "Already released");
+        require(block.number < escrow.timeout, "Escrow timed out");
+
+        // Verify proof that condition was met on target chain
+        // In practice, this would use IBC client verification
+        bytes32 proofHash = keccak256(proof);
+        require(proofHash == escrow.conditionHash, "Invalid proof");
+
+        escrow.released = true;
+        payable(escrow.beneficiary).transfer(escrow.amount);
+
+        emit EscrowReleased(escrowId, proofHash);
+    }
+
+    function refundEscrow(uint256 escrowId) external {
+        Escrow storage escrow = escrows[escrowId];
+        require(msg.sender == escrow.depositor, "Only depositor");
+        require(!escrow.released, "Already released");
+        require(block.number >= escrow.timeout, "Not timed out");
+
+        escrow.released = true;
+        payable(escrow.depositor).transfer(escrow.amount);
+    }
+}
+```
+
+## Gas Optimization Patterns
+
+### 1. Precompile-First Architecture
+
+Leverage precompiles for gas efficiency:
+
+```solidity
+contract OptimizedStakingPool {
+    IStaking constant STAKING = IStaking(0x0000000000000000000000000000000000000800);
+    IDistribution constant DISTRIBUTION = IDistribution(0x0000000000000000000000000000000000000801);
+
+    // Use packed structs for gas efficiency
+    struct UserPosition {
+        uint128 staked;        // Sufficient for most amounts
+        uint128 rewardDebt;    // Reward calculation optimization
+    }
+
+    mapping(address => UserPosition) public positions;
+    uint256 public totalStaked;
+    uint256 public accRewardPerShare;
+
+    function stake() external payable {
+        UserPosition storage pos = positions[msg.sender];
+
+        // Harvest pending rewards using precompile (more gas efficient)
+        if (pos.staked > 0) {
+            uint256 pending = (pos.staked * accRewardPerShare / 1e12) - pos.rewardDebt;
+            if (pending > 0) {
+                DISTRIBUTION.withdrawDelegatorReward(address(this), validator);
+                payable(msg.sender).transfer(pending);
+            }
+        }
+
+        // Use precompile for staking (gas efficient)
+        STAKING.delegate(validator, msg.value);
+
+        // Update position
+        pos.staked += uint128(msg.value);
+        pos.rewardDebt = uint128(pos.staked * accRewardPerShare / 1e12);
+        totalStaked += msg.value;
+    }
+}
+```
+
+**Gas Comparison:**
+- **Pure Solidity staking simulation:** ~200,000 gas
+- **Precompile staking:** ~50,000 gas
+- **Native Cosmos SDK:** ~30,000 gas equivalent
+
+## Security Patterns
+
+### 1. Cross-Chain Reentrancy Protection
+
+Protect against cross-chain reentrancy attacks:
+
+```solidity
+contract SecureCrossChainBridge {
+    mapping(bytes32 => bool) public processedPackets;
+    mapping(address => uint256) public lockedBalances;
+    uint256 private locked = 1;
+
+    modifier nonReentrant() {
+        require(locked == 1, "ReentrancyGuard: reentrant call");
+        locked = 2;
+        _;
+        locked = 1;
+    }
+
+    modifier packetOnce(bytes32 packetHash) {
+        require(!processedPackets[packetHash], "Packet already processed");
+        processedPackets[packetHash] = true;
+        _;
+    }
+
+    function bridgeTokens(
+        string calldata targetChain,
+        address recipient,
+        uint256 amount
+    ) external nonReentrant {
+        require(amount > 0, "Invalid amount");
+        require(amount <= balanceOf(msg.sender), "Insufficient balance");
+
+        // Lock tokens
+        lockedBalances[msg.sender] += amount;
+        _burn(msg.sender, amount);
+
+        // Initiate IBC transfer
+        IBC.transfer(getChannel(targetChain), recipient, amount);
+
+        emit TokensBridged(msg.sender, targetChain, recipient, amount);
+    }
+
+    function receiveFromChain(
+        bytes32 packetHash,
+        address recipient,
+        uint256 amount,
+        bytes calldata proof
+    ) external nonReentrant packetOnce(packetHash) {
+        // Verify IBC proof
+        require(verifyIBCProof(proof, packetHash), "Invalid proof");
+
+        // Mint tokens to recipient
+        _mint(recipient, amount);
+
+        emit TokensReceived(recipient, amount, packetHash);
+    }
+}
+```
+
+## Testing Patterns
+
+### 1. Multi-Chain Test Setup
+
+Set up comprehensive testing for cross-chain functionality:
+
+```javascript
+// hardhat.config.js
+module.exports = {
+  networks: {
+    cosmosEVM: {
+      url: "http://localhost:8545",
+      chainId: 9000,
+    },
+    mockOsmosis: {
+      url: "http://localhost:8546", // Mock chain for testing
+      chainId: 9001,
+    }
+  },
+  // Custom test helpers for IBC simulation
+  mocha: {
+    timeout: 60000 // Longer timeouts for cross-chain tests
+  }
+};
+```
+
+```javascript
+// test/CrossChainArbitrage.test.js
+describe("CrossChainArbitrage", function () {
+  let arbitrage, mockIBC;
+
+  beforeEach(async function () {
+    // Deploy mock IBC precompile for testing
+    mockIBC = await deployMockContract(owner, IIBCTransfer.abi);
+
+    // Deploy arbitrage contract with mock
+    arbitrage = await CrossChainArbitrage.deploy();
+
+    // Setup mock responses
+    await mockIBC.mock.transfer.returns(true);
+  });
+
+  it("should execute profitable arbitrage", async function () {
+    // Test cross-chain arbitrage logic
+    const route = {
+      sourceChannel: "channel-0",
+      targetChain: "osmosis-1",
+      targetDEX: "0x123...",
+      minProfitBps: 100 // 1%
+    };
+
+    await arbitrage.addRoute(ethers.utils.id("route1"), route);
+
+    // Mock profitable conditions
+    await setupMockPrices(localDEX, remoteDEX, 1000, 1020); // 2% profit
+
+    await expect(arbitrage.executeArbitrage(tokenA, tokenB, amount, routeId))
+      .to.emit(arbitrage, "ArbitrageExecuted");
+  });
+});
+```
+
+## Next Steps
+
+These patterns form the foundation for sophisticated Cosmos EVM applications. For deeper architectural understanding:
+
+<Card title="Architecture Deep Dive" href="/docs/evm/developers/architecture">
+  Learn how Cosmos EVM's architecture enables these advanced patterns.
+</Card>

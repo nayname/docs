@@ -1,0 +1,155 @@
+export const Cards = () => {
+  return (
+    <div className="w-full">
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#6976af]/10 via-transparent to-[#545e8c]/10" />
+        <div className="absolute inset-0 bg-grid-slate-900/[0.04] dark:bg-grid-slate-100/[0.03] bg-[length:60px_60px]" />
+
+        <div className="relative max-w-7xl mx-auto px-4 py-16 lg:py-24">
+          <div className="text-center mb-16">
+            <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+              <span className="bg-gradient-to-r from-[#6976af] to-[#545e8c] bg-clip-text text-transparent">
+                Cosmos Hub
+              </span>
+              <br />
+              Developer Documentation
+            </h1>
+            <p className="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              Build the future of interoperable blockchains with comprehensive tools,
+              detailed guides, and cutting-edge technology stack
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-16">
+            <div className="group relative">
+              <div className="relative h-full cursor-pointer overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/90 backdrop-blur-sm transition-all duration-300 ease-out hover:shadow-xl hover:scale-[1.02]">
+                <div className="p-6 pb-4">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#6976af] to-[#8791bf] shadow-lg transition-transform duration-300 group-hover:scale-110">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Cosmos EVM</h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4">
+                    Deploy Ethereum smart contracts with Cosmos SDK integration
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md">Smart Contracts</span>
+                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md">EVM Compatible</span>
+                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md">Cross-chain</span>
+                  </div>
+                </div>
+                <div className="px-6 pb-6">
+                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <a href="/docs/evm" className="inline-flex items-center text-sm font-medium text-[#6976af] hover:text-[#545e8c] dark:text-[#8791bf] dark:hover:text-[#6976af] transition-colors">
+                      View documentation
+                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative">
+              <div className="relative h-full cursor-pointer overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/90 backdrop-blur-sm transition-all duration-300 ease-out hover:shadow-xl hover:scale-[1.02]">
+                <div className="p-6 pb-4">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#545e8c] to-[#6976af] shadow-lg transition-transform duration-300 group-hover:scale-110">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">IBC Protocol</h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4">
+                    Connect to the Internet of Blockchains with cross-chain messaging
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md">Cross-chain</span>
+                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md">Secure</span>
+                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md">Multi-chain</span>
+                  </div>
+                </div>
+                <div className="px-6 pb-6">
+                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <a href="/docs/ibc" className="inline-flex items-center text-sm font-medium text-[#6976af] hover:text-[#545e8c] dark:text-[#8791bf] dark:hover:text-[#6976af] transition-colors">
+                      View documentation
+                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="group relative">
+              <div className="relative h-full cursor-pointer overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/90 backdrop-blur-sm transition-all duration-300 ease-out hover:shadow-xl hover:scale-[1.02] opacity-75">
+                <div className="p-6 pb-4">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#8791bf] to-[#545e8c] shadow-lg transition-transform duration-300 group-hover:scale-110">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                      </svg>
+                    </div>
+                    <span className="px-3 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 rounded-full">
+                      Coming Soon
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Cosmos SDK</h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4">
+                    Build sovereign blockchains with the modular Cosmos SDK framework
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md">Modular</span>
+                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md">Governance</span>
+                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md">Consensus</span>
+                  </div>
+                </div>
+                <div className="px-6 pb-6">
+                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <a href="/docs/sdk" className="inline-flex items-center text-sm font-medium text-[#6976af] hover:text-[#545e8c] dark:text-[#8791bf] dark:hover:text-[#6976af] transition-colors">
+                      View documentation
+                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <div className="inline-flex flex-col sm:flex-row gap-4">
+              <a
+                href="/docs/evm"
+                className="inline-flex items-center px-8 py-4 rounded-xl bg-gradient-to-r from-[#6976af] to-[#545e8c] text-white font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                Start Building
+                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+              <a
+                href="https://github.com/cosmos"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-8 py-4 rounded-xl border-2 border-[#6976af] text-[#6976af] dark:text-[#8791bf] hover:bg-[#6976af] hover:text-white transition-all duration-200"
+              >
+                View on GitHub
+                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

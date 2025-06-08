@@ -1,0 +1,207 @@
+---
+title: "Appraise: Should You Use Cosmos EVM?"
+description: "Evaluate Cosmos EVM against alternatives and understand when it's the right choice for your project."
+---
+
+Cosmos EVM sits at the intersection of two major blockchain ecosystems. Before diving into development, it's crucial to understand when Cosmos EVM is the right choice and how it compares to other approaches.
+
+## The Decision Matrix
+
+<CardGroup cols={2}>
+  <Card title="Coming from Ethereum?" icon="ethereum">
+    You have existing Solidity contracts and want to deploy on a Cosmos chain while gaining IBC connectivity and custom governance.
+  </Card>
+  <Card title="Coming from Cosmos?" icon="atom">
+    You want to tap into Ethereum's developer ecosystem and tooling while keeping Cosmos SDK's modularity and IBC.
+  </Card>
+</CardGroup>
+
+## Cosmos EVM vs. Alternatives
+
+### vs. Pure Ethereum L2s
+
+| Aspect | Cosmos EVM | Ethereum L2s |
+|--------|------------|--------------|
+| **Consensus** | Tendermint (configurable) | Ethereum-dependent |
+| **Sovereignty** | Full sovereign chain | Limited sovereignty |
+| **Interoperability** | Native IBC | Ethereum-centric bridges |
+| **Customization** | Full stack customization | Limited to execution layer |
+| **Gas Token** | Any available token | ETH or derivative |
+
+**Choose Cosmos EVM when:** You need sovereign consensus, IBC connectivity, or deep chain customization.
+
+### vs. Cosmos SDK (Native Development)
+
+| Aspect | Cosmos EVM | Native Cosmos SDK |
+|--------|------------|-------------------|
+| **Developer Pool** | Large (Ethereum devs) | Smaller (Go developers) |
+| **Tooling Maturity** | Mature (Hardhat, Foundry) | Growing (CosmJS, Telescope) |
+| **Performance** | EVM limitations | Native performance |
+| **Flexibility** | EVM constraints | Unlimited flexibility |
+| **Learning Curve** | Lower (if from Ethereum) | Higher (custom modules) |
+
+**Example: Token Contract**
+
+*Cosmos SDK Approach:*
+```go
+// Custom module with native performance
+func (k Keeper) Transfer(ctx sdk.Context, from, to sdk.AccAddress, amount sdk.Coins) error {
+    return k.bankKeeper.SendCoins(ctx, from, to, amount)
+}
+```
+
+*Cosmos EVM Approach:*
+```solidity
+// Standard ERC-20 with familiar tooling
+function transfer(address to, uint256 amount) public returns (bool) {
+    _transfer(msg.sender, to, amount);
+    return true;
+}
+```
+
+### vs. CosmWasm
+
+| Aspect | Cosmos EVM | CosmWasm |
+|--------|------------|----------|
+| **Language** | Solidity/Vyper | Rust/Go |
+| **VM** | Ethereum VM | WebAssembly |
+| **Ecosystem** | Ethereum tooling | Rust/Wasm tooling |
+| **Performance** | EVM overhead | Near-native performance |
+| **Portability** | Ethereum compatible | Multi-chain Wasm |
+
+**Example: Simple Storage Contract**
+
+*CosmWasm Approach:*
+```rust
+#[cw_serde]
+pub struct ExecuteMsg {
+    SetValue { value: String },
+}
+
+pub fn execute(deps: DepsMut, msg: ExecuteMsg) -> Result<Response, ContractError> {
+    match msg {
+        ExecuteMsg::SetValue { value } => {
+            STATE.save(deps.storage, &value)?;
+            Ok(Response::new().add_attribute("action", "set_value"))
+        }
+    }
+}
+```
+
+*Cosmos EVM Approach:*
+```solidity
+contract SimpleStorage {
+    string public storedValue;
+
+    function setValue(string memory _value) public {
+        storedValue = _value;
+        emit ValueSet(_value);
+    }
+}
+```
+
+## Decision Framework
+
+### Choose Cosmos EVM If:
+
+<AccordionGroup>
+  <Accordion title="You Have Ethereum Experience">
+    - Existing Solidity contracts to migrate
+    - Team familiar with Ethereum tooling
+    - Want to leverage Ethereum's mature developer ecosystem
+  </Accordion>
+
+  <Accordion title="You Need Hybrid Functionality">
+    - EVM contracts that interact with Cosmos modules
+    - Bridge between Ethereum and Cosmos ecosystems
+    - Gradual migration from Ethereum to Cosmos
+  </Accordion>
+
+  <Accordion title="You Want Proven Tooling">
+    - Battle-tested development frameworks (Hardhat, Foundry)
+    - Extensive auditing tools and practices
+    - Large pool of auditors familiar with Solidity
+  </Accordion>
+</AccordionGroup>
+
+### Consider Alternatives If:
+
+<AccordionGroup>
+  <Accordion title="Performance is Critical">
+    **Native Cosmos SDK** offers better performance for compute-heavy applications.
+
+    **Example:** A high-frequency DEX might benefit from native implementation over EVM gas costs.
+  </Accordion>
+
+  <Accordion title="You Need Maximum Flexibility">
+    **CosmWasm** provides more flexibility than EVM constraints allow.
+
+    **Example:** Complex governance mechanisms that don't fit EVM's execution model.
+  </Accordion>
+
+  <Accordion title="You're Building Simple Logic">
+    **Native Cosmos SDK modules** might be overkill for simple token transfers or basic logic.
+  </Accordion>
+</AccordionGroup>
+
+## Migration Considerations
+
+### From Ethereum to Cosmos EVM
+
+**Advantages:**
+- Minimal code changes required
+- Keep existing tooling and workflows
+- Gain Cosmos-specific features (IBC, custom governance)
+
+**Considerations:**
+- Different fee markets (EIP-1559 vs. custom)
+- New consensus mechanism implications
+- Chain-specific customizations to account for
+
+### From Cosmos SDK to Cosmos EVM
+
+**Advantages:**
+- Access to Ethereum's developer ecosystem
+- Proven smart contract patterns and libraries
+- Rich tooling for testing and deployment
+
+**Considerations:**
+- Performance overhead of EVM
+- Learning curve for Solidity/EVM concepts
+- Different security model and best practices
+
+## Real-World Use Cases
+
+<CardGroup cols={2}>
+  <Card title="DeFi Protocols" icon="chart-line">
+    **Best Fit:** Cosmos EVM
+
+    Leverage proven DeFi patterns from Ethereum while gaining IBC connectivity for cross-chain liquidity.
+  </Card>
+
+  <Card title="High-Performance Trading" icon="zap">
+    **Best Fit:** Native Cosmos SDK
+
+    Custom modules provide better performance for latency-sensitive trading applications.
+  </Card>
+
+  <Card title="Cross-Chain Infrastructure" icon="network">
+    **Best Fit:** CosmWasm or Cosmos EVM
+
+    Both provide good cross-chain capabilities, choice depends on team expertise.
+  </Card>
+
+  <Card title="NFT Marketplaces" icon="image">
+    **Best Fit:** Cosmos EVM
+
+    Reuse proven ERC-721/1155 standards while adding Cosmos-specific features.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+Once you've decided Cosmos EVM is right for your project:
+
+<Card title="Explore Capabilities" href="/docs/evm/developers/explore">
+  Discover what's possible with Cosmos EVM and see it in action.
+</Card>

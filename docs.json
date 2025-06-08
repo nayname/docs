@@ -5,8 +5,8 @@
   "theme": "palm",
   "colors": {
     "primary": "#4B47CA",
-    "light": "#7552FF",
-    "dark": "#22E2A8"
+    "light": "#7C7CF0",
+    "dark": "#2D2B8A"
   },
   "styling": {
     "icons": {
@@ -39,81 +39,67 @@
   ],
   "topbarCtaButton": {
     "name": "Get Started",
-    "url": "/docs/evm/index"
+    "url": "/docs/evm"
   },
-  "favicon": "/assets/cosmos.png",
+  "favicon": "/assets/brand/cosmos.svg",
   "logo": {
     "light": "/assets/brand/cosmos-wordmark.svg",
-    "dark": "/assets/brand/cosmos-wordmark-dark.svg",
-    "href": "https://cosmos.network"
+    "dark": "/assets/brand/cosmos-wordmark-dark.svg"
   },
   "navigation": {
     "tabs": [
       {
-        "tab": "Overview",
-        "groups": [
-          {
-            "group": "Home",
-            "pages": ["docs/index"]
-          }
-        ]
-      },
-      {
-        "tab": "EVM",
-        "groups": [
+        "tab": "Cosmos EVM",
+        "pages": [
+          "docs/evm/index",
           {
             "group": "Getting Started",
-            "icon": "ethereum",
             "pages": [
-              "docs/evm/index",
-              "docs/evm/explore",
-              "docs/evm/practice"
+              "docs/evm/developers/appraise",
+              "docs/evm/developers/explore",
+              "docs/evm/developers/local-setup"
             ]
           },
           {
             "group": "Development",
-            "icon": "code",
             "pages": [
-              "docs/evm/develop",
-              "docs/evm/local-development"
+              "docs/evm/developers/development-environment",
+              "docs/evm/developers/tooling-and-workflows",
+              "docs/evm/developers/smart-contract-development",
+              "docs/evm/developers/advanced-patterns"
+            ]
+          },
+          {
+            "group": "Integration",
+            "pages": [
+              "docs/evm/developers/chain-integration"
             ]
           },
           {
             "group": "Reference",
-            "icon": "book",
             "pages": [
-              "docs/evm/reference",
-              "docs/evm/troubleshoot"
+              "docs/evm/developers/architecture",
+              "docs/evm/developers/cosmos-comparisons",
+              "docs/evm/developers/reference",
+              "docs/evm/developers/troubleshoot"
             ]
-          }
-        ]
-      },
-      {
-        "tab": "SDK",
-        "groups": [
+          },
           {
-            "group": "Cosmos SDK",
-            "icon": "cosmos",
-            "pages": ["docs/sdk/index"]
-          }
-        ]
-      },
-      {
-        "tab": "IBC",
-        "groups": [
-          {
-            "group": "IBC Protocol",
-            "icon": "globe",
-            "pages": ["docs/ibc/index"]
+            "group": "Precompiled Contracts",
+            "pages": [
+              "docs/evm/developers/precompiles/index",
+              "docs/evm/developers/precompiles/staking",
+              "docs/evm/developers/precompiles/bank",
+              "docs/evm/developers/precompiles/ibc"
+            ]
           }
         ]
       },
       {
         "tab": "API Reference",
-        "groups": [
+        "pages": [
           {
             "group": "Cosmos API",
-            "icon": "code",
             "pages": [
               "docs/api-reference/cosmos/api",
               "docs/api-reference/cosmos/cli"
@@ -127,6 +113,14 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "IBC",
+        "pages": ["docs/ibc/index"]
+      },
+      {
+        "tab": "Cosmos SDK",
+        "pages": ["docs/sdk/index"]
       }
     ]
   },
@@ -146,5 +140,20 @@
   "modeToggle": {
     "default": "light",
     "isHidden": false
-  }
+  },
+  "api": {
+    "baseUrl": ["https://api.cosmos.network", "https://evm-api.cosmos.network"]
+  },
+  "anchors": [
+    {
+      "name": "Community",
+      "icon": "discord",
+      "url": "https://discord.gg/cosmosnetwork"
+    },
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/cosmos"
+    }
+  ]
 }

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Official Cosmos Brand Colors */
+/* === COSMOS BRAND COLORS === */
 :root {
   --cosmos-deep-blue: #4B47CA;
   --cosmos-mint: #22E2A8;
@@ -13,74 +13,285 @@
   --cosmos-cyan: #40B3FF;
 }
 
-/* Light Mode Enhancements - Soften the harsh white backgrounds */
+/* === HEADER NAVIGATION === */
+[data-theme='light'] .mintlify-header,
+[data-theme='light'] .mintlify-navbar,
+[data-theme='light'] .mintlify-topbar,
+[data-theme='light'] #navbar,
+[data-theme='light'] header,
+[data-theme='light'] nav[role="navigation"] {
+  background: linear-gradient(135deg, var(--cosmos-deep-blue) 0%, var(--cosmos-deep-purple) 30%, var(--cosmos-cobalt) 70%, var(--cosmos-orange) 100%) !important;
+  border-bottom: 3px solid var(--cosmos-orange) !important;
+  backdrop-filter: blur(20px) !important;
+  box-shadow: 0 4px 25px rgba(75, 71, 202, 0.2), 0 2px 10px rgba(255, 86, 40, 0.1) !important;
+  position: relative !important;
+  z-index: 100 !important;
+  padding: 0.875rem 1.5rem !important;
+  min-height: 70px !important;
+}
+
+/* Header gradient overlay */
+[data-theme='light'] .mintlify-header::before,
+[data-theme='light'] .mintlify-navbar::before,
+[data-theme='light'] .mintlify-topbar::before,
+[data-theme='light'] #navbar::before,
+[data-theme='light'] header::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 86, 40, 0.1) 100%) !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* Header layout */
+[data-theme='light'] .mintlify-header > div,
+[data-theme='light'] .mintlify-navbar > div,
+[data-theme='light'] .mintlify-topbar > div,
+[data-theme='light'] #navbar > div,
+[data-theme='light'] header > div {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  gap: 1rem !important;
+}
+
+/* === LOGO STYLING === */
+[data-theme='light'] .mintlify-logo,
+[data-theme='light'] .logo,
+[data-theme='light'] .mintlify-header .logo,
+[data-theme='light'] .mintlify-navbar .logo,
+[data-theme='light'] .topbar-logo,
+[data-theme='light'] .header-logo {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  max-height: 32px !important;
+  height: 32px !important;
+  width: auto !important;
+  filter: none !important;
+  transition: transform 0.2s ease, opacity 0.2s ease !important;
+  order: 1 !important;
+  flex-shrink: 0 !important;
+  margin-right: 1rem !important;
+}
+
+[data-theme='light'] .mintlify-logo img,
+[data-theme='light'] .logo img,
+[data-theme='light'] .mintlify-header .logo img,
+[data-theme='light'] .mintlify-navbar .logo img,
+[data-theme='light'] .topbar-logo img,
+[data-theme='light'] .header-logo img {
+  display: block !important;
+  max-height: 32px !important;
+  height: 32px !important;
+  width: auto !important;
+  opacity: 1 !important;
+}
+
+[data-theme='light'] .mintlify-logo:hover,
+[data-theme='light'] .logo:hover {
+  transform: scale(1.05) !important;
+  opacity: 0.9 !important;
+}
+
+/* === SEARCH BAR === */
+[data-theme='light'] .mintlify-search-wrapper,
+[data-theme='light'] .search-wrapper,
+[data-theme='light'] .mintlify-header .search,
+[data-theme='light'] .mintlify-navbar .search {
+  margin-left: 2rem !important;
+  margin-right: auto !important;
+  max-width: 350px !important;
+  width: 350px !important;
+  flex: 0 0 350px !important;
+  order: 2 !important;
+}
+
+[data-theme='light'] .mintlify-search input,
+[data-theme='light'] .search-input,
+[data-theme='light'] input[type="search"] {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  color: white !important;
+  backdrop-filter: blur(15px) !important;
+  border-radius: 12px !important;
+  padding: 0.8rem 1.2rem !important;
+  font-size: 0.95rem !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  width: 100% !important;
+}
+
+[data-theme='light'] .mintlify-search input:focus,
+[data-theme='light'] .search-input:focus,
+[data-theme='light'] input[type="search"]:focus {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  outline: none !important;
+}
+
+[data-theme='light'] .mintlify-search input::placeholder,
+[data-theme='light'] .search-input::placeholder,
+[data-theme='light'] input[type="search"]::placeholder {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* === TOPBAR NAVIGATION LINKS === */
+[data-theme='light'] .mintlify-topbar-links,
+[data-theme='light'] .topbar-links,
+[data-theme='light'] .mintlify-header-nav,
+[data-theme='light'] .header-nav,
+[data-theme='light'] .mintlify-navbar .nav-links,
+[data-theme='light'] [data-testid="topbar-links"],
+[data-theme='light'] [data-testid="header-nav"],
+[data-theme='light'] .mintlify-header nav,
+[data-theme='light'] .mintlify-navbar nav {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  margin-left: auto !important;
+  order: 3 !important;
+  flex-shrink: 0 !important;
+}
+
+[data-theme='light'] .mintlify-topbar-links a,
+[data-theme='light'] .topbar-links a,
+[data-theme='light'] .mintlify-header-nav a,
+[data-theme='light'] .header-nav a,
+[data-theme='light'] [data-testid="topbar-links"] a,
+[data-theme='light'] [data-testid="header-nav"] a,
+[data-theme='light'] .mintlify-header nav a,
+[data-theme='light'] .mintlify-navbar nav a {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.6rem 1rem !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+[data-theme='light'] .mintlify-topbar-links a:hover,
+[data-theme='light'] .topbar-links a:hover,
+[data-theme='light'] .mintlify-header-nav a:hover,
+[data-theme='light'] .header-nav a:hover,
+[data-theme='light'] [data-testid="topbar-links"] a:hover,
+[data-theme='light'] [data-testid="header-nav"] a:hover,
+[data-theme='light'] .mintlify-header nav a:hover,
+[data-theme='light'] .mintlify-navbar nav a:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* === CTA BUTTON === */
+[data-theme='light'] .mintlify-cta-button,
+[data-theme='light'] .topbar-cta-button,
+[data-theme='light'] #topbar-cta-button {
+  order: 4 !important;
+  background: var(--cosmos-orange) !important;
+  color: white !important;
+  border: none !important;
+  font-weight: 700 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 10px !important;
+  box-shadow: 0 3px 12px rgba(255, 86, 40, 0.4) !important;
+  transition: all 0.2s ease !important;
+  margin-left: 1rem !important;
+  flex-shrink: 0 !important;
+}
+
+[data-theme='light'] .mintlify-cta-button:hover,
+[data-theme='light'] .topbar-cta-button:hover,
+[data-theme='light'] #topbar-cta-button:hover {
+  background: var(--cosmos-pink) !important;
+  color: white !important;
+  box-shadow: 0 5px 20px rgba(230, 79, 143, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* === MOBILE RESPONSIVE === */
+@media (max-width: 768px) {
+  [data-theme='light'] .mintlify-search-wrapper,
+  [data-theme='light'] .search-wrapper {
+    order: 3 !important;
+    margin-left: 1rem !important;
+    margin-right: 1rem !important;
+    max-width: 200px !important;
+    width: 200px !important;
+  }
+
+  [data-theme='light'] .mintlify-topbar-links,
+  [data-theme='light'] .topbar-links,
+  [data-theme='light'] .mintlify-header-nav,
+  [data-theme='light'] .header-nav {
+    display: none !important;
+  }
+
+  [data-theme='light'] .mintlify-cta-button,
+  [data-theme='light'] .topbar-cta-button {
+    order: 4 !important;
+    margin-left: 0.5rem !important;
+    padding: 0.6rem 1rem !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+/* === DARK MODE HEADER === */
+[data-theme='dark'] .mintlify-header,
+[data-theme='dark'] .mintlify-navbar,
+[data-theme='dark'] .mintlify-topbar,
+[data-theme='dark'] #navbar,
+[data-theme='dark'] header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%) !important;
+  border-bottom: 2px solid rgba(34, 226, 168, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme='dark'] .mintlify-search input,
+[data-theme='dark'] input[type="search"] {
+  background: rgba(34, 226, 168, 0.1) !important;
+  border: 1px solid rgba(34, 226, 168, 0.3) !important;
+  color: var(--cosmos-mint) !important;
+}
+
+[data-theme='dark'] .mintlify-cta-button,
+[data-theme='dark'] #topbar-cta-button {
+  background: var(--cosmos-mint) !important;
+  color: #1a1a2e !important;
+}
+
+/* === MAIN CONTENT STYLING === */
 [data-theme='light'] {
-  /* Main background with subtle gradient */
   --background: linear-gradient(135deg, #fefefe 0%, #f8fafc 25%, #f1f5f9 100%);
   --sidebar-background: linear-gradient(to bottom, #fcfcfd, #f8fafc);
   --content-background: rgba(255, 255, 255, 0.85);
 }
 
-/* Main page background enhancement */
 [data-theme='light'] body {
   background: linear-gradient(135deg, #fefefe 0%, #f8fafc 25%, #f1f5f9 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* Sidebar enhancements */
-[data-theme='light'] #sidebar {
+/* === SIDEBAR STYLING === */
+[data-theme='light'] #sidebar,
+[data-theme='light'] .mintlify-sidebar {
   background: linear-gradient(to bottom, #fcfcfd, #f8fafc);
   border-right: 1px solid #e2e8f0;
   backdrop-filter: blur(10px);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-/* Sidebar navigation styling */
-[data-theme='light'] #sidebar .sidebar-nav-item {
-  font-weight: 500;
-  color: #475569;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin: 0.25rem 0.5rem;
-  transition: all 0.2s ease;
-  font-size: 0.95rem;
-}
-
-[data-theme='light'] #sidebar .sidebar-nav-item:hover {
-  background: linear-gradient(135deg, rgba(75, 71, 202, 0.08), rgba(117, 34, 181, 0.05));
-  color: var(--cosmos-deep-blue);
-  transform: translateX(4px);
-}
-
-[data-theme='light'] #sidebar .sidebar-nav-item.active {
-  background: linear-gradient(135deg, var(--cosmos-deep-blue), var(--cosmos-deep-purple));
-  color: white;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.3);
-}
-
-/* Sidebar links general styling */
-[data-theme='light'] #sidebar a {
-  text-decoration: none;
-  display: block;
-  font-weight: 500;
-  color: #64748b;
-  transition: all 0.2s ease;
-}
-
-[data-theme='light'] #sidebar a:hover {
-  color: var(--cosmos-deep-blue);
-  background: rgba(75, 71, 202, 0.05);
-  border-radius: 6px;
-}
-
-/* Make sidebar text more readable */
-[data-theme='light'] #sidebar * {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-/* Mintlify sidebar specific styling */
-[data-theme='light'] .mintlify-sidebar-nav {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
 [data-theme='light'] .mintlify-sidebar-nav a {
@@ -107,7 +318,6 @@
   box-shadow: 0 2px 8px rgba(75, 71, 202, 0.3) !important;
 }
 
-/* Sidebar group headers */
 [data-theme='light'] .mintlify-sidebar-group-title {
   font-size: 0.8rem !important;
   font-weight: 700 !important;
@@ -119,205 +329,31 @@
   border-bottom: 1px solid rgba(117, 34, 181, 0.2) !important;
 }
 
-/* Alternative selectors for different Mintlify versions */
-[data-theme='light'] nav[data-theme] a,
-[data-theme='light'] .sidebar-nav a,
-[data-theme='light'] .navigation a {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
-  font-weight: 500 !important;
-  color: #64748b !important;
-  transition: all 0.2s ease !important;
-}
-
-[data-theme='light'] nav[data-theme] a:hover,
-[data-theme='light'] .sidebar-nav a:hover,
-[data-theme='light'] .navigation a:hover {
-  color: var(--cosmos-deep-blue) !important;
-  background: rgba(75, 71, 202, 0.05) !important;
-  border-radius: 6px !important;
-}
-
-/* Content area softer background */
+/* === CONTENT AREA === */
 [data-theme='light'] #content-area {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(10px);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* Cards and components with subtle accents */
-[data-theme='light'] .mintlify-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
+/* === TYPOGRAPHY === */
+[data-theme='light'] h1,
+[data-theme='light'] h2,
+[data-theme='light'] h3,
+[data-theme='light'] h4,
+[data-theme='light'] h5,
+[data-theme='light'] h6 {
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.25;
 }
 
-/* Enhanced Navigation Header */
-[data-theme='light'] #navbar,
-[data-theme='light'] .mintlify-header,
-[data-theme='light'] header {
-  background: linear-gradient(135deg, var(--cosmos-deep-blue) 0%, var(--cosmos-deep-purple) 50%, var(--cosmos-cobalt) 100%);
-  border-bottom: 2px solid rgba(117, 34, 181, 0.3);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 4px 20px rgba(75, 71, 202, 0.15);
-  position: relative;
-  z-index: 100;
-  padding: 0.75rem 1.5rem;
+[data-theme='light'] p {
+  color: #475569;
+  line-height: 1.7;
+  font-weight: 400;
 }
 
-/* Header overlay for extra depth */
-[data-theme='light'] #navbar::before,
-[data-theme='light'] .mintlify-header::before,
-[data-theme='light'] header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* Header text color */
-[data-theme='light'] #navbar *,
-[data-theme='light'] .mintlify-header *,
-[data-theme='light'] header * {
-  color: white !important;
-}
-
-/* Logo styling */
-[data-theme='light'] .mintlify-logo,
-[data-theme='light'] .logo {
-  filter: brightness(1.1) contrast(1.1);
-  transition: transform 0.2s ease;
-}
-
-[data-theme='light'] .mintlify-logo:hover,
-[data-theme='light'] .logo:hover {
-  transform: scale(1.05);
-}
-
-/* Header navigation links */
-[data-theme='light'] .mintlify-header-nav a,
-[data-theme='light'] .header-nav a,
-[data-theme='light'] .topbar-links a {
-  color: rgba(255, 255, 255, 0.9) !important;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  position: relative;
-}
-
-[data-theme='light'] .mintlify-header-nav a:hover,
-[data-theme='light'] .header-nav a:hover,
-[data-theme='light'] .topbar-links a:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: white !important;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Search bar positioning and styling */
-[data-theme='light'] .mintlify-search-wrapper,
-[data-theme='light'] .search-wrapper {
-  margin-left: auto;
-  margin-right: 25%;
-  max-width: 400px;
-  flex: 1;
-}
-
-[data-theme='light'] .mintlify-search input,
-[data-theme='light'] .search-input,
-[data-theme='light'] input[type="search"] {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  color: white !important;
-  backdrop-filter: blur(10px);
-  border-radius: 12px !important;
-  padding: 0.75rem 1rem !important;
-  font-size: 0.95rem !important;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-[data-theme='light'] .mintlify-search input:focus,
-[data-theme='light'] .search-input:focus,
-[data-theme='light'] input[type="search"]:focus {
-  background: rgba(255, 255, 255, 0.25) !important;
-  border-color: rgba(255, 255, 255, 0.5) !important;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  outline: none !important;
-}
-
-[data-theme='light'] .mintlify-search input::placeholder,
-[data-theme='light'] .search-input::placeholder,
-[data-theme='light'] input[type="search"]::placeholder {
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-/* CTA Button enhanced styling */
-[data-theme='light'] .mintlify-cta-button,
-[data-theme='light'] .topbar-cta-button,
-[data-theme='light'] #topbar-cta-button {
-  background: var(--cosmos-orange) !important;
-  color: white !important;
-  border: none !important;
-  font-weight: 700 !important;
-  padding: 0.75rem 1.5rem !important;
-  border-radius: 10px !important;
-  box-shadow: 0 3px 12px rgba(255, 86, 40, 0.4) !important;
-  transition: all 0.2s ease !important;
-  margin-left: 1rem !important;
-}
-
-[data-theme='light'] .mintlify-cta-button:hover,
-[data-theme='light'] .topbar-cta-button:hover,
-[data-theme='light'] #topbar-cta-button:hover {
-  background: var(--cosmos-pink) !important;
-  color: white !important;
-  box-shadow: 0 5px 20px rgba(230, 79, 143, 0.5) !important;
-  transform: translateY(-2px) !important;
-}
-
-/* Mobile responsive header */
-@media (max-width: 768px) {
-  [data-theme='light'] .mintlify-search-wrapper,
-  [data-theme='light'] .search-wrapper {
-    margin-right: 1rem;
-    max-width: 200px;
-  }
-
-  [data-theme='light'] .mintlify-header-nav,
-  [data-theme='light'] .header-nav {
-    display: none;
-  }
-}
-
-/* Code blocks - softer appearance */
-[data-theme='light'] pre {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-  border: 1px solid rgba(117, 82, 255, 0.15) !important;
-  box-shadow: 0 2px 4px rgba(75, 71, 202, 0.08);
-}
-
-/* Inline code with purple accent */
-[data-theme='light'] code:not(pre code) {
-  background: linear-gradient(135deg, rgba(117, 34, 181, 0.08), rgba(75, 71, 202, 0.05)) !important;
-  color: var(--cosmos-deep-purple) !important;
-  border: 1px solid rgba(117, 34, 181, 0.2) !important;
-}
-
-/* Table of contents accent */
-[data-theme='light'] #table-of-contents {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9));
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  backdrop-filter: blur(10px);
-}
-
-/* Links with better visibility */
 [data-theme='light'] a {
   color: var(--cosmos-deep-blue);
   transition: color 0.2s ease;
@@ -327,94 +363,78 @@
   color: var(--cosmos-deep-purple);
 }
 
-/* Light/secondary buttons with orange border */
-[data-theme='light'] button:not(.primary):not(.solid),
-[data-theme='light'] .btn:not(.primary):not(.solid),
-[data-theme='light'] .button-secondary {
-  background: transparent;
-  border: 2px solid var(--cosmos-orange);
-  color: var(--cosmos-orange);
+/* === CODE BLOCKS === */
+pre {
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+[data-theme='light'] pre {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  border: 1px solid rgba(117, 82, 255, 0.15) !important;
+  box-shadow: 0 2px 4px rgba(75, 71, 202, 0.08);
+}
+
+code:not(pre code) {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 0.875em;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+}
+
+[data-theme='light'] code:not(pre code) {
+  background: linear-gradient(135deg, rgba(117, 34, 181, 0.08), rgba(75, 71, 202, 0.05)) !important;
+  color: var(--cosmos-deep-purple) !important;
+  border: 1px solid rgba(117, 34, 181, 0.2) !important;
+}
+
+/* === TABLES === */
+[data-theme='light'] table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.05);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+[data-theme='light'] th {
+  background: linear-gradient(135deg, rgba(75, 71, 202, 0.05), rgba(117, 34, 181, 0.03));
+  color: var(--cosmos-deep-purple);
   font-weight: 600;
-  transition: all 0.2s ease;
+  padding: 1rem;
+  border-bottom: 2px solid rgba(117, 34, 181, 0.2);
 }
 
-[data-theme='light'] button:not(.primary):not(.solid):hover,
-[data-theme='light'] .btn:not(.primary):not(.solid):hover,
-[data-theme='light'] .button-secondary:hover {
-  background: var(--cosmos-orange);
-  color: white;
-  transform: translateY(-1px);
+[data-theme='light'] td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+  background: rgba(255, 255, 255, 0.9);
 }
 
-/* Solid darker buttons with orange text/icons */
-[data-theme='light'] button.primary,
-[data-theme='light'] button.solid,
-[data-theme='light'] .btn-primary,
-[data-theme='light'] .btn-solid,
-[data-theme='light'] #topbar-cta-button {
-  background: var(--cosmos-deep-blue);
-  border: none;
-  color: var(--cosmos-orange) !important;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.3);
-  transition: all 0.2s ease;
+[data-theme='light'] tr:hover td {
+  background: rgba(75, 71, 202, 0.02);
 }
 
-[data-theme='light'] button.primary:hover,
-[data-theme='light'] button.solid:hover,
-[data-theme='light'] .btn-primary:hover,
-[data-theme='light'] .btn-solid:hover,
-[data-theme='light'] #topbar-cta-button:hover {
-  background: var(--cosmos-deep-purple);
-  color: var(--cosmos-orange) !important;
-  box-shadow: 0 4px 12px rgba(117, 34, 181, 0.4);
-  transform: translateY(-1px);
+/* === CARDS AND COMPONENTS === */
+[data-theme='light'] .mintlify-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
 }
 
-/* Additional header targeting for different Mintlify versions */
-[data-theme='light'] .mintlify-navbar,
-[data-theme='light'] .mintlify-topbar,
-[data-theme='light'] nav[role="navigation"] {
-  background: linear-gradient(135deg, var(--cosmos-deep-blue) 0%, var(--cosmos-deep-purple) 50%, var(--cosmos-cobalt) 100%) !important;
-  border-bottom: 2px solid rgba(117, 34, 181, 0.3) !important;
-  backdrop-filter: blur(20px) !important;
-  box-shadow: 0 4px 20px rgba(75, 71, 202, 0.15) !important;
+/* === SMOOTH ANIMATIONS === */
+html {
+  scroll-behavior: smooth;
 }
 
-/* Header layout improvements */
-[data-theme='light'] .mintlify-header .flex,
-[data-theme='light'] .mintlify-navbar .flex,
-[data-theme='light'] .mintlify-topbar .flex {
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+.group:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease;
 }
 
-/* Dark mode header styling */
-[data-theme='dark'] #navbar,
-[data-theme='dark'] .mintlify-header,
-[data-theme='dark'] header,
-[data-theme='dark'] .mintlify-navbar,
-[data-theme='dark'] .mintlify-topbar {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%) !important;
-  border-bottom: 2px solid rgba(34, 226, 168, 0.2) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
-}
-
-[data-theme='dark'] .mintlify-search input,
-[data-theme='dark'] input[type="search"] {
-  background: rgba(34, 226, 168, 0.1) !important;
-  border: 1px solid rgba(34, 226, 168, 0.3) !important;
-  color: var(--cosmos-mint) !important;
-}
-
-[data-theme='dark'] .mintlify-cta-button,
-[data-theme='dark'] #topbar-cta-button {
-  background: var(--cosmos-mint) !important;
-  color: #1a1a2e !important;
-}
-
-/* Active tab indicator */
+/* === TAB INDICATORS === */
 [data-theme='light'] .tab-active,
 [data-theme='light'] .active-tab,
 [data-theme='light'] [aria-selected="true"],
@@ -446,86 +466,4 @@
     width: 100%;
     left: 0;
   }
-}
-
-/* Tab navigation area styling */
-[data-theme='light'] .tabs-nav,
-[data-theme='light'] .mintlify-tabs-nav {
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95));
-}
-
-/* Minimal code block improvements - work with Palm theme */
-pre {
-  border-radius: 8px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-}
-
-/* Inline code styling that complements the theme */
-code:not(pre code) {
-  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-  font-size: 0.875em;
-  padding: 0.125rem 0.375rem;
-  border-radius: 4px;
-}
-
-/* Enhanced hover effects for cards */
-.group:hover {
-  transform: translateY(-2px);
-  transition: transform 0.2s ease;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Global typography improvements */
-[data-theme='light'] {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-}
-
-[data-theme='light'] h1, [data-theme='light'] h2, [data-theme='light'] h3, [data-theme='light'] h4, [data-theme='light'] h5, [data-theme='light'] h6 {
-  font-weight: 700;
-  color: #1e293b;
-  line-height: 1.25;
-}
-
-[data-theme='light'] p {
-  color: #475569;
-  line-height: 1.7;
-  font-weight: 400;
-}
-
-/* Content area typography */
-[data-theme='light'] #content-area {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-/* Table improvements */
-[data-theme='light'] table {
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.05);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-[data-theme='light'] th {
-  background: linear-gradient(135deg, rgba(75, 71, 202, 0.05), rgba(117, 34, 181, 0.03));
-  color: var(--cosmos-deep-purple);
-  font-weight: 600;
-  padding: 1rem;
-  border-bottom: 2px solid rgba(117, 34, 181, 0.2);
-}
-
-[data-theme='light'] td {
-  padding: 0.875rem 1rem;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-  background: rgba(255, 255, 255, 0.9);
-}
-
-[data-theme='light'] tr:hover td {
-  background: rgba(75, 71, 202, 0.02);
 }

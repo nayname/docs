@@ -1,0 +1,118 @@
+---
+title: "Development Environment"
+description: "Set up your local environment for building on the Cosmos EVM."
+---
+
+A well-configured development environment is crucial for productivity and efficiency. This guide walks you through setting up your machine with the essential tools, IDE configurations, and best practices for Cosmos EVM development.
+
+## IDE Setup
+
+A powerful Integrated Development Environment (IDE) is the cornerstone of your workflow. We recommend **Visual Studio Code (VS Code)** for its versatility, extensive extension marketplace, and strong community support.
+
+<CardGroup>
+  <Card title="Recommended VS Code Extensions" icon="vscode">
+    - **Solidity by Nomic Foundation**: Provides syntax highlighting, code completion, and linting for Solidity.
+    - **Go by Google**: Essential for working with the Cosmos SDK and other Go-based components.
+    - **Prettier - Code formatter**: Automatically formats your code to maintain consistency.
+    - **ESLint**: Catches common issues in your JavaScript/TypeScript code.
+  </Card>
+  <Card title="VS Code Configuration" icon="code">
+    Create a `.vscode/settings.json` file in your project root to ensure consistent behavior. This example sets a default Solidity compiler and configures Go testing flags.
+
+    ```json
+    // .vscode/settings.json
+    {
+      "go.testFlags": ["-v"],
+      "go.testTimeout": "60s",
+      "go.lintTool": "golangci-lint",
+      "solidity.defaultCompiler": "remote",
+      "solidity.compileUsingRemoteVersion": "v0.8.20+commit.a1b79de6"
+    }
+    ```
+  </Card>
+</CardGroup>
+
+## AI-Assisted Development
+
+Leverage Large Language Models (LLMs) to accelerate your development process. AI assistants can help write boilerplate code, generate tests, explain complex concepts, and much more.
+
+<Card title="GitHub Copilot" icon="github">
+  **GitHub Copilot** is an AI pair programmer that integrates directly into your IDE. By analyzing the context of your open files, it provides intelligent code suggestions in real-time.
+
+  **Tips for effective use:**
+  - **Provide Context**: Keep related files open so Copilot understands the broader architecture of your project.
+  - **Write Clear Comments**: Describe the function you want to write in a comment, and Copilot will often generate the entire implementation.
+  - **Iterate and Refine**: Use Copilot's suggestions as a starting point and refine them to fit your specific needs.
+</Card>
+
+## Core Tooling
+
+Ensure your system has the necessary compilers, runtimes, and package managers installed.
+
+<CardGroup>
+    <Card title="Node.js" icon="node-js">
+    Most smart contract development frameworks, including Hardhat and Foundry, rely on Node.js.
+
+    - **Version Management**: Use [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) to easily switch between different Node.js versions.
+    - **Package Managers**: While `npm` is the default, we recommend `yarn` for its performance and determinism. Many projects in the Cosmos ecosystem use `yarn`.
+        ```bash
+        # Install nvm
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+        # Install latest LTS version of Node.js
+        nvm install --lts
+        # Install yarn
+        npm install -g yarn
+        ```
+    </Card>
+    <Card title="Go" icon="binary">
+    The Cosmos EVM is built on the Cosmos SDK, which is written in Go.
+
+    - **Installation**: Follow the official instructions at [go.dev/doc/install](https://go.dev/doc/install) to install the latest version.
+    - **Verify Installation**:
+        ```bash
+        go version
+        ```
+    </Card>
+    <Card title="Rust (Optional)" icon="box">
+    While Go and Solidity are primary, Rust is gaining traction for its performance and safety, especially for tooling and provers.
+
+    - **Installation**: Use `rustup` to manage your Rust installation.
+        ```bash
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        ```
+    </Card>
+</CardGroup>
+
+## Environment Configuration
+
+Your shell's configuration file is a good place to set environment variables and aliases for common commands. These files are typically located in your home directory (`~/.bashrc`, `~/.zshrc`).
+
+**Example:**
+```bash
+# ~/.zshrc or ~/.bashrc
+
+# Set Go paths
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+
+# Alias for a common make command
+alias evm-build='make build'
+```
+
+---
+
+## Best Practices
+
+Before you start coding, familiarize yourself with the project's contribution guidelines. The official [Cosmos EVM repository](https://github.com/cosmos/evm) uses a `Makefile` to standardize common development tasks.
+
+<Note>
+Always prefer using the provided `make` targets for building, testing, and linting. This ensures that you are using the same commands and configurations as the core developers and CI/CD pipelines.
+</Note>
+
+```bash
+# Common Makefile commands
+make build      # Build the binaries
+make test       # Run unit and integration tests
+make lint       # Check for code style issues
+make format     # Automatically format the code
+```

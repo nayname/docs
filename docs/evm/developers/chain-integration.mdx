@@ -1,0 +1,395 @@
+---
+title: "Chain Integration: Adding EVM to Your Chain"
+description: "Comprehensive guide to integrating Cosmos EVM into new or existing Cosmos SDK chains."
+---
+
+Integrating Cosmos EVM into your chain unlocks Ethereum compatibility while maintaining Cosmos SDK's sovereignty and modularity. This guide covers both new chain development and existing chain migration.
+
+## Integration Overview
+
+Cosmos EVM integration involves importing three main modules into your Cosmos SDK application:
+
+<CardGroup cols={3}>
+  <Card title="x/vm Module" icon="cpu">
+    Core EVM implementation providing Ethereum compatibility
+  </Card>
+  <Card title="x/feemarket Module" icon="credit-card">
+    EIP-1559 fee market mechanism for dynamic pricing
+  </Card>
+  <Card title="x/erc20 Module" icon="coins">
+    Token unification between Cosmos SDK coins and ERC-20
+  </Card>
+</CardGroup>
+
+### Optional Module
+
+<Card title="x/precisebank Module" icon="precision">
+  **Optional:** Extends bank module precision from 6 to 18 decimals for EVM compatibility. This module serves as a wrapper around x/bank to provide the 18-decimal precision expected by EVM applications while preserving existing Cosmos SDK behavior.
+</Card>
+
+### When to Integrate
+
+**Choose Cosmos EVM integration if:**
+- You want to attract Ethereum developers to your ecosystem
+- Your chain needs smart contract functionality with proven patterns
+- You want cross-chain compatibility through IBC
+- You need access to Ethereum's mature tooling ecosystem
+
+**Cosmos SDK Comparison:**
+- **Native Modules:** Custom Go modules with full flexibility but higher development overhead
+- **CosmWasm:** WebAssembly-based smart contracts with Rust development
+- **Cosmos EVM:** Ethereum compatibility with Solidity development
+
+## New Chain Integration
+
+### 1. Project Setup
+
+Start with a standard Cosmos SDK chain template:
+
+```go
+// app/app.go
+package app
+
+import (
+    "github.com/cosmos/cosmos-sdk/baseapp"
+    "github.com/cosmos/cosmos-sdk/types/module"
+    "github.com/cosmos/evm/x/vm"
+    "github.com/cosmos/evm/x/feemarket"
+    "github.com/cosmos/evm/x/erc20"
+    // Optional: for enhanced decimal precision
+    // "github.com/cosmos/evm/x/precisebank"
+)
+
+var (
+    ModuleBasics = module.NewBasicManager(
+        // Standard Cosmos SDK modules
+        auth.AppModuleBasic{},
+        bank.AppModuleBasic{},
+        staking.AppModuleBasic{},
+        // Cosmos EVM modules
+        vm.AppModuleBasic{},
+        feemarket.AppModuleBasic{},
+        erc20.AppModuleBasic{},
+        // Optional: precisebank.AppModuleBasic{},
+    )
+)
+```
+
+### 2. Module Integration
+
+Add the modules to your application:
+
+```go
+// app/app.go
+type App struct {
+    *baseapp.BaseApp
+
+    // Standard keepers
+    AccountKeeper    authkeeper.AccountKeeper
+    BankKeeper       bankkeeper.Keeper
+    StakingKeeper    stakingkeeper.Keeper
+
+    // EVM keepers
+    VMKeeper         vmkeeper.Keeper
+    FeeMarketKeeper  feemarketkeeper.Keeper
+    Erc20Keeper      erc20keeper.Keeper
+
+    mm *module.Manager
+}
+
+func NewApp() *App {
+    app := &App{}
+
+    // Initialize keepers
+    app.VMKeeper = vmkeeper.NewKeeper(
+        appCodec, keys[vmtypes.StoreKey], tkeys[vmtypes.TransientKey],
+        app.AccountKeeper, app.BankKeeper, app.StakingKeeper,
+        app.FeeMarketKeeper,
+    )
+
+    app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
+        appCodec, keys[feemarkettypes.StoreKey], tkeys[feemarkettypes.TransientKey],
+    )
+
+    app.Erc20Keeper = erc20keeper.NewKeeper(
+        appCodec, keys[erc20types.StoreKey],
+        app.AccountKeeper, app.BankKeeper, app.VMKeeper,
+    )
+
+    return app
+}
+```
+
+### 3. Genesis Configuration
+
+Configure initial parameters:
+
+```json
+{
+  "vm": {
+    "params": {
+      "evm_denom": "atest",
+      "enable_create": true,
+      "enable_call": true,
+      "extra_eips": ["3855", "3860"],
+      "chain_config": {
+        "homestead_block": "0",
+        "eip150_block": "0",
+        "eip155_block": "0",
+        "eip158_block": "0",
+        "byzantium_block": "0",
+        "constantinople_block": "0",
+        "petersburg_block": "0",
+        "istanbul_block": "0",
+        "berlin_block": "0",
+        "london_block": "0"
+      }
+    }
+  },
+  "feemarket": {
+    "params": {
+      "base_fee_change_denominator": 8,
+      "elasticity_multiplier": 2,
+      "enable_height": "0",
+      "base_fee": "1000000000",
+      "min_gas_price": "0.000000001000000000",
+      "min_gas_multiplier": "0.5"
+    }
+  },
+  "erc20": {
+    "params": {
+      "enable_erc20": true,
+      "enable_evm_hook": true
+    }
+  }
+}
+```
+
+## Existing Chain Migration
+
+### Migration Strategy
+
+**For Production Chains:**
+
+<Warning>
+Migrating an existing production chain requires careful planning, extensive testing, and community coordination. Consider these migration approaches:
+</Warning>
+
+<AccordionGroup>
+  <Accordion title="Governance Upgrade">
+    **Best for:** Established chains with strong governance
+
+    **Process:**
+    1. Develop migration plan with community input
+    2. Create governance proposal for upgrade
+    3. Execute coordinated chain halt and upgrade
+    4. Restart with EVM functionality enabled
+
+    **Timeline:** 2-4 months depending on governance process
+  </Accordion>
+
+  <Accordion title="New Chain Launch">
+    **Best for:** Chains ready for major architecture changes
+
+    **Process:**
+    1. Launch new chain with EVM integration
+    2. Migrate state through IBC or snapshots
+    3. Coordinate community migration
+    4. Sunset old chain after successful migration
+
+    **Timeline:** 3-6 months for full migration
+  </Accordion>
+
+  <Accordion title="Parallel Deployment">
+    **Best for:** Chains wanting to test EVM functionality
+
+    **Process:**
+    1. Deploy parallel testnet with EVM
+    2. Run both chains simultaneously
+    3. Gradually migrate applications and users
+    4. Eventual consolidation based on adoption
+
+    **Timeline:** 6-12 months for evaluation and migration
+  </Accordion>
+</AccordionGroup>
+
+### Migration Considerations
+
+**State Migration:**
+```go
+// Migration handler example
+func CreateUpgradeHandler(mm *module.Manager, configurator module.Configurator) upgradetypes.UpgradeHandler {
+    return func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
+        // Initialize new EVM modules
+        vm[vmtypes.ModuleName] = mm.Modules[vmtypes.ModuleName].ConsensusVersion()
+        vm[feemarkettypes.ModuleName] = mm.Modules[feemarkettypes.ModuleName].ConsensusVersion()
+        vm[erc20types.ModuleName] = mm.Modules[erc20types.ModuleName].ConsensusVersion()
+
+        // Migrate existing state if needed
+        // Handle token pair creation for existing denoms
+
+        return mm.RunMigrations(ctx, configurator, vm)
+    }
+}
+```
+
+## Configuration Options
+
+### Permissioned EVM
+
+Restrict smart contract deployment to authorized addresses:
+
+```go
+// app/app.go
+vmParams := vmtypes.Params{
+    EvmDenom:            "atest",
+    EnableCreate:        false, // Disable public contract creation
+    EnableCall:          true,
+    AllowUnprotectedTxs: false,
+    ActivePrecompiles: []string{
+        "0x0000000000000000000000000000000000000800", // Staking
+        "0x0000000000000000000000000000000000000801", // Distribution
+    },
+}
+```
+
+### Custom Precompiles
+
+Add chain-specific functionality:
+
+```go
+// precompiles/custom/bank.go
+type BankPrecompile struct {
+    bankKeeper bankkeeper.Keeper
+}
+
+func (p BankPrecompile) Address() common.Address {
+    return common.HexToAddress("0x0000000000000000000000000000000000001000")
+}
+
+func (p BankPrecompile) RequiredGas(input []byte) uint64 {
+    return 1000 // Base gas cost
+}
+
+func (p BankPrecompile) Run(evm *vm.EVM, contract *vm.Contract, input []byte) ([]byte, error) {
+    // Custom bank operations accessible from Solidity
+    return nil, nil
+}
+```
+
+### JSON-RPC Configuration
+
+Configure API endpoints:
+
+```toml
+# app.toml
+[json-rpc]
+enable = true
+address = "0.0.0.0:8545"
+ws-address = "0.0.0.0:8546"
+api = ["eth", "net", "web3", "txpool", "debug", "miner"]
+gas-cap = 25000000
+evm-timeout = "5s"
+txfee-cap = 1.0
+```
+
+## Testing Integration
+
+### Local Development
+
+```bash
+# Build with EVM integration
+make build
+
+# Initialize with EVM modules
+./build/evmd init mynode --chain-id mychain_1234-1
+
+# Add EVM genesis configuration
+./build/evmd add-genesis-account cosmos1... 1000000000atest
+
+# Start node with JSON-RPC
+./build/evmd start --json-rpc.enable=true
+```
+
+### Integration Tests
+
+```go
+// integration_test.go
+func TestEVMIntegration(t *testing.T) {
+    app := setupApp(t)
+    ctx := app.NewContext(false, tmproto.Header{})
+
+    // Test EVM module integration
+    vmKeeper := app.VMKeeper
+
+    // Deploy test contract
+    contractAddr, err := vmKeeper.DeployContract(ctx, contractCode)
+    require.NoError(t, err)
+
+    // Test contract execution
+    result, err := vmKeeper.CallContract(ctx, contractAddr, callData)
+    require.NoError(t, err)
+    require.NotEmpty(t, result)
+}
+```
+
+## Performance Considerations
+
+### Resource Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| **CPU** | 4 cores | 8+ cores |
+| **RAM** | 16 GB | 32+ GB |
+| **Storage** | 1 TB SSD | 2+ TB NVMe |
+| **Network** | 100 Mbps | 1+ Gbps |
+
+### Optimization Tips
+
+<CardGroup cols={2}>
+  <Card title="State Pruning" icon="scissors">
+    Configure aggressive state pruning to manage disk usage:
+    ```toml
+    pruning = "custom"
+    pruning-keep-recent = "100"
+    pruning-interval = "10"
+    ```
+  </Card>
+
+  <Card title="Cache Configuration" icon="zap">
+    Optimize cache settings for EVM performance:
+    ```toml
+    inter-block-cache = true
+    fast-sync = true
+    ```
+  </Card>
+</CardGroup>
+
+## Monitoring and Maintenance
+
+### Key Metrics
+
+Monitor these EVM-specific metrics:
+
+- **EVM Transaction Throughput:** Transactions per second
+- **Gas Usage Patterns:** Average gas per transaction
+- **Fee Market Efficiency:** Base fee adjustments
+- **Precompile Usage:** Calls to native modules
+- **State Size Growth:** EVM state expansion rate
+
+### Alerting
+
+Set up monitoring for:
+- High gas usage spikes
+- Fee market dysfunction
+- Precompile failures
+- State sync issues
+- JSON-RPC performance
+
+## Next Steps
+
+With your chain integrated, explore advanced patterns:
+
+<Card title="Advanced Development Patterns" href="/docs/evm/developers/advanced-patterns">
+  Learn sophisticated techniques for hybrid Cosmos EVM applications.
+</Card>

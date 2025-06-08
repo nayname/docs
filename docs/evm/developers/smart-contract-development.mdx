@@ -1,0 +1,880 @@
+---
+title: "Smart Contract Development & Deployment"
+description: "Comprehensive guide to writing, testing, deploying, and verifying smart contracts on Cosmos EVM with security best practices."
+---
+
+Smart contract development on Cosmos EVM combines familiar Ethereum patterns with unique Cosmos capabilities. This guide covers the complete development lifecycle from writing secure Solidity code to deploying and verifying contracts on-chain.
+
+## Cosmos EVM Contract Fundamentals
+
+### Key Differences from Ethereum
+
+While Cosmos EVM maintains full Solidity compatibility, several key differences impact contract development:
+
+<CardGroup cols={2}>
+  <Card title="Precompiled Contracts" icon="box">
+    **Access Cosmos SDK modules directly from Solidity**
+
+    - Staking operations at `0x0000000000000000000000000000000000000800`
+    - Distribution at `0x0000000000000000000000000000000000000801`
+    - IBC transfers at `0x0000000000000000000000000000000000000802`
+  </Card>
+
+  <Card title="Fee Market" icon="credit-card">
+    **EIP-1559 dynamic fee pricing**
+
+    - Base fee adjusts based on block utilization
+    - Priority fees for faster inclusion
+    - Different gas economics than fixed-price chains
+  </Card>
+
+  <Card title="Consensus & Finality" icon="zap">
+    **Tendermint consensus characteristics**
+
+    - ~1-2 second block times (vs Ethereum's ~12 seconds)
+    - Instant finality (vs Ethereum's probabilistic finality)
+    - Different MEV landscape
+  </Card>
+
+  <Card title="Address Format" icon="fingerprint">
+    **Dual address support**
+
+    - Ethereum format: `0x1234...`
+    - Cosmos format: `cosmos1abc...`
+    - Deterministic conversion between formats
+  </Card>
+</CardGroup>
+
+## Contract Architecture Patterns
+
+### 1. Hybrid Smart Contracts
+
+Contracts that leverage both EVM and Cosmos functionality:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+// Precompile interfaces
+interface IStaking {
+    function delegate(address validator, uint256 amount) external returns (bool);
+    function undelegate(address validator, uint256 amount) external returns (bool, uint64);
+    function claimRewards(address validator) external returns (bool, uint256);
+    function delegation(address delegator, address validator) external view returns (uint256);
+}
+
+interface IDistribution {
+    function withdrawDelegatorReward(address delegator, address validator) external returns (bool, uint256);
+    function communityPool() external view returns (uint256);
+}
+
+interface IIBCTransfer {
+    function transfer(
+        string calldata sourceChannel,
+        string calldata receiver,
+        uint256 amount
+    ) external returns (bool);
+}
+
+/**
+ * @title Cross-Chain Liquid Staking Protocol
+ * @dev Demonstrates hybrid functionality combining EVM smart contracts with Cosmos SDK modules
+ */
+contract CrossChainLiquidStaking is Ownable, ReentrancyGuard {
+    // Precompile addresses
+    IStaking constant STAKING = IStaking(0x0000000000000000000000000000000000000800);
+    IDistribution constant DISTRIBUTION = IDistribution(0x0000000000000000000000000000000000000801);
+    IIBCTransfer constant IBC = IIBCTransfer(0x0000000000000000000000000000000000000802);
+
+    // Protocol state
+    struct ValidatorInfo {
+        address validatorAddress;
+        uint256 totalDelegated;
+        uint256 rewardRate; // Basis points
+        bool isActive;
+    }
+
+    struct UserPosition {
+        uint256 stakedAmount;
+        uint256 liquidTokens;
+        uint256 lastRewardClaim;
+        mapping(address => uint256) validatorDelegations;
+    }
+
+    // State variables
+    mapping(address => ValidatorInfo) public validators;
+    mapping(address => UserPosition) public userPositions;
+    address[] public validatorList;
+
+    uint256 public totalStaked;
+    uint256 public totalLiquidTokens;
+    uint256 public protocolFeeRate = 1000; // 10% in basis points
+
+    // Cross-chain configuration
+    mapping(string => string) public ibcChannels; // chainId => channelId
+    mapping(string => bool) public supportedChains;
+
+    // Events
+    event Staked(address indexed user, address indexed validator, uint256 amount, uint256 liquidTokens);
+    event Unstaked(address indexed user, address indexed validator, uint256 amount, uint256 liquidTokens);
+    event RewardsClaimed(address indexed user, uint256 amount);
+    event CrossChainTransfer(address indexed user, string targetChain, uint256 amount);
+    event ValidatorAdded(address indexed validator, uint256 rewardRate);
+
+    constructor() Ownable(msg.sender) {
+        // Initialize with default validators
+        _addValidator(0x1234567890123456789012345678901234567890, 500); // 5% reward rate
+    }
+
+    /**
+     * @dev Stake native tokens and receive liquid staking tokens
+     * @param validatorAddress Address of the validator to delegate to
+     */
+    function stake(address validatorAddress) external payable nonReentrant {
+        require(msg.value > 0, "Must stake positive amount");
+        require(validators[validatorAddress].isActive, "Validator not active");
+
+        // Delegate to validator through precompile
+        bool success = STAKING.delegate(validatorAddress, msg.value);
+        require(success, "Delegation failed");
+
+        // Calculate liquid tokens (1:1 ratio for simplicity)
+        uint256 liquidAmount = msg.value;
+
+        // Update validator state
+        validators[validatorAddress].totalDelegated += msg.value;
+
+        // Update user position
+        UserPosition storage position = userPositions[msg.sender];
+        position.stakedAmount += msg.value;
+        position.liquidTokens += liquidAmount;
+        position.validatorDelegations[validatorAddress] += msg.value;
+        position.lastRewardClaim = block.timestamp;
+
+        // Update global state
+        totalStaked += msg.value;
+        totalLiquidTokens += liquidAmount;
+
+        emit Staked(msg.sender, validatorAddress, msg.value, liquidAmount);
+    }
+
+    /**
+     * @dev Unstake liquid tokens and receive native tokens after unbonding period
+     * @param validatorAddress Address of the validator to undelegate from
+     * @param liquidAmount Amount of liquid tokens to burn
+     */
+    function unstake(address validatorAddress, uint256 liquidAmount) external nonReentrant {
+        UserPosition storage position = userPositions[msg.sender];
+        require(position.liquidTokens >= liquidAmount, "Insufficient liquid tokens");
+        require(position.validatorDelegations[validatorAddress] >= liquidAmount, "Insufficient delegation");
+
+        // Undelegate from validator
+        (bool success, uint64 completionTime) = STAKING.undelegate(validatorAddress, liquidAmount);
+        require(success, "Undelegation failed");
+
+        // Update state
+        position.liquidTokens -= liquidAmount;
+        position.stakedAmount -= liquidAmount;
+        position.validatorDelegations[validatorAddress] -= liquidAmount;
+
+        validators[validatorAddress].totalDelegated -= liquidAmount;
+        totalStaked -= liquidAmount;
+        totalLiquidTokens -= liquidAmount;
+
+        emit Unstaked(msg.sender, validatorAddress, liquidAmount, liquidAmount);
+    }
+
+    /**
+     * @dev Claim staking rewards from all validators
+     */
+    function claimRewards() external nonReentrant {
+        UserPosition storage position = userPositions[msg.sender];
+        require(position.stakedAmount > 0, "No staked amount");
+
+        uint256 totalRewards = 0;
+
+        // Claim rewards from all validators user has delegated to
+        for (uint i = 0; i < validatorList.length; i++) {
+            address validator = validatorList[i];
+            uint256 userDelegation = position.validatorDelegations[validator];
+
+            if (userDelegation > 0) {
+                (bool success, uint256 rewards) = DISTRIBUTION.withdrawDelegatorReward(address(this), validator);
+                if (success && rewards > 0) {
+                    // Calculate user's share of rewards
+                    uint256 userShare = (rewards * userDelegation) / validators[validator].totalDelegated;
+
+                    // Apply protocol fee
+                    uint256 protocolFee = (userShare * protocolFeeRate) / 10000;
+                    uint256 userRewards = userShare - protocolFee;
+
+                    totalRewards += userRewards;
+                    // Protocol fee stays in contract for governance/operations
+                }
+            }
+        }
+
+        require(totalRewards > 0, "No rewards available");
+
+        position.lastRewardClaim = block.timestamp;
+        payable(msg.sender).transfer(totalRewards);
+
+        emit RewardsClaimed(msg.sender, totalRewards);
+    }
+
+    /**
+     * @dev Transfer liquid tokens to another Cosmos chain
+     * @param targetChain Chain ID of target chain
+     * @param recipient Recipient address on target chain
+     * @param amount Amount of liquid tokens to transfer
+     */
+    function crossChainTransfer(
+        string calldata targetChain,
+        string calldata recipient,
+        uint256 amount
+    ) external nonReentrant {
+        require(supportedChains[targetChain], "Unsupported target chain");
+        require(userPositions[msg.sender].liquidTokens >= amount, "Insufficient balance");
+
+        string memory channel = ibcChannels[targetChain];
+        require(bytes(channel).length > 0, "No IBC channel configured");
+
+        // Transfer through IBC precompile
+        bool success = IBC.transfer(channel, recipient, amount);
+        require(success, "IBC transfer failed");
+
+        // Update user balance
+        userPositions[msg.sender].liquidTokens -= amount;
+        totalLiquidTokens -= amount;
+
+        emit CrossChainTransfer(msg.sender, targetChain, amount);
+    }
+
+    /**
+     * @dev Add a new validator to the protocol (only owner)
+     */
+    function addValidator(address validatorAddress, uint256 rewardRate) external onlyOwner {
+        _addValidator(validatorAddress, rewardRate);
+    }
+
+    function _addValidator(address validatorAddress, uint256 rewardRate) internal {
+        require(!validators[validatorAddress].isActive, "Validator already exists");
+        require(rewardRate <= 10000, "Invalid reward rate"); // Max 100%
+
+        validators[validatorAddress] = ValidatorInfo({
+            validatorAddress: validatorAddress,
+            totalDelegated: 0,
+            rewardRate: rewardRate,
+            isActive: true
+        });
+
+        validatorList.push(validatorAddress);
+        emit ValidatorAdded(validatorAddress, rewardRate);
+    }
+
+    /**
+     * @dev Configure IBC channel for cross-chain transfers
+     */
+    function configureIBCChannel(string calldata chainId, string calldata channelId) external onlyOwner {
+        ibcChannels[chainId] = channelId;
+        supportedChains[chainId] = true;
+    }
+
+    // View functions
+    function getUserStakingInfo(address user) external view returns (
+        uint256 stakedAmount,
+        uint256 liquidTokens,
+        uint256 lastRewardClaim
+    ) {
+        UserPosition storage position = userPositions[user];
+        return (position.stakedAmount, position.liquidTokens, position.lastRewardClaim);
+    }
+
+    function getValidatorInfo(address validator) external view returns (
+        uint256 totalDelegated,
+        uint256 rewardRate,
+        bool isActive
+    ) {
+        ValidatorInfo storage info = validators[validator];
+        return (info.totalDelegated, info.rewardRate, info.isActive);
+    }
+}
+```
+
+### 2. Gas-Optimized Precompile Usage
+
+Optimize gas costs by leveraging precompiles efficiently:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+/**
+ * @title Gas-Optimized Staking Wrapper
+ * @dev Demonstrates efficient precompile usage patterns
+ */
+contract OptimizedStakingPool {
+    IStaking constant STAKING = IStaking(0x0000000000000000000000000000000000000800);
+
+    // Pack struct to minimize storage slots
+    struct UserInfo {
+        uint128 stakedAmount;    // Sufficient for most amounts
+        uint128 rewardDebt;      // For reward calculations
+        uint64 lastInteraction;  // Timestamp
+        uint64 reserved;         // Future use
+    }
+
+    mapping(address => UserInfo) public users;
+    address public immutable VALIDATOR; // Immutable saves gas
+    uint256 public totalStaked;
+    uint256 public accRewardPerShare;
+
+    constructor(address validator) {
+        VALIDATOR = validator;
+    }
+
+    /**
+     * @dev Batch stake for multiple users (gas optimization)
+     */
+    function batchStake(address[] calldata recipients, uint256[] calldata amounts) external payable {
+        require(recipients.length == amounts.length, "Array length mismatch");
+
+        uint256 totalAmount = 0;
+        for (uint i = 0; i < amounts.length; i++) {
+            totalAmount += amounts[i];
+        }
+        require(msg.value == totalAmount, "Incorrect total amount");
+
+        // Single precompile call for all stakes
+        bool success = STAKING.delegate(VALIDATOR, totalAmount);
+        require(success, "Batch delegation failed");
+
+        // Update individual user records
+        for (uint i = 0; i < recipients.length; i++) {
+            _updateUser(recipients[i], amounts[i]);
+        }
+
+        totalStaked += totalAmount;
+    }
+
+    function _updateUser(address user, uint256 amount) internal {
+        UserInfo storage userInfo = users[user];
+        userInfo.stakedAmount += uint128(amount);
+        userInfo.lastInteraction = uint64(block.timestamp);
+        // Additional reward logic here
+    }
+
+    /**
+     * @dev Emergency batch withdrawal
+     */
+    function emergencyBatchUnstake(address[] calldata users_) external {
+        require(msg.sender == owner(), "Only owner");
+
+        for (uint i = 0; i < users_.length; i++) {
+            UserInfo storage user = users[users_[i]];
+            if (user.stakedAmount > 0) {
+                STAKING.undelegate(VALIDATOR, user.stakedAmount);
+                user.stakedAmount = 0;
+            }
+        }
+    }
+}
+```
+
+## Security Best Practices
+
+### 1. Precompile-Specific Security
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract SecurePrecompileUsage {
+    IStaking constant STAKING = IStaking(0x0000000000000000000000000000000000000800);
+
+    // Track precompile call results for security
+    mapping(bytes32 => bool) public processedOperations;
+
+    modifier onlyOnce(bytes32 operationId) {
+        require(!processedOperations[operationId], "Operation already processed");
+        processedOperations[operationId] = true;
+        _;
+    }
+
+    /**
+     * @dev Secure staking with operation tracking
+     */
+    function secureStake(address validator, uint256 nonce) external payable
+        onlyOnce(keccak256(abi.encodePacked(msg.sender, validator, msg.value, nonce)))
+    {
+        // Validate validator before calling precompile
+        require(_isValidValidator(validator), "Invalid validator");
+
+        // Check for reentrancy even with precompiles
+        require(msg.value > 0, "Must stake positive amount");
+
+        bool success = STAKING.delegate(validator, msg.value);
+        require(success, "Staking failed");
+
+        // Additional state updates after successful precompile call
+        _recordStaking(msg.sender, validator, msg.value);
+    }
+
+    function _isValidValidator(address validator) internal view returns (bool) {
+        // Implement validator validation logic
+        // This could check against a whitelist or query validator status
+        return validator != address(0);
+    }
+
+    function _recordStaking(address user, address validator, uint256 amount) internal {
+        // Record staking operation in contract state
+        // This provides redundancy and enables complex logic
+    }
+}
+```
+
+### 2. Cross-Chain Security Patterns
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract SecureCrossChainBridge {
+    IIBCTransfer constant IBC = IIBCTransfer(0x0000000000000000000000000000000000000802);
+
+    struct PendingTransfer {
+        address sender;
+        string targetChain;
+        string recipient;
+        uint256 amount;
+        uint256 timestamp;
+        bool executed;
+    }
+
+    mapping(bytes32 => PendingTransfer) public pendingTransfers;
+    mapping(address => uint256) public lockedBalances;
+
+    uint256 public constant TRANSFER_TIMEOUT = 3600; // 1 hour
+
+    /**
+     * @dev Secure cross-chain transfer with timeout and rollback
+     */
+    function initiateTransfer(
+        string calldata targetChain,
+        string calldata recipient,
+        uint256 amount,
+        uint256 nonce
+    ) external {
+        require(amount > 0, "Invalid amount");
+        require(balanceOf(msg.sender) >= amount, "Insufficient balance");
+
+        bytes32 transferId = keccak256(abi.encodePacked(
+            msg.sender, targetChain, recipient, amount, nonce, block.timestamp
+        ));
+
+        // Lock tokens before cross-chain operation
+        lockedBalances[msg.sender] += amount;
+        _burn(msg.sender, amount);
+
+        // Record transfer for timeout handling
+        pendingTransfers[transferId] = PendingTransfer({
+            sender: msg.sender,
+            targetChain: targetChain,
+            recipient: recipient,
+            amount: amount,
+            timestamp: block.timestamp,
+            executed: false
+        });
+
+        // Attempt IBC transfer
+        try IBC.transfer(getChannel(targetChain), recipient, amount) returns (bool success) {
+            if (success) {
+                pendingTransfers[transferId].executed = true;
+                emit TransferInitiated(transferId, msg.sender, targetChain, amount);
+            } else {
+                _rollbackTransfer(transferId);
+            }
+        } catch {
+            _rollbackTransfer(transferId);
+        }
+    }
+
+    /**
+     * @dev Allow users to reclaim tokens from failed transfers
+     */
+    function reclaimFailedTransfer(bytes32 transferId) external {
+        PendingTransfer storage transfer = pendingTransfers[transferId];
+        require(transfer.sender == msg.sender, "Not transfer owner");
+        require(!transfer.executed, "Transfer was successful");
+        require(
+            block.timestamp > transfer.timestamp + TRANSFER_TIMEOUT,
+            "Transfer not yet timed out"
+        );
+
+        lockedBalances[msg.sender] -= transfer.amount;
+        _mint(msg.sender, transfer.amount);
+
+        delete pendingTransfers[transferId];
+        emit TransferReclaimed(transferId, msg.sender, transfer.amount);
+    }
+
+    function _rollbackTransfer(bytes32 transferId) internal {
+        PendingTransfer storage transfer = pendingTransfers[transferId];
+        lockedBalances[transfer.sender] -= transfer.amount;
+        _mint(transfer.sender, transfer.amount);
+        delete pendingTransfers[transferId];
+    }
+
+    // Additional security functions...
+    function getChannel(string memory chainId) internal pure returns (string memory) {
+        // Implement secure channel mapping
+        return "channel-0"; // Simplified
+    }
+}
+```
+
+## Testing Strategies
+
+### 1. Precompile Testing with Foundry
+
+```solidity
+// test/CrossChainLiquidStaking.t.sol
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+import "forge-std/Test.sol";
+import "../src/CrossChainLiquidStaking.sol";
+
+contract CrossChainLiquidStakingTest is Test {
+    CrossChainLiquidStaking public stakingContract;
+
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    address constant DISTRIBUTION_PRECOMPILE = 0x0000000000000000000000000000000000000801;
+    address constant IBC_PRECOMPILE = 0x0000000000000000000000000000000000000802;
+
+    address public validator = makeAddr("validator");
+    address public user = makeAddr("user");
+
+    function setUp() public {
+        stakingContract = new CrossChainLiquidStaking();
+
+        // Mock precompile responses
+        _mockStakingPrecompile();
+        _mockDistributionPrecompile();
+        _mockIBCPrecompile();
+
+        // Fund test accounts
+        vm.deal(user, 100 ether);
+
+        // Add test validator
+        stakingContract.addValidator(validator, 500); // 5% reward rate
+    }
+
+    function _mockStakingPrecompile() internal {
+        // Mock successful delegation
+        vm.mockCall(
+            STAKING_PRECOMPILE,
+            abi.encodeWithSelector(IStaking.delegate.selector),
+            abi.encode(true)
+        );
+
+        // Mock successful undelegation
+        vm.mockCall(
+            STAKING_PRECOMPILE,
+            abi.encodeWithSelector(IStaking.undelegate.selector),
+            abi.encode(true, uint64(block.timestamp + 21 days))
+        );
+
+        // Mock delegation query
+        vm.mockCall(
+            STAKING_PRECOMPILE,
+            abi.encodeWithSelector(IStaking.delegation.selector),
+            abi.encode(1 ether)
+        );
+    }
+
+    function _mockDistributionPrecompile() internal {
+        // Mock reward withdrawal
+        vm.mockCall(
+            DISTRIBUTION_PRECOMPILE,
+            abi.encodeWithSelector(IDistribution.withdrawDelegatorReward.selector),
+            abi.encode(true, 0.1 ether) // 0.1 ETH rewards
+        );
+    }
+
+    function _mockIBCPrecompile() internal {
+        // Mock successful IBC transfer
+        vm.mockCall(
+            IBC_PRECOMPILE,
+            abi.encodeWithSelector(IIBCTransfer.transfer.selector),
+            abi.encode(true)
+        );
+    }
+
+    function testStaking() public {
+        vm.startPrank(user);
+
+        uint256 stakeAmount = 1 ether;
+        stakingContract.stake{value: stakeAmount}(validator);
+
+        (uint256 stakedAmount, uint256 liquidTokens,) = stakingContract.getUserStakingInfo(user);
+
+        assertEq(stakedAmount, stakeAmount);
+        assertEq(liquidTokens, stakeAmount);
+        assertEq(stakingContract.totalStaked(), stakeAmount);
+
+        vm.stopPrank();
+    }
+
+    function testUnstaking() public {
+        // First stake
+        vm.prank(user);
+        stakingContract.stake{value: 1 ether}(validator);
+
+        // Then unstake
+        vm.prank(user);
+        stakingContract.unstake(validator, 0.5 ether);
+
+        (uint256 stakedAmount, uint256 liquidTokens,) = stakingContract.getUserStakingInfo(user);
+        assertEq(stakedAmount, 0.5 ether);
+        assertEq(liquidTokens, 0.5 ether);
+    }
+
+    function testCrossChainTransfer() public {
+        // Setup IBC channel
+        stakingContract.configureIBCChannel("osmosis-1", "channel-0");
+
+        // Stake first
+        vm.prank(user);
+        stakingContract.stake{value: 1 ether}(validator);
+
+        // Cross-chain transfer
+        vm.prank(user);
+        stakingContract.crossChainTransfer(
+            "osmosis-1",
+            "osmo1recipient...",
+            0.5 ether
+        );
+
+        (, uint256 liquidTokens,) = stakingContract.getUserStakingInfo(user);
+        assertEq(liquidTokens, 0.5 ether);
+    }
+
+    function testFuzzStaking(uint256 amount) public {
+        amount = bound(amount, 0.001 ether, 100 ether);
+
+        vm.deal(user, amount);
+        vm.prank(user);
+        stakingContract.stake{value: amount}(validator);
+
+        (uint256 stakedAmount,,) = stakingContract.getUserStakingInfo(user);
+        assertEq(stakedAmount, amount);
+    }
+
+    function testRevertInvalidValidator() public {
+        address invalidValidator = makeAddr("invalid");
+
+        vm.prank(user);
+        vm.expectRevert("Validator not active");
+        stakingContract.stake{value: 1 ether}(invalidValidator);
+    }
+}
+```
+
+## Deployment Best Practices
+
+### 1. Deployment Scripts with Verification
+
+```javascript
+// scripts/deploy-with-verification.js
+const { ethers } = require("hardhat");
+const { writeFileSync, mkdirSync } = require("fs");
+
+async function main() {
+    console.log("Starting Cosmos EVM deployment...");
+
+    const [deployer] = await ethers.getSigners();
+    const network = await ethers.provider.getNetwork();
+
+    console.log("Deploying with account:", deployer.address);
+    console.log("Network:", network.name);
+    console.log("Chain ID:", network.chainId);
+
+    // Deploy main contract
+    const CrossChainLiquidStaking = await ethers.getContractFactory("CrossChainLiquidStaking");
+    const stakingContract = await CrossChainLiquidStaking.deploy();
+    await stakingContract.waitForDeployment();
+
+    const contractAddress = await stakingContract.getAddress();
+    console.log("CrossChainLiquidStaking deployed to:", contractAddress);
+
+    // Wait for a few blocks before verification
+    console.log("Waiting for block confirmations...");
+    await new Promise(resolve => setTimeout(resolve, 30000)); // 30 seconds
+
+    // Verify contract if on testnet/mainnet
+    if (network.chainId !== 31337) { // Not local hardhat network
+        try {
+            await hre.run("verify:verify", {
+                address: contractAddress,
+                constructorArguments: [],
+                contract: "contracts/CrossChainLiquidStaking.sol:CrossChainLiquidStaking"
+            });
+            console.log("Contract verified successfully");
+        } catch (error) {
+            console.error("Verification failed:", error.message);
+        }
+    }
+
+    // Save deployment info
+    const deploymentInfo = {
+        contractAddress,
+        deployer: deployer.address,
+        blockNumber: await ethers.provider.getBlockNumber(),
+        timestamp: new Date().toISOString(),
+        network: network.name,
+        chainId: network.chainId.toString(),
+        gasUsed: "TBD", // Would need to track from deployment transaction
+    };
+
+    try {
+        mkdirSync("deployments", { recursive: true });
+    } catch (e) {} // Directory might already exist
+
+    writeFileSync(
+        `deployments/${network.name}-${network.chainId}.json`,
+        JSON.stringify(deploymentInfo, null, 2)
+    );
+
+    console.log("Deployment info saved to deployments/");
+    console.log("Deployment completed successfully!");
+}
+
+main()
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.error("Deployment failed:", error);
+        process.exit(1);
+    });
+```
+
+### 2. Post-Deployment Configuration
+
+```javascript
+// scripts/configure-protocol.js
+const { ethers } = require("hardhat");
+
+async function main() {
+    const contractAddress = process.env.CONTRACT_ADDRESS;
+    const validatorAddress = process.env.VALIDATOR_ADDRESS;
+
+    if (!contractAddress || !validatorAddress) {
+        throw new Error("CONTRACT_ADDRESS and VALIDATOR_ADDRESS must be set");
+    }
+
+    const stakingContract = await ethers.getContractAt(
+        "CrossChainLiquidStaking",
+        contractAddress
+    );
+
+    console.log("Configuring protocol...");
+
+    // Add validator
+    const tx1 = await stakingContract.addValidator(validatorAddress, 500); // 5%
+    await tx1.wait();
+    console.log("Validator added:", validatorAddress);
+
+    // Configure IBC channels
+    const ibcConfigs = [
+        { chainId: "osmosis-1", channelId: "channel-0" },
+        { chainId: "juno-1", channelId: "channel-1" },
+        { chainId: "stargaze-1", channelId: "channel-2" }
+    ];
+
+    for (const config of ibcConfigs) {
+        const tx = await stakingContract.configureIBCChannel(config.chainId, config.channelId);
+        await tx.wait();
+        console.log(`IBC channel configured: ${config.chainId} -> ${config.channelId}`);
+    }
+
+    console.log("Protocol configuration completed!");
+}
+
+main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+});
+```
+
+## Gas Optimization Techniques
+
+### 1. Efficient Storage Patterns
+
+```solidity
+// Optimized storage layout
+contract GasOptimizedContract {
+    // Pack variables into single storage slots
+    struct PackedData {
+        uint128 value1;     // 16 bytes
+        uint64 timestamp;   // 8 bytes
+        uint32 category;    // 4 bytes
+        uint32 flags;       // 4 bytes
+        // Total: 32 bytes = 1 storage slot
+    }
+
+    // Use mappings efficiently
+    mapping(address => PackedData) public data;
+
+    // Prefer uint256 for computations (EVM native)
+    uint256 public total;
+
+    // Constants don't use storage
+    uint256 public constant MAX_AMOUNT = 1000000 ether;
+
+    // Immutables set once in constructor
+    address public immutable VALIDATOR;
+
+    constructor(address validator) {
+        VALIDATOR = validator;
+    }
+}
+```
+
+### 2. Batch Operations
+
+```solidity
+contract BatchOperations {
+    /**
+     * @dev Batch multiple staking operations in single transaction
+     */
+    function batchStake(
+        address[] calldata validators,
+        uint256[] calldata amounts
+    ) external payable {
+        require(validators.length == amounts.length, "Length mismatch");
+
+        uint256 totalAmount = 0;
+        for (uint i = 0; i < amounts.length; i++) {
+            totalAmount += amounts[i];
+        }
+        require(msg.value == totalAmount, "Incorrect total");
+
+        // Single external call instead of multiple
+        for (uint i = 0; i < validators.length; i++) {
+            STAKING.delegate(validators[i], amounts[i]);
+        }
+    }
+}
+```
+
+## Next Steps
+
+With comprehensive smart contract development knowledge, explore advanced cross-chain patterns:
+
+<Card title="Cross-Chain & Hybrid Patterns" href="/docs/evm/developers/advanced-patterns">
+  Learn sophisticated techniques for building applications that span multiple blockchains and leverage both EVM and Cosmos capabilities.
+</Card>

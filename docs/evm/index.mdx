@@ -1,65 +1,169 @@
 ---
 title: "Cosmos EVM"
-description: "Ethereum Virtual Machine compatibility for Cosmos SDK chains"
+description: "Build hybrid applications combining Ethereum smart contracts with Cosmos SDK capabilities."
+type: "custom"
 ---
 
-# Cosmos EVM
+Cosmos EVM brings Ethereum's proven smart contract capabilities to the Cosmos ecosystem, enabling developers to build sovereign, interoperable blockchains with full EVM compatibility.
 
-Cosmos EVM is a plug-and-play solution that adds EVM compatibility and customizability to your Cosmos SDK chain. Build an app-chain with the control and extensibility of the Cosmos SDK, with native support for EVM and seamless EVM↔Cosmos wallet/token/user experience.
-
-<Note>
-**Project Status**: Cosmos EVM is undergoing changes in preparation for a new audit. The first v1 release is targeted for late Q2. While the original evmOS repo is used in production on several chains, this repository will be marked as stable after the audit is completed.
-</Note>
-
-## What Makes Cosmos EVM Different?
+## What Makes Cosmos EVM Unique?
 
 <CardGroup cols={2}>
-  <Card title="EVM Compatibility" icon="ethereum" color="#627EEA">
-    Forward-compatible with Ethereum - run any valid smart contract from Ethereum plus new features not yet available in standard EVM.
+  <Card title="Ethereum-Compatible" icon="ethereum" color="#627EEA">
+    Deploy any Solidity contract unchanged. Use MetaMask, Hardhat, Foundry - all your familiar tools work seamlessly.
   </Card>
-  <Card title="Cosmos Integration" icon="globe" color="#4B47CA">
-    Native IBC support, seamless integration with Cosmos SDK modules, and extensible architecture.
+  <Card title="Cosmos-Powered" icon="atom" color="#4B47CA">
+    Access IBC transfers, custom governance, native staking, and Cosmos SDK modules directly from smart contracts.
   </Card>
-  <Card title="Customizable Features" icon="settings" color="#22E2A8">
-    EVM extensions, custom precompiles, and permissioned/restricted EVM capabilities.
+  <Card title="Sovereign Chain" icon="crown" color="#22E2A8">
+    Full control over consensus, governance, and chain parameters. No dependency on Ethereum's base layer security.
   </Card>
-  <Card title="Token Unification" icon="coins" color="#FF5628">
-    Single Token Representation v2 and ERC-20 module eliminate liquidity fragmentation.
+  <Card title="Forward-Compatible" icon="trending-up" color="#FF5628">
+    Supports new EVM features before they reach Ethereum mainnet, while maintaining full backward compatibility.
   </Card>
 </CardGroup>
 
 ---
 
-## Choose Your Path
+## Developer Journey: The 7-Tier Approach
 
-### 🔍 **New to Cosmos EVM?** → [Explore & Compare](/docs/evm/explore)
-*Understand what Cosmos EVM offers and how it compares to other solutions*
+Our documentation follows a proven methodology that guides you through the complete development journey:
 
-### ⚡ **Ready to Build?** → [Practice with Tutorials](/docs/evm/practice)
-*Step-by-step guides to deploy your first contracts and build applications*
+### 🔍 **1. Appraise** - *Should you use Cosmos EVM?*
 
-### 🔧 **Need Integration Help?** → [Develop & Integrate](/docs/evm/develop)
-*Convert existing chains or build custom integrations*
+<Card title="Evaluate Your Options" href="/docs/evm/developers/appraise" icon="scale-balanced">
+  Compare Cosmos EVM against Ethereum L2s, native Cosmos SDK, and CosmWasm. Make an informed architectural decision for your project.
+</Card>
 
-### 📚 **Looking for References?** → [Remember & Reference](/docs/evm/reference)
-*APIs, configurations, and technical specifications*
+### 🧭 **2. Explore** - *Discover what's possible*
 
-### 🚨 **Having Issues?** → [Troubleshoot & Solve](/docs/evm/troubleshoot)
-*Common problems and their solutions*
+<CardGroup cols={2}>
+  <Card title="Capabilities Overview" href="/docs/evm/developers/explore" icon="compass">
+    Understand Cosmos EVM's unique features and see real-world examples of hybrid applications.
+  </Card>
+  <Card title="Local Setup" href="/docs/evm/developers/local-setup" icon="play">
+    Get a local testnet running in 5 minutes. Clone, build, and start developing immediately.
+  </Card>
+</CardGroup>
+
+### 🔨 **3. Practice** - *Build your skills*
+
+<CardGroup cols={3}>
+  <Card title="Development Environment" href="/docs/evm/developers/development-environment" icon="code">
+    Set up your IDE, configure AI assistants, and install essential development tools.
+  </Card>
+  <Card title="Tooling & Workflows" href="/docs/evm/developers/tooling-and-workflows" icon="wrench">
+    Master Foundry and Hardhat workflows specific to Cosmos EVM development.
+  </Card>
+  <Card title="Smart Contract Development" href="/docs/evm/developers/smart-contract-development" icon="file-code">
+    Learn Solidity best practices, security patterns, and deployment strategies.
+  </Card>
+</CardGroup>
+
+### 🚀 **4. Develop** - *Build sophisticated applications*
+
+<CardGroup cols={2}>
+  <Card title="Advanced Patterns" href="/docs/evm/developers/advanced-patterns" icon="puzzle">
+    Cross-chain arbitrage, liquid staking, governance integration, and other hybrid patterns.
+  </Card>
+  <Card title="Chain Integration" href="/docs/evm/developers/chain-integration" icon="link">
+    Add EVM to new or existing Cosmos SDK chains. Complete integration guide.
+  </Card>
+</CardGroup>
+
+### 💡 **5. Understand** - *Master the fundamentals*
+
+<CardGroup cols={2}>
+  <Card title="Architecture Deep Dive" href="/docs/evm/developers/architecture" icon="cpu">
+    How Cosmos EVM works internally: modules, state management, consensus integration.
+  </Card>
+  <Card title="Cosmos Comparisons" href="/docs/evm/developers/cosmos-comparisons" icon="git-compare">
+    Detailed comparison with native Cosmos SDK and CosmWasm development approaches.
+  </Card>
+</CardGroup>
+
+### 📚 **6. Remember** - *Quick reference*
+
+<CardGroup cols={2}>
+  <Card title="API Reference" href="/docs/evm/developers/reference" icon="book-open">
+    Complete technical reference: module parameters, JSON-RPC APIs, configuration options.
+  </Card>
+  <Card title="Precompiled Contracts" href="/docs/evm/developers/precompiles" icon="box">
+    Access Cosmos SDK modules from Solidity: Staking, Distribution, IBC transfers.
+  </Card>
+</CardGroup>
+
+### 🐛 **7. Solve** - *Troubleshoot issues*
+
+<Card title="Troubleshooting Guide" href="/docs/evm/developers/troubleshoot" icon="bug">
+  Common issues, debugging strategies, and solutions for development and deployment problems.
+</Card>
 
 ---
 
-## Popular Starting Points
+## Quick Start Paths
 
-<CardGroup cols={3}>
-  <Card title="Deploy a Smart Contract" href="/docs/evm/practice#deploy-contract">
-    Get your Solidity contracts running in 5 minutes
+### For Ethereum Developers
+
+**New to Cosmos?** Start here to leverage your existing skills:
+
+1. **[Appraise](/docs/evm/developers/appraise)** → Understand how Cosmos EVM compares to Ethereum L2s
+2. **[Local Setup](/docs/evm/developers/local-setup)** → Get a testnet running in 5 minutes
+3. **[Smart Contract Development](/docs/evm/developers/smart-contract-development)** → Deploy your first contract
+4. **[Precompiles](/docs/evm/developers/precompiles)** → Access Cosmos features from Solidity
+
+### For Cosmos Developers
+
+**Ready to explore EVM?** Bridge your Cosmos knowledge:
+
+1. **[Appraise](/docs/evm/developers/appraise)** → See how EVM compares to native modules and CosmWasm
+2. **[Explore](/docs/evm/developers/explore)** → Understand EVM capabilities in Cosmos context
+3. **[Architecture](/docs/evm/developers/architecture)** → Learn how EVM integrates with Cosmos SDK
+4. **[Chain Integration](/docs/evm/developers/chain-integration)** → Add EVM to your chain
+
+### For Chain Operators
+
+**Building or upgrading a chain?** Focus on infrastructure:
+
+1. **[Chain Integration](/docs/evm/developers/chain-integration)** → Complete integration guide
+2. **[Architecture](/docs/evm/developers/architecture)** → Understand performance implications
+3. **[Troubleshooting](/docs/evm/developers/troubleshoot)** → Operational best practices
+
+---
+
+## Real-World Applications
+
+<CardGroup cols={2}>
+  <Card title="DeFi with IBC" icon="chart-line">
+    **Cross-Chain DEXs:** Arbitrage opportunities across Cosmos chains
+
+    **Liquid Staking:** Stake on multiple chains from a single interface
+
+    **Yield Farming:** Access yield opportunities across the entire Cosmos ecosystem
   </Card>
-  <Card title="Compare Solutions" href="/docs/evm/explore#comparison">
-    See how Cosmos EVM stacks against alternatives
+
+  <Card title="NFTs & Gaming" icon="image">
+    **Cross-Chain NFTs:** Transfer NFTs between Cosmos chains via IBC
+
+    **Gaming Assets:** Unified game economies across multiple chains
+
+    **Governance NFTs:** Voting rights that work across chain boundaries
   </Card>
-  <Card title="Convert Your Chain" href="/docs/evm/develop#chain-conversion">
-    Add EVM compatibility to existing Cosmos chains
+
+  <Card title="Infrastructure" icon="server">
+    **Bridge Contracts:** Connect Cosmos chains to external networks
+
+    **Oracle Networks:** Price feeds and external data for multiple chains
+
+    **Cross-Chain Governance:** Coordinate decisions across chain federations
+  </Card>
+
+  <Card title="Enterprise Solutions" icon="building">
+    **Supply Chain:** Track assets across permissioned and public chains
+
+    **Identity Systems:** Unified identity across enterprise blockchain networks
+
+    **Payment Rails:** Cross-border payments leveraging multiple currencies
   </Card>
 </CardGroup>
 
@@ -69,11 +173,11 @@ Cosmos EVM is a plug-and-play solution that adds EVM compatibility and customiza
 
 <CardGroup cols={2}>
   <Card title="Developer Discord" icon="discord" href="https://discord.gg/cosmosnetwork">
-    Join the conversation with other developers
+    Join the conversation with other Cosmos EVM developers
   </Card>
   <Card title="GitHub Repository" icon="github" href="https://github.com/cosmos/evm">
-    Contribute to the codebase and report issues
+    Source code, issues, and contribution guidelines
   </Card>
 </CardGroup>
 
-*Want to dive deeper into the technical architecture? Check out our [Architecture Overview](/docs/evm/reference#architecture).*
+**Ready to start building?** Choose your path above and dive into the hybrid world of Cosmos EVM.

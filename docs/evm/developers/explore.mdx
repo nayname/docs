@@ -1,0 +1,266 @@
+---
+title: "Explore: Discover Cosmos EVM Capabilities"
+description: "Understand what's possible with Cosmos EVM and how it extends both Ethereum and Cosmos paradigms."
+---
+
+Now that you've decided to explore Cosmos EVM, let's discover what makes it unique and powerful. Cosmos EVM isn't just "Ethereum on Cosmos" - it's a hybrid that unlocks new possibilities.
+
+## What is Cosmos EVM?
+
+Cosmos EVM provides forward-compatible Ethereum Virtual Machine support within the Cosmos SDK framework. Think of it as bringing Ethereum's proven smart contract capabilities to Cosmos's sovereign, interoperable blockchain architecture.
+
+### Core Philosophy
+
+<CardGroup cols={2}>
+  <Card title="Familiar for Ethereum Devs" icon="ethereum">
+    Deploy existing Solidity contracts unchanged. Use MetaMask, Hardhat, Foundry - all your familiar tools work.
+  </Card>
+  <Card title="Extended for Cosmos" icon="atom">
+    Access IBC transfers, custom governance, and native Cosmos modules directly from your smart contracts.
+  </Card>
+</CardGroup>
+
+## Key Capabilities
+
+### 1. Full EVM Compatibility
+
+**What it means:** Any valid Ethereum smart contract can run on Cosmos EVM without modification.
+
+**Cosmos SDK Comparison:**
+- **Cosmos SDK:** Custom modules written in Go, requiring specific Cosmos knowledge
+- **Cosmos EVM:** Standard Solidity contracts work immediately
+
+```solidity
+// This exact contract works on both Ethereum and Cosmos EVM
+contract UniswapV2Pair {
+    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external {
+        // Identical implementation to Ethereum
+    }
+}
+```
+
+### 2. Native IBC Integration
+
+**What it means:** Smart contracts can initiate cross-chain transfers and communicate with other Cosmos chains.
+
+**CosmWasm Comparison:**
+- **CosmWasm:** Native IBC support through Rust contract interfaces
+- **Cosmos EVM:** IBC support through precompiled contracts
+
+```solidity
+// IBC transfer from a smart contract (conceptual)
+interface IIBCTransfer {
+    function transfer(string calldata sourceChannel, string calldata receiver, uint256 amount) external;
+}
+
+contract CrossChainDEX {
+    IIBCTransfer constant IBC = IIBCTransfer(0x0000000000000000000000000000000000000802);
+
+    function arbitrage(string calldata targetChain, uint256 amount) external {
+        // Execute local swap, then IBC transfer profits
+        IBC.transfer("channel-0", msg.sender, amount);
+    }
+}
+```
+
+### 3. Precompiled Contracts (Cosmos Modules Access)
+
+**What it means:** Access native Cosmos SDK functionality directly from Solidity.
+
+**Available Precompiles:**
+- **Staking:** Delegate, undelegate, claim rewards
+- **Distribution:** Manage validator commissions and community pool
+- **IBC:** Cross-chain token transfers
+
+**Cosmos SDK Comparison:**
+```go
+// Native Cosmos SDK staking
+func (k Keeper) Delegate(ctx sdk.Context, delegator sdk.AccAddress, validator sdk.ValAddress, amount sdk.Coin) error {
+    return k.stakingKeeper.Delegate(ctx, delegator, validator, amount)
+}
+```
+
+```solidity
+// Cosmos EVM staking precompile
+interface IStaking {
+    function delegate(address validator, uint256 amount) external returns (bool);
+}
+
+contract StakingVault {
+    IStaking constant STAKING = IStaking(0x0000000000000000000000000000000000000800);
+
+    function autoStake() external payable {
+        STAKING.delegate(preferredValidator, msg.value);
+    }
+}
+```
+
+### 4. Token Unification
+
+**What it means:** IBC tokens and ERC-20 tokens are unified - no more fragmented liquidity.
+
+**Traditional Problem:**
+- Token arrives via IBC as `ibc/ABC123...`
+- Must wrap to ERC-20 for DeFi use
+- Creates separate liquidity pools
+
+**Cosmos EVM Solution:**
+- IBC tokens automatically available as ERC-20
+- Single liquidity pool for maximum efficiency
+- Seamless user experience
+
+## Architecture Insights
+
+### Module Integration
+
+Cosmos EVM consists of three core modules working together:
+
+<AccordionGroup>
+  <Accordion title="x/vm Module (Core EVM)">
+    **Purpose:** Provides the Ethereum Virtual Machine execution environment
+
+    **Cosmos SDK Context:** Similar to how `x/bank` handles token transfers, `x/vm` handles smart contract execution
+
+    **Key Features:**
+    - Ethereum transaction processing
+    - Smart contract deployment and execution
+    - EVM state management
+  </Accordion>
+
+  <Accordion title="x/feemarket Module (EIP-1559)">
+    **Purpose:** Implements dynamic fee pricing mechanism
+
+    **Cosmos SDK Context:** Unlike fixed gas prices in native Cosmos SDK, this provides Ethereum-style dynamic pricing
+
+    **Benefits:**
+    - Automatic fee adjustment based on network demand
+    - Better user experience during congestion
+    - Economic incentives for validators
+  </Accordion>
+
+  <Accordion title="x/erc20 Module (Token Bridge)">
+    **Purpose:** Bridges Cosmos SDK coins and ERC-20 tokens
+
+    **Cosmos SDK Context:** Enables seamless conversion between native Cosmos denominations and ERC-20 representations
+
+    **Use Cases:**
+    - IBC tokens usable in DeFi
+    - Native staking token as ERC-20
+    - Cross-chain token standards
+  </Accordion>
+</AccordionGroup>
+
+## Unique Advantages
+
+### 1. Sovereign Consensus
+
+**Benefit:** Unlike Ethereum L2s, you control your own consensus mechanism.
+
+**Practical Impact:**
+- Custom block times (1-2 seconds vs. Ethereum's 12+ seconds)
+- No dependency on Ethereum's security assumptions
+- Custom validator sets and governance
+
+### 2. Customizable Features
+
+**Permissioned Deployment:**
+```go
+// Governance can restrict contract deployment
+params := types.Params{
+    EnableCreate: true,
+    EnableCall:   true,
+    AllowedPublishers: []string{"cosmos1abc...", "cosmos1def..."},
+}
+```
+
+**Custom Opcodes:**
+Add new EVM opcodes for chain-specific functionality beyond standard Ethereum.
+
+### 3. Best of Both Ecosystems
+
+<CardGroup cols={2}>
+  <Card title="From Ethereum" icon="ethereum">
+    - Mature smart contract libraries (OpenZeppelin)
+    - Extensive auditing ecosystem
+    - Proven DeFi patterns and protocols
+    - Rich developer tooling
+  </Card>
+  <Card title="From Cosmos" icon="atom">
+    - Inter-blockchain communication (IBC)
+    - Custom governance mechanisms
+    - Modular architecture
+    - Proof-of-Stake consensus
+  </Card>
+</CardGroup>
+
+## What You Can Build
+
+### DeFi Protocols with IBC
+
+```solidity
+contract CrossChainDEX {
+    // Standard AMM functionality
+    function swap(address tokenA, address tokenB, uint256 amountIn) external {
+        // Local swap logic
+    }
+
+    // Cross-chain arbitrage enabled by IBC
+    function arbitrageAcrossChains(string calldata targetChain) external {
+        // Execute local trade, IBC transfer to target chain
+        IBC.transfer(targetChain, calculatedAmount);
+    }
+}
+```
+
+### NFT Marketplaces with Cosmos Features
+
+```solidity
+contract CosmosNFTMarketplace {
+    // Standard ERC-721 functionality
+    function mintNFT(address to, string calldata tokenURI) external {
+        _mint(to, tokenId);
+    }
+
+    // Governance-controlled royalty rates
+    function updateRoyalties(uint256 newRate) external {
+        require(msg.sender == governanceModule, "Only governance");
+        royaltyRate = newRate;
+    }
+}
+```
+
+### Liquid Staking with Native Integration
+
+```solidity
+contract LiquidStaking {
+    IStaking constant STAKING = IStaking(0x0000000000000000000000000000000000000800);
+
+    function stake() external payable {
+        // Stake native tokens through precompile
+        STAKING.delegate(selectedValidator, msg.value);
+
+        // Mint liquid staking tokens
+        _mint(msg.sender, msg.value);
+    }
+}
+```
+
+## Performance Characteristics
+
+**Compared to Native Cosmos SDK:**
+- **Throughput:** Lower (EVM overhead vs. native Go)
+- **Development Speed:** Faster (proven patterns and tools)
+- **Flexibility:** Constrained by EVM limitations
+
+**Compared to Ethereum:**
+- **Throughput:** Higher (Tendermint consensus)
+- **Finality:** Faster (1-2 seconds vs. 12+ minutes)
+- **Fees:** Potentially lower (no base layer competition)
+
+## Next Steps
+
+Ready to get hands-on? Set up your local environment:
+
+<Card title="Local Setup Guide" href="/docs/evm/developers/local-setup">
+  Clone the repo and run your first Cosmos EVM node in 5 minutes.
+</Card>
