@@ -13,28 +13,32 @@
   --cosmos-cyan: #40B3FF;
 }
 
+/* Dark mode colors */
+:root[data-theme="dark"] {
+  --cosmos-deep-blue: #5B57FF;
+  --cosmos-mint: #2EF2B8;
+  --cosmos-cobalt: #5261FF;
+  --cosmos-deep-purple: #8532C5;
+  --cosmos-orange: #FF6638;
+  --cosmos-pink: #F65F9F;
+  --cosmos-cyan: #50C3FF;
+}
+
 /* === HEADER NAVIGATION === */
-[data-theme='light'] .mintlify-header,
-[data-theme='light'] .mintlify-navbar,
 [data-theme='light'] .mintlify-topbar,
-[data-theme='light'] #navbar,
-[data-theme='light'] header,
-[data-theme='light'] nav[role="navigation"] {
+[data-theme='light'] header {
   background: linear-gradient(135deg, var(--cosmos-deep-blue) 0%, var(--cosmos-deep-purple) 30%, var(--cosmos-cobalt) 70%, var(--cosmos-orange) 100%) !important;
-  border-bottom: 3px solid var(--cosmos-orange) !important;
+  border-bottom: 2px solid var(--cosmos-orange) !important;
   backdrop-filter: blur(20px) !important;
-  box-shadow: 0 4px 25px rgba(75, 71, 202, 0.2), 0 2px 10px rgba(255, 86, 40, 0.1) !important;
+  box-shadow: 0 4px 25px rgba(75, 71, 202, 0.2) !important;
   position: relative !important;
   z-index: 100 !important;
-  padding: 0.875rem 1.5rem !important;
-  min-height: 70px !important;
+  padding: 1rem 1.5rem !important;
+  min-height: 64px !important;
 }
 
 /* Header gradient overlay */
-[data-theme='light'] .mintlify-header::before,
-[data-theme='light'] .mintlify-navbar::before,
 [data-theme='light'] .mintlify-topbar::before,
-[data-theme='light'] #navbar::before,
 [data-theme='light'] header::before {
   content: '' !important;
   position: absolute !important;
@@ -42,158 +46,103 @@
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 86, 40, 0.1) 100%) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
   pointer-events: none !important;
   z-index: -1 !important;
 }
 
 /* Header layout */
-[data-theme='light'] .mintlify-header > div,
-[data-theme='light'] .mintlify-navbar > div,
 [data-theme='light'] .mintlify-topbar > div,
-[data-theme='light'] #navbar > div,
 [data-theme='light'] header > div {
   display: flex !important;
   align-items: center !important;
-  justify-content: flex-start !important;
+  justify-content: space-between !important;
   width: 100% !important;
   gap: 1rem !important;
 }
 
 /* === LOGO STYLING === */
-[data-theme='light'] .mintlify-logo,
-[data-theme='light'] .logo,
-[data-theme='light'] .mintlify-header .logo,
-[data-theme='light'] .mintlify-navbar .logo,
-[data-theme='light'] .topbar-logo,
-[data-theme='light'] .header-logo {
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  max-height: 32px !important;
-  height: 32px !important;
+[data-theme='light'] .mintlify-topbar .logo,
+[data-theme='light'] .logo {
+  display: flex !important;
+  align-items: center !important;
+  height: 40px !important;
   width: auto !important;
-  filter: none !important;
-  transition: transform 0.2s ease, opacity 0.2s ease !important;
-  order: 1 !important;
-  flex-shrink: 0 !important;
-  margin-right: 1rem !important;
+  transition: transform 0.2s ease !important;
 }
 
-[data-theme='light'] .mintlify-logo img,
-[data-theme='light'] .logo img,
-[data-theme='light'] .mintlify-header .logo img,
-[data-theme='light'] .mintlify-navbar .logo img,
-[data-theme='light'] .topbar-logo img,
-[data-theme='light'] .header-logo img {
+[data-theme='light'] .mintlify-topbar .logo img,
+[data-theme='light'] .logo img {
   display: block !important;
-  max-height: 32px !important;
-  height: 32px !important;
+  max-height: 36px !important;
+  height: auto !important;
   width: auto !important;
-  opacity: 1 !important;
+  object-fit: contain !important;
 }
 
-[data-theme='light'] .mintlify-logo:hover,
 [data-theme='light'] .logo:hover {
   transform: scale(1.05) !important;
-  opacity: 0.9 !important;
 }
 
 /* === SEARCH BAR === */
-[data-theme='light'] .mintlify-search-wrapper,
-[data-theme='light'] .search-wrapper,
-[data-theme='light'] .mintlify-header .search,
-[data-theme='light'] .mintlify-navbar .search {
-  margin-left: 2rem !important;
-  margin-right: auto !important;
-  max-width: 350px !important;
-  width: 350px !important;
-  flex: 0 0 350px !important;
-  order: 2 !important;
+[data-theme='light'] .mintlify-topbar .search,
+[data-theme='light'] .search-wrapper {
+  flex: 1 !important;
+  max-width: 400px !important;
+  margin: 0 2rem !important;
 }
 
-[data-theme='light'] .mintlify-search input,
-[data-theme='light'] .search-input,
+[data-theme='light'] .mintlify-topbar .search input,
 [data-theme='light'] input[type="search"] {
-  background: rgba(255, 255, 255, 0.25) !important;
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
   color: white !important;
-  backdrop-filter: blur(15px) !important;
-  border-radius: 12px !important;
-  padding: 0.8rem 1.2rem !important;
-  font-size: 0.95rem !important;
+  border-radius: 8px !important;
+  padding: 0.7rem 1rem !important;
+  font-size: 0.9rem !important;
   transition: all 0.2s ease !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
   width: 100% !important;
 }
 
-[data-theme='light'] .mintlify-search input:focus,
-[data-theme='light'] .search-input:focus,
+[data-theme='light'] .mintlify-topbar .search input:focus,
 [data-theme='light'] input[type="search"]:focus {
-  background: rgba(255, 255, 255, 0.3) !important;
-  border-color: rgba(255, 255, 255, 0.6) !important;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
   outline: none !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
 }
 
-[data-theme='light'] .mintlify-search input::placeholder,
-[data-theme='light'] .search-input::placeholder,
+[data-theme='light'] .mintlify-topbar .search input::placeholder,
 [data-theme='light'] input[type="search"]::placeholder {
-  color: rgba(255, 255, 255, 0.8) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 /* === TOPBAR NAVIGATION LINKS === */
-[data-theme='light'] .mintlify-topbar-links,
-[data-theme='light'] .topbar-links,
-[data-theme='light'] .mintlify-header-nav,
-[data-theme='light'] .header-nav,
-[data-theme='light'] .mintlify-navbar .nav-links,
-[data-theme='light'] [data-testid="topbar-links"],
-[data-theme='light'] [data-testid="header-nav"],
-[data-theme='light'] .mintlify-header nav,
-[data-theme='light'] .mintlify-navbar nav {
+[data-theme='light'] .mintlify-topbar nav,
+[data-theme='light'] .topbar-links {
   display: flex !important;
   align-items: center !important;
-  gap: 0.5rem !important;
-  margin-left: auto !important;
-  order: 3 !important;
-  flex-shrink: 0 !important;
+  gap: 0.75rem !important;
 }
 
-[data-theme='light'] .mintlify-topbar-links a,
-[data-theme='light'] .topbar-links a,
-[data-theme='light'] .mintlify-header-nav a,
-[data-theme='light'] .header-nav a,
-[data-theme='light'] [data-testid="topbar-links"] a,
-[data-theme='light'] [data-testid="header-nav"] a,
-[data-theme='light'] .mintlify-header nav a,
-[data-theme='light'] .mintlify-navbar nav a {
-  color: rgba(255, 255, 255, 0.95) !important;
-  font-weight: 600 !important;
+[data-theme='light'] .mintlify-topbar nav a,
+[data-theme='light'] .topbar-links a {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500 !important;
   font-size: 0.9rem !important;
-  padding: 0.6rem 1rem !important;
-  border-radius: 8px !important;
+  padding: 0.5rem 0.875rem !important;
+  border-radius: 6px !important;
   transition: all 0.2s ease !important;
   text-decoration: none !important;
-  white-space: nowrap !important;
   background: rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  backdrop-filter: blur(10px) !important;
 }
 
-[data-theme='light'] .mintlify-topbar-links a:hover,
-[data-theme='light'] .topbar-links a:hover,
-[data-theme='light'] .mintlify-header-nav a:hover,
-[data-theme='light'] .header-nav a:hover,
-[data-theme='light'] [data-testid="topbar-links"] a:hover,
-[data-theme='light'] [data-testid="header-nav"] a:hover,
-[data-theme='light'] .mintlify-header nav a:hover,
-[data-theme='light'] .mintlify-navbar nav a:hover {
+[data-theme='light'] .mintlify-topbar nav a:hover,
+[data-theme='light'] .topbar-links a:hover {
   background: rgba(255, 255, 255, 0.2) !important;
   color: white !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  border-color: rgba(255, 255, 255, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 /* === CTA BUTTON === */
