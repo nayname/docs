@@ -56,6 +56,7 @@
         "evm/developers/development-environment",
         {
           "group": "Smart Contract Development",
+          "collapsed": true,
           "pages": [
             "evm/developers/smart-contracts/index",
             "evm/developers/smart-contracts/overview"
@@ -63,6 +64,7 @@
         },
         {
           "group": "Tooling & Resources",
+          "collapsed": true,
           "pages": [
             "evm/developers/tooling-and-resources/index",
             "evm/developers/tooling-and-resources/foundry-guide",
@@ -72,14 +74,15 @@
           ]
         },
         {
-            "group": "Precompiled Contracts",
-            "pages": [
-                "evm/developers/precompiles/index",
-                "evm/developers/precompiles/overview",
-                "evm/developers/precompiles/staking",
-                "evm/developers/precompiles/distribution",
-                "evm/developers/precompiles/ibc"
-            ]
+          "group": "Precompiled Contracts",
+          "collapsed": true,
+          "pages": [
+            "evm/developers/precompiles/index",
+            "evm/developers/precompiles/overview",
+            "evm/developers/precompiles/staking",
+            "evm/developers/precompiles/distribution",
+            "evm/developers/precompiles/ibc"
+          ]
         },
         "evm/developers/advanced-patterns",
         "evm/developers/chain-integration",
