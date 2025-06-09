@@ -4,11 +4,232 @@ description: "Use the OpenZeppelin Contract Wizard to bootstrap your ERC20, ERC7
 mode: "custom"
 ---
 
-The OpenZeppelin Contract Wizard is an interactive tool that helps you generate secure, production-ready smart contracts based on OpenZeppelin's battle-tested libraries. You can use it to quickly create standard contracts like ERC20 (fungible tokens), ERC721 (NFTs), ERC1155 (multi-token standard), and Governor (for on-chain governance).
+<div style={{
+  padding: '0 1.5rem',
+  maxWidth: '100%',
+  margin: '0 auto'
+}}>
+  <div style={{
+    marginBottom: '2rem'
+  }}>
+    <p style={{
+      fontSize: '1.125rem',
+      marginBottom: '1rem',
+      lineHeight: '1.7'
+    }}>
+      Generate secure, production-ready smart contracts based on OpenZeppelin's battle-tested libraries.
+      Create standard contracts like ERC20 (fungible tokens), ERC721 (NFTs), ERC1155 (multi-token standard),
+      and Governor (for on-chain governance) with confidence.
+    </p>
 
-This is an excellent starting point for any new project, as it ensures you are using the latest security best practices.
+    <Note>
+      **Pro Tip:**  On top of serving as an excellent starting point for any new project, this wizard is a good way to check existing builds against current standards.
+    </Note>
+  </div>
 
-<iframe
-    src="https://wizard.openzeppelin.com/"
-    style={{ width: '100%', height: '100vh', border: 'none' }}
-/>
+  <div style={{
+    border: '1px solid var(--primary-border, #e5e7eb)',
+    borderRadius: '0.75rem',
+    overflow: 'hidden',
+    marginBottom: '2rem',
+    background: 'var(--background, #ffffff)'
+  }}>
+    <div style={{
+      padding: '0.75rem 1.25rem',
+      background: 'var(--primary, #4B47CA)',
+      color: 'white',
+      fontSize: '0.875rem',
+      fontWeight: '500',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.75rem'
+    }}>
+      <div style={{
+        width: '8px',
+        height: '8px',
+        borderRadius: '50%',
+        background: '#10B981',
+        flexShrink: '0'
+      }}></div>
+      <span>wizard.openzeppelin.com</span>
+      <span style={{ marginLeft: 'auto', opacity: '0.9', fontSize: '0.8rem' }}>
+        Interactive Contract Generator
+      </span>
+    </div>
+
+    <iframe
+      src="https://wizard.openzeppelin.com/"
+      style={{
+        width: '100%',
+        height: 'calc(100vh - 240px)',
+        border: 'none',
+        display: 'block',
+        minHeight: '600px'
+      }}
+      title="OpenZeppelin Contract Wizard"
+    />
+  </div>
+
+  <div style={{
+    background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+    border: '1px solid #e2e8f0',
+    borderRadius: '0.75rem',
+    padding: '1.5rem',
+    marginTop: '1rem'
+  }}>
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      marginBottom: '1rem'
+    }}>
+      <div style={{
+        width: '20px',
+        height: '20px',
+        borderRadius: '50%',
+        background: 'var(--primary, #4B47CA)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        fontSize: '12px',
+        fontWeight: 'bold'
+      }}>
+        ✓
+      </div>
+      <h3 style={{
+        margin: '0',
+        color: '#1e293b',
+        fontSize: '1.25rem',
+        fontWeight: '600'
+      }}>
+        Next Steps
+      </h3>
+    </div>
+
+    <div style={{
+      display: 'grid',
+      gap: '0.75rem'
+    }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '0.75rem',
+        padding: '0.75rem',
+        background: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: '0.5rem',
+        border: '1px solid rgba(226, 232, 240, 0.5)'
+      }}>
+        <div style={{
+          width: '24px',
+          height: '24px',
+          borderRadius: '50%',
+          background: '#22C55E',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          flexShrink: '0',
+          marginTop: '2px'
+        }}>
+          1
+        </div>
+        <div>
+          <strong style={{ color: '#374151' }}>Copy & Save:</strong> Copy the generated contract code to your development environment
+        </div>
+      </div>
+
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '0.75rem',
+        padding: '0.75rem',
+        background: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: '0.5rem',
+        border: '1px solid rgba(226, 232, 240, 0.5)'
+      }}>
+        <div style={{
+          width: '24px',
+          height: '24px',
+          borderRadius: '50%',
+          background: '#3B82F6',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          flexShrink: '0',
+          marginTop: '2px'
+        }}>
+          2
+        </div>
+        <div>
+          <strong style={{ color: '#374151' }}>Customize:</strong> Review and customize the contract parameters for your specific needs
+        </div>
+      </div>
+
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '0.75rem',
+        padding: '0.75rem',
+        background: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: '0.5rem',
+        border: '1px solid rgba(226, 232, 240, 0.5)'
+      }}>
+        <div style={{
+          width: '24px',
+          height: '24px',
+          borderRadius: '50%',
+          background: '#F59E0B',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          flexShrink: '0',
+          marginTop: '2px'
+        }}>
+          3
+        </div>
+        <div>
+          <strong style={{ color: '#374151' }}>Test:</strong> Test thoroughly using <a href="/docs/evm/developers/tooling-and-resources/testing-and-fuzzing" style={{ color: 'var(--primary, #4B47CA)', textDecoration: 'none', fontWeight: '500' }}>recommended testing frameworks</a>
+        </div>
+      </div>
+
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '0.75rem',
+        padding: '0.75rem',
+        background: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: '0.5rem',
+        border: '1px solid rgba(226, 232, 240, 0.5)'
+      }}>
+        <div style={{
+          width: '24px',
+          height: '24px',
+          borderRadius: '50%',
+          background: '#8B5CF6',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          flexShrink: '0',
+          marginTop: '2px'
+        }}>
+          4
+        </div>
+        <div>
+          <strong style={{ color: '#374151' }}>Deploy:</strong> Deploy to Cosmos EVM using <a href="/docs/evm/developers/tooling-and-resources/foundry-guide" style={{ color: 'var(--primary, #4B47CA)', textDecoration: 'none', fontWeight: '500' }}>Foundry</a> or <a href="/docs/evm/developers/tooling-and-resources/hardhat-guide" style={{ color: 'var(--primary, #4B47CA)', textDecoration: 'none', fontWeight: '500' }}>Hardhat</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
