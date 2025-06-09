@@ -54,6 +54,164 @@ interface IIBCTransfer {
 }
 ```
 
+## ABI
+
+```json
+[
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "connectionId",
+        "type": "string"
+      }
+    ],
+    "name": "getConnection",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "clientId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "counterpartyClientId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "counterpartyConnectionId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "state",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "channelId",
+        "type": "string"
+      }
+    ],
+    "name": "getChannel",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "state",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "ordering",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "counterpartyPortId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "counterpartyChannelId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "connectionId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "version",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "sourceChannel",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "receiver",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "transfer",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "sourcePort",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "sourceChannel",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "receiver",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint64",
+        "name": "timeoutHeight",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint64",
+        "name": "timeoutTimestamp",
+        "type": "uint64"
+      }
+    ],
+    "name": "transfer",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
+```
+
 ## Functions
 
 ### Transfer Functions

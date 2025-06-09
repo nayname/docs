@@ -1,0 +1,87 @@
+{
+  "name": "Cosmos EVM",
+  "colors": {
+    "primary": "#4B47CA",
+    "light": "#6D6AD7",
+    "dark": "#3A37A1"
+  },
+  "logo": {
+    "light": "/assets/brand/wordmark-light.svg",
+    "dark": "/assets/brand/wordmark-dark.svg"
+  },
+  "topbarLinks": [
+    {
+      "name": "Discord",
+      "url": "https://discord.gg/cosmosnetwork"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "GitHub",
+    "url": "https://github.com/cosmos/evm"
+  },
+  "anchors": [
+    {
+      "name": "Documentation",
+      "icon": "book-open-text",
+      "url": "evm"
+    },
+    {
+      "name": "Community",
+      "icon": "discord",
+      "url": "https://discord.gg/cosmosnetwork"
+    },
+    {
+      "name": "Blog",
+      "icon": "newspaper",
+      "url": "https://blog.cosmos.network/"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Cosmos EVM",
+      "pages": [
+        "evm/index"
+      ]
+    },
+    {
+      "group": "Developers",
+      "pages": [
+        "evm/developers/appraise",
+        "evm/developers/explore",
+        "evm/developers/local-setup",
+        "evm/developers/development-environment",
+        "evm/developers/smart-contract-development",
+        {
+          "group": "Tooling & Resources",
+          "pages": [
+            "evm/developers/tooling-and-resources/index",
+            "evm/developers/tooling-and-resources/foundry-guide",
+            "evm/developers/tooling-and-resources/hardhat-guide",
+            "evm/developers/tooling-and-resources/testing-and-fuzzing",
+            "evm/developers/tooling-and-resources/contract-wizard"
+          ]
+        },
+        {
+            "group": "Precompiled Contracts",
+            "pages": [
+                "evm/developers/precompiles/index",
+                "evm/developers/precompiles/overview",
+                "evm/developers/precompiles/staking",
+                "evm/developers/precompiles/distribution",
+                "evm/developers/precompiles/ibc"
+            ]
+        },
+        "evm/developers/advanced-patterns",
+        "evm/developers/chain-integration",
+        "evm/developers/architecture",
+        "evm/developers/reference",
+        "evm/developers/troubleshoot"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "discord": "https://discord.gg/cosmosnetwork",
+    "github": "https://github.com/cosmos",
+    "twitter": "https://twitter.com/cosmos"
+  }
+}

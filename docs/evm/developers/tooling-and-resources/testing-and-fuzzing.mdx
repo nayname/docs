@@ -1,0 +1,82 @@
+---
+title: "Testing & Fuzzing"
+description: "An overview of essential testing libraries, tools, and best practices for writing robust and secure smart contracts on Cosmos EVM."
+---
+
+Thorough testing is non-negotiable for smart contract development. This guide provides an overview of the tools and libraries available to help you write comprehensive tests, including unit tests, integration tests, and property-based (fuzz) testing.
+
+## Core Testing Frameworks
+
+Your primary testing experience will be shaped by your chosen development framework. Both Foundry and Hardhat offer powerful, built-in testing capabilities.
+
+<CardGroup cols={2}>
+  <Card title="Foundry" icon="hammer" href="/docs/evm/developers/tooling-and-resources/foundry-guide">
+    **Solidity-Native Testing**
+
+    Foundry allows you to write your tests directly in Solidity, which can be more intuitive and efficient for many developers. It includes a fast test runner, powerful cheatcodes for manipulating blockchain state, and integrated fuzz testing.
+  </Card>
+  <Card title="Hardhat" icon="wrench" href="/docs/evm/developers/tooling-and-resources/hardhat-guide">
+    **JavaScript/TypeScript Testing**
+
+    Hardhat uses a JavaScript-based testing environment with Mocha and Chai. It provides a flexible and extensible platform for writing complex test scenarios and integrating with the broader JavaScript ecosystem.
+  </Card>
+</CardGroup>
+
+## Fuzz Testing
+
+Fuzzing, or property-based testing, is a powerful technique where a tool generates random inputs to test that your code adheres to a specific set of rules or "properties."
+
+- **Foundry's Fuzzer**: Foundry has a built-in, highly configurable fuzzer. You can define properties in your Solidity tests, and the fuzzer will attempt to find edge cases that violate them.
+  ```solidity
+  // test/MyContract.t.sol
+  function test_myFunction_fuzz(uint256 amount) public {
+      vm.assume(amount > 0 && amount < 1e18); // Constrain inputs
+      myContract.myFunction(amount);
+      assertEq(myContract.someState(), expectedValue);
+  }
+  ```
+- **Echidna**: A powerful, standalone property-based testing tool for Ethereum smart contracts. Echidna requires more setup but offers advanced features for complex fuzzing campaigns.
+
+## Popular Libraries & Tools
+
+These tools can supplement your primary testing framework.
+
+<AccordionGroup>
+  <Accordion title="OpenZeppelin Test Helpers">
+    **What it is**: A JavaScript library for Hardhat users that provides utilities for common testing patterns, such as advancing time, checking for reverts, and handling BigNumbers.
+
+    **When to use it**: When you need to simplify complex testing scenarios in a Hardhat environment.
+    ```javascript
+    const { time, expectRevert } = require('@openzeppelin/test-helpers');
+
+    // Advance time
+    await time.increase(time.duration.days(1));
+
+    // Check for a specific revert reason
+    await expectRevert(
+      contract.someFunction(),
+      "Ownable: caller is not the owner"
+    );
+    ```
+  </Accordion>
+  <Accordion title="solidity-coverage">
+    **What it is**: A code coverage tool that helps you identify which parts of your codebase are not being tested.
+
+    **When to use it**: To ensure your test suite is comprehensive and doesn't have critical gaps. It integrates easily with both Hardhat and Foundry.
+    ```bash
+    # For Hardhat
+    npx hardhat coverage
+
+    # For Foundry
+    forge coverage
+    ```
+  </Accordion>
+    <Accordion title="Slither">
+    **What it is**: A static analysis framework that runs a suite of vulnerability detectors on your Solidity code.
+
+    **When to use it**: As part of your CI/CD pipeline to automatically catch common security issues before deployment.
+    ```bash
+    slither .
+    ```
+  </Accordion>
+</AccordionGroup>
