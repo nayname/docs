@@ -24,209 +24,24 @@
   --cosmos-cyan: #50C3FF;
 }
 
-/* === HEADER NAVIGATION === */
+/* === MINIMAL HEADER THEMING === */
+/* Only apply subtle theming without breaking Mintlify's functionality */
 [data-theme='light'] .mintlify-topbar,
 [data-theme='light'] header {
-  background: linear-gradient(135deg, var(--cosmos-deep-blue) 0%, var(--cosmos-deep-purple) 30%, var(--cosmos-cobalt) 70%, var(--cosmos-orange) 100%) !important;
-  border-bottom: 2px solid var(--cosmos-orange) !important;
-  backdrop-filter: blur(20px) !important;
-  box-shadow: 0 4px 25px rgba(75, 71, 202, 0.2) !important;
-  position: relative !important;
-  z-index: 100 !important;
-  padding: 1rem 1.5rem !important;
-  min-height: 64px !important;
+  background: linear-gradient(135deg, var(--cosmos-deep-blue) 0%, var(--cosmos-deep-purple) 30%, var(--cosmos-cobalt) 70%, var(--cosmos-orange) 100%);
+  border-bottom: 2px solid var(--cosmos-orange);
 }
 
-/* Header gradient overlay */
-[data-theme='light'] .mintlify-topbar::before,
-[data-theme='light'] header::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
-  pointer-events: none !important;
-  z-index: -1 !important;
-}
-
-/* Header layout */
-[data-theme='light'] .mintlify-topbar > div,
-[data-theme='light'] header > div {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  gap: 1rem !important;
-}
-
-/* === LOGO STYLING === */
-[data-theme='light'] .mintlify-topbar .logo,
-[data-theme='light'] .logo {
-  display: flex !important;
-  align-items: center !important;
-  height: 40px !important;
-  width: auto !important;
-  transition: transform 0.2s ease !important;
-}
-
-[data-theme='light'] .mintlify-topbar .logo img,
-[data-theme='light'] .logo img {
-  display: block !important;
-  max-height: 36px !important;
-  height: auto !important;
-  width: auto !important;
-  object-fit: contain !important;
-}
-
-[data-theme='light'] .logo:hover {
-  transform: scale(1.05) !important;
-}
-
-/* === SEARCH BAR === */
-[data-theme='light'] .mintlify-topbar .search,
-[data-theme='light'] .search-wrapper {
-  flex: 1 !important;
-  max-width: 400px !important;
-  margin: 0 2rem !important;
-}
-
-[data-theme='light'] .mintlify-topbar .search input,
-[data-theme='light'] input[type="search"] {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  color: white !important;
-  border-radius: 8px !important;
-  padding: 0.7rem 1rem !important;
-  font-size: 0.9rem !important;
-  transition: all 0.2s ease !important;
-  width: 100% !important;
-}
-
-[data-theme='light'] .mintlify-topbar .search input:focus,
-[data-theme='light'] input[type="search"]:focus {
-  background: rgba(255, 255, 255, 0.25) !important;
-  border-color: rgba(255, 255, 255, 0.5) !important;
-  outline: none !important;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
-}
-
-[data-theme='light'] .mintlify-topbar .search input::placeholder,
-[data-theme='light'] input[type="search"]::placeholder {
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-/* === TOPBAR NAVIGATION LINKS === */
-[data-theme='light'] .mintlify-topbar nav,
-[data-theme='light'] .topbar-links {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.75rem !important;
-}
-
-[data-theme='light'] .mintlify-topbar nav a,
-[data-theme='light'] .topbar-links a {
-  color: rgba(255, 255, 255, 0.9) !important;
-  font-weight: 500 !important;
-  font-size: 0.9rem !important;
-  padding: 0.5rem 0.875rem !important;
-  border-radius: 6px !important;
-  transition: all 0.2s ease !important;
-  text-decoration: none !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-}
-
-[data-theme='light'] .mintlify-topbar nav a:hover,
-[data-theme='light'] .topbar-links a:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-  color: white !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
-}
-
-/* === CTA BUTTON === */
-[data-theme='light'] .mintlify-cta-button,
-[data-theme='light'] .topbar-cta-button,
-[data-theme='light'] #topbar-cta-button {
-  order: 4 !important;
-  background: var(--cosmos-orange) !important;
-  color: white !important;
-  border: none !important;
-  font-weight: 700 !important;
-  padding: 0.75rem 1.5rem !important;
-  border-radius: 10px !important;
-  box-shadow: 0 3px 12px rgba(255, 86, 40, 0.4) !important;
-  transition: all 0.2s ease !important;
-  margin-left: 1rem !important;
-  flex-shrink: 0 !important;
-}
-
-[data-theme='light'] .mintlify-cta-button:hover,
-[data-theme='light'] .topbar-cta-button:hover,
-[data-theme='light'] #topbar-cta-button:hover {
-  background: var(--cosmos-pink) !important;
-  color: white !important;
-  box-shadow: 0 5px 20px rgba(230, 79, 143, 0.5) !important;
-  transform: translateY(-2px) !important;
-}
-
-/* === MOBILE RESPONSIVE === */
-@media (max-width: 768px) {
-  [data-theme='light'] .mintlify-search-wrapper,
-  [data-theme='light'] .search-wrapper {
-    order: 3 !important;
-    margin-left: 1rem !important;
-    margin-right: 1rem !important;
-    max-width: 200px !important;
-    width: 200px !important;
-  }
-
-  [data-theme='light'] .mintlify-topbar-links,
-  [data-theme='light'] .topbar-links,
-  [data-theme='light'] .mintlify-header-nav,
-  [data-theme='light'] .header-nav {
-    display: none !important;
-  }
-
-  [data-theme='light'] .mintlify-cta-button,
-  [data-theme='light'] .topbar-cta-button {
-    order: 4 !important;
-    margin-left: 0.5rem !important;
-    padding: 0.6rem 1rem !important;
-    font-size: 0.85rem !important;
-  }
-}
-
-/* === DARK MODE HEADER === */
-[data-theme='dark'] .mintlify-header,
-[data-theme='dark'] .mintlify-navbar,
+/* Dark mode header - minimal override */
 [data-theme='dark'] .mintlify-topbar,
-[data-theme='dark'] #navbar,
 [data-theme='dark'] header {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%) !important;
-  border-bottom: 2px solid rgba(34, 226, 168, 0.2) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
-}
-
-[data-theme='dark'] .mintlify-search input,
-[data-theme='dark'] input[type="search"] {
-  background: rgba(34, 226, 168, 0.1) !important;
-  border: 1px solid rgba(34, 226, 168, 0.3) !important;
-  color: var(--cosmos-mint) !important;
-}
-
-[data-theme='dark'] .mintlify-cta-button,
-[data-theme='dark'] #topbar-cta-button {
-  background: var(--cosmos-mint) !important;
-  color: #1a1a2e !important;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%);
+  border-bottom: 2px solid rgba(34, 226, 168, 0.2);
 }
 
 /* === MAIN CONTENT STYLING === */
 [data-theme='light'] {
   --background: linear-gradient(135deg, #fefefe 0%, #f8fafc 25%, #f1f5f9 100%);
-  --sidebar-background: linear-gradient(to bottom, #fcfcfd, #f8fafc);
-  --content-background: rgba(255, 255, 255, 0.85);
 }
 
 [data-theme='light'] body {
@@ -239,43 +54,42 @@
 [data-theme='light'] .mintlify-sidebar {
   background: linear-gradient(to bottom, #fcfcfd, #f8fafc);
   border-right: 1px solid #e2e8f0;
-  backdrop-filter: blur(10px);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 [data-theme='light'] .mintlify-sidebar-nav a {
-  font-weight: 500 !important;
-  color: #64748b !important;
-  padding: 0.75rem 1rem !important;
-  border-radius: 8px !important;
-  margin: 0.25rem 0.5rem !important;
-  transition: all 0.2s ease !important;
-  font-size: 0.95rem !important;
+  font-weight: 500;
+  color: #64748b;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin: 0.25rem 0.5rem;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
 }
 
 [data-theme='light'] .mintlify-sidebar-nav a:hover {
-  background: linear-gradient(135deg, rgba(75, 71, 202, 0.08), rgba(117, 34, 181, 0.05)) !important;
-  color: var(--cosmos-deep-blue) !important;
-  transform: translateX(4px) !important;
+  background: linear-gradient(135deg, rgba(75, 71, 202, 0.08), rgba(117, 34, 181, 0.05));
+  color: var(--cosmos-deep-blue);
+  transform: translateX(4px);
 }
 
 [data-theme='light'] .mintlify-sidebar-nav a[aria-current="page"],
 [data-theme='light'] .mintlify-sidebar-nav a.active {
-  background: linear-gradient(135deg, var(--cosmos-deep-blue), var(--cosmos-deep-purple)) !important;
-  color: white !important;
-  font-weight: 600 !important;
-  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.3) !important;
+  background: linear-gradient(135deg, var(--cosmos-deep-blue), var(--cosmos-deep-purple));
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.3);
 }
 
 [data-theme='light'] .mintlify-sidebar-group-title {
-  font-size: 0.8rem !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
-  color: var(--cosmos-deep-purple) !important;
-  margin: 1.5rem 1rem 0.5rem !important;
-  padding-bottom: 0.5rem !important;
-  border-bottom: 1px solid rgba(117, 34, 181, 0.2) !important;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cosmos-deep-purple);
+  margin: 1.5rem 1rem 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(117, 34, 181, 0.2);
 }
 
 /* === CONTENT AREA === */
@@ -319,8 +133,8 @@ pre {
 }
 
 [data-theme='light'] pre {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-  border: 1px solid rgba(117, 82, 255, 0.15) !important;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid rgba(117, 82, 255, 0.15);
   box-shadow: 0 2px 4px rgba(75, 71, 202, 0.08);
 }
 
@@ -332,9 +146,9 @@ code:not(pre code) {
 }
 
 [data-theme='light'] code:not(pre code) {
-  background: linear-gradient(135deg, rgba(117, 34, 181, 0.08), rgba(75, 71, 202, 0.05)) !important;
-  color: var(--cosmos-deep-purple) !important;
-  border: 1px solid rgba(117, 34, 181, 0.2) !important;
+  background: linear-gradient(135deg, rgba(117, 34, 181, 0.08), rgba(75, 71, 202, 0.05));
+  color: var(--cosmos-deep-purple);
+  border: 1px solid rgba(117, 34, 181, 0.2);
 }
 
 /* === TABLES === */

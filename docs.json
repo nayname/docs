@@ -53,44 +53,62 @@
         "pages": [
           "docs/evm/index",
           {
-            "group": "Getting Started",
+            "group": "Introduction",
+            "isCollapsible": true,
             "pages": [
-              "docs/evm/developers/appraise",
-              "docs/evm/developers/explore",
-              "docs/evm/developers/local-setup"
+              "docs/evm/why-cosmos-evm",
+              "docs/evm/what-is-cosmos-evm",
+              "docs/evm/architecture"
             ]
           },
           {
-            "group": "Development",
+            "group": "Developer Guides",
+            "isCollapsible": true,
             "pages": [
-              "docs/evm/developers/development-environment",
-              "docs/evm/developers/tooling-and-workflows",
-              "docs/evm/developers/smart-contract-development",
-              "docs/evm/developers/advanced-patterns"
-            ]
-          },
-          {
-            "group": "Integration",
-            "pages": [
-              "docs/evm/developers/chain-integration"
-            ]
-          },
-          {
-            "group": "Reference",
-            "pages": [
-              "docs/evm/developers/architecture",
+              "docs/evm/developers/index",
+              {
+                "group": "Getting Started",
+                "isCollapsible": true,
+                "pages": [
+                  "docs/evm/developers/local-setup",
+                  "docs/evm/developers/development-environment"
+                ]
+              },
+              {
+                "group": "Smart Contracts",
+                "isCollapsible": true,
+                "pages": [
+                  "docs/evm/developers/smart-contracts/index",
+                  "docs/evm/developers/smart-contracts/overview"
+                ]
+              },
+              {
+                "group": "Tooling & Resources",
+                "isCollapsible": true,
+                "pages": [
+                  "docs/evm/developers/tooling-and-resources/index",
+                  "docs/evm/developers/tooling-and-resources/foundry-guide",
+                  "docs/evm/developers/tooling-and-resources/hardhat-guide",
+                  "docs/evm/developers/tooling-and-resources/testing-and-fuzzing",
+                  "docs/evm/developers/tooling-and-resources/contract-wizard"
+                ]
+              },
+              {
+                "group": "Precompiled Contracts",
+                "isCollapsible": true,
+                "pages": [
+                  "docs/evm/developers/precompiles/index",
+                  "docs/evm/developers/precompiles/overview",
+                  "docs/evm/developers/precompiles/staking",
+                  "docs/evm/developers/precompiles/distribution",
+                  "docs/evm/developers/precompiles/ibc"
+                ]
+              },
+              "docs/evm/developers/advanced-patterns",
+              "docs/evm/developers/chain-integration",
               "docs/evm/developers/cosmos-comparisons",
               "docs/evm/developers/reference",
               "docs/evm/developers/troubleshoot"
-            ]
-          },
-          {
-            "group": "Precompiled Contracts",
-            "pages": [
-              "docs/evm/developers/precompiles/index",
-              "docs/evm/developers/precompiles/staking",
-              "docs/evm/developers/precompiles/bank",
-              "docs/evm/developers/precompiles/ibc"
             ]
           }
         ]
@@ -109,6 +127,7 @@
             "group": "EVM API",
             "pages": [
               "docs/api-reference/evm/evm-json-rpc",
+              "docs/api-reference/evm/get-balance",
               "docs/api-reference/evm/opcodes"
             ]
           }
