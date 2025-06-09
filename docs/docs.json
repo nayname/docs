@@ -38,19 +38,29 @@
   ],
   "navigation": [
     {
-      "group": "Cosmos EVM",
+      "group": "Introduction",
+      "collapsed": true,
       "pages": [
-        "evm/index"
+        "evm/index",
+        "evm/why-cosmos-evm",
+        "evm/what-is-cosmos-evm",
+        "evm/architecture"
       ]
     },
     {
-      "group": "Developers",
+      "group": "Developer Guides",
+      "collapsed": true,
       "pages": [
-        "evm/developers/appraise",
-        "evm/developers/explore",
+        "evm/developers/index",
         "evm/developers/local-setup",
         "evm/developers/development-environment",
-        "evm/developers/smart-contract-development",
+        {
+          "group": "Smart Contract Development",
+          "pages": [
+            "evm/developers/smart-contracts/index",
+            "evm/developers/smart-contracts/overview"
+          ]
+        },
         {
           "group": "Tooling & Resources",
           "pages": [
@@ -73,7 +83,6 @@
         },
         "evm/developers/advanced-patterns",
         "evm/developers/chain-integration",
-        "evm/developers/architecture",
         "evm/developers/reference",
         "evm/developers/troubleshoot"
       ]
