@@ -1,253 +1,610 @@
 ---
 title: "EVM Opcode Sandbox"
 description: "Interactive tool to test, simulate, and understand EVM bytecode execution with real-time results and gas calculations."
-mode: "custom"
 ---
 
 import { PageFeedback } from "/snippets/feedback.mdx"
 
-<div style={{
-  maxWidth: '100%',
-  margin: '0 auto',
-  padding: '1rem'
-}}>
-
-## Interactive EVM Opcode Simulator
-
-Test and understand EVM bytecode execution in real-time. This sandbox simulates the Ethereum Virtual Machine with 1:1 accuracy, showing stack operations, memory changes, storage updates, and gas consumption.
+<div style={{ maxWidth: '100%' }}>
 
 <div style={{
-  background: '#f8fafc',
-  border: '2px solid #e2e8f0',
-  borderRadius: '0.75rem',
-  padding: '1.5rem',
-  marginBottom: '1.5rem'
+  background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+  border: '1px solid #cbd5e1',
+  borderRadius: '1rem',
+  padding: '2rem',
+  marginBottom: '2rem',
+  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
 }}>
   <div style={{
-    display: 'grid',
-    gap: '1.5rem',
-    gridTemplateColumns: '1fr 1fr'
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+    marginBottom: '1rem'
   }}>
-
-    {/* Input Section */}
-    <div>
-      <h3 style={{ marginTop: '0', color: '#1f2937', fontSize: '1.25rem', fontWeight: '600' }}>
-        📝 Bytecode Input
-      </h3>
-
-      <div style={{ marginBottom: '1rem' }}>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#374151' }}>
-          Bytecode (hex):
-        </label>
-        <textarea
-          id="bytecode-input"
-          placeholder="Enter bytecode... e.g., 6001600201600055"
-          style={{
-            width: '100%',
-            height: '80px',
-            padding: '0.75rem',
-            border: '1px solid #d1d5db',
-            borderRadius: '0.5rem',
-            fontFamily: 'monospace',
-            fontSize: '0.875rem',
-            resize: 'vertical'
-          }}
-        />
-      </div>
-
-      <div style={{ marginBottom: '1rem' }}>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#374151' }}>
-          Call Data (hex):
-        </label>
-        <input
-          id="calldata-input"
-          type="text"
-          placeholder="Optional call data... e.g., 0x1234abcd"
-          style={{
-            width: '100%',
-            padding: '0.75rem',
-            border: '1px solid #d1d5db',
-            borderRadius: '0.5rem',
-            fontFamily: 'monospace',
-            fontSize: '0.875rem'
-          }}
-        />
-      </div>
-
-      <div style={{ marginBottom: '1rem' }}>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#374151' }}>
-          Gas Limit:
-        </label>
-        <input
-          id="gas-input"
-          type="number"
-          defaultValue="1000000"
-          min="1"
-          style={{
-            width: '100%',
-            padding: '0.75rem',
-            border: '1px solid #d1d5db',
-            borderRadius: '0.5rem',
-            fontSize: '0.875rem'
-          }}
-        />
-      </div>
-
-      <button
-        id="execute-btn"
-        style={{
-          background: 'linear-gradient(135deg, #4B47CA 0%, #6366f1 100%)',
-          color: 'white',
-          padding: '0.75rem 1.5rem',
-          border: 'none',
-          borderRadius: '0.5rem',
-          fontWeight: '600',
-          cursor: 'pointer',
-          width: '100%',
-          fontSize: '1rem'
-        }}
-      >
-        🚀 Execute Bytecode
-      </button>
-
-      <div style={{ marginTop: '1rem' }}>
-        <details style={{ background: '#f3f4f6', padding: '1rem', borderRadius: '0.5rem' }}>
-          <summary style={{ cursor: 'pointer', fontWeight: '600', color: '#374151' }}>
-            📚 Quick Examples
-          </summary>
-          <div style={{ marginTop: '0.75rem', fontSize: '0.875rem' }}>
-            <div style={{ marginBottom: '0.5rem' }}>
-              <strong>Simple Addition:</strong>
-              <code style={{ display: 'block', background: '#1f2937', color: '#f9fafb', padding: '0.25rem', borderRadius: '0.25rem', marginTop: '0.25rem' }}>
-                6001600201600055
-              </code>
-              <span style={{ color: '#6b7280', fontSize: '0.8rem' }}>PUSH1 1, PUSH1 2, ADD, PUSH1 0, SSTORE</span>
-            </div>
-            <div style={{ marginBottom: '0.5rem' }}>
-              <strong>Stack Operations:</strong>
-              <code style={{ display: 'block', background: '#1f2937', color: '#f9fafb', padding: '0.25rem', borderRadius: '0.25rem', marginTop: '0.25rem' }}>
-                600a600b01600052
-              </code>
-              <span style={{ color: '#6b7280', fontSize: '0.8rem' }}>PUSH1 10, PUSH1 11, ADD, PUSH1 0, MSTORE</span>
-            </div>
-            <div>
-              <strong>Conditional Jump:</strong>
-              <code style={{ display: 'block', background: '#1f2937', color: '#f9fafb', padding: '0.25rem', borderRadius: '0.25rem', marginTop: '0.25rem' }}>
-                600160010760115750
-              </code>
-              <span style={{ color: '#6b7280', fontSize: '0.8rem' }}>PUSH1 1, PUSH1 1, EQ, PUSH1 17, JUMPI, POP</span>
-            </div>
-          </div>
-        </details>
-      </div>
+    <div style={{
+      background: 'linear-gradient(135deg, #4B47CA 0%, #6366f1 100%)',
+      borderRadius: '0.75rem',
+      padding: '0.75rem',
+      color: 'white',
+      fontSize: '1.5rem'
+    }}>
+      🔬
     </div>
-
-    {/* Output Section */}
     <div>
-      <h3 style={{ marginTop: '0', color: '#1f2937', fontSize: '1.25rem', fontWeight: '600' }}>
-        ⚡ Execution Results
-      </h3>
-
-      <div id="execution-output" style={{
-        background: '#1f2937',
-        color: '#f9fafb',
-        padding: '1rem',
-        borderRadius: '0.5rem',
-        fontFamily: 'monospace',
-        fontSize: '0.875rem',
-        minHeight: '300px',
-        overflow: 'auto'
+      <h1 style={{
+        margin: '0',
+        fontSize: '2rem',
+        fontWeight: '700',
+        background: 'linear-gradient(135deg, #4B47CA 0%, #6366f1 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text'
       }}>
-        <div style={{ color: '#9ca3af' }}>
-          Ready to execute bytecode...
-          <br /><br />
-          This simulator will show:
-          <br />• Step-by-step execution trace
-          <br />• Stack state changes
-          <br />• Memory operations
-          <br />• Storage updates
-          <br />• Gas consumption
-          <br />• Final result or error
-        </div>
-      </div>
+        EVM Opcode Sandbox
+      </h1>
+      <p style={{
+        margin: '0.5rem 0 0 0',
+        color: '#64748b',
+        fontSize: '1.1rem'
+      }}>
+        Interactive tool to test, simulate, and understand EVM bytecode execution
+      </p>
     </div>
   </div>
-</div>
 
-<div style={{
-  background: '#fef3c7',
-  border: '1px solid #f59e0b',
-  borderRadius: '0.5rem',
-  padding: '1rem',
-  marginBottom: '1.5rem'
-}}>
-  <strong>🔬 Educational Tool:</strong> This sandbox is designed for learning EVM internals.
-  Results may not account for all real-world factors like block context, contract interactions, or specific chain implementations.
+  <div style={{
+    background: '#fef3c7',
+    border: '1px solid #f59e0b',
+    borderRadius: '0.5rem',
+    padding: '1rem',
+    fontSize: '0.9rem'
+  }}>
+    <strong>🎓 Educational Tool:</strong> This sandbox simulates EVM execution with 1:1 accuracy.
+    Results show exact gas consumption, stack operations, and state changes for learning purposes.
+  </div>
 </div>
-
-## EVM Opcode Reference
 
 <div style={{
   display: 'grid',
-  gap: '1rem',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-  marginBottom: '1.5rem'
+  gridTemplateColumns: '1fr 1fr',
+  gap: '2rem',
+  marginBottom: '2rem'
 }}>
 
-  <div style={{ background: '#f0f9ff', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #0ea5e9' }}>
-    <h4 style={{ margin: '0 0 0.5rem 0', color: '#0369a1' }}>Arithmetic (0x01-0x0b)</h4>
-    <div style={{ fontSize: '0.875rem', color: '#374151' }}>
-      <div><code>01</code> ADD</div>
-      <div><code>02</code> MUL</div>
-      <div><code>03</code> SUB</div>
-      <div><code>04</code> DIV</div>
-      <div><code>06</code> MOD</div>
-      <div><code>08</code> ADDMOD</div>
-      <div><code>09</code> MULMOD</div>
-      <div><code>0a</code> EXP</div>
+{/* Input Panel */}
+<div style={{
+  background: '#ffffff',
+  border: '1px solid #e2e8f0',
+  borderRadius: '1rem',
+  padding: '1.5rem',
+  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+}}>
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
+    marginBottom: '1.5rem',
+    paddingBottom: '1rem',
+    borderBottom: '2px solid #f1f5f9'
+  }}>
+    <div style={{
+      background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+      borderRadius: '0.5rem',
+      padding: '0.5rem',
+      color: 'white',
+      fontSize: '1.25rem'
+    }}>
+      📝
     </div>
+    <h3 style={{
+      margin: '0',
+      fontSize: '1.25rem',
+      fontWeight: '600',
+      color: '#1e293b'
+    }}>
+      Bytecode Input
+    </h3>
   </div>
 
-  <div style={{ background: '#f0fdf4', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #22c55e' }}>
-    <h4 style={{ margin: '0 0 0.5rem 0', color: '#166534' }}>Comparison (0x10-0x1d)</h4>
-    <div style={{ fontSize: '0.875rem', color: '#374151' }}>
-      <div><code>10</code> LT</div>
-      <div><code>11</code> GT</div>
-      <div><code>12</code> SLT</div>
-      <div><code>13</code> SGT</div>
-      <div><code>14</code> EQ</div>
-      <div><code>15</code> ISZERO</div>
-      <div><code>16</code> AND</div>
-      <div><code>17</code> OR</div>
-      <div><code>18</code> XOR</div>
-      <div><code>19</code> NOT</div>
-    </div>
+  <div style={{ marginBottom: '1.25rem' }}>
+    <label style={{
+      display: 'block',
+      marginBottom: '0.5rem',
+      fontWeight: '600',
+      color: '#374151',
+      fontSize: '0.9rem'
+    }}>
+      <span title="Enter raw EVM bytecode in hexadecimal format">
+        Bytecode (hex) ℹ️
+      </span>
+    </label>
+    <textarea
+      id="bytecode-input"
+      placeholder="Enter bytecode... e.g., 6001600201600055"
+      title="Raw EVM bytecode in hexadecimal format. Each pair of hex digits represents one byte/opcode."
+      style={{
+        width: '100%',
+        height: '100px',
+        padding: '0.75rem',
+        border: '2px solid #e2e8f0',
+        borderRadius: '0.75rem',
+        fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+        fontSize: '0.875rem',
+        resize: 'vertical',
+        transition: 'border-color 0.2s ease',
+        outline: 'none'
+      }}
+      onFocus={(e) => e.target.style.borderColor = '#4B47CA'}
+      onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+    />
   </div>
 
-  <div style={{ background: '#fefce8', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #eab308' }}>
-    <h4 style={{ margin: '0 0 0.5rem 0', color: '#a16207' }}>Stack Ops (0x50-0x5f)</h4>
-    <div style={{ fontSize: '0.875rem', color: '#374151' }}>
-      <div><code>50</code> POP</div>
-      <div><code>51</code> MLOAD</div>
-      <div><code>52</code> MSTORE</div>
-      <div><code>53</code> MSTORE8</div>
-      <div><code>54</code> SLOAD</div>
-      <div><code>55</code> SSTORE</div>
-      <div><code>56</code> JUMP</div>
-      <div><code>57</code> JUMPI</div>
-    </div>
+  <div style={{ marginBottom: '1.25rem' }}>
+    <label style={{
+      display: 'block',
+      marginBottom: '0.5rem',
+      fontWeight: '600',
+      color: '#374151',
+      fontSize: '0.9rem'
+    }}>
+      <span title="Optional transaction input data">
+        Call Data (hex) ℹ️
+      </span>
+    </label>
+    <input
+      id="calldata-input"
+      type="text"
+      placeholder="Optional call data... e.g., 0x1234abcd"
+      title="Transaction input data that would be available via CALLDATALOAD opcodes"
+      style={{
+        width: '100%',
+        padding: '0.75rem',
+        border: '2px solid #e2e8f0',
+        borderRadius: '0.75rem',
+        fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+        fontSize: '0.875rem',
+        transition: 'border-color 0.2s ease',
+        outline: 'none'
+      }}
+      onFocus={(e) => e.target.style.borderColor = '#4B47CA'}
+      onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+    />
   </div>
 
-  <div style={{ background: '#fdf2f8', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #ec4899' }}>
-    <h4 style={{ margin: '0 0 0.5rem 0', color: '#be185d' }}>Push Ops (0x60-0x7f)</h4>
-    <div style={{ fontSize: '0.875rem', color: '#374151' }}>
-      <div><code>60</code> PUSH1</div>
-      <div><code>61</code> PUSH2</div>
-      <div><code>62</code> PUSH3</div>
-      <div>...</div>
-      <div><code>7f</code> PUSH32</div>
+  <div style={{ marginBottom: '1.5rem' }}>
+    <label style={{
+      display: 'block',
+      marginBottom: '0.5rem',
+      fontWeight: '600',
+      color: '#374151',
+      fontSize: '0.9rem'
+    }}>
+      <span title="Maximum gas available for execution">
+        Gas Limit ℹ️
+      </span>
+    </label>
+    <input
+      id="gas-input"
+      type="number"
+      defaultValue="1000000"
+      min="1"
+      title="Maximum amount of gas that can be consumed during execution"
+      style={{
+        width: '100%',
+        padding: '0.75rem',
+        border: '2px solid #e2e8f0',
+        borderRadius: '0.75rem',
+        fontSize: '0.875rem',
+        transition: 'border-color 0.2s ease',
+        outline: 'none'
+      }}
+      onFocus={(e) => e.target.style.borderColor = '#4B47CA'}
+      onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+    />
+  </div>
+
+  <button
+    id="execute-btn"
+    title="Execute the bytecode and see step-by-step results"
+    style={{
+      width: '100%',
+      background: 'linear-gradient(135deg, #4B47CA 0%, #6366f1 100%)',
+      color: 'white',
+      padding: '1rem 1.5rem',
+      border: 'none',
+      borderRadius: '0.75rem',
+      fontWeight: '600',
+      cursor: 'pointer',
+      fontSize: '1rem',
+      transition: 'all 0.2s ease',
+      boxShadow: '0 2px 4px rgba(75, 71, 202, 0.2)'
+    }}
+    onMouseOver={(e) => {
+      e.target.style.transform = 'translateY(-1px)';
+      e.target.style.boxShadow = '0 4px 12px rgba(75, 71, 202, 0.3)';
+    }}
+    onMouseOut={(e) => {
+      e.target.style.transform = 'translateY(0)';
+      e.target.style.boxShadow = '0 2px 4px rgba(75, 71, 202, 0.2)';
+    }}
+  >
+    🚀 Execute Bytecode
+  </button>
+
+  <details style={{
+    background: '#f8fafc',
+    padding: '1rem',
+    borderRadius: '0.75rem',
+    marginTop: '1rem',
+    border: '1px solid #e2e8f0'
+  }}>
+    <summary style={{
+      cursor: 'pointer',
+      fontWeight: '600',
+      color: '#374151',
+      padding: '0.5rem',
+      borderRadius: '0.5rem'
+    }}>
+      📚 Quick Examples
+    </summary>
+    <div style={{ marginTop: '1rem', fontSize: '0.875rem' }}>
+      <div style={{ marginBottom: '1rem' }}>
+        <div style={{ fontWeight: '600', color: '#374151', marginBottom: '0.25rem' }}>Simple Addition:</div>
+        <code
+          style={{
+            display: 'block',
+            background: '#1e293b',
+            color: '#f1f5f9',
+            padding: '0.5rem',
+            borderRadius: '0.375rem',
+            marginBottom: '0.25rem',
+            cursor: 'pointer',
+            fontSize: '0.8rem'
+          }}
+          onClick={(e) => {
+            document.getElementById('bytecode-input').value = e.target.textContent;
+            navigator.clipboard.writeText(e.target.textContent);
+          }}
+          title="Click to copy to input field"
+        >
+          6001600201600055
+        </code>
+        <div style={{ color: '#6b7280', fontSize: '0.75rem' }}>
+          PUSH1 1, PUSH1 2, ADD, PUSH1 0, SSTORE
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '1rem' }}>
+        <div style={{ fontWeight: '600', color: '#374151', marginBottom: '0.25rem' }}>Memory Store:</div>
+        <code
+          style={{
+            display: 'block',
+            background: '#1e293b',
+            color: '#f1f5f9',
+            padding: '0.5rem',
+            borderRadius: '0.375rem',
+            marginBottom: '0.25rem',
+            cursor: 'pointer',
+            fontSize: '0.8rem'
+          }}
+          onClick={(e) => {
+            document.getElementById('bytecode-input').value = e.target.textContent;
+            navigator.clipboard.writeText(e.target.textContent);
+          }}
+          title="Click to copy to input field"
+        >
+          600a600052
+        </code>
+        <div style={{ color: '#6b7280', fontSize: '0.75rem' }}>
+          PUSH1 10, PUSH1 0, MSTORE
+        </div>
+      </div>
+
+      <div>
+        <div style={{ fontWeight: '600', color: '#374151', marginBottom: '0.25rem' }}>Conditional Jump:</div>
+        <code
+          style={{
+            display: 'block',
+            background: '#1e293b',
+            color: '#f1f5f9',
+            padding: '0.5rem',
+            borderRadius: '0.375rem',
+            marginBottom: '0.25rem',
+            cursor: 'pointer',
+            fontSize: '0.8rem'
+          }}
+          onClick={(e) => {
+            document.getElementById('bytecode-input').value = e.target.textContent;
+            navigator.clipboard.writeText(e.target.textContent);
+          }}
+          title="Click to copy to input field"
+        >
+          600160010760085750
+        </code>
+        <div style={{ color: '#6b7280', fontSize: '0.75rem' }}>
+          PUSH1 1, PUSH1 1, EQ, PUSH1 8, JUMPI, POP
+        </div>
+      </div>
+    </div>
+  </details>
+</div>
+
+{/* Output Panel */}
+<div style={{
+  background: '#ffffff',
+  border: '1px solid #e2e8f0',
+  borderRadius: '1rem',
+  padding: '1.5rem',
+  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+}}>
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
+    marginBottom: '1.5rem',
+    paddingBottom: '1rem',
+    borderBottom: '2px solid #f1f5f9'
+  }}>
+    <div style={{
+      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+      borderRadius: '0.5rem',
+      padding: '0.5rem',
+      color: 'white',
+      fontSize: '1.25rem'
+    }}>
+      ⚡
+    </div>
+    <h3 style={{
+      margin: '0',
+      fontSize: '1.25rem',
+      fontWeight: '600',
+      color: '#1e293b'
+    }}>
+      Execution Results
+    </h3>
+  </div>
+
+  <div
+    id="execution-output"
+    style={{
+      background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
+      color: '#f1f5f9',
+      padding: '1.5rem',
+      borderRadius: '0.75rem',
+      fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+      fontSize: '0.8rem',
+      lineHeight: '1.6',
+      minHeight: '400px',
+      maxHeight: '500px',
+      overflow: 'auto',
+      border: '1px solid #475569',
+      whiteSpace: 'pre-wrap',
+      wordBreak: 'break-all'
+    }}
+  >
+    <div style={{ color: '#94a3b8', textAlign: 'center', paddingTop: '2rem' }}>
+      <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🔧</div>
+      <div>Ready to execute bytecode...</div>
+      <br />
+      <div style={{ fontSize: '0.75rem', lineHeight: '1.8' }}>
+        This simulator will show:
+        <br />• Step-by-step execution trace
+        <br />• Stack state changes
+        <br />• Memory operations
+        <br />• Storage updates
+        <br />• Gas consumption
+        <br />• Final result or error
+      </div>
     </div>
   </div>
+</div>
+
+</div>
+
+<div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+  gap: '1.5rem',
+  marginBottom: '2rem'
+}}>
+
+<div style={{
+  background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+  padding: '1.5rem',
+  borderRadius: '1rem',
+  border: '1px solid #3b82f6',
+  boxShadow: '0 1px 3px rgba(59, 130, 246, 0.1)'
+}}>
+  <h4 style={{
+    margin: '0 0 1rem 0',
+    color: '#1e40af',
+    fontSize: '1.1rem',
+    fontWeight: '600',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem'
+  }}>
+    🧮 Arithmetic (0x01-0x0b)
+  </h4>
+  <div style={{ fontSize: '0.85rem', color: '#1e40af', lineHeight: '1.6' }}>
+    <div><code>01</code> ADD</div>
+    <div><code>02</code> MUL</div>
+    <div><code>03</code> SUB</div>
+    <div><code>04</code> DIV</div>
+    <div><code>06</code> MOD</div>
+    <div><code>08</code> ADDMOD</div>
+    <div><code>09</code> MULMOD</div>
+    <div><code>0a</code> EXP</div>
+  </div>
+</div>
+
+<div style={{
+  background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+  padding: '1.5rem',
+  borderRadius: '1rem',
+  border: '1px solid #22c55e',
+  boxShadow: '0 1px 3px rgba(34, 197, 94, 0.1)'
+}}>
+  <h4 style={{
+    margin: '0 0 1rem 0',
+    color: '#15803d',
+    fontSize: '1.1rem',
+    fontWeight: '600',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem'
+  }}>
+    ⚖️ Comparison (0x10-0x1d)
+  </h4>
+  <div style={{ fontSize: '0.85rem', color: '#15803d', lineHeight: '1.6' }}>
+    <div><code>10</code> LT</div>
+    <div><code>11</code> GT</div>
+    <div><code>12</code> SLT</div>
+    <div><code>13</code> SGT</div>
+    <div><code>14</code> EQ</div>
+    <div><code>15</code> ISZERO</div>
+    <div><code>16</code> AND</div>
+    <div><code>17</code> OR</div>
+    <div><code>18</code> XOR</div>
+    <div><code>19</code> NOT</div>
+  </div>
+</div>
+
+<div style={{
+  background: 'linear-gradient(135deg, #fefce8 0%, #fef3c7 100%)',
+  padding: '1.5rem',
+  borderRadius: '1rem',
+  border: '1px solid #eab308',
+  boxShadow: '0 1px 3px rgba(234, 179, 8, 0.1)'
+}}>
+  <h4 style={{
+    margin: '0 0 1rem 0',
+    color: '#a16207',
+    fontSize: '1.1rem',
+    fontWeight: '600',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem'
+  }}>
+    📚 Stack Ops (0x50-0x5f)
+  </h4>
+  <div style={{ fontSize: '0.85rem', color: '#a16207', lineHeight: '1.6' }}>
+    <div><code>50</code> POP</div>
+    <div><code>51</code> MLOAD</div>
+    <div><code>52</code> MSTORE</div>
+    <div><code>53</code> MSTORE8</div>
+    <div><code>54</code> SLOAD</div>
+    <div><code>55</code> SSTORE</div>
+    <div><code>56</code> JUMP</div>
+    <div><code>57</code> JUMPI</div>
+  </div>
+</div>
+
+<div style={{
+  background: 'linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%)',
+  padding: '1.5rem',
+  borderRadius: '1rem',
+  border: '1px solid #ec4899',
+  boxShadow: '0 1px 3px rgba(236, 72, 153, 0.1)'
+}}>
+  <h4 style={{
+    margin: '0 0 1rem 0',
+    color: '#be185d',
+    fontSize: '1.1rem',
+    fontWeight: '600',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem'
+  }}>
+    📦 Push Ops (0x60-0x7f)
+  </h4>
+  <div style={{ fontSize: '0.85rem', color: '#be185d', lineHeight: '1.6' }}>
+    <div><code>60</code> PUSH1</div>
+    <div><code>61</code> PUSH2</div>
+    <div><code>62</code> PUSH3</div>
+    <div>...</div>
+    <div><code>7f</code> PUSH32</div>
+  </div>
+</div>
+
+</div>
+
+## Understanding Execution Results
+
+<div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+  gap: '1.5rem',
+  marginBottom: '2rem'
+}}>
+
+<div style={{
+  background: '#f8fafc',
+  padding: '1.5rem',
+  borderRadius: '1rem',
+  border: '1px solid #e2e8f0'
+}}>
+  <h4 style={{ margin: '0 0 1rem 0', color: '#1f2937', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    📊 Execution Summary
+  </h4>
+  <ul style={{ margin: '0', paddingLeft: '1.5rem', color: '#374151', lineHeight: '1.8' }}>
+    <li><strong>Gas Used:</strong> Total gas consumed</li>
+    <li><strong>Stack Size:</strong> Remaining stack items</li>
+    <li><strong>Storage Entries:</strong> Modified storage slots</li>
+    <li><strong>Status:</strong> Success or error details</li>
+  </ul>
+</div>
+
+<div style={{
+  background: '#f8fafc',
+  padding: '1.5rem',
+  borderRadius: '1rem',
+  border: '1px solid #e2e8f0'
+}}>
+  <h4 style={{ margin: '0 0 1rem 0', color: '#1f2937', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    🔍 Step-by-Step Trace
+  </h4>
+  <ul style={{ margin: '0', paddingLeft: '1.5rem', color: '#374151', lineHeight: '1.8' }}>
+    <li><strong>PC:</strong> Program counter position</li>
+    <li><strong>Opcode:</strong> Executed instruction</li>
+    <li><strong>Gas Cost:</strong> Gas consumed per step</li>
+    <li><strong>Stack Changes:</strong> Before/after states</li>
+  </ul>
+</div>
+
+<div style={{
+  background: '#f8fafc',
+  padding: '1.5rem',
+  borderRadius: '1rem',
+  border: '1px solid #e2e8f0'
+}}>
+  <h4 style={{ margin: '0 0 1rem 0', color: '#1f2937', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    📦 Final State
+  </h4>
+  <ul style={{ margin: '0', paddingLeft: '1.5rem', color: '#374151', lineHeight: '1.8' }}>
+    <li><strong>Stack:</strong> Remaining values</li>
+    <li><strong>Storage:</strong> Persistent data</li>
+    <li><strong>Memory:</strong> Temporary data</li>
+    <li><strong>Return Data:</strong> Function output</li>
+  </ul>
+</div>
+
+</div>
+
+<Card title="🔗 Related Developer Tools" icon="wrench">
+  Explore other development resources:
+
+  **Interactive Tools**
+  - [Foundry for Testing](/docs/evm/developers/tooling-and-resources/foundry-guide) - Advanced testing framework
+  - [Contract Wizard](/docs/evm/developers/tooling-and-resources/contract-wizard) - Generate standard contracts
+
+  **Advanced Features**
+  - [Precompiled Contracts](/docs/evm/developers/precompiles) - Access Cosmos SDK from Solidity
+  - [Cross-Chain Patterns](/docs/evm/developers/advanced) - Build hybrid applications
+</Card>
+
+<PageFeedback />
+
 </div>
 
 <script>
@@ -623,46 +980,52 @@ function executeOpcode() {
     evm.reset(gasInput, calldata);
     const trace = evm.run(bytecode);
 
-    let result = \`📊 Execution Summary\\n\`;
-    result += \`Gas Used: \${evm.gasUsed} / \${gasInput}\\n\`;
+    let result = \`📊 EXECUTION SUMMARY\\n\`;
+    result += \`\${'═'.repeat(50)}\\n\`;
+    result += \`Gas Used: \${evm.gasUsed.toLocaleString()} / \${gasInput.toLocaleString()}\\n\`;
     result += \`Final Stack Size: \${evm.stack.length}\\n\`;
     result += \`Storage Entries: \${Object.keys(evm.storage).length}\\n\`;
 
     if (evm.error) {
-      result += \`\\n❌ Error: \${evm.error}\\n\`;
+      result += \`Status: ❌ ERROR\\n\`;
+      result += \`Error: \${evm.error}\\n\`;
     } else {
-      result += \`\\n✅ Execution completed successfully\\n\`;
+      result += \`Status: ✅ SUCCESS\\n\`;
     }
 
-    result += \`\\n🔍 Execution Trace\\n\`;
-    result += \`\${'─'.repeat(70)}\\n\`;
+    result += \`\\n🔍 EXECUTION TRACE\\n\`;
+    result += \`\${'═'.repeat(50)}\\n\`;
 
     trace.forEach(step => {
       if (step.error) {
-        result += \`Step \${step.step}: ❌ \${step.error}\\n\`;
+        result += \`Step \${step.step.toString().padStart(2)}: ❌ \${step.error}\\n\`;
         return;
       }
 
       result += \`Step \${step.step.toString().padStart(2)}: \`;
       result += \`PC=\${step.pc.toString().padStart(3)} \`;
       result += \`\${step.opcode} \${step.opcodeName.padEnd(8)} \`;
-      result += \`Gas=\${step.gasUsed.toString().padStart(3)}\\n\`;
+      result += \`Gas=\${step.gasUsed.toString().padStart(5)}\\n\`;
 
       if (step.stackBefore.length !== step.stackAfter.length ||
           !step.stackBefore.every((val, i) => val === step.stackAfter[i])) {
-        result += \`    Stack: [\${step.stackBefore.slice(-3).map(v => '0x' + v.toString(16)).join(', ')}] \\n\`;
-        result += \`        -> [\${step.stackAfter.slice(-3).map(v => '0x' + v.toString(16)).join(', ')}]\\n\`;
+        const beforeTop3 = step.stackBefore.slice(-3).reverse();
+        const afterTop3 = step.stackAfter.slice(-3).reverse();
+        result += \`      Stack: [\${beforeTop3.map(v => '0x' + v.toString(16).padStart(4, '0')).join(', ')}]\\n\`;
+        result += \`          -> [\${afterTop3.map(v => '0x' + v.toString(16).padStart(4, '0')).join(', ')}]\\n\`;
       }
     });
 
-    result += \`\\n📦 Final State\\n\`;
-    result += \`\${'─'.repeat(40)}\\n\`;
+    result += \`\\n📦 FINAL STATE\\n\`;
+    result += \`\${'═'.repeat(30)}\\n\`;
 
     if (evm.stack.length > 0) {
       result += \`Stack (top 5):\\n\`;
       evm.stack.slice(-5).reverse().forEach((value, i) => {
-        result += \`  [\${evm.stack.length - 1 - i}]: 0x\${value.toString(16)}\\n\`;
+        result += \`  [\${evm.stack.length - 1 - i}]: 0x\${value.toString(16).padStart(8, '0')}\\n\`;
       });
+    } else {
+      result += \`Stack: Empty\\n\`;
     }
 
     if (Object.keys(evm.storage).length > 0) {
@@ -670,12 +1033,14 @@ function executeOpcode() {
       Object.entries(evm.storage).forEach(([key, value]) => {
         result += \`  [\${key}]: \${value}\\n\`;
       });
+    } else {
+      result += \`\\nStorage: Empty\\n\`;
     }
 
-    output.innerHTML = result;
+    output.textContent = result;
 
   } catch (error) {
-    output.innerHTML = \`❌ Error: \${error.message}\`;
+    output.textContent = \`❌ ERROR: \${error.message}\`;
   }
 }
 
@@ -699,188 +1064,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 `}
 </script>
-
-<div style={{
-  background: '#fef3c7',
-  border: '1px solid #f59e0b',
-  borderRadius: '0.5rem',
-  padding: '1rem',
-  marginBottom: '1.5rem'
-}}>
-  <strong>🔬 Educational Tool:</strong> This sandbox is designed for learning EVM internals.
-  Results may not account for all real-world factors like block context, contract interactions, or specific chain implementations.
-</div>
-
-## EVM Opcode Reference
-
-<div style={{
-  display: 'grid',
-  gap: '1rem',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-  marginBottom: '1.5rem'
-}}>
-
-  <div style={{ background: '#f0f9ff', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #0ea5e9' }}>
-    <h4 style={{ margin: '0 0 0.5rem 0', color: '#0369a1' }}>Arithmetic (0x01-0x0b)</h4>
-    <div style={{ fontSize: '0.875rem', color: '#374151' }}>
-      <div><code>01</code> ADD</div>
-      <div><code>02</code> MUL</div>
-      <div><code>03</code> SUB</div>
-      <div><code>04</code> DIV</div>
-      <div><code>06</code> MOD</div>
-      <div><code>08</code> ADDMOD</div>
-      <div><code>09</code> MULMOD</div>
-      <div><code>0a</code> EXP</div>
-    </div>
-  </div>
-
-  <div style={{ background: '#f0fdf4', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #22c55e' }}>
-    <h4 style={{ margin: '0 0 0.5rem 0', color: '#166534' }}>Comparison (0x10-0x1d)</h4>
-    <div style={{ fontSize: '0.875rem', color: '#374151' }}>
-      <div><code>10</code> LT</div>
-      <div><code>11</code> GT</div>
-      <div><code>12</code> SLT</div>
-      <div><code>13</code> SGT</div>
-      <div><code>14</code> EQ</div>
-      <div><code>15</code> ISZERO</div>
-      <div><code>16</code> AND</div>
-      <div><code>17</code> OR</div>
-      <div><code>18</code> XOR</div>
-      <div><code>19</code> NOT</div>
-    </div>
-  </div>
-
-  <div style={{ background: '#fefce8', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #eab308' }}>
-    <h4 style={{ margin: '0 0 0.5rem 0', color: '#a16207' }}>Stack Ops (0x50-0x5f)</h4>
-    <div style={{ fontSize: '0.875rem', color: '#374151' }}>
-      <div><code>50</code> POP</div>
-      <div><code>51</code> MLOAD</div>
-      <div><code>52</code> MSTORE</div>
-      <div><code>53</code> MSTORE8</div>
-      <div><code>54</code> SLOAD</div>
-      <div><code>55</code> SSTORE</div>
-      <div><code>56</code> JUMP</div>
-      <div><code>57</code> JUMPI</div>
-    </div>
-  </div>
-
-  <div style={{ background: '#fdf2f8', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #ec4899' }}>
-    <h4 style={{ margin: '0 0 0.5rem 0', color: '#be185d' }}>Push Ops (0x60-0x7f)</h4>
-    <div style={{ fontSize: '0.875rem', color: '#374151' }}>
-      <div><code>60</code> PUSH1</div>
-      <div><code>61</code> PUSH2</div>
-      <div><code>62</code> PUSH3</div>
-      <div>...</div>
-      <div><code>7f</code> PUSH32</div>
-    </div>
-  </div>
-</div>
-
-## Understanding the Results
-
-The sandbox provides detailed execution information:
-
-### 📊 Execution Summary
-- **Gas Used:** Total gas consumed during execution
-- **Stack Size:** Number of items remaining on the stack
-- **Storage Entries:** Number of storage slots modified
-
-### 🔍 Execution Trace
-Each step shows:
-- **Step Number:** Sequential execution step
-- **PC (Program Counter):** Current position in bytecode
-- **Opcode:** Hex representation and mnemonic
-- **Gas Cost:** Gas consumed for this operation
-- **Stack Changes:** Before and after stack state
-
-### 📦 Final State
-- **Stack Contents:** Values remaining on the execution stack
-- **Storage Updates:** Key-value pairs written to storage
-
-## Educational Examples
-
-### Example 1: Simple Arithmetic
-```
-Bytecode: 6005600601600055
-Explanation:
-- PUSH1 5    (0x6005) - Push 5 onto stack
-- PUSH1 6    (0x6006) - Push 6 onto stack
-- ADD        (0x01)   - Add top two values (5+6=11)
-- PUSH1 0    (0x6000) - Push storage key 0
-- SSTORE     (0x55)   - Store 11 at storage[0]
-```
-
-### Example 2: Conditional Logic
-```
-Bytecode: 600160010760115750
-Explanation:
-- PUSH1 1    (0x6001) - Push 1
-- PUSH1 1    (0x6001) - Push 1
-- EQ         (0x14)   - Check if equal (1==1 = true)
-- PUSH1 17   (0x6011) - Push jump destination
-- JUMPI      (0x57)   - Jump if condition true
-- POP        (0x50)   - This gets skipped
-```
-
-### Example 3: Memory Operations
-```
-Bytecode: 600a600052602060005260606000f3
-Explanation:
-- PUSH1 10   (0x600a) - Push value 10
-- PUSH1 0    (0x6000) - Push memory offset 0
-- MSTORE     (0x52)   - Store 10 at memory[0:32]
-- PUSH1 32   (0x6020) - Push return size
-- PUSH1 0    (0x6000) - Push return offset
-- RETURN     (0xf3)   - Return memory[0:32]
-```
-
-## Advanced Features
-
-### Gas Optimization Insights
-The sandbox shows exact gas consumption for each operation, helping you:
-- **Optimize costly operations** like storage writes (SSTORE costs 20,000 gas)
-- **Compare alternatives** between memory and storage usage
-- **Understand execution costs** for different opcode sequences
-
-### Stack Visualization
-See how operations manipulate the stack:
-- **Push operations** add values to the top
-- **Arithmetic operations** consume operands and push results
-- **Stack overflow/underflow** detection and error reporting
-
-### Jump Validation
-The simulator validates jump destinations:
-- **JUMP/JUMPI** must target valid **JUMPDEST** opcodes
-- **Invalid jumps** are caught and reported as errors
-- **Conditional jumps** show branching behavior
-
-## Learning Resources
-
-<div style={{
-  display: 'grid',
-  gap: '1rem',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-  marginTop: '2rem'
-}}>
-  <div style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
-    <h4 style={{ margin: '0 0 1rem 0', color: '#1f2937' }}>📚 EVM Deep Dive</h4>
-    <ul style={{ margin: '0', paddingLeft: '1.5rem', color: '#374151' }}>
-      <li><a href="https://ethereum.org/en/developers/docs/evm/" style={{ color: '#4B47CA', textDecoration: 'none' }}>Ethereum.org EVM Guide</a></li>
-      <li><a href="https://github.com/ethereum/execution-specs" style={{ color: '#4B47CA', textDecoration: 'none' }}>Execution Specifications</a></li>
-      <li><a href="https://www.evm.codes/" style={{ color: '#4B47CA', textDecoration: 'none' }}>EVM Codes Reference</a></li>
-    </ul>
-  </div>
-
-  <div style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
-    <h4 style={{ margin: '0 0 1rem 0', color: '#1f2937' }}>🔧 Related Tools</h4>
-    <ul style={{ margin: '0', paddingLeft: '1.5rem', color: '#374151' }}>
-      <li><a href="/docs/evm/developers/tooling-and-resources/foundry-guide" style={{ color: '#4B47CA', textDecoration: 'none' }}>Foundry for Development</a></li>
-      <li><a href="/docs/evm/developers/tooling-and-resources/testing-and-fuzzing" style={{ color: '#4B47CA', textDecoration: 'none' }}>Testing and Fuzzing</a></li>
-      <li><a href="/docs/evm/developers/precompiles" style={{ color: '#4B47CA', textDecoration: 'none' }}>Cosmos Precompiles</a></li>
-    </ul>
-  </div>
-</div>
-
-<PageFeedback />
-
-</div>
+</rewritten_file>

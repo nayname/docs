@@ -70,8 +70,8 @@
                 "group": "Getting Started",
                 "isCollapsible": true,
                 "pages": [
-                  "docs/evm/developers/local-setup",
-                  "docs/evm/developers/development-environment"
+                  "docs/evm/developers/development-environment",
+                  "docs/evm/developers/local-setup"
                 ]
               },
               {
@@ -105,11 +105,16 @@
                   "docs/evm/developers/precompiles/ibc"
                 ]
               },
-              "docs/evm/developers/advanced",
-              "docs/evm/developers/chain-integration",
-              "docs/evm/developers/cosmos-comparisons",
-              "docs/evm/developers/reference",
-              "docs/evm/developers/troubleshoot"
+              {
+                "group": "Advanced Topics",
+                "isCollapsible": true,
+                "pages": [
+                  "docs/evm/developers/advanced",
+                  "docs/evm/developers/chain-integration",
+                  "docs/evm/developers/reference",
+                  "docs/evm/developers/troubleshoot"
+                ]
+              }
             ]
           }
         ]
@@ -119,12 +124,14 @@
         "pages": [
           {
             "group": "Cosmos API",
+            "isCollapsible": true,
             "pages": [
               "docs/api-reference/cosmos/index"
             ]
           },
           {
             "group": "EVM API",
+            "isCollapsible": true,
             "pages": [
               "docs/api-reference/evm/get-balance",
               "docs/api-reference/evm/opcodes",
