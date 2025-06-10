@@ -45,6 +45,16 @@ pnpm-lock.yaml
 
 coverage/
 
+# Python virtual environments and OpenAPI generation artifacts
+openapi_venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Temporary protobuf files
+proto-sources/
+
 # Misc
 
 dist/
