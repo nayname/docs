@@ -713,3 +713,60 @@ button,
 
 /* === CONSERVATIVE MINTLIFY OVERRIDES === */
 /* Only target very specific elements to avoid breaking functionality */
+
+/* === FORCE HIDE AI ASSISTANT === */
+/* Hide any AI assistant, chatbot, or help widgets */
+[data-mintlify="ai-assistant"],
+[data-mintlify="chatbot"],
+[class*="ai-assistant"],
+[class*="chatbot"],
+[class*="help-widget"],
+[id*="ai-assistant"],
+[id*="chatbot"],
+[id*="assistant"],
+.assistant,
+.ai-assistant,
+.chatbot,
+.help-widget,
+.mint-ai,
+.mint-assistant,
+.mint-chatbot,
+[aria-label*="assistant" i],
+[aria-label*="ai" i],
+[aria-label*="chat" i],
+[title*="assistant" i],
+[title*="ai" i] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  z-index: -1 !important;
+}
+
+/* Hide floating action buttons and similar widgets */
+button[class*="fab"],
+button[class*="float"],
+.floating-button,
+.floating-widget,
+[style*="position: fixed"][style*="bottom"],
+[style*="position: fixed"][style*="right"] {
+  display: none !important;
+}
+
+/* Specifically target common AI assistant selectors */
+.intercom-launcher,
+.helpscout-beacon,
+.crisp-client,
+div[data-widget="assistant"],
+div[id*="widget"],
+iframe[src*="assistant"],
+iframe[src*="chat"],
+iframe[src*="help"] {
+  display: none !important;
+  visibility: hidden !important;
+}
