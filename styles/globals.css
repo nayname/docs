@@ -2,7 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* === COSMOS BRAND COLORS === */
+/* === SPACE THEME COLOR PALETTE === */
+:root {
+  --cosmos-space-dark: #231E23;
+  --cosmos-teal: #39A6A3;
+  --cosmos-light-mint: #DEEEE2;
+  --cosmos-bright-green: #ABF1363;
+}
+
+/* Enhanced colors for UI variety */
 :root {
   --cosmos-deep-blue: #4B47CA;
   --cosmos-mint: #22E2A8;
@@ -13,8 +21,11 @@
   --cosmos-cyan: #40B3FF;
 }
 
-/* Dark mode colors */
-:root[data-theme="dark"] {
+/* Dark mode color adjustments */
+html[data-theme="dark"] {
+  --cosmos-teal: #4AB6B3;
+  --cosmos-light-mint: #E8F2E8;
+  --cosmos-bright-green: #BBF1373;
   --cosmos-deep-blue: #5B57FF;
   --cosmos-mint: #2EF2B8;
   --cosmos-cobalt: #5261FF;
@@ -24,200 +35,560 @@
   --cosmos-cyan: #50C3FF;
 }
 
-/* === MINIMAL HEADER THEMING === */
-/* Only apply subtle theming without breaking Mintlify's functionality */
-[data-theme='light'] .mintlify-topbar,
-[data-theme='light'] header {
-  background: linear-gradient(135deg, var(--cosmos-deep-blue) 0%, var(--cosmos-deep-purple) 30%, var(--cosmos-cobalt) 70%, var(--cosmos-orange) 100%);
-  border-bottom: 2px solid var(--cosmos-orange);
-}
-
-/* Dark mode header - minimal override */
-[data-theme='dark'] .mintlify-topbar,
-[data-theme='dark'] header {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%);
-  border-bottom: 2px solid rgba(34, 226, 168, 0.2);
-}
-
-/* === MAIN CONTENT STYLING === */
-[data-theme='light'] {
-  --background: linear-gradient(135deg, #fefefe 0%, #f8fafc 25%, #f1f5f9 100%);
-}
-
-[data-theme='light'] body {
-  background: linear-gradient(135deg, #fefefe 0%, #f8fafc 25%, #f1f5f9 100%);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-/* === SIDEBAR STYLING === */
-[data-theme='light'] #sidebar,
-[data-theme='light'] .mintlify-sidebar {
-  background: linear-gradient(to bottom, #fcfcfd, #f8fafc);
-  border-right: 1px solid #e2e8f0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-[data-theme='light'] .mintlify-sidebar-nav a {
-  font-weight: 500;
-  color: #64748b;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin: 0.25rem 0.5rem;
-  transition: all 0.2s ease;
-  font-size: 0.95rem;
-}
-
-[data-theme='light'] .mintlify-sidebar-nav a:hover {
-  background: linear-gradient(135deg, rgba(75, 71, 202, 0.08), rgba(117, 34, 181, 0.05));
-  color: var(--cosmos-deep-blue);
-  transform: translateX(4px);
-}
-
-[data-theme='light'] .mintlify-sidebar-nav a[aria-current="page"],
-[data-theme='light'] .mintlify-sidebar-nav a.active {
-  background: linear-gradient(135deg, var(--cosmos-deep-blue), var(--cosmos-deep-purple));
-  color: white;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.3);
-}
-
-[data-theme='light'] .mintlify-sidebar-group-title {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--cosmos-deep-purple);
-  margin: 1.5rem 1rem 0.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(117, 34, 181, 0.2);
-}
-
-/* === CONTENT AREA === */
-[data-theme='light'] #content-area {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-/* === TYPOGRAPHY === */
-[data-theme='light'] h1,
-[data-theme='light'] h2,
-[data-theme='light'] h3,
-[data-theme='light'] h4,
-[data-theme='light'] h5,
-[data-theme='light'] h6 {
-  font-weight: 700;
-  color: #1e293b;
-  line-height: 1.25;
-}
-
-[data-theme='light'] p {
-  color: #475569;
-  line-height: 1.7;
-  font-weight: 400;
-}
-
-[data-theme='light'] a {
-  color: var(--cosmos-deep-blue);
-  transition: color 0.2s ease;
-}
-
-[data-theme='light'] a:hover {
-  color: var(--cosmos-deep-purple);
-}
-
-/* === CODE BLOCKS === */
-pre {
-  border-radius: 8px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-}
-
-[data-theme='light'] pre {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 1px solid rgba(117, 82, 255, 0.15);
-  box-shadow: 0 2px 4px rgba(75, 71, 202, 0.08);
-}
-
-code:not(pre code) {
-  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-  font-size: 0.875em;
-  padding: 0.125rem 0.375rem;
-  border-radius: 4px;
-}
-
-[data-theme='light'] code:not(pre code) {
-  background: linear-gradient(135deg, rgba(117, 34, 181, 0.08), rgba(75, 71, 202, 0.05));
-  color: var(--cosmos-deep-purple);
-  border: 1px solid rgba(117, 34, 181, 0.2);
-}
-
-/* === TABLES === */
-[data-theme='light'] table {
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.05);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-[data-theme='light'] th {
-  background: linear-gradient(135deg, rgba(75, 71, 202, 0.05), rgba(117, 34, 181, 0.03));
-  color: var(--cosmos-deep-purple);
-  font-weight: 600;
-  padding: 1rem;
-  border-bottom: 2px solid rgba(117, 34, 181, 0.2);
-}
-
-[data-theme='light'] td {
-  padding: 0.875rem 1rem;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-  background: rgba(255, 255, 255, 0.9);
-}
-
-[data-theme='light'] tr:hover td {
-  background: rgba(75, 71, 202, 0.02);
-}
-
-/* === CARDS AND COMPONENTS === */
-[data-theme='light'] .mintlify-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 2px 8px rgba(75, 71, 202, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-}
-
-/* === SMOOTH ANIMATIONS === */
+/* === GLOBAL PAGE BACKGROUND === */
 html {
   scroll-behavior: smooth;
 }
 
+body {
+  transition: all 0.3s ease;
+}
+
+/* Light theme - apply the color scheme globally */
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background: linear-gradient(135deg, var(--cosmos-light-mint) 0%, rgba(222, 238, 226, 0.6) 25%, rgba(57, 166, 163, 0.1) 100%) !important;
+  color: var(--cosmos-space-dark) !important;
+}
+
+/* Dark theme */
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+  background: linear-gradient(135deg, var(--cosmos-space-dark) 0%, rgba(35, 30, 35, 0.95) 50%, rgba(16, 20, 25, 0.9) 100%) !important;
+  color: #ffffff !important;
+}
+
+/* === MINTLIFY HEADER/TOPBAR STYLING === */
+/* Target Mintlify's actual header elements */
+[data-testid="topbar"],
+nav[aria-label="main navigation"],
+.nx-top-bar,
+header.sticky,
+div[data-testid="navbar"] {
+  height: 56px !important;
+  min-height: 56px !important;
+  backdrop-filter: blur(12px) !important;
+  border-bottom: 2px solid rgba(57, 166, 163, 0.4) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+}
+
+/* Light theme header */
+html[data-theme="light"] [data-testid="topbar"],
+html[data-theme="light"] nav[aria-label="main navigation"],
+html[data-theme="light"] .nx-top-bar,
+html[data-theme="light"] header.sticky,
+html[data-theme="light"] div[data-testid="navbar"] {
+  background: linear-gradient(135deg, var(--cosmos-light-mint) 0%, rgba(57, 166, 163, 0.15) 50%, rgba(171, 241, 99, 0.1) 100%) !important;
+  border-bottom: 2px solid rgba(57, 166, 163, 0.5) !important;
+}
+
+/* Dark theme header */
+html[data-theme="dark"] [data-testid="topbar"],
+html[data-theme="dark"] nav[aria-label="main navigation"],
+html[data-theme="dark"] .nx-top-bar,
+html[data-theme="dark"] header.sticky,
+html[data-theme="dark"] div[data-testid="navbar"] {
+  background: linear-gradient(135deg, var(--cosmos-space-dark) 0%, rgba(35, 30, 35, 0.95) 50%, rgba(34, 226, 168, 0.1) 100%) !important;
+  border-bottom: 2px solid rgba(34, 226, 168, 0.4) !important;
+}
+
+/* === MODE TOGGLE VISIBILITY === */
+/* Ensure mode toggle is visible and styled */
+button[aria-label*="theme"],
+button[data-testid*="theme"],
+div[data-testid*="theme-toggle"],
+.theme-toggle,
+[role="button"][aria-label*="Toggle"] {
+  display: flex !important;
+  align-items: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+  border: 2px solid rgba(57, 166, 163, 0.4) !important;
+  border-radius: 8px !important;
+  padding: 0.5rem !important;
+  transition: all 0.2s ease !important;
+  margin: 0 0.5rem !important;
+}
+
+html[data-theme="dark"] button[aria-label*="theme"],
+html[data-theme="dark"] button[data-testid*="theme"],
+html[data-theme="dark"] div[data-testid*="theme-toggle"],
+html[data-theme="dark"] .theme-toggle,
+html[data-theme="dark"] [role="button"][aria-label*="Toggle"] {
+  background: linear-gradient(135deg, rgba(34, 226, 168, 0.15), rgba(34, 226, 168, 0.05)) !important;
+  border: 2px solid rgba(34, 226, 168, 0.4) !important;
+}
+
+/* === TOPBAR LINKS STYLING === */
+/* Style the topbar navigation links */
+nav a,
+[data-testid="topbar"] a,
+header a:not(.logo),
+.topbar-link {
+  color: var(--cosmos-space-dark) !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+  border: 1px solid transparent !important;
+}
+
+html[data-theme="light"] nav a:hover,
+html[data-theme="light"] [data-testid="topbar"] a:hover,
+html[data-theme="light"] header a:hover:not(.logo) {
+  background: linear-gradient(135deg, rgba(57, 166, 163, 0.15), rgba(171, 241, 99, 0.1)) !important;
+  color: var(--cosmos-teal) !important;
+  border: 1px solid rgba(57, 166, 163, 0.3) !important;
+}
+
+html[data-theme="dark"] nav a,
+html[data-theme="dark"] [data-testid="topbar"] a,
+html[data-theme="dark"] header a:not(.logo) {
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] nav a:hover,
+html[data-theme="dark"] [data-testid="topbar"] a:hover,
+html[data-theme="dark"] header a:hover:not(.logo) {
+  background: linear-gradient(135deg, rgba(34, 226, 168, 0.15), rgba(75, 71, 202, 0.1)) !important;
+  color: var(--cosmos-mint) !important;
+  border: 1px solid rgba(34, 226, 168, 0.3) !important;
+}
+
+/* === MAIN CONTENT AREA === */
+main,
+article,
+.nx-content,
+[data-testid="main-content"] {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+/* Light theme content */
+html[data-theme="light"] main,
+html[data-theme="light"] article,
+html[data-theme="light"] .nx-content,
+html[data-theme="light"] [data-testid="main-content"] {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(222, 238, 226, 0.3) 100%) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 12px !important;
+  margin: 1rem !important;
+  padding: 2rem !important;
+  border: 1px solid rgba(57, 166, 163, 0.2) !important;
+}
+
+/* Dark theme content */
+html[data-theme="dark"] main,
+html[data-theme="dark"] article,
+html[data-theme="dark"] .nx-content,
+html[data-theme="dark"] [data-testid="main-content"] {
+  background: linear-gradient(135deg, rgba(35, 30, 35, 0.9) 0%, rgba(16, 20, 25, 0.8) 100%) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 12px !important;
+  margin: 1rem !important;
+  padding: 2rem !important;
+  border: 1px solid rgba(34, 226, 168, 0.2) !important;
+}
+
+/* === SIDEBAR STYLING === */
+aside,
+nav[aria-label="sidebar"],
+.nx-sidebar,
+[data-testid="sidebar"] {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* Light theme sidebar */
+html[data-theme="light"] aside,
+html[data-theme="light"] nav[aria-label="sidebar"],
+html[data-theme="light"] .nx-sidebar,
+html[data-theme="light"] [data-testid="sidebar"] {
+  background: linear-gradient(to bottom, rgba(222, 238, 226, 0.4), rgba(255, 255, 255, 0.9)) !important;
+  border-right: 2px solid rgba(57, 166, 163, 0.3) !important;
+}
+
+/* Dark theme sidebar */
+html[data-theme="dark"] aside,
+html[data-theme="dark"] nav[aria-label="sidebar"],
+html[data-theme="dark"] .nx-sidebar,
+html[data-theme="dark"] [data-testid="sidebar"] {
+  background: linear-gradient(to bottom, rgba(35, 30, 35, 0.8), rgba(16, 20, 25, 0.9)) !important;
+  border-right: 2px solid rgba(34, 226, 168, 0.3) !important;
+}
+
+/* === NAVIGATION LINKS === */
+aside a,
+nav[aria-label="sidebar"] a,
+.nx-sidebar a,
+[data-testid="sidebar"] a {
+  font-weight: 500 !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 8px !important;
+  margin: 0.25rem 0.5rem !important;
+  transition: all 0.2s ease !important;
+  font-size: 0.95rem !important;
+  display: block !important;
+  border: 1px solid transparent !important;
+}
+
+/* Light theme navigation links */
+html[data-theme="light"] aside a,
+html[data-theme="light"] nav[aria-label="sidebar"] a,
+html[data-theme="light"] .nx-sidebar a,
+html[data-theme="light"] [data-testid="sidebar"] a {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] aside a:hover,
+html[data-theme="light"] nav[aria-label="sidebar"] a:hover,
+html[data-theme="light"] .nx-sidebar a:hover,
+html[data-theme="light"] [data-testid="sidebar"] a:hover {
+  background: linear-gradient(135deg, rgba(57, 166, 163, 0.15), rgba(171, 241, 99, 0.1)) !important;
+  color: var(--cosmos-teal) !important;
+  transform: translateX(4px) !important;
+  border: 1px solid rgba(57, 166, 163, 0.3) !important;
+}
+
+html[data-theme="light"] aside a[aria-current="page"],
+html[data-theme="light"] aside a.active,
+html[data-theme="light"] nav[aria-label="sidebar"] a[aria-current="page"],
+html[data-theme="light"] nav[aria-label="sidebar"] a.active,
+html[data-theme="light"] .nx-sidebar a[aria-current="page"],
+html[data-theme="light"] .nx-sidebar a.active {
+  background: linear-gradient(135deg, var(--cosmos-teal), var(--cosmos-bright-green)) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border: 2px solid rgba(57, 166, 163, 0.6) !important;
+}
+
+/* Dark theme navigation links */
+html[data-theme="dark"] aside a,
+html[data-theme="dark"] nav[aria-label="sidebar"] a,
+html[data-theme="dark"] .nx-sidebar a,
+html[data-theme="dark"] [data-testid="sidebar"] a {
+  color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] aside a:hover,
+html[data-theme="dark"] nav[aria-label="sidebar"] a:hover,
+html[data-theme="dark"] .nx-sidebar a:hover,
+html[data-theme="dark"] [data-testid="sidebar"] a:hover {
+  background: linear-gradient(135deg, rgba(34, 226, 168, 0.15), rgba(75, 71, 202, 0.1)) !important;
+  color: var(--cosmos-mint) !important;
+  transform: translateX(4px) !important;
+  border: 1px solid rgba(34, 226, 168, 0.3) !important;
+}
+
+html[data-theme="dark"] aside a[aria-current="page"],
+html[data-theme="dark"] aside a.active,
+html[data-theme="dark"] nav[aria-label="sidebar"] a[aria-current="page"],
+html[data-theme="dark"] nav[aria-label="sidebar"] a.active,
+html[data-theme="dark"] .nx-sidebar a[aria-current="page"],
+html[data-theme="dark"] .nx-sidebar a.active {
+  background: linear-gradient(135deg, var(--cosmos-mint), var(--cosmos-cyan)) !important;
+  color: var(--cosmos-space-dark) !important;
+  font-weight: 600 !important;
+  border: 2px solid rgba(34, 226, 168, 0.6) !important;
+}
+
+/* === TYPOGRAPHY === */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  transition: color 0.2s ease !important;
+}
+
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] h4,
+html[data-theme="light"] h5,
+html[data-theme="light"] h6 {
+  color: var(--cosmos-space-dark) !important;
+}
+
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5,
+html[data-theme="dark"] h6 {
+  color: #ffffff !important;
+}
+
+p {
+  line-height: 1.7 !important;
+  font-weight: 400 !important;
+  transition: color 0.2s ease !important;
+}
+
+html[data-theme="light"] p {
+  color: #475569 !important;
+}
+
+html[data-theme="dark"] p {
+  color: #cbd5e1 !important;
+}
+
+/* Links */
+a {
+  transition: color 0.2s ease !important;
+  text-decoration: none !important;
+}
+
+html[data-theme="light"] a {
+  color: var(--cosmos-teal) !important;
+}
+
+html[data-theme="light"] a:hover {
+  color: var(--cosmos-bright-green) !important;
+}
+
+html[data-theme="dark"] a {
+  color: var(--cosmos-mint) !important;
+}
+
+html[data-theme="dark"] a:hover {
+  color: var(--cosmos-cyan) !important;
+}
+
+/* === CODE BLOCKS === */
+pre {
+  border-radius: 8px !important;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+}
+
+html[data-theme="light"] pre {
+  background: linear-gradient(135deg, rgba(222, 238, 226, 0.4) 0%, rgba(255, 255, 255, 0.9) 100%) !important;
+  border: 2px solid rgba(57, 166, 163, 0.3) !important;
+}
+
+html[data-theme="dark"] pre {
+  background: linear-gradient(135deg, rgba(35, 30, 35, 0.9) 0%, rgba(16, 20, 25, 0.95) 100%) !important;
+  border: 2px solid rgba(34, 226, 168, 0.3) !important;
+}
+
+code:not(pre code) {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+  font-size: 0.875em !important;
+  padding: 0.125rem 0.375rem !important;
+  border-radius: 4px !important;
+}
+
+html[data-theme="light"] code:not(pre code) {
+  background: linear-gradient(135deg, rgba(57, 166, 163, 0.15), rgba(171, 241, 99, 0.1)) !important;
+  color: var(--cosmos-space-dark) !important;
+  border: 1px solid rgba(57, 166, 163, 0.3) !important;
+}
+
+html[data-theme="dark"] code:not(pre code) {
+  background: linear-gradient(135deg, rgba(35, 30, 35, 0.9), rgba(34, 226, 168, 0.15)) !important;
+  color: var(--cosmos-mint) !important;
+  border: 1px solid rgba(34, 226, 168, 0.3) !important;
+}
+
+/* === TABLES === */
+table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  width: 100% !important;
+}
+
+html[data-theme="light"] table {
+  border: 2px solid rgba(57, 166, 163, 0.3) !important;
+}
+
+html[data-theme="dark"] table {
+  border: 2px solid rgba(34, 226, 168, 0.3) !important;
+}
+
+th {
+  font-weight: 600 !important;
+  padding: 1rem !important;
+}
+
+html[data-theme="light"] th {
+  background: linear-gradient(135deg, rgba(57, 166, 163, 0.15), rgba(171, 241, 99, 0.08)) !important;
+  color: var(--cosmos-space-dark) !important;
+  border-bottom: 2px solid rgba(57, 166, 163, 0.3) !important;
+}
+
+html[data-theme="dark"] th {
+  background: linear-gradient(135deg, rgba(35, 30, 35, 0.9), rgba(34, 226, 168, 0.15)) !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid rgba(34, 226, 168, 0.3) !important;
+}
+
+td {
+  padding: 0.875rem 1rem !important;
+}
+
+html[data-theme="light"] td {
+  border-bottom: 1px solid rgba(57, 166, 163, 0.15) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+html[data-theme="dark"] td {
+  border-bottom: 1px solid rgba(34, 226, 168, 0.15) !important;
+  background: rgba(35, 30, 35, 0.7) !important;
+}
+
+html[data-theme="light"] tr:hover td {
+  background: linear-gradient(135deg, rgba(57, 166, 163, 0.08), rgba(255, 255, 255, 0.95)) !important;
+}
+
+html[data-theme="dark"] tr:hover td {
+  background: linear-gradient(135deg, rgba(34, 226, 168, 0.08), rgba(35, 30, 35, 0.8)) !important;
+}
+
+/* === CARDS AND COMPONENTS === */
+.card,
+[data-testid="card"],
+div[class*="card"] {
+  backdrop-filter: blur(10px) !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+  padding: 1.5rem !important;
+  margin: 1rem 0 !important;
+}
+
+html[data-theme="light"] .card,
+html[data-theme="light"] [data-testid="card"],
+html[data-theme="light"] div[class*="card"] {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(222, 238, 226, 0.4) 100%) !important;
+  border: 2px solid rgba(57, 166, 163, 0.3) !important;
+}
+
+html[data-theme="dark"] .card,
+html[data-theme="dark"] [data-testid="card"],
+html[data-theme="dark"] div[class*="card"] {
+  background: linear-gradient(135deg, rgba(35, 30, 35, 0.95) 0%, rgba(34, 226, 168, 0.1) 100%) !important;
+  border: 2px solid rgba(34, 226, 168, 0.3) !important;
+}
+
+/* === LANDING PAGE ENHANCEMENTS === */
+/* Icon containers for the landing page */
+.icon-container {
+  position: relative !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s ease !important;
+}
+
+html[data-theme="light"] .icon-container {
+  background: linear-gradient(135deg, var(--cosmos-light-mint) 0%, rgba(57, 166, 163, 0.15) 50%, rgba(171, 241, 99, 0.1) 100%) !important;
+  border: 2px solid rgba(35, 30, 35, 0.15) !important;
+  color: var(--cosmos-space-dark) !important;
+}
+
+html[data-theme="light"] .icon-container svg {
+  color: var(--cosmos-space-dark) !important;
+}
+
+html[data-theme="dark"] .icon-container {
+  background: linear-gradient(135deg, rgba(35, 30, 35, 0.9) 0%, rgba(34, 226, 168, 0.2) 50%, rgba(75, 71, 202, 0.2) 100%) !important;
+  border: 2px solid rgba(34, 226, 168, 0.4) !important;
+  color: var(--cosmos-mint) !important;
+}
+
+html[data-theme="dark"] .icon-container svg {
+  color: var(--cosmos-mint) !important;
+}
+
+.icon-container:hover {
+  transform: scale(1.05) !important;
+}
+
+html[data-theme="light"] .icon-container:hover {
+  border-color: rgba(57, 166, 163, 0.5) !important;
+}
+
+html[data-theme="dark"] .icon-container:hover {
+  border-color: rgba(34, 226, 168, 0.6) !important;
+}
+
+/* === GRADIENT OVERRIDES FOR LANDING PAGE === */
+/* Override Tailwind gradients with theme colors */
+html[data-theme="light"] .bg-gradient-to-br.from-indigo-500.to-purple-600 {
+  background: linear-gradient(135deg, var(--cosmos-deep-blue) 0%, var(--cosmos-deep-purple) 100%) !important;
+}
+
+html[data-theme="light"] .bg-gradient-to-br.from-purple-600.to-emerald-500 {
+  background: linear-gradient(135deg, var(--cosmos-deep-purple) 0%, var(--cosmos-teal) 100%) !important;
+}
+
+html[data-theme="light"] .bg-gradient-to-br.from-emerald-500.to-cyan-500 {
+  background: linear-gradient(135deg, var(--cosmos-teal) 0%, var(--cosmos-cyan) 100%) !important;
+}
+
+html[data-theme="dark"] .bg-gradient-to-br.from-indigo-500.to-purple-600 {
+  background: linear-gradient(135deg, var(--cosmos-deep-blue) 0%, var(--cosmos-deep-purple) 100%) !important;
+}
+
+html[data-theme="dark"] .bg-gradient-to-br.from-purple-600.to-emerald-500 {
+  background: linear-gradient(135deg, var(--cosmos-deep-purple) 0%, var(--cosmos-mint) 100%) !important;
+}
+
+html[data-theme="dark"] .bg-gradient-to-br.from-emerald-500.to-cyan-500 {
+  background: linear-gradient(135deg, var(--cosmos-mint) 0%, var(--cosmos-cyan) 100%) !important;
+}
+
+/* Ensure icons in gradient containers have proper contrast */
+.bg-gradient-to-br svg {
+  color: white !important;
+}
+
+/* === MODERN VISUAL ENHANCEMENTS === */
+/* Block shadows and highlights for modern design */
 .group:hover {
-  transform: translateY(-2px);
-  transition: transform 0.2s ease;
+  transform: translateY(-2px) !important;
+  transition: transform 0.2s ease !important;
 }
 
-/* === TAB INDICATORS === */
-[data-theme='light'] .tab-active,
-[data-theme='light'] .active-tab,
-[data-theme='light'] [aria-selected="true"],
-[data-theme='light'] .mintlify-tab[data-state="active"] {
-  position: relative;
+/* Tab indicators with block styling */
+.tab-active,
+.active-tab,
+[aria-selected="true"],
+[data-state="active"] {
+  position: relative !important;
 }
 
-[data-theme='light'] .tab-active::after,
-[data-theme='light'] .active-tab::after,
-[data-theme='light'] [aria-selected="true"]::after,
-[data-theme='light'] .mintlify-tab[data-state="active"]::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--cosmos-orange) 0%, #ff6b3d 50%, #ff8562 100%);
-  border-radius: 2px 2px 0 0;
-  animation: slideIn 0.3s ease-out;
+.tab-active::after,
+.active-tab::after,
+[aria-selected="true"]::after,
+[data-state="active"]::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: -2px !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 3px !important;
+  border-radius: 2px 2px 0 0 !important;
+  animation: slideIn 0.3s ease-out !important;
+}
+
+html[data-theme="light"] .tab-active::after,
+html[data-theme="light"] .active-tab::after,
+html[data-theme="light"] [aria-selected="true"]::after,
+html[data-theme="light"] [data-state="active"]::after {
+  background: linear-gradient(90deg, var(--cosmos-teal) 0%, var(--cosmos-bright-green) 100%) !important;
+}
+
+html[data-theme="dark"] .tab-active::after,
+html[data-theme="dark"] .active-tab::after,
+html[data-theme="dark"] [aria-selected="true"]::after,
+html[data-theme="dark"] [data-state="active"]::after {
+  background: linear-gradient(90deg, var(--cosmos-mint) 0%, var(--cosmos-cyan) 100%) !important;
 }
 
 @keyframes slideIn {
@@ -229,4 +600,49 @@ html {
     width: 100%;
     left: 0;
   }
+}
+
+/* === LONG SHADOW ALTERNATIVES === */
+/* Subtle long shadow effect for elevated elements */
+.elevated-element {
+  position: relative !important;
+}
+
+.elevated-element::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 4px !important;
+  left: 4px !important;
+  right: -4px !important;
+  bottom: -4px !important;
+  z-index: -1 !important;
+  border-radius: inherit !important;
+  opacity: 0.3 !important;
+}
+
+html[data-theme="light"] .elevated-element::before {
+  background: linear-gradient(135deg, rgba(57, 166, 163, 0.2), rgba(171, 241, 99, 0.1)) !important;
+}
+
+html[data-theme="dark"] .elevated-element::before {
+  background: linear-gradient(135deg, rgba(34, 226, 168, 0.2), rgba(75, 71, 202, 0.1)) !important;
+}
+
+/* === FORCE VISIBILITY FOR MINTLIFY ELEMENTS === */
+/* Ensure mode toggle and topbar elements are visible */
+[data-testid*="theme"],
+[aria-label*="theme"],
+button[title*="theme"],
+button[aria-label*="Toggle"],
+.theme-button {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+  pointer-events: auto !important;
+}
+
+/* Override any hidden states */
+.hidden[data-testid*="theme"],
+.hidden[aria-label*="theme"] {
+  display: flex !important;
 }

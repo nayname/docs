@@ -5,8 +5,8 @@
   "theme": "palm",
   "colors": {
     "primary": "#4B47CA",
-    "light": "#7C7CF0",
-    "dark": "#2D2B8A"
+    "light": "#39A6A3",
+    "dark": "#22E2A8"
   },
   "styling": {
     "icons": {
@@ -43,8 +43,8 @@
   },
   "favicon": "/assets/brand/cosmos.svg",
   "logo": {
-    "light": "/assets/brand/cosmos-wordmark.svg",
-    "dark": "/assets/brand/cosmos-wordmark-dark.svg"
+    "light": "/assets/brand/cosmos-wordmark-dark.svg",
+    "dark": "/assets/brand/cosmos-wordmark.svg"
   },
   "navigation": {
     "tabs": [
@@ -119,19 +119,20 @@
           {
             "group": "Cosmos API",
             "pages": [
-              "docs/api-reference/cosmos/api",
-              "docs/api-reference/cosmos/cli"
+              "docs/api-reference/cosmos/index"
             ]
           },
           {
             "group": "EVM API",
             "pages": [
-              "docs/api-reference/evm/evm-json-rpc",
-              "docs/api-reference/evm/get-balance",
-              "docs/api-reference/evm/opcodes"
+              "docs/api-reference/evm/get-balance"
             ]
           }
         ]
+      },
+      {
+        "tab": "API Specs",
+        "pages": ["docs/api-specs/index"]
       },
       {
         "tab": "IBC",

@@ -1,11 +1,47 @@
 ---
-title: "IBC Protocol"
-description: "Secure, trust-minimised cross-chain communication"
+title: "Inter-Blockchain Communication (IBC)"
+description: "Learn about IBC protocol implementation and cross-chain communication in the Cosmos ecosystem."
 ---
 
-# IBC Protocol
+The Inter-Blockchain Communication (IBC) protocol enables secure and reliable communication between independent blockchains in the Cosmos ecosystem.
 
-[Landing Page Content]
+## Overview
 
+IBC is a protocol that allows blockchains to communicate with each other in a trustless way. It enables:
 
-[Sub-section Index]
+- **Token transfers** between chains
+- **Data packets** and arbitrary message passing
+- **Cross-chain smart contract calls**
+- **Interchain accounts** for remote chain control
+
+<CardGroup cols={2}>
+  <Card title="IBC Protocol Specification" icon="file-text">
+    Technical specification and implementation details of the IBC protocol
+  </Card>
+  <Card title="Cross-Chain Development" icon="link">
+    Build applications that leverage IBC for cross-chain functionality
+  </Card>
+</CardGroup>
+
+## Key Concepts
+
+### Channels and Connections
+IBC uses a layered architecture with channels built on top of connections:
+
+- **Connections**: Establish identity verification between chains
+- **Channels**: Enable application-specific communication protocols
+- **Packets**: Carry data and prove delivery between chains
+
+### Relayers
+Relayers are off-chain processes that facilitate IBC communication by:
+- Monitoring for packets on source chains
+- Submitting proofs to destination chains
+- Handling timeouts and acknowledgments
+
+## Next Steps
+
+For hands-on IBC development with smart contracts, explore the IBC precompile:
+
+<Card title="IBC Precompile Guide" href="/docs/evm/developers/precompiles/ibc">
+  Learn how to use IBC functionality directly from Solidity contracts
+</Card>
