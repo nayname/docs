@@ -1,9 +1,13 @@
 ---
-title: "Architecture & Ethereum Differences"
-description: "Understand Cosmos EVM's architecture and key differences from Ethereum that affect smart contract development and deployment."
+title: "Cosmos EVM Architecture"
+description: "A technical overview of the Cosmos EVM architecture, its core components, and its key differences from standard Ethereum."
 ---
 
-Understanding Cosmos EVM's architecture is essential for building robust applications and avoiding common pitfalls when migrating from Ethereum. This guide highlights critical differences and architectural decisions that directly impact smart contract development.
+This document outlines the architecture of Cosmos EVM. It covers the following key areas:
+
+*   **Protocol-level Differences:** A summary of the fundamental distinctions from Ethereum, including consensus, finality, gas economics, and address formats.
+*   **Core Components:** An explanation of the primary modules (`x/vm`, `x/feemarket`, `x/erc20`) that comprise the EVM functionality.
+*   **State Management:** A description of how EVM and native Cosmos SDK state are managed together in a unified structure.
 
 ## Critical Differences from Ethereum
 

@@ -1,163 +1,114 @@
 ---
-title: "Explore: Discover Cosmos EVM Capabilities"
-description: "Understand what's possible with Cosmos EVM and how it extends both Ethereum and Cosmos paradigms."
+title: "Introduction to Cosmos EVM"
+description: "A technical introduction to Cosmos EVM, its core components, and its key functionalities within the Cosmos SDK ecosystem."
 ---
-
-Now that you've decided to explore Cosmos EVM, let's dive a bit deeper. Cosmos EVM isn't just "Ethereum on Cosmos" - it's a hybrid that unlocks new possibilities.
 
 ## What is Cosmos EVM?
 
-Cosmos EVM provides forward-compatible Ethereum Virtual Machine support within the Cosmos SDK framework. Think of it as bringing Ethereum's proven smart contract capabilities to Cosmos's sovereign, interoperable blockchain architecture.
+Cosmos EVM is a set of modules for the Cosmos SDK that provides an Ethereum Virtual Machine (EVM) execution environment. It enables the deployment and operation of Solidity-based smart contracts on a sovereign Cosmos-based blockchain. This allows developers to use Ethereum's tooling and contract standards within a customizable, interoperable network.
 
-### Core Philosophy
+## Core Capabilities
 
-**Familiar for Ethereum Developers:** Deploy existing Solidity contracts unchanged. Use MetaMask, Hardhat, Foundry - all your familiar tools work without modification.
+### 1. EVM Compatibility
 
-**Extended for Cosmos:** Access IBC transfers, custom governance, and native Cosmos modules directly from your smart contracts, unlocking new possibilities beyond standard Ethereum.
-
-## Key Capabilities
-
-### 1. Full EVM Compatibility
-
-**What it means:** Any valid Ethereum smart contract can run on Cosmos EVM without modification.
-
-**Cosmos SDK Comparison:**
-- **Cosmos SDK:** Custom modules written in Go, requiring specific Cosmos knowledge
-- **Cosmos EVM:** Standard Solidity contracts work immediately
+Cosmos EVM is designed to be compatible with the core Ethereum specification. This means that any valid Ethereum smart contract, developed in languages like Solidity or Vyper, can be deployed and executed on a Cosmos EVM chain without code modification. This compatibility extends to the JSON-RPC API, allowing standard Ethereum tools like MetaMask, Hardhat, and Foundry to interact with the chain.
 
 ```solidity
-// This exact contract works on both Ethereum and Cosmos EVM
-contract UniswapV2Pair {
-    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external {
-        // Identical implementation to Ethereum
+// This standard ERC-20 contract is deployable on both Ethereum and Cosmos EVM
+contract MyToken is ERC20 {
+    constructor(uint256 initialSupply) ERC20("MyToken", "MTK") {
+        _mint(msg.sender, initialSupply);
     }
 }
 ```
 
-### 2. Native IBC Integration
+### 2. Native Inter-Blockchain Communication (IBC)
 
-**What it means:** Smart contracts can initiate cross-chain transfers and communicate with other Cosmos chains.
-
-**CosmWasm Comparison:**
-- **CosmWasm:** Native IBC support through Rust contract interfaces
-- **Cosmos EVM:** IBC support through precompiled contracts
+Smart contracts deployed on Cosmos EVM can interact with the Inter-Blockchain Communication protocol through a dedicated precompiled contract. This enables contracts to programmatically send and receive tokens to and from other IBC-enabled blockchains within the Cosmos network.
 
 ```solidity
-// IBC transfer from a smart contract (conceptual)
+// A smart contract can initiate an IBC transfer via the precompile
 interface IIBCTransfer {
     function transfer(string calldata sourceChannel, string calldata receiver, uint256 amount) external;
 }
 
-contract CrossChainDEX {
-    IIBCTransfer constant IBC = IIBCTransfer(0x0000000000000000000000000000000000000802);
+contract CrossChainAssetManager {
+    IIBCTransfer constant IBC_PRECOMPILE = IIBCTransfer(0x0000000000000000000000000000000000000802);
 
-    function arbitrage(string calldata targetChain, uint256 amount) external {
-        // Execute local swap, then IBC transfer profits
-        IBC.transfer("channel-0", msg.sender, amount);
+    function sendToOtherChain(string calldata channel, string calldata recipient, uint256 amount) external {
+        // Business logic here...
+        IBC_PRECOMPILE.transfer(channel, recipient, amount);
     }
 }
 ```
 
-### 3. Precompiled Contracts (Cosmos Modules Access)
+### 3. Access to Native Modules via Precompiles
 
-**What it means:** Access native Cosmos SDK functionality directly from Solidity.
+Precompiled contracts are a key feature of Cosmos EVM, providing a bridge between the EVM and underlying Cosmos SDK modules. These contracts exist at fixed addresses and allow Solidity code to call functions within native modules like `x/staking` and `x/distribution`.
 
-**Available Precompiles:**
-- **Staking:** Delegate, undelegate, claim rewards
-- **Distribution:** Manage validator commissions and community pool
-- **IBC:** Cross-chain token transfers
-
-**Cosmos SDK Comparison:**
+**Native Cosmos SDK Go Logic:**
 ```go
-// Native Cosmos SDK staking
-func (k Keeper) Delegate(ctx sdk.Context, delegator sdk.AccAddress, validator sdk.ValAddress, amount sdk.Coin) error {
+// In a custom Cosmos SDK module, a keeper calls another keeper directly
+func (k Keeper) DelegateTokens(ctx sdk.Context, delegator sdk.AccAddress, validator sdk.ValAddress, amount sdk.Coin) error {
     return k.stakingKeeper.Delegate(ctx, delegator, validator, amount)
 }
 ```
 
+**Equivalent Solidity Logic via Precompile:**
 ```solidity
-// Cosmos EVM staking precompile
+// A smart contract calls the staking precompile to achieve the same result
 interface IStaking {
     function delegate(address validator, uint256 amount) external returns (bool);
 }
 
-contract StakingVault {
-    IStaking constant STAKING = IStaking(0x0000000000000000000000000000000000000800);
+contract StakingContract {
+    IStaking constant STAKING_PRECOMPILE = IStaking(0x0000000000000000000000000000000000000800);
 
-    function autoStake() external payable {
-        STAKING.delegate(preferredValidator, msg.value);
+    function delegateFunds() external payable {
+        STAKING_PRECOMPILE.delegate(preferredValidator, msg.value);
     }
 }
 ```
 
-### 4. Token Unification
+### 4. Native Token Unification
 
-**What it means:** IBC tokens and ERC-20 tokens are unified - no more fragmented liquidity.
+The `x/erc20` module provides a mechanism to represent both native Cosmos SDK coins and IBC-vouchered tokens as ERC-20 contracts. This eliminates the need for separate "wrapped" token standards, unifying liquidity and simplifying the user experience for assets moving between the native and EVM environments. An IBC token `ibc/ABC...` can be automatically registered and used as a standard ERC-20 token in DeFi protocols.
 
-**Traditional Problem:**
-- Token arrives via IBC as `ibc/ABC123...`
-- Must wrap to ERC-20 for DeFi use
-- Creates separate liquidity pools
+## Architectural Components
 
-**Cosmos EVM Solution:**
-- IBC tokens automatically available as ERC-20
-- Single liquidity pool for maximum efficiency
-- Seamless user experience
-
-## Architecture Insights
-
-### Module Integration
-
-Cosmos EVM consists of three core modules working together:
+Cosmos EVM is implemented as a collection of interoperable Cosmos SDK modules:
 
 <AccordionGroup>
   <Accordion title="x/vm Module (Core EVM)">
-    **Purpose:** Provides the Ethereum Virtual Machine execution environment
-
-    **Cosmos SDK Context:** Similar to how `x/bank` handles token transfers, `x/vm` handles smart contract execution
-
-    **Key Features:**
-    - Ethereum transaction processing
-    - Smart contract deployment and execution
-    - EVM state management
+    **Function:** Provides the core EVM execution environment.
+    **Responsibilities:**
+    - Processing Ethereum-formatted transactions.
+    - Managing smart contract deployment and execution logic.
+    - Handling EVM state transitions and storage within the Cosmos state machine.
   </Accordion>
 
   <Accordion title="x/feemarket Module (EIP-1559)">
-    **Purpose:** Implements dynamic fee pricing mechanism
-
-    **Cosmos SDK Context:** Unlike fixed gas prices in native Cosmos SDK, this provides Ethereum-style dynamic pricing
-
-    **Benefits:**
-    - Automatic fee adjustment based on network demand
-    - Better user experience during congestion
-    - Economic incentives for validators
+    **Function:** Implements the EIP-1559 dynamic fee mechanism.
+    **Responsibilities:**
+    - Adjusting the base gas fee based on block utilization.
+    - Providing a more predictable fee environment compared to fixed-gas-price models.
   </Accordion>
 
   <Accordion title="x/erc20 Module (Token Bridge)">
-    **Purpose:** Bridges Cosmos SDK coins and ERC-20 tokens
-
-    **Cosmos SDK Context:** Enables seamless conversion between native Cosmos denominations and ERC-20 representations
-
-    **Use Cases:**
-    - IBC tokens usable in DeFi
-    - Native staking token as ERC-20
-    - Cross-chain token standards
+    **Function:** Manages the bidirectional conversion between Cosmos SDK `sdk.Coin` and ERC-20 tokens.
+    **Responsibilities:**
+    - Registering `Coin` denominations as ERC-20 contracts.
+    - Enabling IBC tokens to be used seamlessly in EVM-based applications.
   </Accordion>
 </AccordionGroup>
 
-## Unique Advantages
+## Chain-Level Customization
 
-### 1. Sovereign Consensus
+As a sovereign module, Cosmos EVM allows for chain-level configurations that are not possible on Ethereum mainnet or most L2s.
 
-Unlike Ethereum L2s, you control your own consensus mechanism with practical benefits:
-- Custom block times (1-2 seconds vs. Ethereum's 12+ seconds)
-- No dependency on Ethereum's security assumptions
-- Custom validator sets and governance
-
-### 2. Customizable Features
-
-**Permissioned Deployment:** Governance can restrict contract deployment to specific addresses:
+**Permissioned Deployment:** The EVM module's parameters can be configured through governance to restrict smart contract deployment to a specific list of addresses.
 ```go
+// Example of setting allowed publishers in the module parameters
 params := types.Params{
     EnableCreate: true,
     EnableCall:   true,
@@ -165,90 +116,4 @@ params := types.Params{
 }
 ```
 
-**Custom Opcodes:** Add new EVM opcodes for chain-specific functionality beyond standard Ethereum.
-
-### 3. Best of Both Ecosystems
-
-**From Ethereum:**
-- Mature smart contract libraries (OpenZeppelin)
-- Extensive auditing ecosystem
-- Proven DeFi patterns and protocols
-- Rich developer tooling
-
-**From Cosmos:**
-- Inter-blockchain communication (IBC)
-- Custom governance mechanisms
-- Modular architecture
-- Proof-of-Stake consensus
-
-## What You Can Build
-
-### DeFi Protocols with IBC
-
-```solidity
-contract CrossChainDEX {
-    // Standard AMM functionality
-    function swap(address tokenA, address tokenB, uint256 amountIn) external {
-        // Local swap logic
-    }
-
-    // Cross-chain arbitrage enabled by IBC
-    function arbitrageAcrossChains(string calldata targetChain) external {
-        // Execute local trade, IBC transfer to target chain
-        IBC.transfer(targetChain, calculatedAmount);
-    }
-}
-```
-
-### NFT Marketplaces with Cosmos Features
-
-```solidity
-contract CosmosNFTMarketplace {
-    // Standard ERC-721 functionality
-    function mintNFT(address to, string calldata tokenURI) external {
-        _mint(to, tokenId);
-    }
-
-    // Governance-controlled royalty rates
-    function updateRoyalties(uint256 newRate) external {
-        require(msg.sender == governanceModule, "Only governance");
-        royaltyRate = newRate;
-    }
-}
-```
-
-### Liquid Staking with Native Integration
-
-```solidity
-contract LiquidStaking {
-    IStaking constant STAKING = IStaking(0x0000000000000000000000000000000000000800);
-
-    function stake() external payable {
-        // Stake native tokens through precompile
-        STAKING.delegate(selectedValidator, msg.value);
-
-        // Mint liquid staking tokens
-        _mint(msg.sender, msg.value);
-    }
-}
-```
-
-## Performance Characteristics
-
-**Compared to Native Cosmos SDK:**
-- **Throughput:** Lower (EVM overhead vs. native Go)
-- **Development Speed:** Faster (proven patterns and tools)
-- **Flexibility:** Constrained by EVM limitations
-
-**Compared to Ethereum:**
-- **Throughput:** Higher (Tendermint consensus)
-- **Finality:** Faster (1-2 seconds vs. 12+ minutes)
-- **Fees:** Potentially lower (no base layer competition)
-
-## Next Steps
-
-Ready to get hands-on? Set up your local environment:
-
-<Card title="Local Setup Guide" href="/docs/evm/developers/local-setup">
-  Clone the repo and run your first Cosmos EVM node in 5 minutes.
-</Card>
+**Custom Precompiles:** Chains can implement their own custom precompiled contracts to expose unique features of their native modules to the EVM, going beyond the standard set.

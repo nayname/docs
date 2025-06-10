@@ -1,0 +1,464 @@
+export const WalletConnect = () => {
+  if (typeof window === 'undefined') {
+    return (
+      <div style={{
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        border: '1px solid #e2e8f0',
+        borderRadius: '1rem',
+        padding: '2rem',
+        margin: '1.5rem 0',
+        textAlign: 'center'
+      }}>
+        <p>🦊 Wallet connection available in browser</p>
+      </div>
+    );
+  }
+
+  const [isConnected, setIsConnected] = React.useState(false);
+  const [account, setAccount] = React.useState('');
+  const [isChainAdded, setIsChainAdded] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isDarkMode, setIsDarkMode] = React.useState(false);
+
+  // Cosmos EVM Testnet Configuration
+  const chainConfig = {
+    chainId: '0x2328', // 9000 in hex
+    chainName: 'Cosmos EVM Testnet',
+    rpcUrls: ['https://testnet-evm.cosmos.network'],
+    nativeCurrency: {
+      name: 'TEST',
+      symbol: 'TEST',
+      decimals: 18
+    },
+    blockExplorerUrls: ['https://explorer.cosmos.network/evm']
+  };
+
+  // Check theme and wallet status
+  React.useEffect(() => {
+    // Check theme
+    const checkTheme = () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark' ||
+                     (!document.documentElement.getAttribute('data-theme') &&
+                      window.matchMedia('(prefers-color-scheme: dark)').matches);
+      setIsDarkMode(isDark);
+    };
+
+    const checkConnection = async () => {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+          if (accounts.length > 0) {
+            setIsConnected(true);
+            setAccount(accounts[0]);
+          }
+        } catch (error) {
+          console.error('Error checking connection:', error);
+        }
+      }
+    };
+
+    const checkChain = async () => {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+          setIsChainAdded(chainId === chainConfig.chainId);
+        } catch (error) {
+          console.error('Error checking chain:', error);
+        }
+      }
+    };
+
+    checkTheme();
+    checkConnection();
+    checkChain();
+
+    // Listen for theme changes
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addListener(checkTheme);
+
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeListener(checkTheme);
+    };
+  }, []);
+
+  const connectWallet = async () => {
+    if (typeof window.ethereum === 'undefined') {
+      alert('MetaMask is not installed. Please install MetaMask to continue.');
+      window.open('https://metamask.io/download/', '_blank');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts'
+      });
+      setIsConnected(true);
+      setAccount(accounts[0]);
+    } catch (error) {
+      console.error('Error connecting wallet:', error);
+      alert('Failed to connect wallet. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const addChain = async () => {
+    if (typeof window.ethereum === 'undefined') {
+      alert('MetaMask is not installed.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [chainConfig]
+      });
+      setIsChainAdded(true);
+      alert('Cosmos EVM Testnet has been added to your wallet!');
+    } catch (error) {
+      console.error('Error adding chain:', error);
+      if (error.code === 4001) {
+        alert('You rejected the request to add the chain.');
+      } else {
+        alert('Failed to add chain. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const switchToChain = async () => {
+    if (typeof window.ethereum === 'undefined') return;
+
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainConfig.chainId }]
+      });
+    } catch (error) {
+      console.error('Error switching chain:', error);
+      if (error.code === 4902) {
+        await addChain();
+      }
+    }
+  };
+
+  const formatAddress = (address) => {
+    if (!address) return '';
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  // Theme-aware colors
+  const colors = {
+    background: isDarkMode
+      ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
+      : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+    border: isDarkMode ? '#334155' : '#e2e8f0',
+    cardBg: isDarkMode ? 'rgba(30, 41, 59, 0.7)' : 'rgba(255, 255, 255, 0.7)',
+    cardBorder: isDarkMode ? '#334155' : '#e2e8f0',
+    text: isDarkMode ? '#f8fafc' : '#1e293b',
+    textSecondary: isDarkMode ? '#cbd5e1' : '#64748b',
+    codeBg: isDarkMode ? '#374151' : '#f3f4f6',
+    infoBg: isDarkMode ? 'rgba(59, 130, 246, 0.1)' : '#eff6ff',
+    infoBorder: isDarkMode ? 'rgba(59, 130, 246, 0.3)' : '#bfdbfe',
+    infoText: isDarkMode ? '#93c5fd' : '#1e40af'
+  };
+
+  return (
+    <div style={{
+      background: colors.background,
+      border: `1px solid ${colors.border}`,
+      borderRadius: '1rem',
+      padding: '2rem',
+      margin: '1.5rem 0',
+      boxShadow: isDarkMode
+        ? '0 4px 6px -1px rgba(0, 0, 0, 0.3)'
+        : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+      transition: 'all 0.3s ease'
+    }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem',
+        marginBottom: '1.5rem'
+      }}>
+        <div style={{
+          background: 'linear-gradient(135deg, #4B47CA 0%, #6366f1 100%)',
+          borderRadius: '0.75rem',
+          padding: '0.75rem',
+          color: 'white',
+          fontSize: '1.5rem'
+        }}>
+          🦊
+        </div>
+        <div>
+          <h3 style={{
+            margin: '0',
+            fontSize: '1.5rem',
+            fontWeight: '700',
+            color: colors.text,
+            transition: 'color 0.3s ease'
+          }}>
+            Connect to Cosmos EVM Testnet
+          </h3>
+          <p style={{
+            margin: '0.25rem 0 0 0',
+            color: colors.textSecondary,
+            fontSize: '1rem',
+            transition: 'color 0.3s ease'
+          }}>
+            Connect your wallet and add the testnet to start building
+          </p>
+        </div>
+      </div>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: '1rem',
+        marginBottom: '1.5rem'
+      }}>
+        <div style={{
+          background: isConnected ? '#dcfce7' : '#fef3c7',
+          border: `1px solid ${isConnected ? '#16a34a' : '#f59e0b'}`,
+          borderRadius: '0.75rem',
+          padding: '1rem'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            marginBottom: '0.5rem'
+          }}>
+            <span style={{ fontSize: '1.25rem' }}>
+              {isConnected ? '✅' : '⚠️'}
+            </span>
+            <strong style={{
+              color: isConnected ? '#166534' : '#92400e',
+              fontSize: '0.9rem'
+            }}>
+              Wallet Status
+            </strong>
+          </div>
+          <p style={{
+            margin: '0',
+            fontSize: '0.85rem',
+            color: isConnected ? '#166534' : '#92400e'
+          }}>
+            {isConnected
+              ? `Connected: ${formatAddress(account)}`
+              : 'Not connected'
+            }
+          </p>
+        </div>
+
+        <div style={{
+          background: isChainAdded ? '#dcfce7' : '#fef3c7',
+          border: `1px solid ${isChainAdded ? '#16a34a' : '#f59e0b'}`,
+          borderRadius: '0.75rem',
+          padding: '1rem'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            marginBottom: '0.5rem'
+          }}>
+            <span style={{ fontSize: '1.25rem' }}>
+              {isChainAdded ? '🔗' : '⚠️'}
+            </span>
+            <strong style={{
+              color: isChainAdded ? '#166534' : '#92400e',
+              fontSize: '0.9rem'
+            }}>
+              Network Status
+            </strong>
+          </div>
+          <p style={{
+            margin: '0',
+            fontSize: '0.85rem',
+            color: isChainAdded ? '#166534' : '#92400e'
+          }}>
+            {isChainAdded
+              ? 'Cosmos EVM Testnet configured'
+              : 'Testnet not added'
+            }
+          </p>
+        </div>
+      </div>
+
+      <div style={{
+        display: 'flex',
+        gap: '1rem',
+        flexWrap: 'wrap',
+        marginBottom: '1.5rem'
+      }}>
+        <button
+          onClick={connectWallet}
+          disabled={isLoading || isConnected}
+          style={{
+            background: isConnected
+              ? '#9ca3af'
+              : 'linear-gradient(135deg, #4B47CA 0%, #6366f1 100%)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '0.75rem',
+            padding: '0.75rem 1.5rem',
+            fontSize: '0.9rem',
+            fontWeight: '600',
+            cursor: isConnected || isLoading ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s ease',
+            opacity: isLoading ? 0.7 : 1
+          }}
+        >
+          {isLoading ? '⏳ Connecting...' :
+           isConnected ? '✅ Wallet Connected' : '🔌 Connect Wallet'}
+        </button>
+
+        <button
+          onClick={isChainAdded ? switchToChain : addChain}
+          disabled={isLoading || !isConnected}
+          style={{
+            background: isChainAdded
+              ? 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+              : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '0.75rem',
+            padding: '0.75rem 1.5rem',
+            fontSize: '0.9rem',
+            fontWeight: '600',
+            cursor: isLoading || !isConnected ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s ease',
+            opacity: isLoading || !isConnected ? 0.7 : 1
+          }}
+        >
+          {isLoading ? '⏳ Processing...' :
+           isChainAdded ? '🔄 Switch to Testnet' : '➕ Add Testnet'}
+        </button>
+      </div>
+
+      <div style={{
+        padding: '1rem',
+        background: colors.cardBg,
+        borderRadius: '0.75rem',
+        border: `1px solid ${colors.cardBorder}`,
+        transition: 'all 0.3s ease'
+      }}>
+        <h4 style={{
+          margin: '0 0 0.75rem 0',
+          fontSize: '1rem',
+          fontWeight: '600',
+          color: colors.text,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          transition: 'color 0.3s ease'
+        }}>
+          📋 Network Details
+        </h4>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '0.75rem',
+          fontSize: '0.85rem'
+        }}>
+          <div>
+            <strong style={{ color: colors.textSecondary }}>Chain ID:</strong>
+            <code style={{
+              marginLeft: '0.5rem',
+              background: colors.codeBg,
+              padding: '0.125rem 0.375rem',
+              borderRadius: '0.25rem',
+              fontSize: '0.8rem',
+              color: colors.text,
+              transition: 'all 0.3s ease'
+            }}>
+              {chainConfig.chainId} (9000)
+            </code>
+          </div>
+          <div>
+            <strong style={{ color: colors.textSecondary }}>RPC URL:</strong>
+            <code style={{
+              marginLeft: '0.5rem',
+              background: colors.codeBg,
+              padding: '0.125rem 0.375rem',
+              borderRadius: '0.25rem',
+              fontSize: '0.8rem',
+              color: colors.text,
+              transition: 'all 0.3s ease'
+            }}>
+              {chainConfig.rpcUrls[0]}
+            </code>
+          </div>
+          <div>
+            <strong style={{ color: colors.textSecondary }}>Symbol:</strong>
+            <code style={{
+              marginLeft: '0.5rem',
+              background: colors.codeBg,
+              padding: '0.125rem 0.375rem',
+              borderRadius: '0.25rem',
+              fontSize: '0.8rem',
+              color: colors.text,
+              transition: 'all 0.3s ease'
+            }}>
+              TEST
+            </code>
+          </div>
+          <div>
+            <strong style={{ color: colors.textSecondary }}>Explorer:</strong>
+            <a
+              href={chainConfig.blockExplorerUrls[0]}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                marginLeft: '0.5rem',
+                color: '#4B47CA',
+                textDecoration: 'none',
+                fontSize: '0.8rem'
+              }}
+            >
+              View Explorer →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div style={{
+        marginTop: '1rem',
+        padding: '0.75rem',
+        background: colors.infoBg,
+        border: `1px solid ${colors.infoBorder}`,
+        borderRadius: '0.5rem',
+        transition: 'all 0.3s ease'
+      }}>
+        <p style={{
+          margin: '0',
+          fontSize: '0.85rem',
+          color: colors.infoText,
+          transition: 'color 0.3s ease'
+        }}>
+          💡 <strong>Need testnet tokens?</strong> Visit the{' '}
+          <a
+            href="https://faucet.cosmos.network"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: colors.infoText, fontWeight: '600' }}
+          >
+            faucet
+          </a> to get TEST tokens for development.
+        </p>
+      </div>
+    </div>
+  );
+};

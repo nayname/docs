@@ -1,24 +1,22 @@
 ---
-title: "Development Environment"
-description: "Set up your local environment for building on the Cosmos EVM."
+title: "Development Environment Setup"
+description: "A guide to setting up a local environment for Cosmos EVM development."
 ---
 
-A well-configured development environment is crucial for productivity and efficiency. This guide walks you through setting up your machine with the essential tools, IDE configurations, and best practices for Cosmos EVM development.
+This guide provides instructions for setting up a local development environment with the necessary tools and configurations for building on Cosmos EVM.
 
 ## IDE Setup
 
-### Visual Studio Code (Recommended)
+### Visual Studio Code
 
-**Visual Studio Code** provides the best development experience with extensive extension support and strong community backing.
+Visual Studio Code is recommended for its extension support.
 
 #### Essential Extensions
 
-Install these extensions for optimal Cosmos EVM development:
-
-- **Solidity by Nomic Foundation** - Syntax highlighting, code completion, and linting
-- **Go by Google** - Essential for Cosmos SDK development
-- **Prettier - Code formatter** - Automated code formatting
-- **ESLint** - JavaScript/TypeScript error detection
+- **Solidity by Nomic Foundation**: Syntax highlighting, code completion, and linting.
+- **Go by Google**: Required for Cosmos SDK development.
+- **Prettier - Code formatter**: For automated code formatting.
+- **ESLint**: For JavaScript/TypeScript error detection.
 
 #### VS Code Configuration
 
@@ -33,17 +31,6 @@ Create a `.vscode/settings.json` file in your project root:
   "solidity.compileUsingRemoteVersion": "v0.8.20+commit.a1b79de6"
 }
 ```
-
-### AI-Assisted Development
-
-<Tip>
-**GitHub Copilot** can significantly accelerate your development process by providing intelligent code suggestions based on context.
-
-**Best practices for Copilot:**
-- Keep related files open for better context
-- Write clear comments describing desired functionality
-- Use suggestions as starting points and refine as needed
-</Tip>
 
 ## Core Tooling
 
