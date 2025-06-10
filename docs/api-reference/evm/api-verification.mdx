@@ -1,0 +1,328 @@
+---
+title: "API Verification & Testing"
+description: "How to verify actual RPC method support and generate comprehensive API documentation for Cosmos EVM chains."
+---
+
+# API Verification & Testing
+
+This guide explains how to verify which JSON-RPC methods are actually supported by your Cosmos EVM chain and generate comprehensive, accurate API documentation.
+
+<Warning>
+**Important:** Cosmos EVM implementations may not support all Ethereum JSON-RPC methods. This verification process helps you document exactly what's available rather than making assumptions.
+</Warning>
+
+## Overview
+
+The verification system includes:
+
+1. **Method Discovery** - Test live endpoints to find supported methods
+2. **OpenAPI Generation** - Create comprehensive API specs with examples
+3. **Documentation Generation** - Generate interactive docs with code samples
+4. **Client SDK Generation** - Generate type-safe clients for multiple languages
+
+## Quick Start
+
+### Prerequisites
+
+```bash
+# Required tools
+pip install requests jinja2 pyyaml
+
+# Optional (for SDK generation)
+npm install -g @openapitools/openapi-generator-cli
+```
+
+### Run Complete Verification
+
+```bash
+# Start your local node
+./local_node.sh
+
+# Run complete API verification and generation
+./scripts/openapi-gen/run_complete_generation.sh
+```
+
+This will:
+- Test all standard Ethereum JSON-RPC methods
+- Generate compatibility reports
+- Create comprehensive OpenAPI specifications
+- Generate documentation pages
+- Create Postman collections for testing
+- Generate client SDKs (if openapi-generator-cli is installed)
+
+## Manual Verification
+
+### 1. Method Discovery
+
+Test which methods are actually supported:
+
+```bash
+python3 scripts/openapi-gen/method_discovery.py \
+  --rpc-url http://localhost:8545 \
+  --output docs/api-specs/compatibility_report.md \
+  --json-output docs/api-specs/method_discovery.json
+```
+
+**Output Files:**
+- `compatibility_report.md` - Human-readable compatibility report
+- `method_discovery.json` - Machine-readable test results
+
+### 2. Generate OpenAPI Specification
+
+Create comprehensive API documentation:
+
+```bash
+python3 scripts/openapi-gen/enhanced_generator.py \
+  --config scripts/openapi-gen/config.yaml \
+  --discovery docs/api-specs/method_discovery.json \
+  --output docs/api-specs/cosmos-evm-complete.json \
+  --generate-pages \
+  --pages-dir docs/api-reference/evm
+```
+
+**Output Files:**
+- `cosmos-evm-complete.json` - Complete OpenAPI 3.0 specification
+- `docs/api-reference/evm/*.mdx` - Individual method documentation pages
+
+### 3. Test Against Different Networks
+
+Test against different endpoints:
+
+```bash
+# Test mainnet
+RPC_URL="https://evm-rpc.cosmos.network" ./scripts/openapi-gen/run_complete_generation.sh
+
+# Test testnet
+RPC_URL="https://testnet-evm-rpc.cosmos.network" ./scripts/openapi-gen/run_complete_generation.sh
+```
+
+## Understanding the Results
+
+### Compatibility Report
+
+The compatibility report shows:
+
+```markdown
+# Cosmos EVM JSON-RPC Compatibility Report
+
+## Summary
+- Total Methods Tested: 35
+- Supported: 28
+- Unsupported: 7
+- Errors: 0
+
+## Supported Methods
+
+### Account Methods
+| Method | Description | Min Geth Version |
+|--------|-------------|------------------|
+| `eth_getBalance` | Get account balance | 1.9.0 |
+| `eth_getTransactionCount` | Get transaction count | 1.9.0 |
+...
+```
+
+### Method Discovery JSON
+
+The JSON output provides detailed test results:
+
+```json
+{
+  "supported": {
+    "eth_getBalance": {
+      "category": "Account",
+      "description": "Get account balance",
+      "test_params": ["0x...", "latest"],
+      "response_sample": {
+        "jsonrpc": "2.0",
+        "result": "0x1bc16d674ec80000",
+        "id": 1
+      },
+      "min_geth_version": "1.9.0"
+    }
+  },
+  "unsupported": {
+    "eth_getProof": {
+      "category": "Account",
+      "error_message": "Method not found",
+      "min_geth_version": "1.10.0"
+    }
+  }
+}
+```
+
+## Generated Documentation Features
+
+### OpenAPI Specification
+
+The generated OpenAPI spec includes:
+
+- **Complete method definitions** with request/response schemas
+- **Multi-language code examples** (curl, JavaScript, Python, Go)
+- **Interactive testing** support for documentation sites
+- **Categorized methods** for better organization
+- **Error handling** documentation
+
+### MDX Documentation Pages
+
+Each supported method gets its own documentation page with:
+
+```mdx
+---
+title: "eth_getBalance"
+description: "Returns the balance of an account at a given address"
+openapi: "POST /"
+---
+
+## Code Examples
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    curl -X POST http://localhost:8545 \
+      -H "Content-Type: application/json" \
+      -d '{"jsonrpc":"2.0","method":"eth_getBalance","params":["0x...","latest"],"id":1}'
+    ```
+  </Tab>
+
+  <Tab title="JavaScript">
+    ```javascript
+    const provider = new JsonRpcProvider('http://localhost:8545');
+    const balance = await provider.getBalance('0x...');
+    ```
+  </Tab>
+</Tabs>
+```
+
+### Client SDKs
+
+Generated SDKs provide type-safe access:
+
+```typescript
+// TypeScript client
+import { CosmosEvmApi } from 'cosmos-evm-client';
+
+const api = new CosmosEvmApi({ basePath: 'http://localhost:8545' });
+const balance = await api.ethGetBalance('0x...', 'latest');
+```
+
+```python
+# Python client
+from cosmos_evm_client import CosmosEvmApi
+
+api = CosmosEvmApi(base_url='http://localhost:8545')
+balance = api.eth_get_balance('0x...', 'latest')
+```
+
+## Integration with Documentation Sites
+
+### Mintlify Integration
+
+The generated OpenAPI spec works with Mintlify's interactive API documentation:
+
+```json
+{
+  "openapi": "/api-specs/cosmos-evm-complete.json"
+}
+```
+
+### Postman Integration
+
+Import the generated Postman collection for manual testing:
+
+1. Open Postman
+2. Import `docs/api-specs/cosmos-evm-postman.json`
+3. Set the `baseUrl` variable to your RPC endpoint
+4. Test methods interactively
+
+## Customization
+
+### Adding Custom Methods
+
+To test custom precompile methods, edit `scripts/openapi-gen/method_discovery.py`:
+
+```python
+def get_custom_test_methods() -> List[MethodTest]:
+    return [
+        MethodTest(
+            "cosmos_getValidators",
+            [],
+            "Get Cosmos validators",
+            "Cosmos"
+        ),
+        # Add more custom methods
+    ]
+```
+
+### Modifying Code Templates
+
+Edit `scripts/openapi-gen/config.yaml` to customize code examples:
+
+```yaml
+code_templates:
+  rust:
+    template: |
+      use reqwest;
+
+      async fn {function_name}({parameters}) -> Result<Value, Error> {
+          // Custom Rust template
+      }
+```
+
+## Continuous Integration
+
+Add to your CI pipeline to keep documentation in sync:
+
+```yaml
+# .github/workflows/api-docs.yml
+name: Update API Documentation
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM
+  workflow_dispatch:
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup dependencies
+        run: |
+          pip install requests jinja2 pyyaml
+          npm install -g @openapitools/openapi-generator-cli
+
+      - name: Start local node
+        run: ./local_node.sh &
+
+      - name: Wait for node
+        run: sleep 30
+
+      - name: Generate API documentation
+        run: ./scripts/openapi-gen/run_complete_generation.sh
+
+      - name: Commit changes
+        run: |
+          git config --local user.name "API Docs Bot"
+          git add docs/api-specs/ docs/api-reference/
+          git commit -m "Update API documentation" || exit 0
+          git push
+```
+
+## Best Practices
+
+### Method Testing
+
+1. **Test regularly** - Methods may change between versions
+2. **Test multiple networks** - Mainnet/testnet may have differences
+3. **Document limitations** - Note any method-specific constraints
+4. **Version tracking** - Track which go-ethereum version methods require
+
+### Documentation Maintenance
+
+1. **Keep examples current** - Update code examples when APIs change
+2. **Add context** - Explain Cosmos-specific behaviors
+3. **Link to source** - Reference implementation details where helpful
+4. **Monitor usage** - Track which methods are most commonly used
+
+This verification system ensures your API documentation accurately reflects what's actually implemented, providing developers with reliable information for building applications.

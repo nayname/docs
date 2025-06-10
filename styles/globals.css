@@ -59,75 +59,51 @@ html[data-theme="dark"] body {
 }
 
 /* === MINTLIFY HEADER/TOPBAR STYLING === */
-/* Target Mintlify's actual header elements */
-[data-testid="topbar"],
-nav[aria-label="main navigation"],
-.nx-top-bar,
-header.sticky,
-div[data-testid="navbar"] {
-  height: 56px !important;
-  min-height: 56px !important;
+/* Conservative header targeting to avoid breaking functionality */
+.mint-topbar,
+.mint-header,
+[data-mintlify="topbar"] {
   backdrop-filter: blur(12px) !important;
   border-bottom: 2px solid rgba(57, 166, 163, 0.4) !important;
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 50 !important;
 }
 
 /* Light theme header */
-html[data-theme="light"] [data-testid="topbar"],
-html[data-theme="light"] nav[aria-label="main navigation"],
-html[data-theme="light"] .nx-top-bar,
-html[data-theme="light"] header.sticky,
-html[data-theme="light"] div[data-testid="navbar"] {
+html[data-theme="light"] .mint-topbar,
+html[data-theme="light"] .mint-header,
+html[data-theme="light"] [data-mintlify="topbar"],
+html[data-theme="light"] nav.mint-nav,
+html[data-theme="light"] header.mint-header,
+html[data-theme="light"] .topbar {
   background: linear-gradient(135deg, var(--cosmos-light-mint) 0%, rgba(57, 166, 163, 0.15) 50%, rgba(171, 241, 99, 0.1) 100%) !important;
   border-bottom: 2px solid rgba(57, 166, 163, 0.5) !important;
 }
 
 /* Dark theme header */
-html[data-theme="dark"] [data-testid="topbar"],
-html[data-theme="dark"] nav[aria-label="main navigation"],
-html[data-theme="dark"] .nx-top-bar,
-html[data-theme="dark"] header.sticky,
-html[data-theme="dark"] div[data-testid="navbar"] {
+html[data-theme="dark"] .mint-topbar,
+html[data-theme="dark"] .mint-header,
+html[data-theme="dark"] [data-mintlify="topbar"],
+html[data-theme="dark"] nav.mint-nav,
+html[data-theme="dark"] header.mint-header,
+html[data-theme="dark"] .topbar {
   background: linear-gradient(135deg, var(--cosmos-space-dark) 0%, rgba(35, 30, 35, 0.95) 50%, rgba(34, 226, 168, 0.1) 100%) !important;
   border-bottom: 2px solid rgba(34, 226, 168, 0.4) !important;
 }
 
-/* === MODE TOGGLE VISIBILITY === */
-/* Ensure mode toggle is visible and styled */
-button[aria-label*="theme"],
-button[data-testid*="theme"],
-div[data-testid*="theme-toggle"],
-.theme-toggle,
-[role="button"][aria-label*="Toggle"] {
-  display: flex !important;
-  align-items: center !important;
+/* === FORCE MINTLIFY TOPBAR LINKS VISIBILITY === */
+/* Conservative topbar link targeting */
+.mint-topbar-links,
+.mint-topbar-link,
+.mint-header-links,
+.mint-header-link,
+[data-mintlify="topbar-links"],
+[data-mintlify="topbar-link"] {
   opacity: 1 !important;
   visibility: visible !important;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
-  border: 2px solid rgba(57, 166, 163, 0.4) !important;
-  border-radius: 8px !important;
-  padding: 0.5rem !important;
-  transition: all 0.2s ease !important;
-  margin: 0 0.5rem !important;
 }
 
-html[data-theme="dark"] button[aria-label*="theme"],
-html[data-theme="dark"] button[data-testid*="theme"],
-html[data-theme="dark"] div[data-testid*="theme-toggle"],
-html[data-theme="dark"] .theme-toggle,
-html[data-theme="dark"] [role="button"][aria-label*="Toggle"] {
-  background: linear-gradient(135deg, rgba(34, 226, 168, 0.15), rgba(34, 226, 168, 0.05)) !important;
-  border: 2px solid rgba(34, 226, 168, 0.4) !important;
-}
-
-/* === TOPBAR LINKS STYLING === */
-/* Style the topbar navigation links */
-nav a,
-[data-testid="topbar"] a,
-header a:not(.logo),
-.topbar-link {
+.mint-topbar-link a,
+.mint-header-link a,
+[data-mintlify="topbar-link"] a {
   color: var(--cosmos-space-dark) !important;
   font-weight: 500 !important;
   padding: 0.5rem 1rem !important;
@@ -137,41 +113,63 @@ header a:not(.logo),
   border: 1px solid transparent !important;
 }
 
-html[data-theme="light"] nav a:hover,
-html[data-theme="light"] [data-testid="topbar"] a:hover,
-html[data-theme="light"] header a:hover:not(.logo) {
+html[data-theme="light"] .mint-topbar-link a:hover,
+html[data-theme="light"] .mint-header-link a:hover {
   background: linear-gradient(135deg, rgba(57, 166, 163, 0.15), rgba(171, 241, 99, 0.1)) !important;
   color: var(--cosmos-teal) !important;
   border: 1px solid rgba(57, 166, 163, 0.3) !important;
 }
 
-html[data-theme="dark"] nav a,
-html[data-theme="dark"] [data-testid="topbar"] a,
-html[data-theme="dark"] header a:not(.logo) {
+html[data-theme="dark"] .mint-topbar-link a,
+html[data-theme="dark"] .mint-header-link a {
   color: #ffffff !important;
 }
 
-html[data-theme="dark"] nav a:hover,
-html[data-theme="dark"] [data-testid="topbar"] a:hover,
-html[data-theme="dark"] header a:hover:not(.logo) {
+html[data-theme="dark"] .mint-topbar-link a:hover,
+html[data-theme="dark"] .mint-header-link a:hover {
   background: linear-gradient(135deg, rgba(34, 226, 168, 0.15), rgba(75, 71, 202, 0.1)) !important;
   color: var(--cosmos-mint) !important;
   border: 1px solid rgba(34, 226, 168, 0.3) !important;
 }
 
+/* === MINTLIFY MODE TOGGLE VISIBILITY === */
+/* Conservative mode toggle targeting */
+.mint-mode-toggle,
+.mint-theme-toggle,
+.mint-dark-mode-toggle,
+[data-mintlify="mode-toggle"],
+[data-mintlify="theme-toggle"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html[data-theme="dark"] .mint-mode-toggle,
+html[data-theme="dark"] .mint-theme-toggle,
+html[data-theme="dark"] .mint-dark-mode-toggle,
+html[data-theme="dark"] [data-mintlify="mode-toggle"],
+html[data-theme="dark"] [data-mintlify="theme-toggle"],
+html[data-theme="dark"] button[aria-label*="toggle" i],
+html[data-theme="dark"] button[aria-label*="theme" i] {
+  background: linear-gradient(135deg, rgba(34, 226, 168, 0.15), rgba(34, 226, 168, 0.05)) !important;
+  border: 2px solid rgba(34, 226, 168, 0.4) !important;
+}
+
 /* === MAIN CONTENT AREA === */
 main,
 article,
-.nx-content,
-[data-testid="main-content"] {
+.mint-content,
+[data-mintlify="main-content"] {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
 /* Light theme content */
 html[data-theme="light"] main,
 html[data-theme="light"] article,
-html[data-theme="light"] .nx-content,
-html[data-theme="light"] [data-testid="main-content"] {
+html[data-theme="light"] .mint-content,
+html[data-theme="light"] [data-mintlify="main-content"] {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(222, 238, 226, 0.3) 100%) !important;
   backdrop-filter: blur(10px) !important;
   border-radius: 12px !important;
@@ -183,8 +181,8 @@ html[data-theme="light"] [data-testid="main-content"] {
 /* Dark theme content */
 html[data-theme="dark"] main,
 html[data-theme="dark"] article,
-html[data-theme="dark"] .nx-content,
-html[data-theme="dark"] [data-testid="main-content"] {
+html[data-theme="dark"] .mint-content,
+html[data-theme="dark"] [data-mintlify="main-content"] {
   background: linear-gradient(135deg, rgba(35, 30, 35, 0.9) 0%, rgba(16, 20, 25, 0.8) 100%) !important;
   backdrop-filter: blur(10px) !important;
   border-radius: 12px !important;
@@ -195,36 +193,32 @@ html[data-theme="dark"] [data-testid="main-content"] {
 
 /* === SIDEBAR STYLING === */
 aside,
-nav[aria-label="sidebar"],
-.nx-sidebar,
-[data-testid="sidebar"] {
+.mint-sidebar,
+[data-mintlify="sidebar"] {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
   backdrop-filter: blur(8px) !important;
 }
 
 /* Light theme sidebar */
 html[data-theme="light"] aside,
-html[data-theme="light"] nav[aria-label="sidebar"],
-html[data-theme="light"] .nx-sidebar,
-html[data-theme="light"] [data-testid="sidebar"] {
+html[data-theme="light"] .mint-sidebar,
+html[data-theme="light"] [data-mintlify="sidebar"] {
   background: linear-gradient(to bottom, rgba(222, 238, 226, 0.4), rgba(255, 255, 255, 0.9)) !important;
   border-right: 2px solid rgba(57, 166, 163, 0.3) !important;
 }
 
 /* Dark theme sidebar */
 html[data-theme="dark"] aside,
-html[data-theme="dark"] nav[aria-label="sidebar"],
-html[data-theme="dark"] .nx-sidebar,
-html[data-theme="dark"] [data-testid="sidebar"] {
+html[data-theme="dark"] .mint-sidebar,
+html[data-theme="dark"] [data-mintlify="sidebar"] {
   background: linear-gradient(to bottom, rgba(35, 30, 35, 0.8), rgba(16, 20, 25, 0.9)) !important;
   border-right: 2px solid rgba(34, 226, 168, 0.3) !important;
 }
 
 /* === NAVIGATION LINKS === */
 aside a,
-nav[aria-label="sidebar"] a,
-.nx-sidebar a,
-[data-testid="sidebar"] a {
+.mint-sidebar a,
+[data-mintlify="sidebar"] a {
   font-weight: 500 !important;
   padding: 0.75rem 1rem !important;
   border-radius: 8px !important;
@@ -237,16 +231,14 @@ nav[aria-label="sidebar"] a,
 
 /* Light theme navigation links */
 html[data-theme="light"] aside a,
-html[data-theme="light"] nav[aria-label="sidebar"] a,
-html[data-theme="light"] .nx-sidebar a,
-html[data-theme="light"] [data-testid="sidebar"] a {
+html[data-theme="light"] .mint-sidebar a,
+html[data-theme="light"] [data-mintlify="sidebar"] a {
   color: #64748b !important;
 }
 
 html[data-theme="light"] aside a:hover,
-html[data-theme="light"] nav[aria-label="sidebar"] a:hover,
-html[data-theme="light"] .nx-sidebar a:hover,
-html[data-theme="light"] [data-testid="sidebar"] a:hover {
+html[data-theme="light"] .mint-sidebar a:hover,
+html[data-theme="light"] [data-mintlify="sidebar"] a:hover {
   background: linear-gradient(135deg, rgba(57, 166, 163, 0.15), rgba(171, 241, 99, 0.1)) !important;
   color: var(--cosmos-teal) !important;
   transform: translateX(4px) !important;
@@ -255,10 +247,8 @@ html[data-theme="light"] [data-testid="sidebar"] a:hover {
 
 html[data-theme="light"] aside a[aria-current="page"],
 html[data-theme="light"] aside a.active,
-html[data-theme="light"] nav[aria-label="sidebar"] a[aria-current="page"],
-html[data-theme="light"] nav[aria-label="sidebar"] a.active,
-html[data-theme="light"] .nx-sidebar a[aria-current="page"],
-html[data-theme="light"] .nx-sidebar a.active {
+html[data-theme="light"] .mint-sidebar a[aria-current="page"],
+html[data-theme="light"] .mint-sidebar a.active {
   background: linear-gradient(135deg, var(--cosmos-teal), var(--cosmos-bright-green)) !important;
   color: white !important;
   font-weight: 600 !important;
@@ -267,16 +257,14 @@ html[data-theme="light"] .nx-sidebar a.active {
 
 /* Dark theme navigation links */
 html[data-theme="dark"] aside a,
-html[data-theme="dark"] nav[aria-label="sidebar"] a,
-html[data-theme="dark"] .nx-sidebar a,
-html[data-theme="dark"] [data-testid="sidebar"] a {
+html[data-theme="dark"] .mint-sidebar a,
+html[data-theme="dark"] [data-mintlify="sidebar"] a {
   color: #cbd5e1 !important;
 }
 
 html[data-theme="dark"] aside a:hover,
-html[data-theme="dark"] nav[aria-label="sidebar"] a:hover,
-html[data-theme="dark"] .nx-sidebar a:hover,
-html[data-theme="dark"] [data-testid="sidebar"] a:hover {
+html[data-theme="dark"] .mint-sidebar a:hover,
+html[data-theme="dark"] [data-mintlify="sidebar"] a:hover {
   background: linear-gradient(135deg, rgba(34, 226, 168, 0.15), rgba(75, 71, 202, 0.1)) !important;
   color: var(--cosmos-mint) !important;
   transform: translateX(4px) !important;
@@ -285,10 +273,8 @@ html[data-theme="dark"] [data-testid="sidebar"] a:hover {
 
 html[data-theme="dark"] aside a[aria-current="page"],
 html[data-theme="dark"] aside a.active,
-html[data-theme="dark"] nav[aria-label="sidebar"] a[aria-current="page"],
-html[data-theme="dark"] nav[aria-label="sidebar"] a.active,
-html[data-theme="dark"] .nx-sidebar a[aria-current="page"],
-html[data-theme="dark"] .nx-sidebar a.active {
+html[data-theme="dark"] .mint-sidebar a[aria-current="page"],
+html[data-theme="dark"] .mint-sidebar a.active {
   background: linear-gradient(135deg, var(--cosmos-mint), var(--cosmos-cyan)) !important;
   color: var(--cosmos-space-dark) !important;
   font-weight: 600 !important;
@@ -549,7 +535,7 @@ html[data-theme="dark"] .bg-gradient-to-br.from-emerald-500.to-cyan-500 {
 }
 
 /* === MODERN VISUAL ENHANCEMENTS === */
-/* Block shadows and highlights for modern design */
+/* Subtle highlights for modern design */
 .group:hover {
   transform: translateY(-2px) !important;
   transition: transform 0.2s ease !important;
@@ -602,7 +588,7 @@ html[data-theme="dark"] [data-state="active"]::after {
   }
 }
 
-/* === LONG SHADOW ALTERNATIVES === */
+/* === ENHANCED BLOCK SHADOWS === */
 /* Subtle long shadow effect for elevated elements */
 .elevated-element {
   position: relative !important;
@@ -628,21 +614,102 @@ html[data-theme="dark"] .elevated-element::before {
   background: linear-gradient(135deg, rgba(34, 226, 168, 0.2), rgba(75, 71, 202, 0.1)) !important;
 }
 
-/* === FORCE VISIBILITY FOR MINTLIFY ELEMENTS === */
-/* Ensure mode toggle and topbar elements are visible */
-[data-testid*="theme"],
-[aria-label*="theme"],
-button[title*="theme"],
-button[aria-label*="Toggle"],
-.theme-button {
+/* === MINTLIFY SPECIFIC OVERRIDES === */
+/* Force all Mintlify UI elements to be visible */
+[class*="mint-"],
+[data-mintlify],
+.mintlify-topbar,
+.mintlify-header {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Mintlify theme toggle specific targeting */
+button[data-theme-toggle],
+button[data-mode-toggle],
+.theme-toggle-button {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* === ADDITIONAL MINTLIFY TARGETING === */
+/* More aggressive targeting for Mintlify UI elements */
+header,
+nav,
+.topbar,
+[data-testid*="topbar"],
+[data-testid*="header"],
+[data-testid*="navbar"],
+[class*="topbar"],
+[class*="header"],
+[class*="navbar"] {
   opacity: 1 !important;
   visibility: visible !important;
   display: flex !important;
+  height: auto !important;
+  min-height: 48px !important;
+}
+
+/* Force topbar links to be visible */
+header a,
+nav a,
+.topbar a,
+[data-testid*="topbar"] a,
+[data-testid*="header"] a,
+[data-testid*="navbar"] a,
+[class*="topbar"] a,
+[class*="header"] a,
+[class*="navbar"] a {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0.5rem 1rem !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Force all possible mode toggle selectors */
+button,
+[role="button"],
+[data-testid*="theme"],
+[data-testid*="mode"],
+[data-testid*="toggle"],
+[class*="theme"],
+[class*="mode"],
+[class*="toggle"],
+[aria-label*="theme" i],
+[aria-label*="mode" i],
+[aria-label*="toggle" i],
+[title*="theme" i],
+[title*="mode" i],
+[title*="toggle" i] {
+  opacity: 1 !important;
+  visibility: visible !important;
   pointer-events: auto !important;
 }
 
-/* Override any hidden states */
-.hidden[data-testid*="theme"],
-.hidden[aria-label*="theme"] {
+/* Ensure no elements are hidden */
+.hidden[class*="theme"],
+.hidden[class*="mode"],
+.hidden[class*="toggle"],
+[style*="display: none"][class*="theme"],
+[style*="display: none"][class*="mode"],
+[style*="display: none"][class*="toggle"] {
   display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
+
+/* Global visibility override for key UI elements */
+[class*="mint"],
+[id*="mint"],
+[data-mint],
+[data-mintlify] {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* === CONSERVATIVE MINTLIFY OVERRIDES === */
+/* Only target very specific elements to avoid breaking functionality */
