@@ -9,23 +9,15 @@ Integrating Cosmos EVM into your chain unlocks Ethereum compatibility while main
 
 Cosmos EVM integration involves importing three main modules into your Cosmos SDK application:
 
-<CardGroup cols={3}>
-  <Card title="x/vm Module" icon="cpu">
-    Core EVM implementation providing Ethereum compatibility
-  </Card>
-  <Card title="x/feemarket Module" icon="credit-card">
-    EIP-1559 fee market mechanism for dynamic pricing
-  </Card>
-  <Card title="x/erc20 Module" icon="coins">
-    Token unification between Cosmos SDK coins and ERC-20
-  </Card>
-</CardGroup>
+**x/vm Module** - Core EVM implementation providing Ethereum compatibility
+
+**x/feemarket Module** - EIP-1559 fee market mechanism for dynamic pricing
+
+**x/erc20 Module** - Token unification between Cosmos SDK coins and ERC-20
 
 ### Optional Module
 
-<Card title="x/precisebank Module" icon="precision">
-  **Optional:** Extends bank module precision from 6 to 18 decimals for EVM compatibility. This module serves as a wrapper around x/bank to provide the 18-decimal precision expected by EVM applications while preserving existing Cosmos SDK behavior.
-</Card>
+**x/precisebank Module** - Extends bank module precision from 6 to 18 decimals for EVM compatibility. This module serves as a wrapper around x/bank to provide the 18-decimal precision expected by EVM applications while preserving existing Cosmos SDK behavior.
 
 ### When to Integrate
 

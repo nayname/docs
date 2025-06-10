@@ -53,7 +53,7 @@
         "pages": [
           "docs/evm/index",
           {
-            "group": "Introduction",
+            "group": "Overview",
             "isCollapsible": true,
             "pages": [
               "docs/evm/why-cosmos-evm",
@@ -172,7 +172,7 @@
     "prompt": "Search Cosmos docs..."
   },
   "modeToggle": {
-    "default": "light",
+    "default": "system",
     "isHidden": false
   },
   "api": {

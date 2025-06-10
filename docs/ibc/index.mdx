@@ -1,47 +1,96 @@
 ---
 title: "Inter-Blockchain Communication (IBC)"
 description: "Learn about IBC protocol implementation and cross-chain communication in the Cosmos ecosystem."
+mode: "wide"
 ---
 
-The Inter-Blockchain Communication (IBC) protocol enables secure and reliable communication between independent blockchains in the Cosmos ecosystem.
+# Inter-Blockchain Communication (IBC)
 
-## Overview
+The IBC protocol enables secure and reliable communication between independent blockchains in the Cosmos ecosystem. Build truly interoperable applications that work across chains.
 
-IBC is a protocol that allows blockchains to communicate with each other in a trustless way. It enables:
+## What IBC Enables
 
-- **Token transfers** between chains
-- **Data packets** and arbitrary message passing
-- **Cross-chain smart contract calls**
-- **Interchain accounts** for remote chain control
+IBC is a protocol that allows blockchains to communicate with each other in a trustless way:
 
 <CardGroup cols={2}>
-  <Card title="IBC Protocol Specification" icon="file-text">
-    Technical specification and implementation details of the IBC protocol
+  <Card title="Token Transfers" icon="arrow-right-left">
+    Send and receive tokens between any IBC-enabled chains with cryptographic security guarantees.
   </Card>
-  <Card title="Cross-Chain Development" icon="link">
-    Build applications that leverage IBC for cross-chain functionality
+  <Card title="Data Packets" icon="package">
+    Pass arbitrary messages and data between chains for complex cross-chain application logic.
+  </Card>
+  <Card title="Smart Contract Calls" icon="code">
+    Execute smart contract functions on remote chains directly from your application or contract.
+  </Card>
+  <Card title="Interchain Accounts" icon="user">
+    Control accounts on remote chains for advanced cross-chain governance and DeFi applications.
   </Card>
 </CardGroup>
 
 ## Key Concepts
 
-### Channels and Connections
-IBC uses a layered architecture with channels built on top of connections:
+Understanding IBC's layered architecture:
 
-- **Connections**: Establish identity verification between chains
-- **Channels**: Enable application-specific communication protocols
-- **Packets**: Carry data and prove delivery between chains
+<CardGroup cols={2}>
+  <Card title="Connections & Channels" icon="link">
+    **Connections** establish identity verification between chains.
+    **Channels** enable application-specific communication protocols built on connections.
+  </Card>
+  <Card title="Packets & Proofs" icon="shield">
+    **Packets** carry data between chains with delivery guarantees.
+    **Proofs** provide cryptographic verification of packet delivery and state changes.
+  </Card>
+</CardGroup>
 
-### Relayers
-Relayers are off-chain processes that facilitate IBC communication by:
-- Monitoring for packets on source chains
-- Submitting proofs to destination chains
-- Handling timeouts and acknowledgments
+## Relayers
 
-## Next Steps
+Relayers are off-chain processes that facilitate IBC communication:
 
-For hands-on IBC development with smart contracts, explore the IBC precompile:
+<CardGroup cols={3}>
+  <Card title="Monitoring" icon="eye">
+    Continuously watch for new packets and state changes on connected blockchains.
+  </Card>
+  <Card title="Proof Submission" icon="upload">
+    Submit cryptographic proofs to destination chains to complete packet delivery.
+  </Card>
+  <Card title="Timeout Handling" icon="clock">
+    Handle packet timeouts and acknowledgments to ensure reliable communication.
+  </Card>
+</CardGroup>
 
-<Card title="IBC Precompile Guide" href="/docs/evm/developers/precompiles/ibc">
-  Learn how to use IBC functionality directly from Solidity contracts
+## Development Resources
+
+Get started building with IBC:
+
+<CardGroup cols={2}>
+  <Card title="IBC Protocol Specification" icon="file-text">
+    Technical specification and implementation details of the IBC protocol for developers.
+    <a href="https://github.com/cosmos/ibc">View Specification →</a>
+  </Card>
+  <Card title="Cross-Chain Development" icon="wrench">
+    Build applications that leverage IBC for cross-chain functionality with practical guides.
+    <a href="https://ibc.cosmos.network/">Start Building →</a>
+  </Card>
+</CardGroup>
+
+## IBC with Smart Contracts
+
+Use IBC functionality directly from Solidity contracts:
+
+<Card title="IBC Precompile Guide" icon="zap">
+  Learn how to use IBC functionality directly from Solidity smart contracts with the IBC precompile module.
+  <a href="/docs/evm/developers/precompiles/ibc">Explore IBC Precompile →</a>
 </Card>
+
+## Community & Support
+
+<CardGroup cols={2}>
+  <Card title="IBC GitHub" icon="github">
+    Source code, protocol specifications, and implementation examples for IBC.
+    <a href="https://github.com/cosmos/ibc">View GitHub →</a>
+  </Card>
+  <Card title="IBC Working Group" icon="message-circle">
+    Join the IBC working group discussions and contribute to protocol development.
+    <a href="https://discord.gg/cosmosnetwork">Join Discord →</a>
+  </Card>
+</CardGroup>

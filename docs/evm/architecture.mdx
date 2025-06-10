@@ -11,23 +11,17 @@ Before diving into architecture details, developers migrating from Ethereum must
 
 ### 1. Consensus and Finality
 
-<CardGroup cols={2}>
-  <Card title="Ethereum" icon="ethereum">
-    **Probabilistic Finality**
-    - ~12 second block times
-    - 12+ block confirmations recommended
-    - Risk of chain reorganizations
-    - MEV extraction opportunities
-  </Card>
+**Ethereum - Probabilistic Finality:**
+- ~12 second block times
+- 12+ block confirmations recommended
+- Risk of chain reorganizations
+- MEV extraction opportunities
 
-  <Card title="Cosmos EVM" icon="atom">
-    **Instant Finality**
-    - ~1-2 second block times
-    - Immediate finality (no reorgs)
-    - Different MEV landscape
-    - Tendermint consensus guarantees
-  </Card>
-</CardGroup>
+**Cosmos EVM - Instant Finality:**
+- ~1-2 second block times
+- Immediate finality (no reorgs)
+- Different MEV landscape
+- Tendermint consensus guarantees
 
 **Impact on Smart Contracts:**
 ```solidity

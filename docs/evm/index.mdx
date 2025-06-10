@@ -1,43 +1,31 @@
 ---
 title: "Introduction to Cosmos EVM"
 description: "Discover Cosmos EVM, the Ethereum-compatible execution environment built for the sovereign, interoperable Cosmos ecosystem."
+mode: "wide"
 ---
 
 # Introduction to Cosmos EVM
 
-Welcome to Cosmos EVM, a high-performance execution environment that brings the familiar Ethereum development experience to the modular and interconnected Cosmos ecosystem.
+Discover Cosmos EVM, a high-performance execution environment that brings the familiar Ethereum development experience to the modular and interconnected Cosmos ecosystem.
 
 ## Choose Your Path
 
 Select your background to get started with the most relevant resources:
 
 <CardGroup cols={3}>
-  <Card
-    title="EVM Developers"
-    icon="ethereum"
-    href="/docs/evm/developers"
-  >
-    Migrate from Ethereum with your existing Solidity skills.
+  <Card title="EVM Developers" icon="zap">
+    A quick guide to getting started and building on Cosmos EVM.
+    <a href="/docs/evm/developers">Get Started →</a>
   </Card>
-
-  <Card
-    title="Cosmos Developers"
-    icon="atom"
-    href="/docs/evm/developers/cosmos-comparisons"
-  >
+  <Card title="Cosmos Developers" icon="puzzle-piece">
     Add smart contracts to your Cosmos SDK toolkit.
+    <a href="/docs/evm/developers/cosmos-comparisons">Learn More →</a>
   </Card>
-
-  <Card
-    title="Infrastructure Teams"
-    icon="building"
-    href="/docs/evm/developers/chain-integration"
-  >
-    Integrate EVM into new or existing chains.
+  <Card title="Infrastructure Teams" icon="server">
+    Spin up your own RPC nodes or local testnet.
+    <a href="/docs/evm/developers/chain-integration">Setup Guide →</a>
   </Card>
 </CardGroup>
-
----
 
 ## Quick Start
 
@@ -45,22 +33,24 @@ Get up and running in minutes:
 
 ### Connect to Testnet
 
-**Network Details:**
-- **RPC Endpoint:** `https://testnet-evm.cosmos.network`
-- **Chain ID:** `cosmos_9000-1`
-- **Block Explorer:** `https://explorer.cosmos.network/evm`
-- **Faucet:** `https://faucet.cosmos.network`
+<Info>
+**RPC Endpoint:** `https://testnet-evm.cosmos.network`
+**Chain ID:** `cosmos_9000-1`
+**Block Explorer:** `https://explorer.cosmos.network/evm`
+**Faucet:** `https://faucet.cosmos.network`
+</Info>
 
-**MetaMask Setup:**
-```javascript
+### MetaMask Setup
+
+```json
 {
-  chainId: "0x2328", // 9000 in hex
-  chainName: "Cosmos EVM Testnet",
-  rpcUrls: ["https://testnet-evm.cosmos.network"],
-  nativeCurrency: {
-    name: "TEST",
-    symbol: "TEST",
-    decimals: 18
+  "chainId": "0x2328",
+  "chainName": "Cosmos EVM Testnet",
+  "rpcUrls": ["https://testnet-evm.cosmos.network"],
+  "nativeCurrency": {
+    "name": "TEST",
+    "symbol": "TEST",
+    "decimals": 18
   }
 }
 ```
@@ -68,134 +58,129 @@ Get up and running in minutes:
 ### Deploy Your First Contract
 
 <CardGroup cols={2}>
-  <Card title="Foundry Guide" icon="hammer" href="/docs/evm/developers/tooling-and-resources/foundry-guide">
+  <Card title="Foundry Guide" icon="hammer">
     Use Foundry for fast, efficient smart contract development and deployment.
+    <a href="/docs/evm/developers/tooling-and-resources/foundry-guide">Setup Foundry →</a>
   </Card>
-
-  <Card title="Hardhat Integration" icon="wrench" href="/docs/evm/developers/tooling-and-resources/hardhat-guide">
+  <Card title="Hardhat Integration" icon="wrench">
     Set up Hardhat for familiar development workflows and testing.
+    <a href="/docs/evm/developers/tooling-and-resources/hardhat-guide">Setup Hardhat →</a>
   </Card>
 </CardGroup>
-
----
 
 ## Learning Paths
 
 Choose your journey based on your experience:
 
-### Path 1: EVM Migration Journey
+### EVM Migration Journey
 **Perfect for:** Ethereum developers migrating to Cosmos EVM
 
 <CardGroup cols={2}>
-  <Card title="1. Understanding the Platform" icon="lightbulb" href="/docs/evm/why-cosmos-evm">
-    **Key differences and advantages** over Ethereum L2s: sovereignty, instant finality, native IBC, and lower costs.
+  <Card title="Understanding the Platform" icon="lightbulb">
+    Key differences and advantages over Ethereum L2s: sovereignty, instant finality, native IBC, and lower costs.
+    <a href="/docs/evm/why-cosmos-evm">Learn Differences →</a>
   </Card>
-
-  <Card title="2. Quick Migration Guide" icon="rocket" href="/docs/evm/developers/ethereum-migration">
-    **Port existing contracts** in under 30 minutes with step-by-step migration instructions.
+  <Card title="Quick Migration Guide" icon="rocket">
+    Port existing contracts in under 30 minutes with step-by-step migration instructions.
+    <a href="/docs/evm/developers/ethereum-migration">Start Migration →</a>
   </Card>
-
-  <Card title="3. Precompiled Contracts" icon="box" href="/docs/evm/developers/precompiles">
-    **Access native Cosmos features** from Solidity: staking, governance, IBC transfers, and distribution.
+  <Card title="Precompiled Contracts" icon="zap">
+    Access native Cosmos features from Solidity: staking, governance, IBC transfers, and distribution.
+    <a href="/docs/evm/developers/precompiles">Explore Precompiles →</a>
   </Card>
-
-  <Card title="4. Cross-Chain Integration" icon="link" href="/docs/evm/developers/ibc-integration">
-    **Build truly interoperable applications** that communicate across the Cosmos ecosystem.
+  <Card title="Cross-Chain Integration" icon="link">
+    Build truly interoperable applications that communicate across the Cosmos ecosystem.
+    <a href="/docs/evm/developers/ibc-integration">Build Cross-Chain →</a>
   </Card>
 </CardGroup>
 
-### Path 2: Cosmos Developer Journey
+### Cosmos Developer Journey
 **Perfect for:** Cosmos SDK developers learning smart contracts
 
 <CardGroup cols={2}>
-  <Card title="1. Smart Contract Fundamentals" icon="code" href="/docs/evm/developers/solidity-basics">
-    **Learn Solidity from a Cosmos perspective** with familiar concepts and patterns.
+  <Card title="Smart Contract Fundamentals" icon="book">
+    Learn Solidity from a Cosmos perspective with familiar concepts and patterns.
+    <a href="/docs/evm/developers/solidity-basics">Learn Solidity →</a>
   </Card>
-
-  <Card title="2. Development Environment" icon="settings" href="/docs/evm/developers/development-environment">
-    **Set up your workspace for success** with VS Code, Solidity extensions, and testing frameworks.
+  <Card title="Development Environment" icon="code">
+    Set up your workspace for success with VS Code, Solidity extensions, and testing frameworks.
+    <a href="/docs/evm/developers/development-environment">Setup Environment →</a>
   </Card>
-
-  <Card title="3. Testing & Security" icon="shield" href="/docs/evm/developers/testing-guide">
-    **Master smart contract security patterns** and learn property-based testing with Foundry.
+  <Card title="Testing & Security" icon="shield">
+    Master smart contract security patterns and learn property-based testing with Foundry.
+    <a href="/docs/evm/developers/testing-guide">Learn Testing →</a>
   </Card>
-
-  <Card title="4. Integration Patterns" icon="puzzle-piece" href="/docs/evm/developers/cosmos-integration">
-    **Combine smart contracts with native modules** for powerful hybrid applications.
+  <Card title="Integration Patterns" icon="puzzle-piece">
+    Combine smart contracts with native modules for powerful hybrid applications.
+    <a href="/docs/evm/developers/cosmos-integration">Build Integration →</a>
   </Card>
 </CardGroup>
 
-### Path 3: Infrastructure Implementation
+### Infrastructure Implementation
 **Perfect for:** Teams launching or upgrading chains
 
 <CardGroup cols={2}>
-  <Card title="1. Planning Guide" icon="clipboard-list" href="/docs/evm/developers/implementation-planning">
-    **Technical requirements and timelines** for successful EVM integration projects.
+  <Card title="Planning Guide" icon="calendar">
+    Technical requirements and timelines for successful EVM integration projects.
+    <a href="/docs/evm/developers/implementation-planning">Plan Implementation →</a>
   </Card>
-
-  <Card title="2. Integration Steps" icon="cog" href="/docs/evm/developers/chain-integration">
-    **Complete implementation guide** with Go code examples and configuration templates.
+  <Card title="Integration Steps" icon="cog">
+    Complete implementation guide with Go code examples and configuration templates.
+    <a href="/docs/evm/developers/chain-integration">Start Integration →</a>
   </Card>
-
-  <Card title="3. Production Setup" icon="server" href="/docs/evm/developers/production-deployment">
-    **Infrastructure and monitoring** requirements for mainnet deployment.
+  <Card title="Production Setup" icon="server">
+    Infrastructure and monitoring requirements for mainnet deployment.
+    <a href="/docs/evm/developers/production-deployment">Setup Production →</a>
   </Card>
-
-  <Card title="4. Launch Checklist" icon="check-circle" href="/docs/evm/developers/launch-guide">
-    **Go-live preparation** and post-launch operations for successful chain launches.
+  <Card title="Launch Checklist" icon="check-circle">
+    Go-live preparation and post-launch operations for successful chain launches.
+    <a href="/docs/evm/developers/launch-guide">Launch Guide →</a>
   </Card>
 </CardGroup>
-
----
 
 ## Key Features
 
 <CardGroup cols={2}>
   <Card title="Instant Finality" icon="zap">
-    **1-5 second block times** with no chain reorganizations. Your transactions are final immediately.
+    1-5 second block times with no chain reorganizations. Your transactions are final immediately.
   </Card>
-
-  <Card title="Native IBC" icon="globe">
-    **Cross-chain by default.** Send tokens and data to any IBC-enabled chain directly from smart contracts.
+  <Card title="Native IBC" icon="link">
+    Cross-chain by default. Send tokens and data to any IBC-enabled chain directly from smart contracts.
   </Card>
-
   <Card title="Lower Costs" icon="dollar-sign">
-    **10-100x cheaper** than Ethereum with configurable gas limits and dynamic fee markets.
+    10-100x cheaper than Ethereum with configurable gas limits and dynamic fee markets.
   </Card>
-
-  <Card title="Full EVM Compatibility" icon="cpu">
-    **Deploy unchanged.** Your existing Ethereum contracts and tools work out of the box.
+  <Card title="Full EVM Compatibility" icon="check">
+    Deploy unchanged. Your existing Ethereum contracts and tools work out of the box.
   </Card>
 </CardGroup>
-
----
 
 ## Essential Resources
 
 <CardGroup cols={3}>
-  <Card title="API Reference" icon="book-open" href="/docs/api-reference/evm">
+  <Card title="API Reference" icon="book">
     Complete JSON-RPC documentation and configuration options.
+    <a href="/docs/api-reference/evm">View API Docs →</a>
   </Card>
-
-  <Card title="EVM Opcode Sandbox" icon="terminal" href="/docs/evm/developers/evm-opcode-sandbox">
+  <Card title="EVM Opcode Sandbox" icon="play">
     Interactive EVM simulator for learning and debugging.
+    <a href="/docs/evm/developers/evm-opcode-sandbox">Try Sandbox →</a>
   </Card>
-
-  <Card title="Contract Examples" icon="file-code" href="/docs/evm/developers/smart-contracts">
+  <Card title="Contract Examples" icon="file-code">
     Production-ready contracts using Cosmos-specific features.
+    <a href="/docs/evm/developers/smart-contracts">View Examples →</a>
   </Card>
 </CardGroup>
-
----
 
 ## Community & Support
 
 <CardGroup cols={2}>
-  <Card title="Developer Discord" icon="message-circle" href="https://discord.gg/cosmosnetwork">
+  <Card title="Developer Discord" icon="message-circle">
     Join discussions with other Cosmos EVM developers and get real-time help.
+    <a href="https://discord.gg/cosmosnetwork">Join Discord →</a>
   </Card>
-
-  <Card title="GitHub Repository" icon="github" href="https://github.com/cosmos/evm">
+  <Card title="GitHub Repository" icon="github">
     Source code, issues, and contribution guidelines for the project.
+    <a href="https://github.com/cosmos/evm">View GitHub →</a>
   </Card>
 </CardGroup>

@@ -11,14 +11,9 @@ Cosmos EVM provides forward-compatible Ethereum Virtual Machine support within t
 
 ### Core Philosophy
 
-<CardGroup cols={2}>
-  <Card title="Familiar for Ethereum Devs" icon="ethereum">
-    Deploy existing Solidity contracts unchanged. Use MetaMask, Hardhat, Foundry - all your familiar tools work.
-  </Card>
-  <Card title="Extended for Cosmos" icon="atom">
-    Access IBC transfers, custom governance, and native Cosmos modules directly from your smart contracts.
-  </Card>
-</CardGroup>
+**Familiar for Ethereum Developers:** Deploy existing Solidity contracts unchanged. Use MetaMask, Hardhat, Foundry - all your familiar tools work without modification.
+
+**Extended for Cosmos:** Access IBC transfers, custom governance, and native Cosmos modules directly from your smart contracts, unlocking new possibilities beyond standard Ethereum.
 
 ## Key Capabilities
 
@@ -154,18 +149,15 @@ Cosmos EVM consists of three core modules working together:
 
 ### 1. Sovereign Consensus
 
-**Benefit:** Unlike Ethereum L2s, you control your own consensus mechanism.
-
-**Practical Impact:**
+Unlike Ethereum L2s, you control your own consensus mechanism with practical benefits:
 - Custom block times (1-2 seconds vs. Ethereum's 12+ seconds)
 - No dependency on Ethereum's security assumptions
 - Custom validator sets and governance
 
 ### 2. Customizable Features
 
-**Permissioned Deployment:**
+**Permissioned Deployment:** Governance can restrict contract deployment to specific addresses:
 ```go
-// Governance can restrict contract deployment
 params := types.Params{
     EnableCreate: true,
     EnableCall:   true,
@@ -173,25 +165,21 @@ params := types.Params{
 }
 ```
 
-**Custom Opcodes:**
-Add new EVM opcodes for chain-specific functionality beyond standard Ethereum.
+**Custom Opcodes:** Add new EVM opcodes for chain-specific functionality beyond standard Ethereum.
 
 ### 3. Best of Both Ecosystems
 
-<CardGroup cols={2}>
-  <Card title="From Ethereum" icon="ethereum">
-    - Mature smart contract libraries (OpenZeppelin)
-    - Extensive auditing ecosystem
-    - Proven DeFi patterns and protocols
-    - Rich developer tooling
-  </Card>
-  <Card title="From Cosmos" icon="atom">
-    - Inter-blockchain communication (IBC)
-    - Custom governance mechanisms
-    - Modular architecture
-    - Proof-of-Stake consensus
-  </Card>
-</CardGroup>
+**From Ethereum:**
+- Mature smart contract libraries (OpenZeppelin)
+- Extensive auditing ecosystem
+- Proven DeFi patterns and protocols
+- Rich developer tooling
+
+**From Cosmos:**
+- Inter-blockchain communication (IBC)
+- Custom governance mechanisms
+- Modular architecture
+- Proof-of-Stake consensus
 
 ## What You Can Build
 

@@ -7,225 +7,258 @@ Cosmos EVM sits at the intersection of two major blockchain ecosystems. Before d
 
 ## The Decision Matrix
 
-<CardGroup cols={2}>
-  <Card title="Coming from Ethereum?" icon="ethereum">
-    You are looking to expand your existing EVM protocol to a new custom sovereign chain with enhanced performance and interoperability.
-  </Card>
-  <Card title="Coming from Cosmos?" icon="atom">
-    You want to tap into Ethereum's vast developer ecosystem, mature tooling, and battle-tested smart contract patterns while retaining the modularity and sovereignty of the Cosmos SDK.
-  </Card>
-</CardGroup>
+**Coming from Ethereum?** You are looking to expand your existing EVM protocol to a new custom sovereign chain with enhanced performance and interoperability.
+
+**Coming from Cosmos?** You want to tap into Ethereum's vast developer ecosystem, mature tooling, and battle-tested smart contract patterns while retaining the modularity and sovereignty of the Cosmos SDK.
+
+## Critical Technical Differences from Standard EVM
+
+Understanding these fundamental differences is essential for developers migrating from Ethereum mainnet or L2s to Cosmos EVM.
+
+### Transaction Ordering and Mempool Behavior
+
+**Ethereum Mainnet/L2s:**
+- Transactions are ordered by gas price and nonce in the mempool
+- Miners/sequencers can reorder transactions for MEV extraction
+- Multiple transactions per block per EOA are supported
+- App-side mempool handles transaction ordering
+
+**Cosmos EVM:**
+- **No app-side mempool** - transactions are ordered by arrival time to the proposer
+- **Single transaction per block per EOA** - only one transaction per externally owned account can be included in each block
+- Tendermint orders transactions in the order they arrive to the block proposer
+- No traditional MEV opportunities due to different consensus mechanism
+
+```solidity
+// This behavior differs significantly:
+// On Ethereum: Both txs can be in the same block
+// On Cosmos EVM: Only the first to reach the proposer will be included
+
+// Transaction 1: user.transfer(100)  - nonce 5
+// Transaction 2: user.approve(spender, 200) - nonce 6
+// Result: Only one will be included per block
+```
+
+### Consensus and Finality Model
+
+**Ethereum Mainnet:**
+- Probabilistic finality (requires 12+ confirmations)
+- ~12-15 second block times
+- Risk of chain reorganizations
+- Proof-of-Work → Proof-of-Stake transition
+
+**Ethereum L2s (Arbitrum, Optimism):**
+- Dependent on Ethereum's finality
+- Challenge periods for fraud proofs
+- Centralized sequencers in most cases
+
+**Cosmos EVM:**
+- **Instant finality** via Tendermint consensus
+- **1-2 second block times**
+- **No chain reorganizations** - blocks are final immediately
+- Byzantine Fault Tolerant consensus with validator sets
+
+### RPC Method Limitations
+
+Cosmos EVM currently supports **Ethereum RPC methods up to v1.10**. Methods introduced in later versions may not be available:
+
+**Supported Methods:**
+- `eth_getBalance`, `eth_sendTransaction`, `eth_call`
+- `eth_getBlockByNumber`, `eth_getTransactionReceipt`
+- `eth_estimateGas`, `eth_gasPrice`
+- `web3_clientVersion`, `net_version`
+
+**Limited/Unsupported:**
+- Advanced debugging methods from post-v1.10
+- Some Ethereum-specific methods related to mining
+- Methods specific to Ethereum's Proof-of-Stake transition
+
+### Gas and Fee Economics
+
+**Ethereum Mainnet:**
+- EIP-1559 with base fee + priority fee
+- Gas prices fluctuate based on network congestion
+- Gas limit: ~30M gas per block
+
+**Cosmos EVM:**
+- **EIP-1559 implementation** but with different economics
+- **Configurable gas limits** (often higher than Ethereum)
+- **Different gas costs** for precompile operations
+- **Native token as gas** (not necessarily ETH)
+
+```solidity
+// Gas costs differ for equivalent operations:
+// Ethereum: transfer() ~21,000 gas
+// Cosmos EVM: transfer() ~21,000 gas (similar)
+// Cosmos EVM: stakingPrecompile.delegate() ~50,000 gas (unique)
+```
+
+### Address Format and Account System
+
+**Standard EVM:**
+- Only Ethereum-format addresses: `0x1234...`
+- Single address representation
+
+**Cosmos EVM:**
+- **Dual address format** support:
+  - Ethereum format: `0x1234567890123456789012345678901234567890`
+  - Cosmos format: `cosmos1zg3yy3k3xz6k83xz6k83xz6k83xz6k83xzt7h8q`
+- **Deterministic conversion** between formats
+- Same private key controls both representations
+
+### Smart Contract Deployment and Execution
+
+**Key Differences:**
+
+1. **Precompiled Contracts:** Access to native Cosmos SDK modules
+   ```solidity
+   IStaking(0x0000000000000000000000000000000000000800).delegate(validator, amount);
+   ```
+
+2. **Cross-chain Capabilities:** Native IBC integration
+   ```solidity
+   IIBCTransfer(0x0000000000000000000000000000000000000802).transfer(channel, recipient, amount);
+   ```
+
+3. **Contract Address Calculation:** Different due to chain parameters
 
 ## Quick Comparison Matrix
 
-| Aspect | Cosmos EVM | Native Cosmos SDK | CosmWasm |
-|--------|------------|-------------------|----------|
-| **Language** | Solidity, Vyper | Go | Rust, JavaScript (CosmJS) |
-| **Performance** | Good (with Precompiles) | Highest performance | Near-native performance |
-| **Developer Pool** | Large (Ethereum devs) | Smaller (Go devs) | Growing (Rust devs) |
-| **Tooling Maturity** | Mature (Hardhat, Foundry) | Custom tools | Evolving tools |
-| **Flexibility** | EVM constraints | Unlimited | High flexibility |
-| **Gas Efficiency** | Moderate | Highest | High |
-| **Interoperability** | EVM + Native IBC | Native IBC | Native IBC |
-| **Upgradability** | Contract upgrades | Governance upgrades | Built-in migration |
-| **Security Model** | Solidity patterns | Custom validation | Rust safety + validation |
+| Aspect | Cosmos EVM | Ethereum Mainnet | Ethereum L2s | Native Cosmos SDK | CosmWasm |
+|--------|------------|------------------|--------------|-------------------|----------|
+| **Consensus** | Tendermint BFT | Proof-of-Stake | Ethereum-dependent | Tendermint BFT | Tendermint BFT |
+| **Finality** | Instant (1-2s) | Probabilistic (~12 min) | L1-dependent | Instant (1-2s) | Instant (1-2s) |
+| **Tx per Block (EOA)** | 1 | Unlimited | Unlimited | N/A | N/A |
+| **Mempool** | Tendermint | App-side | Sequencer-managed | Tendermint | Tendermint |
+| **Language** | Solidity, Vyper | Solidity, Vyper | Solidity, Vyper | Go | Rust |
+| **Gas Token** | Any token | ETH | ETH/derivatives | N/A | N/A |
+| **Precompiles** | Cosmos modules | Standard only | Standard only | Native access | Native access |
+| **Cross-chain** | Native IBC | Bridges | Bridges | Native IBC | Native IBC |
 
 ## Detailed Comparisons
 
-### vs. Pure Ethereum L2s
+### vs. Ethereum Mainnet
 
-| Aspect | Cosmos EVM | Ethereum L2s |
-|--------|------------|--------------|
-| **Consensus** | Tendermint (configurable) | Ethereum-dependent |
-| **Sovereignty** | Full sovereign chain | Limited sovereignty |
-| **Interoperability** | Native IBC for Cosmos ecosystem | Ethereum-centric bridges |
-| **Customization** | Full stack customization | Limited to execution layer |
-| **Gas Token** | Any available token | ETH or derivative |
+**Advantages of Cosmos EVM:**
+- **Faster finality:** 1-2 seconds vs. 12+ minutes
+- **Lower costs:** No competition with DeFi for block space
+- **Sovereignty:** Own validator set and governance
+- **Native cross-chain:** IBC integration without bridges
+- **Customization:** Configurable parameters and features
 
-**Choose Cosmos EVM when:** You need sovereign consensus, deep chain customization, or first-class connectivity to the Cosmos ecosystem via IBC.
+**Trade-offs:**
+- **Smaller ecosystem:** Less liquidity and fewer protocols
+- **Transaction limitations:** One tx per block per EOA
+- **Different MEV landscape:** Traditional MEV strategies don't apply
+- **Learning curve:** New consensus model and behaviors
+
+### vs. Ethereum L2s (Arbitrum, Optimism)
+
+**Advantages of Cosmos EVM:**
+- **True sovereignty:** Independent consensus and security
+- **No dependency:** Not reliant on Ethereum's security assumptions
+- **Native IBC:** Direct connection to Cosmos ecosystem
+- **Customizable economics:** Own gas token and fee structures
+
+**Trade-offs:**
+- **Security model:** Own validator set vs. Ethereum's security
+- **Liquidity:** Must bootstrap own ecosystem
+- **Bridge complexity:** More complex to bridge to Ethereum
+- **Tooling:** Some Ethereum-specific tools may not work
 
 ### vs. Native Cosmos SDK
 
-<AccordionGroup>
-  <Accordion title="Development Experience">
-    **Native SDK** provides maximum flexibility and performance with direct state access and custom logic in Go. However, it comes with a steep learning curve. **Cosmos EVM** offers a familiar Solidity environment with mature tooling, significantly lowering the barrier to entry for the large pool of Ethereum developers.
+**When to Choose Cosmos EVM:**
+- **Ethereum developer expertise:** Team familiar with Solidity
+- **Proven patterns:** Want to use battle-tested EVM contracts
+- **Gradual migration:** Moving from Ethereum to Cosmos
+- **Tooling preference:** Prefer Hardhat/Foundry over Go development
 
-*Cosmos SDK Approach:*
-```go
-// Custom module with native performance
-func (k Keeper) Transfer(ctx sdk.Context, from, to sdk.AccAddress, amount sdk.Coins) error {
-    return k.bankKeeper.SendCoins(ctx, from, to, amount)
-}
-```
-
-*Cosmos EVM Approach:*
-```solidity
-// Standard ERC-20 with familiar tooling
-function transfer(address to, uint256 amount) public returns (bool) {
-    _transfer(msg.sender, to, amount);
-    return true;
-}
-```
-  </Accordion>
-
-  <Accordion title="Performance">
-    **Native SDK** offers the highest possible performance with no VM overhead. **Cosmos EVM** introduces interpretation overhead, but this is mitigated by precompiled contracts that provide near-native speed for common operations like staking and IBC transfers. For most applications, Cosmos EVM performance is more than sufficient.
-  </Accordion>
-</AccordionGroup>
+**When to Choose Native SDK:**
+- **Performance critical:** Need maximum performance
+- **Deep customization:** Require protocol-level modifications
+- **Go expertise:** Team prefers Go development
+- **Complex logic:** Need capabilities beyond EVM constraints
 
 ### vs. CosmWasm
 
-<AccordionGroup>
-  <Accordion title="Development Experience">
-    **CosmWasm** uses Rust, offering high performance and strong safety guarantees. Its ecosystem is growing but smaller than Ethereum's. **Cosmos EVM** uses Solidity, which has a larger developer community and more mature tooling, making it easier to find developers and audited code.
+**Cosmos EVM Advantages:**
+- **Larger developer pool:** More Solidity developers available
+- **Mature tooling:** Hardhat, Foundry, OpenZeppelin
+- **Battle-tested contracts:** Proven DeFi patterns and audits
+- **Migration path:** Easier from existing Ethereum contracts
 
-*CosmWasm Approach:*
-```rust
-#[cw_serde]
-pub struct ExecuteMsg {
-    SetValue { value: String },
-}
-
-pub fn execute(deps: DepsMut, msg: ExecuteMsg) -> Result<Response, ContractError> {
-    match msg {
-        ExecuteMsg::SetValue { value } => {
-            STATE.save(deps.storage, &value)?;
-            Ok(Response::new().add_attribute("action", "set_value"))
-        }
-    }
-}
-```
-
-*Cosmos EVM Approach:*
-```solidity
-contract SimpleStorage {
-    string public storedValue;
-
-    function setValue(string memory _value) public {
-        storedValue = _value;
-        emit ValueSet(_value);
-    }
-}
-```
-  </Accordion>
-  <Accordion title="Performance & VM">
-      **CosmWasm** executes smart contracts in a WebAssembly (Wasm) environment, which is known for its near-native performance and efficiency. **Cosmos EVM** uses the Ethereum Virtual Machine, which has more overhead but offers direct compatibility with the entire Ethereum ecosystem.
-  </Accordion>
-</AccordionGroup>
-
+**CosmWasm Advantages:**
+- **Better performance:** WebAssembly efficiency
+- **Memory safety:** Rust's safety guarantees
+- **Portability:** Contracts work across Cosmos chains
+- **Modern architecture:** Purpose-built for Cosmos
 
 ## Use Case Decision Framework
 
 ### Choose Cosmos EVM If:
 
-<AccordionGroup>
-  <Accordion title="You Have Ethereum Experience">
-    - You want to migrate existing Solidity contracts.
-    - Your team is familiar with Ethereum tooling (Hardhat, Foundry).
-    - You want to leverage Ethereum's mature developer ecosystem and battle-tested contract patterns.
-  </Accordion>
+**You Have Ethereum Experience:**
+- Existing Solidity contracts to migrate
+- Team familiar with Ethereum tooling (Hardhat, Foundry)
+- Want to leverage Ethereum's mature developer ecosystem
 
-  <Accordion title="You Need Hybrid Functionality">
-    - You plan to build EVM contracts that interact deeply with Cosmos modules (e.g., staking, governance, IBC).
-    - You want to create a bridge between the Ethereum and Cosmos ecosystems.
-    - You are planning a gradual migration from Ethereum to a sovereign Cosmos chain.
-  </Accordion>
-</AccordionGroup>
+**You Need Hybrid Functionality:**
+- EVM contracts that interact with Cosmos modules (staking, governance, IBC)
+- Bridge between Ethereum and Cosmos ecosystems
+- Gradual migration from Ethereum to sovereign chain
 
-### Choose Native Cosmos SDK When:
+**You Want Sovereignty with Familiarity:**
+- Need independent consensus but want familiar development experience
+- Want to tap into Ethereum's liquidity while maintaining sovereignty
+- Require custom chain parameters with EVM compatibility
 
-<AccordionGroup>
-  <Accordion title="Performance is Absolutely Critical">
-    - You are building a high-frequency trading platform or a complex consensus mechanism where any VM overhead is unacceptable.
-  </Accordion>
-  <Accordion title="You Need Deep Chain Integration">
-      - Your application requires custom governance mechanisms, novel cryptographic primitives, or other protocol-level features that are not possible within the EVM's constraints.
-  </Accordion>
-</AccordionGroup>
+### Choose Ethereum Mainnet/L2s When:
 
-### Choose CosmWasm When:
+**Maximum Compatibility Needed:**
+- Require all latest Ethereum features and RPC methods
+- Need multiple transactions per block per account
+- Want traditional MEV opportunities
+- Require maximum liquidity and DeFi composability
 
-<AccordionGroup>
-  <Accordion title="You Prioritize Safety and Portability">
-      - You are building complex DeFi protocols where Rust's safety guarantees are a major advantage.
-      - You want to write smart contracts that can be deployed across multiple chains in the Cosmos ecosystem with minimal changes.
-  </Accordion>
-</AccordionGroup>
+### Performance Considerations
 
-## Performance Benchmarks
+**Transaction Throughput:**
+- **Cosmos EVM:** Limited by single tx per block per EOA
+- **Ethereum:** Limited by gas limit and competition
+- **L2s:** Higher throughput but centralized sequencers
 
-### Gas Cost Comparison
+**Development Speed:**
+- **Cosmos EVM:** Fast for Ethereum developers (familiar tools)
+- **Native SDK:** Slower learning curve but maximum flexibility
+- **CosmWasm:** Middle ground with modern features
 
-| Operation | Native SDK (equiv.) | CosmWasm | Cosmos EVM |
-|-----------|------------|----------|------------|
-| **Simple Transfer** | 20,000 | 25,000 | 21,000 |
-| **Complex Logic** | 50,000 | 75,000 | 150,000 |
-| **State Write** | 5,000 | 7,500 | 20,000 |
-| **Precompile Call** | N/A | N/A | 35,000 - 80,000 |
-
-
-### Development Time Estimates
-
-| Task | Native SDK | CosmWasm | Cosmos EVM |
-|------|------------|----------|------------|
-| **Simple Token** | 2-3 weeks | 1 week | 2-3 days |
-| **DeFi Protocol** | 6-8 weeks | 3-4 weeks | 1-2 weeks |
-| **Cross-Chain App** | 4-6 weeks | 2-3 weeks | 1-2 weeks |
+**Gas Efficiency:**
+- **Precompile operations:** Much cheaper than pure Solidity
+- **Standard operations:** Similar to Ethereum
+- **Cross-chain:** Native IBC cheaper than bridges
 
 ## Migration Considerations
 
 ### From Ethereum to Cosmos EVM
-**Advantages:**
-- Minimal code changes required for existing Solidity contracts.
-- Keep your existing tooling and workflows (Hardhat, Foundry).
-- Gain access to unique Cosmos features like IBC and native staking through precompiles.
 
-**Considerations:**
-- Understand the implications of a new consensus mechanism (instant finality).
-- Account for chain-specific customizations and different address formats.
+**Code Changes Required:**
+- **Minimal for basic contracts:** Most Solidity contracts work unchanged
+- **Transaction pattern changes:** Account for single tx per block limitation
+- **Precompile integration:** Add native Cosmos functionality
+- **Address handling:** Support both address formats
 
-### From Cosmos SDK to Cosmos EVM
-**Advantages:**
-- Tap into the vast Ethereum developer ecosystem and talent pool.
-- Utilize proven smart contract patterns, libraries (e.g., OpenZeppelin), and audit expertise.
-- Speed up development with rich tooling for testing and deployment.
+**Testing Considerations:**
+- **Different consensus behavior:** No chain reorgs to test
+- **Transaction ordering:** Different from Ethereum mempool behavior
+- **Gas costs:** Test with actual precompile costs
 
-**Considerations:**
-- Accept the performance overhead of the EVM compared to native Go.
-- Your team may need to learn Solidity and EVM-specific concepts and security best practices.
+### Development Migration Path
 
-## Real-World Use Cases
+1. **Deploy existing contracts** with minimal changes
+2. **Test transaction patterns** with single tx per block limitation
+3. **Integrate precompiles** for enhanced functionality
+4. **Optimize for Cosmos EVM** specific behaviors
+5. **Add cross-chain features** using IBC
 
-<CardGroup cols={2}>
-  <Card title="DeFi Protocols" icon="chart-line">
-    **Best Fit:** Cosmos EVM
-
-    Leverage proven DeFi patterns from Ethereum while gaining IBC connectivity for cross-chain liquidity.
-  </Card>
-
-  <Card title="High-Performance Trading" icon="zap">
-    **Best Fit:** Native Cosmos SDK
-
-    Custom modules provide better performance for latency-sensitive trading applications.
-  </Card>
-
-  <Card title="Cross-Chain Infrastructure" icon="network">
-    **Best Fit:** CosmWasm or Cosmos EVM
-
-    Both provide good cross-chain capabilities; the choice depends on team expertise and specific requirements.
-  </Card>
-
-  <Card title="NFT Marketplaces" icon="image">
-    **Best Fit:** Cosmos EVM
-
-    Reuse proven ERC-721/1155 standards while adding Cosmos-specific features like IBC transfers.
-  </Card>
-</CardGroup>
-
-## Next Steps
-
-Now that you've compared the options, you're ready to explore what's possible with Cosmos EVM.
-
-<Card title="Explore Capabilities" href="/docs/evm/developers/explore">
-  Discover the unique features of Cosmos EVM and see it in action.
-</Card>
+The choice between Cosmos EVM and other platforms depends on your specific needs for sovereignty, performance, developer experience, and ecosystem integration. Cosmos EVM excels when you need Ethereum compatibility within a sovereign, fast-finality chain with native Cosmos ecosystem access.

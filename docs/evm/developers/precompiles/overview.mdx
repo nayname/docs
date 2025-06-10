@@ -18,25 +18,17 @@ Precompiles are contracts written in Go that implement native Cosmos SDK module 
 
 ### Architecture Overview
 
-<CardGroup cols={2}>
-  <Card title="Traditional Approach" icon="code">
-    **Pure Solidity Implementation**
+**Traditional Approach - Pure Solidity Implementation:**
+- All logic implemented in Solidity
+- Higher gas costs for complex operations
+- Limited to EVM-native functionality
+- No access to Cosmos SDK features
 
-    - All logic implemented in Solidity
-    - Higher gas costs for complex operations
-    - Limited to EVM-native functionality
-    - No access to Cosmos SDK features
-  </Card>
-
-  <Card title="Precompile Approach" icon="zap">
-    **Hybrid Native Implementation**
-
-    - Critical operations use native Go code
-    - Significantly lower gas costs
-    - Full access to Cosmos SDK modules
-    - Best-in-class performance for common patterns
-  </Card>
-</CardGroup>
+**Precompile Approach - Hybrid Native Implementation:**
+- Critical operations use native Go code
+- Significantly lower gas costs
+- Full access to Cosmos SDK modules
+- Best-in-class performance for common patterns
 
 ### Performance Benefits
 

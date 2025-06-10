@@ -11,39 +11,25 @@ Smart contract development on Cosmos EVM combines familiar Ethereum patterns wit
 
 While Cosmos EVM maintains full Solidity compatibility, several key differences impact contract development:
 
-<CardGroup cols={2}>
-  <Card title="Precompiled Contracts" icon="box">
-    **Access Cosmos SDK modules directly from Solidity**
+**Precompiled Contracts** - Access Cosmos SDK modules directly from Solidity:
+- Staking operations at `0x0000000000000000000000000000000000000800`
+- Distribution at `0x0000000000000000000000000000000000000801`
+- IBC transfers at `0x0000000000000000000000000000000000000802`
 
-    - Staking operations at `0x0000000000000000000000000000000000000800`
-    - Distribution at `0x0000000000000000000000000000000000000801`
-    - IBC transfers at `0x0000000000000000000000000000000000000802`
-  </Card>
+**Fee Market** - EIP-1559 dynamic fee pricing:
+- Base fee adjusts based on block utilization
+- Priority fees for faster inclusion
+- Different gas economics than fixed-price chains
 
-  <Card title="Fee Market" icon="credit-card">
-    **EIP-1559 dynamic fee pricing**
+**Consensus & Finality** - Tendermint consensus characteristics:
+- ~1-2 second block times (vs Ethereum's ~12 seconds)
+- Instant finality (vs Ethereum's probabilistic finality)
+- Different MEV landscape
 
-    - Base fee adjusts based on block utilization
-    - Priority fees for faster inclusion
-    - Different gas economics than fixed-price chains
-  </Card>
-
-  <Card title="Consensus & Finality" icon="zap">
-    **Tendermint consensus characteristics**
-
-    - ~1-2 second block times (vs Ethereum's ~12 seconds)
-    - Instant finality (vs Ethereum's probabilistic finality)
-    - Different MEV landscape
-  </Card>
-
-  <Card title="Address Format" icon="fingerprint">
-    **Dual address support**
-
-    - Ethereum format: `0x1234...`
-    - Cosmos format: `cosmos1abc...`
-    - Deterministic conversion between formats
-  </Card>
-</CardGroup>
+**Address Format** - Dual address support:
+- Ethereum format: `0x1234...`
+- Cosmos format: `cosmos1abc...`
+- Deterministic conversion between formats
 
 ## Contract Architecture Patterns
 

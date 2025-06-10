@@ -51,27 +51,19 @@ This script:
 
 Once running, your local node provides these endpoints:
 
-<CardGroup cols={2}>
-  <Card title="Cosmos RPC" icon="atom">
-    **URL:** `http://localhost:26657`
+**Cosmos RPC:** `http://localhost:26657`
+- Used for Cosmos SDK queries and transactions
+```bash
+curl http://localhost:26657/status
+```
 
-    **Usage:** Cosmos SDK queries and transactions
-    ```bash
-    curl http://localhost:26657/status
-    ```
-  </Card>
-
-  <Card title="EVM JSON-RPC" icon="ethereum">
-    **URL:** `http://localhost:8545`
-
-    **Usage:** Ethereum-compatible tools (MetaMask, Hardhat)
-    ```bash
-    curl -X POST -H "Content-Type: application/json" \
-      --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' \
-      http://localhost:8545
-    ```
-  </Card>
-</CardGroup>
+**EVM JSON-RPC:** `http://localhost:8545`
+- Used by Ethereum-compatible tools (MetaMask, Hardhat)
+```bash
+curl -X POST -H "Content-Type: application/json" \
+  --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' \
+  http://localhost:8545
+```
 
 ## Test Accounts
 
