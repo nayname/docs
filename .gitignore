@@ -47,6 +47,7 @@ coverage/
 
 # Python virtual environments and OpenAPI generation artifacts
 openapi_venv/
+jsonrpc_discovery_venv/
 venv/
 __pycache__/
 *.pyc
@@ -54,6 +55,9 @@ __pycache__/
 
 # Temporary protobuf files
 proto-sources/
+
+# Mintlify build files
+.mintlify/
 
 # Misc
 

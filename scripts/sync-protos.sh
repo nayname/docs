@@ -15,7 +15,7 @@ COSMOS_SDK_REPO="https://github.com/cosmos/cosmos-sdk.git"
 COSMOS_SDK_BRANCH="main"
 COSMOS_SDK_PROTO_PATH="proto"
 
-EVM_REPO="https://github.com/evmos/ethermint.git"  # or whichever evm repo you're using
+EVM_REPO="https://github.com/cosmos/evm.git"
 EVM_BRANCH="main"
 EVM_PROTO_PATH="proto"
 
@@ -62,79 +62,9 @@ sync_repo_protos "$COSMOS_SDK_REPO" "$COSMOS_SDK_BRANCH" "$COSMOS_SDK_PROTO_PATH
 # Sync EVM protobuf files
 sync_repo_protos "$EVM_REPO" "$EVM_BRANCH" "$EVM_PROTO_PATH" "$PROTO_DIR/evm"
 
-# Update the OpenAPI generator config to use the new proto sources
 echo ""
-echo "📝 Updating OpenAPI generator configuration..."
-cat > "$SCRIPT_DIR/openapi-gen/config.yaml" << EOF
-# OpenAPI Generation Configuration
-name: "Cosmos SDK & EVM API Documentation"
-version: "1.0.0"
-
-# Local protobuf source directories
-proto_source_dirs:
-  - "proto-sources/cosmos-sdk"
-  - "proto-sources/evm"
-
-# Generation settings
-generation:
-  auto_generate_pages: true
-
-# Server configurations for documentation
-servers:
-  cosmos_rest:
-    - url: "https://rest.cosmos.network"
-      description: "Cosmos REST Mainnet"
-    - url: "https://testnet-rest.cosmos.network"
-      description: "Cosmos REST Testnet"
-    - url: "http://localhost:1317"
-      description: "Local Development"
-
-  cosmos_grpc:
-    - url: "https://grpc.cosmos.network:9090"
-      description: "Cosmos gRPC Mainnet"
-    - url: "https://testnet-grpc.cosmos.network:9090"
-      description: "Cosmos gRPC Testnet"
-    - url: "http://localhost:9090"
-      description: "Local Development"
-
-# Method categorization for better organization
-categories:
-  core:
-    - "bank"
-    - "auth"
-    - "staking"
-    - "distribution"
-    - "slashing"
-    - "gov"
-
-  advanced:
-    - "authz"
-    - "feegrant"
-    - "group"
-    - "nft"
-    - "upgrade"
-    - "evidence"
-
-  evm:
-    - "evm"
-    - "feemarket"
-
-# Documentation metadata
-metadata:
-  title: "Cosmos SDK & EVM API Documentation"
-  description: "Complete API reference for Cosmos SDK and EVM functionality"
-  contact:
-    name: "Documentation Team"
-    url: "https://docs.cosmos.network"
-EOF
-
-echo "Configuration updated"
-
-# Regenerate API documentation
+echo "✅ Protobuf sync complete!"
 echo ""
-echo "Regenerating API documentation..."
-cd "$PROJECT_ROOT"
-bash "$SCRIPT_DIR/openapi-gen/run_complete_generation.sh"
-
-echo ""
-echo "Sync and regeneration complete!"
+echo "🔧 Next steps:"
+echo "   1. Generate OpenAPI specs: python3 scripts/generate-openapi-specs.py"
+echo "   2. Generate docs: npx @mintlify/scraping@latest openapi-file docs/api-specs/cosmos-sdk-complete.json -o docs/api-reference/cosmos-rest"

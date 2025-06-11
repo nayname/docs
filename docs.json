@@ -39,7 +39,7 @@
   ],
   "topbarCtaButton": {
     "name": "Get Started",
-    "url": "/docs/evm"
+    "url": "/docs/index"
   },
   "favicon": "/assets/brand/cosmos.svg",
   "logo": {
@@ -203,13 +203,12 @@
             "group": "EVM Support",
             "isCollapsible": true,
             "pages": [
-              "docs/api-reference/evm/json-rpc-support",
               {
                 "group": "EVM REST API",
                 "isCollapsible": true,
                 "pages": [
-                  "docs/api-reference/cosmos-rest/evm/account",
-                  "docs/api-reference/cosmos-rest/evm/ethereumtx"
+                  "docs/api-reference/cosmos-rest/vm/account",
+                  "docs/api-reference/cosmos-rest/vm/ethereumtx"
                 ]
               },
               {
@@ -221,11 +220,85 @@
                 ]
               },
               {
+                "group": "ERC20 Module",
+                "isCollapsible": true,
+                "pages": [
+                  "docs/api-reference/cosmos-rest/erc20/tokenpairs",
+                  "docs/api-reference/cosmos-rest/erc20/converterc20"
+                ]
+              },
+              {
+                "group": "Precise Bank",
+                "isCollapsible": true,
+                "pages": [
+                  "docs/api-reference/cosmos-rest/precisebank/remainder"
+                ]
+              },
+              {
                 "group": "EVM JSON-RPC",
                 "isCollapsible": true,
                 "pages": [
-                  "docs/api-reference/evm/evm-json-rpc",
-                  "docs/api-reference/evm/opcodes"
+                  "docs/api-reference/evm-jsonrpc/index",
+                  {
+                    "group": "Account & Balance",
+                    "isCollapsible": true,
+                    "pages": [
+                      "docs/api-reference/evm-jsonrpc/eth/eth_accounts",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_getBalance",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_getCode",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_getStorageAt",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_getTransactionCount"
+                    ]
+                  },
+                  {
+                    "group": "Block Methods",
+                    "isCollapsible": true,
+                    "pages": [
+                      "docs/api-reference/evm-jsonrpc/eth/eth_blockNumber",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_getBlockByHash",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_getBlockByNumber",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_getBlockTransactionCountByHash",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_getBlockTransactionCountByNumber"
+                    ]
+                  },
+                  {
+                    "group": "Transaction Methods",
+                    "isCollapsible": true,
+                    "pages": [
+                      "docs/api-reference/evm-jsonrpc/eth/eth_sendTransaction",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_sendRawTransaction",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_getTransactionByHash",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_getTransactionByBlockHashAndIndex",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_getTransactionByBlockNumberAndIndex",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_getTransactionReceipt"
+                    ]
+                  },
+                  {
+                    "group": "Gas & Fee Methods",
+                    "isCollapsible": true,
+                    "pages": [
+                      "docs/api-reference/evm-jsonrpc/eth/eth_gasPrice",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_maxPriorityFeePerGas",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_feeHistory",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_estimateGas"
+                    ]
+                  },
+                  {
+                    "group": "Call & Simulation",
+                    "isCollapsible": true,
+                    "pages": [
+                      "docs/api-reference/evm-jsonrpc/eth/eth_call",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_chainId"
+                    ]
+                  },
+                  {
+                    "group": "WebSocket Subscriptions",
+                    "isCollapsible": true,
+                    "pages": [
+                      "docs/api-reference/evm-jsonrpc/eth/eth_subscribe",
+                      "docs/api-reference/evm-jsonrpc/eth/eth_unsubscribe"
+                    ]
+                  }
                 ]
               }
             ]
@@ -286,10 +359,6 @@
         ]
       },
       {
-        "tab": "API Specs",
-        "pages": ["docs/api-specs/index"]
-      },
-      {
         "tab": "IBC",
         "pages": ["docs/ibc/index"]
       },
@@ -314,7 +383,7 @@
     "chatbot": false
   },
   "search": {
-    "prompt": "Search Cosmos docs..."
+    "prompt": "Search docs..."
   },
   "modeToggle": {
     "default": "system",
@@ -322,7 +391,7 @@
   },
   "api": {
     "baseUrl": ["https://rest.cosmos.network", "https://testnet-rest.cosmos.network"],
-    "spec": "docs/api-specs/cosmos-sdk-complete.json"
+    "spec": ".mintlify/cosmos-sdk-complete.json"
   },
   "anchors": [
     {
