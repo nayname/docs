@@ -1,0 +1,234 @@
+---
+title: "Introduction to Cosmos EVM"
+description: "Discover Cosmos EVM, the Ethereum-compatible execution environment built for the sovereign, interoperable Cosmos ecosystem."
+mode: "wide"
+---
+
+import { EthereumIcon, CosmosLogo, InfrastructureIcon, SmartContractIcon } from '/snippets/icons.mdx'
+
+# Introduction to Cosmos EVM
+
+Discover Cosmos EVM, a high-performance execution environment that brings the familiar Ethereum development experience to the modular and interconnected Cosmos ecosystem.
+
+## Critical Differences from Standard EVMs
+
+**Essential for all developers, operators, and teams:** These fundamental differences from Ethereum mainnet and L2s affect smart contract behavior, chain interaction, and infrastructure operation.
+
+### Smart Contract & Transaction Behavior
+
+<CardGroup cols={2}>
+  <Card title="Transaction Ordering" icon="clock">
+    **Cosmos EVM:** No app-side mempool - transactions ordered by arrival time to proposer. Only one transaction per block per EOA (externally owned account).
+
+    **Standard EVM:** Multiple transactions per block per account, ordered by gas price and nonce in mempool.
+  </Card>
+  <Card title="Consensus & Finality" icon="shield">
+    **Cosmos EVM:** Instant finality via Tendermint BFT consensus (1-2 second blocks). No chain reorganizations.
+
+    **Standard EVM:** Probabilistic finality requiring 12+ confirmations (~12-15 minutes). Risk of chain reorgs.
+  </Card>
+  <Card title="Precompiled Contracts" icon="zap">
+    **Cosmos EVM:** Access native Cosmos SDK modules (staking, IBC, governance) directly from Solidity at predefined addresses.
+
+    **Standard EVM:** Limited to basic cryptographic precompiles (ecrecover, sha256, etc.).
+  </Card>
+  <Card title="Address Formats" icon="user">
+    **Cosmos EVM:** Dual format support - Ethereum (0x123...) and Cosmos (cosmos1...) with deterministic conversion.
+
+    **Standard EVM:** Only Ethereum format addresses supported.
+  </Card>
+</CardGroup>
+
+### Gas Economics & Fee Structure
+
+| Aspect | Cosmos EVM | Ethereum Mainnet | Ethereum L2s |
+|--------|------------|------------------|--------------|
+| **Fee Model** | EIP-1559 (base + priority) | EIP-1559 (base + priority) | EIP-1559 or fixed |
+| **Gas Token** | Native chain token | ETH | ETH/derivatives |
+| **Gas Limit** | Configurable (often higher) | ~30M gas per block | Variable |
+| **Precompile Gas** | Much lower costs | Fixed higher costs | Fixed higher costs |
+| **Block Time** | 1-2 seconds | 12-15 seconds | Variable |
+
+### RPC & Infrastructure Differences
+
+<CardGroup cols={2}>
+  <Card title="JSON-RPC Limitations" icon="code">
+    **Supported:** Ethereum RPC methods up to v1.10 including eth_getBalance, eth_call, eth_sendTransaction.
+
+    **Limited:** Advanced debugging methods, mining-specific calls, post-v1.10 methods may not be available.
+  </Card>
+  <Card title="Mempool Behavior" icon="layers">
+    **Cosmos EVM:** Tendermint mempool with first-come-first-served ordering. No traditional MEV opportunities.
+
+    **Standard EVM:** App-side mempool with gas-price ordering. MEV extraction possible.
+  </Card>
+</CardGroup>
+
+## Resources
+
+Essential tools and documentation for building on Cosmos EVM:
+
+<CardGroup cols={3}>
+  <Card title="API Reference" icon="book">
+    Complete JSON-RPC documentation, precompile interfaces, and configuration options.
+    <a href="/docs/api-reference/evm">View API Docs →</a>
+  </Card>
+  <Card title="EVM Opcode Sandbox" icon="play">
+    Interactive EVM simulator for learning bytecode execution and debugging contracts.
+    <a href="/docs/evm/developers/evm-opcode-sandbox">Try Sandbox →</a>
+  </Card>
+  <Card title="Contract Examples" icon="file-code">
+    Production-ready contracts demonstrating Cosmos-specific features and patterns.
+    <a href="/docs/evm/developers/smart-contracts">View Examples →</a>
+  </Card>
+</CardGroup>
+
+## Learning Paths
+
+Choose your journey based on your background and goals:
+
+### For Ethereum Developers
+**Migrate and extend your existing Ethereum knowledge**
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon={<EthereumIcon size={20} color="#627EEA" />}>
+    Get up and running in minutes - deploy existing contracts and connect to testnet.
+    <a href="/docs/evm/developers">Start Building →</a>
+  </Card>
+  <Card title="Migration Guide" icon="rocket">
+    Port contracts with step-by-step instructions and learn key behavioral differences.
+    <a href="/docs/evm/developers/ethereum-migration">Migrate Contracts →</a>
+  </Card>
+  <Card title="Precompiles" icon="box">
+    Access native Cosmos features: staking, governance, IBC transfers, and distribution rewards.
+    <a href="/docs/evm/developers/precompiles">Explore Precompiles →</a>
+  </Card>
+  <Card title="Cross-Chain Integration" icon="link">
+    Build interoperable applications that communicate across the Cosmos ecosystem via IBC.
+    <a href="/docs/evm/developers/ibc-integration">Build Cross-Chain →</a>
+  </Card>
+</CardGroup>
+
+### For Cosmos Developers
+**Add smart contracts to your Cosmos SDK toolkit**
+
+<CardGroup cols={2}>
+  <Card title="Solidity Fundamentals" icon={<CosmosLogo size={20} color="#2E3148" />}>
+    Learn smart contract development from a Cosmos perspective with familiar concepts.
+    <a href="/docs/evm/developers/solidity-basics">Learn Solidity →</a>
+  </Card>
+  <Card title="Development Setup" icon="code">
+    Configure your environment with VS Code, testing frameworks, and Cosmos integration.
+    <a href="/docs/evm/developers/development-environment">Setup Environment →</a>
+  </Card>
+  <Card title="Hybrid Applications" icon="puzzle-piece">
+    Combine smart contracts with native SDK modules for powerful hybrid architectures.
+    <a href="/docs/evm/developers/cosmos-integration">Build Integrations →</a>
+  </Card>
+  <Card title="Comparison Guide" icon="compare">
+    When to use EVM vs native SDK vs CosmWasm for your specific application needs.
+    <a href="/docs/evm/developers/cosmos-comparisons">Compare Approaches →</a>
+  </Card>
+</CardGroup>
+
+### For Infrastructure Teams
+**Deploy and operate Cosmos EVM chains**
+
+<CardGroup cols={2}>
+  <Card title="Chain Integration" icon={<InfrastructureIcon size={20} color="#374151" />}>
+    Add EVM support to new or existing Cosmos SDK chains with complete implementation guide.
+    <a href="/docs/evm/developers/chain-integration">Integrate EVM →</a>
+  </Card>
+  <Card title="Production Deployment" icon="server">
+    Infrastructure requirements, monitoring setup, and security considerations for mainnet.
+    <a href="/docs/evm/developers/production-deployment">Deploy Production →</a>
+  </Card>
+  <Card title="Configuration Guide" icon="cog">
+    Node configuration, parameter tuning, and optimization for different use cases.
+    <a href="/docs/evm/developers/configuration">Configure Node →</a>
+  </Card>
+  <Card title="Troubleshooting" icon="lightbulb">
+    Common issues, debugging strategies, and performance optimization techniques.
+    <a href="/docs/evm/developers/troubleshoot">Get Help →</a>
+  </Card>
+</CardGroup>
+
+### Smart Contract Development
+**Master Solidity development on Cosmos EVM**
+
+<CardGroup cols={2}>
+  <Card title="Contract Development" icon={<SmartContractIcon size={20} color="#7c3aed" />}>
+    Comprehensive guide to writing, testing, and deploying secure smart contracts.
+    <a href="/docs/evm/developers/smart-contracts">Build Contracts →</a>
+  </Card>
+  <Card title="Testing & Security" icon="shield">
+    Security patterns, property-based testing, and audit preparation strategies.
+    <a href="/docs/evm/developers/testing-guide">Learn Testing →</a>
+  </Card>
+  <Card title="Advanced Patterns" icon="puzzle-piece">
+    Production examples: liquid staking, cross-chain governance, and DeFi protocols.
+    <a href="/docs/evm/developers/advanced">View Examples →</a>
+  </Card>
+  <Card title="Debugging Tools" icon="bug">
+    Interactive tools for learning EVM mechanics and debugging contract execution.
+    <a href="/docs/evm/developers/evm-opcode-sandbox">Debug Contracts →</a>
+  </Card>
+</CardGroup>
+
+## Quick Start
+
+Get up and running in minutes:
+
+### Connect to Testnet
+
+<Info>
+**Cosmos EVM Testnet Configuration**
+
+To connect to the Cosmos EVM testnet, add this network to your wallet:
+
+- **Network Name:** Cosmos EVM Testnet
+- **RPC URL:** `https://testnet-evm.cosmos.network`
+- **Chain ID:** `9000`
+- **Currency Symbol:** `TEST`
+- **Block Explorer:** `https://explorer.cosmos.network/evm`
+</Info>
+
+<Steps>
+  <Step title="Install MetaMask">
+    Download and install [MetaMask](https://metamask.io/download/) if you haven't already.
+  </Step>
+
+  <Step title="Add Network">
+    Open MetaMask and click "Add Network" → "Add a network manually" and enter the configuration above.
+  </Step>
+
+  <Step title="Get Test Tokens">
+    Visit the [testnet faucet](https://faucet.cosmos.network) to receive test tokens for development.
+  </Step>
+</Steps>
+
+### Deploy Your First Contract
+
+<CardGroup cols={2}>
+  <Card title="Foundry Setup" icon="hammer">
+    Fast, efficient smart contract development and deployment with Foundry toolkit.
+    <a href="/docs/evm/developers/tooling-and-resources/foundry-guide">Setup Foundry →</a>
+  </Card>
+  <Card title="Hardhat Integration" icon="wrench">
+    Familiar development workflows and comprehensive testing with Hardhat framework.
+    <a href="/docs/evm/developers/tooling-and-resources/hardhat-guide">Setup Hardhat →</a>
+  </Card>
+</CardGroup>
+
+## Community & Support
+
+<CardGroup cols={2}>
+  <Card title="Developer Discord" icon="message-circle">
+    Join discussions with other Cosmos EVM developers and get real-time help from the community.
+    <a href="https://discord.gg/cosmosnetwork">Join Discord →</a>
+  </Card>
+  <Card title="GitHub Repository" icon="github">
+    Source code, issues, contribution guidelines, and the latest updates for the project.
+    <a href="https://github.com/cosmos/evm">View GitHub →</a>
+  </Card>
+</CardGroup>

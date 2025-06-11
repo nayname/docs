@@ -1,0 +1,186 @@
+export const CustomCard = ({ title, href, icon, children, className = "" }) => {
+  const cardContent = (
+    <div className={`custom-card ${className}`}>
+      {icon && (
+        <div className="card-icon">
+          <i className={`icon-${icon}`}></i>
+        </div>
+      )}
+      <div className="card-content">
+        <h3 className="card-title">{title}</h3>
+        <div className="card-description">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (href) {
+    return (
+      <a href={href} className="card-link">
+        {cardContent}
+      </a>
+    );
+  }
+
+  return cardContent;
+};
+
+export const CardGrid = ({ cols = 3, children, className = "" }) => {
+  return (
+    <div className={`card-grid card-grid-${cols} ${className}`}>
+      {children}
+    </div>
+  );
+};
+
+<style jsx>{`
+  .card-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .card-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .card-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .card-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (max-width: 1024px) {
+    .card-grid-3,
+    .card-grid-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .card-grid,
+    .card-grid-2,
+    .card-grid-3,
+    .card-grid-4 {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card-link:hover {
+    transform: translateY(-4px);
+    text-decoration: none;
+  }
+
+  .custom-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(222, 238, 226, 0.4) 100%);
+    border: 2px solid rgba(57, 166, 163, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .custom-card:hover {
+    border-color: rgba(57, 166, 163, 0.5);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  [data-theme="dark"] .custom-card {
+    background: linear-gradient(135deg, rgba(35, 30, 35, 0.95) 0%, rgba(34, 226, 168, 0.1) 100%);
+    border-color: rgba(34, 226, 168, 0.3);
+  }
+
+  [data-theme="dark"] .custom-card:hover {
+    border-color: rgba(34, 226, 168, 0.5);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  .card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--cosmos-teal) 0%, var(--cosmos-bright-green) 100%);
+  }
+
+  [data-theme="dark"] .card-icon {
+    background: linear-gradient(135deg, var(--cosmos-mint) 0%, var(--cosmos-cyan) 100%);
+  }
+
+  .card-icon i {
+    font-size: 24px;
+    color: white;
+  }
+
+  .card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+    color: var(--cosmos-space-dark);
+    line-height: 1.3;
+  }
+
+  [data-theme="dark"] .card-title {
+    color: #ffffff;
+  }
+
+  .card-description {
+    flex: 1;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #475569;
+  }
+
+  [data-theme="dark"] .card-description {
+    color: #cbd5e1;
+  }
+
+  /* Icon mappings */
+  .icon-ethereum::before { content: "⟠"; }
+  .icon-atom::before { content: "⚛"; }
+  .icon-building::before { content: "🏢"; }
+  .icon-zap::before { content: "⚡"; }
+  .icon-cpu::before { content: "🖥"; }
+  .icon-hammer::before { content: "🔨"; }
+  .icon-box::before { content: "📦"; }
+  .icon-book-open::before { content: "📖"; }
+  .icon-file-code::before { content: "📄"; }
+  .icon-flask::before { content: "🧪"; }
+  .icon-lightbulb::before { content: "💡"; }
+  .icon-git-compare::before { content: "🔄"; }
+  .icon-puzzle::before { content: "🧩"; }
+  .icon-code::before { content: "💻"; }
+  .icon-magic-wand::before { content: "🪄"; }
+  .icon-shield::before { content: "🛡"; }
+  .icon-link::before { content: "🔗"; }
+  .icon-wrench::before { content: "🔧"; }
+  .icon-play::before { content: "▶"; }
+  .icon-balance-scale::before { content: "⚖"; }
+  .icon-chart-bar::before { content: "📊"; }
+  .icon-rocket::before { content: "🚀"; }
+  .icon-bug::before { content: "🐛"; }
+  .icon-discord::before { content: "💬"; }
+  .icon-github::before { content: "🐙"; }
+`}</style>

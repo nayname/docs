@@ -1,0 +1,120 @@
+---
+title: "Smart Contract Development Lifecycle"
+description: "A comprehensive guide to the smart contract development lifecycle: writing, compiling, testing, deploying, and verifying contracts on Cosmos EVM."
+---
+
+# Smart Contract Development Lifecycle
+
+Developing smart contracts is a multi-stage process that requires careful attention to detail, especially regarding security and gas efficiency. This guide outlines the standard, best-practice lifecycle for bringing a smart contract from an idea to a live, verified deployment on a Cosmos EVM chain.
+
+## The 5 Stages of the Development Lifecycle
+
+<div className="mermaid">
+graph TD
+    A[1. Write Code] --> B[2. Compile];
+    B --> C[3. Test];
+    C --> D[4. Deploy];
+    D --> E[5. Verify];
+    C -- Fails --> A;
+    E -- On Testnet --> C;
+</div>
+
+---
+
+### Stage 1: Write Code
+
+This is the initial phase where you translate your application's logic into Solidity.
+
+#### **Setup Your Environment**
+-   **IDE**: [Visual Studio Code](https://code.visualstudio.com/) is the most popular choice. Install the `hardhat-solidity` extension for syntax highlighting and language support.
+-   **Framework**: Choose a development framework to manage your project. The two main choices are:
+    -   **[Hardhat (JavaScript/TypeScript)](../tooling-and-resources/hardhat-guide)**: Excellent for developers coming from a web development background.
+    -   **[Foundry (Solidity)](../tooling-and-resources/foundry-guide)**: Allows you to write your tests directly in Solidity, which can be more intuitive.
+
+#### **Leverage Standard Libraries**
+-   **Don't Reinvent the Wheel**: For common patterns like tokens (ERC20, ERC721), access control (`Ownable`), and security utilities (`ReentrancyGuard`), use a battle-tested library like [OpenZeppelin Contracts](https://www.openzeppelin.com/contracts).
+-   **Installation**: Add it to your project with `npm install @openzeppelin/contracts` (for Hardhat) or by managing dependencies in `foundry.toml` (for Foundry).
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+// Import a standard, secure Ownable contract from OpenZeppelin
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MyContract is Ownable {
+    // Your custom logic here
+    constructor() Ownable(msg.sender) {}
+}
+```
+
+---
+
+### Stage 2: Compile
+
+The compilation step converts your human-readable Solidity code into EVM bytecode, which is the machine code that the blockchain can execute.
+
+-   **Compiler Version**: Always specify the exact compiler version using a `pragma` statement (e.g., `pragma solidity 0.8.24;`). This prevents unexpected behavior from different compiler versions.
+-   **Framework Commands**: Your chosen framework handles this step for you.
+    -   `npx hardhat compile`
+    -   `forge build`
+-   **Output**: This process generates two key artifacts:
+    -   **Bytecode**: The code that will be deployed on-chain.
+    -   **ABI (Application Binary Interface)**: A JSON file that describes your contract's functions. Your frontend application (using Ethers.js or Viem) will use the ABI to know how to interact with your deployed contract.
+
+---
+
+### Stage 3: Test
+
+**This is the most critical stage.** Thorough testing is essential to ensure your contract is secure and functions as expected.
+
+<CardGroup>
+  <Card title="Unit Testing" icon="scale-balanced">
+    Tests that check individual functions in isolation to verify their logic.
+  </Card>
+  <Card title="Integration Testing" icon="network-wired">
+    Tests that check how multiple contracts (or a contract and a precompile) work together.
+  </Card>
+  <Card title="Fuzz Testing" icon="vial-virus">
+    A powerful technique where the testing framework throws thousands of random inputs at your functions to find edge cases you didn't consider. See our [Testing and Fuzzing Guide](../tooling-and-resources/testing-and-fuzzing).
+  </Card>
+</CardGroup>
+
+Your framework is also your testing runner:
+-   `npx hardhat test`
+-   `forge test`
+
+---
+
+### Stage 4: Deploy
+
+Deployment is the act of sending a transaction that puts your compiled contract bytecode onto the blockchain.
+
+#### **Deployment Scripts**
+Create scripts to manage your deployments. This makes the process repeatable and less error-prone. Both Hardhat and Foundry have scripting capabilities.
+
+#### **Network Configuration**
+-   **Testnet First**: Always deploy to a public testnet before mainnet. This allows you to do a final round of testing in a live, multi-user environment.
+-   **Mainnet**: For mainnet deployment, you will need:
+    -   The chain's RPC URL and Chain ID.
+    -   A funded account to pay for deployment gas.
+
+#### **Security**
+-   **Never commit private keys to Git.** Use `.env` files and a tool like `dotenv` to manage them securely.
+
+```bash
+# Example deployment with Hardhat
+npx hardhat run scripts/deploy.ts --network cosmosEvmTestnet
+```
+
+---
+
+### Stage 5: Verify
+
+Verification is the process of publishing your contract's source code and linking it to the deployed bytecode on a block explorer.
+
+-   **Why Verify?**: An unverified contract is a black box. Verification provides transparency and builds trust with your users, as they can read the code and confirm that it does what you claim.
+-   **How it Works**: Block explorers have a verification engine. You provide them with your source code and compiler settings. The explorer re-compiles your code and checks if the resulting bytecode matches what's on-chain.
+-   **Tools**: Frameworks often have plugins (e.g., `hardhat-etherscan`) that automate this process.
+
+Once verified, your contract's page on the block explorer will show a green checkmark, and users will be able to read and interact with your functions directly from the explorer's UI.
