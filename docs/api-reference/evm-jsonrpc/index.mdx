@@ -1,157 +1,81 @@
 ---
-title: "EVM JSON-RPC API"
-description: "Complete JSON-RPC API reference for Cosmos EVM chains with Ethereum compatibility"
+title: "Overview"
+description: "Complete JSON-RPC API reference for Cosmos EVM"
 ---
 
 ## Overview
 
 Cosmos EVM chains implement the Ethereum JSON-RPC API specification, providing full compatibility with existing Ethereum tooling and infrastructure. This allows developers to use familiar tools like MetaMask, Hardhat, Foundry, and other Ethereum ecosystem tools seamlessly.
 
+## Supported EVM-RPC methods
+
+*Based on go-ethereum v1.10*
+
+| Method | Namespace | Supported | Notes | Link |
+|--------|-----------|-----------|-------|------|
+| **Account & Balance** |||||
+| `eth_accounts` | eth | ✅ | Returns addresses owned by client | [📖](./eth/eth_accounts) |
+| `eth_getBalance` | eth | ✅ | Returns account balance | [📖](./eth/eth_getBalance) |
+| `eth_getCode` | eth | ✅ | Returns contract code | [📖](./eth/eth_getCode) |
+| `eth_getStorageAt` | eth | ✅ | Returns storage value | [📖](./eth/eth_getStorageAt) |
+| `eth_getTransactionCount` | eth | ✅ | Returns nonce (transaction count) | [📖](./eth/eth_getTransactionCount) |
+| **Block Methods** |||||
+| `eth_blockNumber` | eth | ✅ | Returns latest block number | [📖](./eth/eth_blockNumber) |
+| `eth_getBlockByHash` | eth | ✅ | Returns block by hash | [📖](./eth/eth_getBlockByHash) |
+| `eth_getBlockByNumber` | eth | ✅ | Returns block by number | [📖](./eth/eth_getBlockByNumber) |
+| `eth_getBlockTransactionCountByHash` | eth | ✅ | Transaction count in block by hash | [📖](./eth/eth_getBlockTransactionCountByHash) |
+| `eth_getBlockTransactionCountByNumber` | eth | ✅ | Transaction count in block by number | [📖](./eth/eth_getBlockTransactionCountByNumber) |
+| `eth_getUncleByBlockHashAndIndex` | eth | ✅ | Returns `null` (no uncles in Tendermint) | - |
+| `eth_getUncleByBlockNumberAndIndex` | eth | ✅ | Returns `null` (no uncles in Tendermint) | - |
+| `eth_getUncleCountByBlockHash` | eth | ✅ | Returns `0x0` (no uncles) | - |
+| `eth_getUncleCountByBlockNumber` | eth | ✅ | Returns `0x0` (no uncles) | - |
+| **Transaction Methods** |||||
+| `eth_sendTransaction` | eth | ✅ | Creates and sends transaction | [📖](./eth/eth_sendTransaction) |
+| `eth_sendRawTransaction` | eth | ✅ | Sends pre-signed transaction | [📖](./eth/eth_sendRawTransaction) |
+| `eth_getTransactionByHash` | eth | ✅ | Returns transaction by hash | [📖](./eth/eth_getTransactionByHash) |
+| `eth_getTransactionByBlockHashAndIndex` | eth | ✅ | Transaction by block hash and index | [📖](./eth/eth_getTransactionByBlockHashAndIndex) |
+| `eth_getTransactionByBlockNumberAndIndex` | eth | ✅ | Transaction by block number and index | [📖](./eth/eth_getTransactionByBlockNumberAndIndex) |
+| `eth_getTransactionReceipt` | eth | ✅ | Returns transaction receipt | [📖](./eth/eth_getTransactionReceipt) |
+| `eth_sign` | eth | ✅ | Signs data (requires unlocked account) | - |
+| `eth_signTransaction` | eth | ✅ | Signs transaction (requires unlocked account) | - |
+| **Gas & Fee Methods** |||||
+| `eth_gasPrice` | eth | ✅ | Returns current gas price | [📖](./eth/eth_gasPrice) |
+| `eth_estimateGas` | eth | ✅ | Estimates gas for transaction | [📖](./eth/eth_estimateGas) |
+| `eth_feeHistory` | eth | ❌ | EIP-1559 method, relies on baseFee | [📖](./eth/eth_feeHistory) |
+| `eth_maxPriorityFeePerGas` | eth | ❌ | EIP-1559 method (London fork) | [📖](./eth/eth_maxPriorityFeePerGas) |
+| **Call & Simulation** |||||
+| `eth_call` | eth | ✅ | Execute message call without transaction | [📖](./eth/eth_call) |
+| `eth_chainId` | eth | ✅ | Returns chain ID | [📖](./eth/eth_chainId) |
+| `eth_syncing` | eth | ✅ | Returns sync status or `false` | - |
+| **Filters & Logs** |||||
+| `eth_newFilter` | eth | ✅ | Creates filter for logs | - |
+| `eth_newBlockFilter` | eth | ✅ | Creates filter for new blocks | - |
+| `eth_newPendingTransactionFilter` | eth | ✅ | Creates filter for pending transactions | - |
+| `eth_uninstallFilter` | eth | ✅ | Removes filter | - |
+| `eth_getFilterChanges` | eth | ✅ | Polls filter for changes | - |
+| `eth_getFilterLogs` | eth | ✅ | Returns logs matching filter ID | - |
+| `eth_getLogs` | eth | ✅ | Returns logs matching filter object | - |
+| **WebSocket Subscriptions** |||||
+| `eth_subscribe` | eth | ✅ | Subscribe to events | [📖](./eth/eth_subscribe) |
+| `eth_unsubscribe` | eth | ✅ | Unsubscribe from events | [📖](./eth/eth_unsubscribe) |
+| **Network Methods** |||||
+| `net_version` | net | ✅ | Returns network ID | - |
+| `net_listening` | net | ✅ | Returns listening status | - |
+| `net_peerCount` | net | ✅ | Returns peer count | - |
+| **Web3 Utility** |||||
+| `web3_clientVersion` | web3 | ✅ | Returns client version | - |
+| `web3_sha3` | web3 | ✅ | Keccak-256 hash | - |
+| **Post-Merge / Advanced** |||||
+| `eth_getProof` | eth | ❌ | Merkle proof (EIP-1186, post-v1.10) | - |
+| `eth_createAccessList` | eth | ❌ | EIP-2930 access lists (post-v1.10) | - |
+
 <Info>
-  **41 methods discovered** from the cosmos/evm codebase, with **24 core methods** documented below.
+  **Namespace Support**: `debug` endpoints are not yet supported but are slated for a future release.
 </Info>
 
-## API Endpoints
+## Usage
 
-<CardGroup cols={2}>
-  <Card title="Mainnet RPC" icon="server" href="https://evm-rpc.cosmos.network">
-    Production JSON-RPC endpoint for Cosmos EVM mainnet
-  </Card>
-  <Card title="Testnet RPC" icon="flask" href="https://testnet-evm-rpc.cosmos.network">
-    Testing JSON-RPC endpoint for Cosmos EVM testnet
-  </Card>
-  <Card title="Local Development" icon="laptop" href="http://localhost:8545">
-    Standard local development endpoint
-  </Card>
-  <Card title="WebSocket" icon="wifi" href="wss://evm-rpc.cosmos.network">
-    Real-time subscriptions and events
-  </Card>
-</CardGroup>
-
-## Quick Setup
-
-### MetaMask Configuration
-
-Add Cosmos EVM to your wallet:
-
-```json Network Configuration
-{
-  "chainId": "0x...",
-  "chainName": "Cosmos EVM",
-  "rpcUrls": ["https://evm-rpc.cosmos.network"],
-  "nativeCurrency": {
-    "name": "COSMOS",
-    "symbol": "COSMOS",
-    "decimals": 18
-  },
-  "blockExplorerUrls": ["https://explorer.cosmos.network"]
-}
-```
-
-### Development Tools
-
-<CodeGroup>
-```javascript Hardhat (hardhat.config.js)
-module.exports = {
-  networks: {
-    cosmosevm: {
-      url: "https://evm-rpc.cosmos.network",
-      accounts: [process.env.PRIVATE_KEY],
-      chainId: 0x... // Chain ID in decimal
-    }
-  }
-}
-```
-
-```toml Foundry (foundry.toml)
-[rpc_endpoints]
-cosmosevm = "https://evm-rpc.cosmos.network"
-
-# Deploy with:
-# forge script --rpc-url cosmosevm --broadcast
-```
-
-```javascript Web3.js
-const Web3 = require('web3');
-const web3 = new Web3('https://evm-rpc.cosmos.network');
-
-// All standard Ethereum methods work
-const balance = await web3.eth.getBalance(address);
-const blockNumber = await web3.eth.getBlockNumber();
-```
-
-```javascript Ethers.js
-const { ethers } = require('ethers');
-const provider = new ethers.providers.JsonRpcProvider(
-  'https://evm-rpc.cosmos.network'
-);
-
-// Full Ethereum compatibility
-const balance = await provider.getBalance(address);
-const block = await provider.getBlock('latest');
-```
-</CodeGroup>
-
-## Available Methods
-
-The following methods have been discovered from the cosmos/evm codebase and are available on Cosmos EVM chains:
-
-### Account & Balance Methods
-- [`eth_accounts`](./eth/eth_accounts) - Returns list of addresses owned by client
-- [`eth_getBalance`](./eth/eth_getBalance) - Returns balance of account at given address
-- [`eth_getCode`](./eth/eth_getCode) - Returns code at a given address
-- [`eth_getStorageAt`](./eth/eth_getStorageAt) - Returns storage value at position
-- [`eth_getTransactionCount`](./eth/eth_getTransactionCount) - Returns transaction count (nonce)
-
-### Block Methods
-- [`eth_blockNumber`](./eth/eth_blockNumber) - Returns current block number
-- [`eth_getBlockByHash`](./eth/eth_getBlockByHash) - Returns block information by hash
-- [`eth_getBlockByNumber`](./eth/eth_getBlockByNumber) - Returns block information by number
-- [`eth_getBlockTransactionCountByHash`](./eth/eth_getBlockTransactionCountByHash) - Returns transaction count in block by hash
-- [`eth_getBlockTransactionCountByNumber`](./eth/eth_getBlockTransactionCountByNumber) - Returns transaction count in block by number
-
-### Transaction Methods
-- [`eth_sendTransaction`](./eth/eth_sendTransaction) - Creates and sends transaction
-- [`eth_sendRawTransaction`](./eth/eth_sendRawTransaction) - Sends signed transaction
-- [`eth_getTransactionByHash`](./eth/eth_getTransactionByHash) - Returns transaction by hash
-- [`eth_getTransactionByBlockHashAndIndex`](./eth/eth_getTransactionByBlockHashAndIndex) - Returns transaction by block hash and index
-- [`eth_getTransactionByBlockNumberAndIndex`](./eth/eth_getTransactionByBlockNumberAndIndex) - Returns transaction by block number and index
-- [`eth_getTransactionReceipt`](./eth/eth_getTransactionReceipt) - Returns transaction receipt
-
-### Gas & Fee Methods
-- [`eth_gasPrice`](./eth/eth_gasPrice) - Returns current gas price
-- [`eth_maxPriorityFeePerGas`](./eth/eth_maxPriorityFeePerGas) - Returns max priority fee per gas (EIP-1559)
-- [`eth_feeHistory`](./eth/eth_feeHistory) - Returns fee history
-- [`eth_estimateGas`](./eth/eth_estimateGas) - Estimates gas for transaction
-
-### Call & Simulation
-- [`eth_call`](./eth/eth_call) - Executes message call without transaction
-- [`eth_chainId`](./eth/eth_chainId) - Returns chain ID
-
-### Subscription Methods (WebSocket)
-- [`eth_subscribe`](./eth/eth_subscribe) - Subscribe to events via WebSocket
-- [`eth_unsubscribe`](./eth/eth_unsubscribe) - Unsubscribe from events
-
-<Warning>
-  **Additional Methods Available**: The cosmos/evm codebase implements **41 total methods**. The methods above represent the core Ethereum-compatible APIs. Additional methods may be available for advanced use cases.
-</Warning>
-
-## Method Categories
-
-### Core Ethereum Compatibility
-All standard Ethereum JSON-RPC methods are supported, ensuring full compatibility with:
-- **Wallets**: MetaMask, WalletConnect, Coinbase Wallet
-- **Development Tools**: Hardhat, Foundry, Truffle, Remix
-- **Libraries**: Web3.js, Ethers.js, Web3.py
-- **Infrastructure**: Infura, Alchemy patterns
-
-### Cosmos-Specific Enhancements
-While maintaining Ethereum compatibility, Cosmos EVM chains may include:
-- **Enhanced Gas Handling**: Integration with Cosmos SDK fee mechanisms
-- **Cross-Chain Features**: IBC-enabled smart contracts (where supported)
-- **Multi-Token Support**: Native integration with Cosmos SDK tokens
-
-## Real-Time Data with WebSocket
+### Real-Time Data with WebSocket
 
 <CodeGroup>
 ```javascript Subscribe to New Blocks
@@ -190,7 +114,7 @@ ws.on('open', () => {
 ```
 </CodeGroup>
 
-## Error Handling
+### Error Handling
 
 Standard Ethereum JSON-RPC error codes:
 
@@ -203,44 +127,18 @@ Standard Ethereum JSON-RPC error codes:
 | -32603 | Internal error | Internal JSON-RPC error |
 | -32000 to -32099 | Server error | Implementation-defined server errors |
 
-## Best Practices
-
-<Steps>
-  <Step title="Use Batch Requests">
-    Combine multiple calls for better performance
-    ```json
-    [
-      {"jsonrpc": "2.0", "method": "eth_getBalance", "params": ["0x...", "latest"], "id": 1},
-      {"jsonrpc": "2.0", "method": "eth_getTransactionCount", "params": ["0x...", "latest"], "id": 2}
-    ]
-    ```
-  </Step>
-
-  <Step title="Handle Rate Limits">
-    Implement exponential backoff and respect rate limits on public endpoints
-  </Step>
-
-  <Step title="Use WebSocket for Real-Time">
-    Subscribe to events instead of polling for better efficiency
-  </Step>
-
-  <Step title="Cache Responses">
-    Cache block data and other immutable responses appropriately
-  </Step>
-</Steps>
-
 ## Performance Considerations
 
 ### Public RPC Limits
-- **Rate Limiting**: Public endpoints have request limits
+- **Rate Limiting**: Public endpoints typically have request limits
+- **Block History**: Most public endpoints prune to a limited number of recent blocks
 - **Payload Size**: Large requests may be rejected
-- **Concurrent Connections**: WebSocket connection limits apply
+- **Concurrent Connections**: WebSocket connection or time limits may apply
 
 ### Optimization Tips
-- Use `latest` block tag sparingly in production
-- Batch multiple requests when possible
+- Use `latest` block tag sparingly
 - Implement proper retry logic with exponential backoff
-- Consider running your own node for high-volume applications
+- Deploy your own node or hire a private service for heavier use-cases
 
 ## Testing Your Integration
 
@@ -297,7 +195,3 @@ curl -X POST https://evm-rpc.cosmos.network \
 </CardGroup>
 
 ---
-
-<Info>
-  **Method Discovery**: This documentation is automatically generated by analyzing the [cosmos/evm](https://github.com/cosmos/evm) codebase. Methods are discovered directly from the source code to ensure accuracy and completeness.
-</Info>

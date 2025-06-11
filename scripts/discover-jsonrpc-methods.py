@@ -11,7 +11,7 @@ This script discovers all available EVM JSON-RPC methods by:
 import os
 import re
 import json
-import yaml
+import yaml # type: ignore
 import requests
 import tempfile
 import subprocess
