@@ -6,6 +6,10 @@ This script generates proper OpenAPI specs that can be used with Mintlify
 to create interactive API documentation with code samples and playgrounds.
 
 Enhanced to prioritize EVM modules over Cosmos SDK modules when there's overlap.
+
+IMPORTANT: Only generates GET endpoints for Query service methods. Other gRPC
+methods require signed transactions via /cosmos/tx/v1beta1/txs and are not
+suitable for direct REST API calls.
 """
 
 import os
@@ -119,8 +123,8 @@ def generate_combined_openapi_spec(all_modules: Dict[str, Any], base_url: str = 
     spec = {
         "openapi": "3.0.3",
         "info": {
-            "title": "Cosmos SDK & EVM REST API",
-            "description": "Complete REST API reference for all Cosmos SDK and EVM modules. EVM-specific modules take precedence where applicable.",
+            "title": "Cosmos SDK & EVM Query API",
+            "description": "Query operations for all Cosmos SDK and EVM modules. Only includes GET endpoints for querying blockchain state. State-changing operations require signed transactions submitted to /cosmos/tx/v1beta1/txs.",
             "version": "1.0.0",
             "contact": {
                 "name": "Cosmos SDK Documentation",
@@ -198,12 +202,15 @@ def generate_combined_openapi_spec(all_modules: Dict[str, Any], base_url: str = 
                 method_lower = method_name.lower()
 
                 # Determine HTTP method and path
-                if service_name.lower() == "query" or method_lower.startswith("get") or method_lower in ["params", "balance", "balances", "validators"]:
+                # In Cosmos SDK, only Query service methods should be GET
+                # All other methods require signed transactions via /cosmos/tx/v1beta1/txs
+                if service_name.lower() == "query":
                     http_method = "get"
                     path = f"{base_path}/{method_lower}"
                 else:
-                    http_method = "post"
-                    path = f"{base_path}/{method_lower}"
+                    # Skip non-query methods as they require signed transactions
+                    # These should be documented separately in transaction operations
+                    continue
 
                 operation = {
                     "tags": [service_tag],
@@ -230,21 +237,7 @@ def generate_combined_openapi_spec(all_modules: Dict[str, Any], base_url: str = 
                     }
                 }
 
-                if http_method == "post":
-                    operation["requestBody"] = {
-                        "required": True,
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {"type": "object"}
-                                    }
-                                }
-                            }
-                        }
-                    }
-
+                # Add query parameters for GET requests
                 if http_method == "get":
                     operation["parameters"] = [
                         {
