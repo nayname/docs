@@ -205,7 +205,7 @@
                 ]
               },
               {
-                "group": "EVM REST API",
+                "group": "vm",
                 "isCollapsible": true,
                 "pages": [
                   "docs/api-reference/cosmos-rest/vm/account",
@@ -213,7 +213,7 @@
                 ]
               },
               {
-                "group": "Fee Market",
+                "group": "feemarket",
                 "isCollapsible": true,
                 "pages": [
                   "docs/api-reference/cosmos-rest/feemarket/params",
@@ -221,7 +221,7 @@
                 ]
               },
               {
-                "group": "ERC20 Module",
+                "group": "erc20",
                 "isCollapsible": true,
                 "pages": [
                   "docs/api-reference/cosmos-rest/erc20/tokenpairs",
@@ -236,7 +236,7 @@
                 ]
               },
               {
-                "group": "Feegrant",
+                "group": "feegrant",
                 "isCollapsible": true,
                 "pages": [
                   "docs/api-reference/cosmos-rest/feegrant/grantallowance",
@@ -246,7 +246,7 @@
                 ]
               },
               {
-                "group": "Group",
+                "group": "group",
                 "isCollapsible": true,
                 "pages": [
                   "docs/api-reference/cosmos-rest/group/groupinfo",
@@ -267,7 +267,7 @@
                 ]
               },
               {
-                "group": "Vesting",
+                "group": "vesting",
                 "isCollapsible": true,
                 "pages": [
                   "docs/api-reference/cosmos-rest/vesting/createvestingaccount",
@@ -275,7 +275,7 @@
                 ]
               },
               {
-                "group": "NFT",
+                "group": "nft",
                 "isCollapsible": true,
                 "pages": [
                   "docs/api-reference/cosmos-rest/nft/send",
@@ -301,7 +301,7 @@
                     ]
                 },
                 {
-                    "group": "Block Methods",
+                    "group": "Block",
                     "isCollapsible": true,
                     "pages": [
                         "docs/api-reference/evm-jsonrpc/eth/eth_blockNumber",
@@ -312,7 +312,7 @@
                     ]
                 },
                 {
-                    "group": "Transaction Methods",
+                    "group": "Transaction",
                     "isCollapsible": true,
                     "pages": [
                         "docs/api-reference/evm-jsonrpc/eth/eth_sendTransaction",
@@ -324,7 +324,7 @@
                     ]
                 },
                 {
-                    "group": "Gas & Fee Methods",
+                    "group": "Gas & Fee",
                     "isCollapsible": true,
                     "pages": [
                         "docs/api-reference/evm-jsonrpc/eth/eth_gasPrice",
@@ -334,7 +334,7 @@
                     ]
                 },
                 {
-                    "group": "Call & Simulation",
+                    "group": "Call & ChainId",
                     "isCollapsible": true,
                     "pages": [
                         "docs/api-reference/evm-jsonrpc/eth/eth_call",

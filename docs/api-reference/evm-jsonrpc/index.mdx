@@ -1,73 +1,72 @@
 ---
 title: "Overview"
-description: "Complete JSON-RPC API reference for Cosmos EVM"
+description: "Cosmos EVM SON-RPC API reference"
+mode: "center"
 ---
 
-## Overview
-
-Cosmos EVM chains implement the Ethereum JSON-RPC API specification, providing full compatibility with existing Ethereum tooling and infrastructure. This allows developers to use familiar tools like MetaMask, Hardhat, Foundry, and other Ethereum ecosystem tools seamlessly.
+Cosmos EVM chains implement the Ethereum JSON-RPC API specification, providing full compatibility with existing Ethereum tooling and infrastructure.
 
 ## Supported EVM-RPC methods
 
 *Based on go-ethereum v1.10*
 
-| Method | Namespace | Supported | Notes | Link |
+| Method | Namespace | Supported | Notes | Goto |
 |--------|-----------|-----------|-------|------|
 | **Account & Balance** |||||
-| `eth_accounts` | eth | ✅ | Returns addresses owned by client | [📖](./eth/eth_accounts) |
-| `eth_getBalance` | eth | ✅ | Returns account balance | [📖](./eth/eth_getBalance) |
-| `eth_getCode` | eth | ✅ | Returns contract code | [📖](./eth/eth_getCode) |
-| `eth_getStorageAt` | eth | ✅ | Returns storage value | [📖](./eth/eth_getStorageAt) |
-| `eth_getTransactionCount` | eth | ✅ | Returns nonce (transaction count) | [📖](./eth/eth_getTransactionCount) |
+| `eth_accounts` | eth | Y | Returns addresses owned by client | [📖](./eth/eth_accounts) |
+| `eth_getBalance` | eth | Y | Returns account balance | [📖](./eth/eth_getBalance) |
+| `eth_getCode` | eth | Y | Returns contract code | [📖](./eth/eth_getCode) |
+| `eth_getStorageAt` | eth | Y | Returns storage value | [📖](./eth/eth_getStorageAt) |
+| `eth_getTransactionCount` | eth | Y | Returns nonce (transaction count) | [📖](./eth/eth_getTransactionCount) |
 | **Block Methods** |||||
-| `eth_blockNumber` | eth | ✅ | Returns latest block number | [📖](./eth/eth_blockNumber) |
-| `eth_getBlockByHash` | eth | ✅ | Returns block by hash | [📖](./eth/eth_getBlockByHash) |
-| `eth_getBlockByNumber` | eth | ✅ | Returns block by number | [📖](./eth/eth_getBlockByNumber) |
-| `eth_getBlockTransactionCountByHash` | eth | ✅ | Transaction count in block by hash | [📖](./eth/eth_getBlockTransactionCountByHash) |
-| `eth_getBlockTransactionCountByNumber` | eth | ✅ | Transaction count in block by number | [📖](./eth/eth_getBlockTransactionCountByNumber) |
-| `eth_getUncleByBlockHashAndIndex` | eth | ✅ | Returns `null` (no uncles in Tendermint) | - |
-| `eth_getUncleByBlockNumberAndIndex` | eth | ✅ | Returns `null` (no uncles in Tendermint) | - |
-| `eth_getUncleCountByBlockHash` | eth | ✅ | Returns `0x0` (no uncles) | - |
-| `eth_getUncleCountByBlockNumber` | eth | ✅ | Returns `0x0` (no uncles) | - |
+| `eth_blockNumber` | eth | Y | Returns latest block number | [📖](./eth/eth_blockNumber) |
+| `eth_getBlockByHash` | eth | Y | Returns block by hash | [📖](./eth/eth_getBlockByHash) |
+| `eth_getBlockByNumber` | eth | Y | Returns block by number | [📖](./eth/eth_getBlockByNumber) |
+| `eth_getBlockTransactionCountByHash` | eth | Y | Transaction count in block by hash | [📖](./eth/eth_getBlockTransactionCountByHash) |
+| `eth_getBlockTransactionCountByNumber` | eth | Y | Transaction count in block by number | [📖](./eth/eth_getBlockTransactionCountByNumber) |
+| `eth_getUncleByBlockHashAndIndex` | eth | Y | Returns `null` (no uncles in Tendermint) | - |
+| `eth_getUncleByBlockNumberAndIndex` | eth | Y | Returns `null` (no uncles in Tendermint) | - |
+| `eth_getUncleCountByBlockHash` | eth | Y | Returns `0x0` (no uncles) | - |
+| `eth_getUncleCountByBlockNumber` | eth | Y | Returns `0x0` (no uncles) | - |
 | **Transaction Methods** |||||
-| `eth_sendTransaction` | eth | ✅ | Creates and sends transaction | [📖](./eth/eth_sendTransaction) |
-| `eth_sendRawTransaction` | eth | ✅ | Sends pre-signed transaction | [📖](./eth/eth_sendRawTransaction) |
-| `eth_getTransactionByHash` | eth | ✅ | Returns transaction by hash | [📖](./eth/eth_getTransactionByHash) |
-| `eth_getTransactionByBlockHashAndIndex` | eth | ✅ | Transaction by block hash and index | [📖](./eth/eth_getTransactionByBlockHashAndIndex) |
-| `eth_getTransactionByBlockNumberAndIndex` | eth | ✅ | Transaction by block number and index | [📖](./eth/eth_getTransactionByBlockNumberAndIndex) |
-| `eth_getTransactionReceipt` | eth | ✅ | Returns transaction receipt | [📖](./eth/eth_getTransactionReceipt) |
-| `eth_sign` | eth | ✅ | Signs data (requires unlocked account) | - |
-| `eth_signTransaction` | eth | ✅ | Signs transaction (requires unlocked account) | - |
+| `eth_sendTransaction` | eth | Y | Creates and sends transaction | [📖](./eth/eth_sendTransaction) |
+| `eth_sendRawTransaction` | eth | Y | Sends pre-signed transaction | [📖](./eth/eth_sendRawTransaction) |
+| `eth_getTransactionByHash` | eth | Y | Returns transaction by hash | [📖](./eth/eth_getTransactionByHash) |
+| `eth_getTransactionByBlockHashAndIndex` | eth | Y | Transaction by block hash and index | [📖](./eth/eth_getTransactionByBlockHashAndIndex) |
+| `eth_getTransactionByBlockNumberAndIndex` | eth | Y | Transaction by block number and index | [📖](./eth/eth_getTransactionByBlockNumberAndIndex) |
+| `eth_getTransactionReceipt` | eth | Y | Returns transaction receipt | [📖](./eth/eth_getTransactionReceipt) |
+| `eth_sign` | eth | Y | Signs data (requires unlocked account) | - |
+| `eth_signTransaction` | eth | Y | Signs transaction (requires unlocked account) | - |
 | **Gas & Fee Methods** |||||
-| `eth_gasPrice` | eth | ✅ | Returns current gas price | [📖](./eth/eth_gasPrice) |
-| `eth_estimateGas` | eth | ✅ | Estimates gas for transaction | [📖](./eth/eth_estimateGas) |
-| `eth_feeHistory` | eth | ❌ | EIP-1559 method, relies on baseFee | [📖](./eth/eth_feeHistory) |
-| `eth_maxPriorityFeePerGas` | eth | ❌ | EIP-1559 method (London fork) | [📖](./eth/eth_maxPriorityFeePerGas) |
+| `eth_gasPrice` | eth | Y | Returns current gas price | [📖](./eth/eth_gasPrice) |
+| `eth_estimateGas` | eth | Y | Estimates gas for transaction | [📖](./eth/eth_estimateGas) |
+| `eth_feeHistory` | eth | N | EIP-1559 method, relies on baseFee | [📖](./eth/eth_feeHistory) |
+| `eth_maxPriorityFeePerGas` | eth | N | EIP-1559 method (London fork) | [📖](./eth/eth_maxPriorityFeePerGas) |
 | **Call & Simulation** |||||
-| `eth_call` | eth | ✅ | Execute message call without transaction | [📖](./eth/eth_call) |
-| `eth_chainId` | eth | ✅ | Returns chain ID | [📖](./eth/eth_chainId) |
-| `eth_syncing` | eth | ✅ | Returns sync status or `false` | - |
+| `eth_call` | eth | Y | Execute message call without transaction | [📖](./eth/eth_call) |
+| `eth_chainId` | eth | Y | Returns chain ID | [📖](./eth/eth_chainId) |
+| `eth_syncing` | eth | Y | Returns sync status or `false` | - |
 | **Filters & Logs** |||||
-| `eth_newFilter` | eth | ✅ | Creates filter for logs | - |
-| `eth_newBlockFilter` | eth | ✅ | Creates filter for new blocks | - |
-| `eth_newPendingTransactionFilter` | eth | ✅ | Creates filter for pending transactions | - |
-| `eth_uninstallFilter` | eth | ✅ | Removes filter | - |
-| `eth_getFilterChanges` | eth | ✅ | Polls filter for changes | - |
-| `eth_getFilterLogs` | eth | ✅ | Returns logs matching filter ID | - |
-| `eth_getLogs` | eth | ✅ | Returns logs matching filter object | - |
+| `eth_newFilter` | eth | Y | Creates filter for logs | - |
+| `eth_newBlockFilter` | eth | Y | Creates filter for new blocks | - |
+| `eth_newPendingTransactionFilter` | eth | Y | Creates filter for pending transactions | - |
+| `eth_uninstallFilter` | eth | Y | Removes filter | - |
+| `eth_getFilterChanges` | eth | Y | Polls filter for changes | - |
+| `eth_getFilterLogs` | eth | Y | Returns logs matching filter ID | - |
+| `eth_getLogs` | eth | Y | Returns logs matching filter object | - |
 | **WebSocket Subscriptions** |||||
-| `eth_subscribe` | eth | ✅ | Subscribe to events | [📖](./eth/eth_subscribe) |
-| `eth_unsubscribe` | eth | ✅ | Unsubscribe from events | [📖](./eth/eth_unsubscribe) |
+| `eth_subscribe` | eth | Y | Subscribe to events | [📖](./eth/eth_subscribe) |
+| `eth_unsubscribe` | eth | Y | Unsubscribe from events | [📖](./eth/eth_unsubscribe) |
 | **Network Methods** |||||
-| `net_version` | net | ✅ | Returns network ID | - |
-| `net_listening` | net | ✅ | Returns listening status | - |
-| `net_peerCount` | net | ✅ | Returns peer count | - |
+| `net_version` | net | Y | Returns network ID | - |
+| `net_listening` | net | Y | Returns listening status | - |
+| `net_peerCount` | net | Y | Returns peer count | - |
 | **Web3 Utility** |||||
-| `web3_clientVersion` | web3 | ✅ | Returns client version | - |
-| `web3_sha3` | web3 | ✅ | Keccak-256 hash | - |
+| `web3_clientVersion` | web3 | Y | Returns client version | - |
+| `web3_sha3` | web3 | Y | Keccak-256 hash | - |
 | **Post-Merge / Advanced** |||||
-| `eth_getProof` | eth | ❌ | Merkle proof (EIP-1186, post-v1.10) | - |
-| `eth_createAccessList` | eth | ❌ | EIP-2930 access lists (post-v1.10) | - |
+| `eth_getProof` | eth | N | Merkle proof (EIP-1186, post-v1.10) | - |
+| `eth_createAccessList` | eth | N | EIP-2930 access lists (post-v1.10) | - |
 
 <Info>
   **Namespace Support**: `debug` endpoints are not yet supported but are slated for a future release.
