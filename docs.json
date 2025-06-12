@@ -34,11 +34,11 @@
             "isCollapsible": true,
             "pages": [
               "docs/devnet/overview",
+              "docs/devnet/getting-started",
+              "docs/devnet/how-to-get-tokens",
               "docs/devnet/precompiles",
               "docs/devnet/launched-contracts",
-              "docs/devnet/how-to-get-tokens",
-              "docs/devnet/resources",
-              "docs/devnet/how-to-get-started"
+              "docs/devnet/resources"
             ]
           }
         ]
