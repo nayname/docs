@@ -1,0 +1,303 @@
+---
+title: "Slashing"
+description: "Validator slashing and jail management for network security"
+icon: "gavel"
+---
+
+# Slashing Precompile
+
+**Address**: `0x0000000000000000000000000000000000000806`
+
+**Related Module**: [x/slashing](https://docs.cosmos.network/main/modules/slashing)
+
+The Slashing precompile provides access to Cosmos SDK slashing functionality, enabling smart contracts to interact with validator punishment mechanisms, jail management, and signing information queries.
+
+## Functions
+
+### unjail
+
+**Signature**: `unjail(address validatorAddress) → bool`
+
+**Description**: Allows validators to unjail themselves after being jailed for downtime.
+
+**Parameters**:
+- `validatorAddress` (address): The validator operator address to unjail
+
+**Returns**: Boolean indicating success
+
+### getSigningInfo
+
+**Signature**: `getSigningInfo(address consAddress) → SigningInfo`
+
+**Description**: Returns the signing info for a specific validator.
+
+**Parameters**:
+- `consAddress` (address): The validator consensus address
+
+**Returns**: SigningInfo struct containing validator signing information
+
+### getSigningInfos
+
+**Signature**: `getSigningInfos(PageRequest calldata pagination) → (SigningInfo[], PageResponse)`
+
+**Description**: Returns the signing info for all validators with pagination.
+
+**Parameters**:
+- `pagination` (PageRequest): Pagination configuration for the query
+
+**Returns**: 
+- Array of SigningInfo structs
+- PageResponse with pagination information
+
+### getParams
+
+**Signature**: `getParams() → Params`
+
+**Description**: Returns the slashing module parameters.
+
+**Returns**: Params struct containing slashing module configuration
+
+## Events
+
+- `ValidatorUnjailed(address indexed validator)`
+
+## Data Structures
+
+### SigningInfo
+- `validatorAddress` (address): Address of the validator
+- `startHeight` (int64): Height at which validator was first a candidate or was unjailed
+- `indexOffset` (int64): Index offset into signed block bit array
+- `jailedUntil` (int64): Timestamp until which validator is jailed due to liveness downtime
+- `tombstoned` (bool): Whether the validator has been tombstoned
+- `missedBlocksCounter` (int64): Missed blocks counter
+
+### Params
+- `signedBlocksWindow` (int64): How many blocks the validator should have signed
+- `minSignedPerWindow` (Dec): Minimum blocks signed per window to avoid slashing
+- `downtimeJailDuration` (int64): How long the validator will be jailed for downtime
+- `slashFractionDoubleSign` (Dec): Percentage of slash for double sign
+- `slashFractionDowntime` (Dec): Percentage of slash for downtime
+
+<details>
+<summary>ABI</summary>
+
+```json
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "address", "name": "validator", "type": "address"}
+    ],
+    "name": "ValidatorUnjailed",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "getParams",
+    "outputs": [
+      {
+        "components": [
+          {"internalType": "int64", "name": "signedBlocksWindow", "type": "int64"},
+          {
+            "components": [
+              {"internalType": "uint256", "name": "value", "type": "uint256"},
+              {"internalType": "uint8", "name": "precision", "type": "uint8"}
+            ],
+            "internalType": "struct Dec",
+            "name": "minSignedPerWindow",
+            "type": "tuple"
+          },
+          {"internalType": "int64", "name": "downtimeJailDuration", "type": "int64"},
+          {
+            "components": [
+              {"internalType": "uint256", "name": "value", "type": "uint256"},
+              {"internalType": "uint8", "name": "precision", "type": "uint8"}
+            ],
+            "internalType": "struct Dec",
+            "name": "slashFractionDoubleSign",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {"internalType": "uint256", "name": "value", "type": "uint256"},
+              {"internalType": "uint8", "name": "precision", "type": "uint8"}
+            ],
+            "internalType": "struct Dec",
+            "name": "slashFractionDowntime",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct Params",
+        "name": "params",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "consAddress", "type": "address"}
+    ],
+    "name": "getSigningInfo",
+    "outputs": [
+      {
+        "components": [
+          {"internalType": "address", "name": "validatorAddress", "type": "address"},
+          {"internalType": "int64", "name": "startHeight", "type": "int64"},
+          {"internalType": "int64", "name": "indexOffset", "type": "int64"},
+          {"internalType": "int64", "name": "jailedUntil", "type": "int64"},
+          {"internalType": "bool", "name": "tombstoned", "type": "bool"},
+          {"internalType": "int64", "name": "missedBlocksCounter", "type": "int64"}
+        ],
+        "internalType": "struct SigningInfo",
+        "name": "signingInfo",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {"internalType": "bytes", "name": "key", "type": "bytes"},
+          {"internalType": "uint64", "name": "offset", "type": "uint64"},
+          {"internalType": "uint64", "name": "limit", "type": "uint64"},
+          {"internalType": "bool", "name": "countTotal", "type": "bool"},
+          {"internalType": "bool", "name": "reverse", "type": "bool"}
+        ],
+        "internalType": "struct PageRequest",
+        "name": "pagination",
+        "type": "tuple"
+      }
+    ],
+    "name": "getSigningInfos",
+    "outputs": [
+      {
+        "components": [
+          {"internalType": "address", "name": "validatorAddress", "type": "address"},
+          {"internalType": "int64", "name": "startHeight", "type": "int64"},
+          {"internalType": "int64", "name": "indexOffset", "type": "int64"},
+          {"internalType": "int64", "name": "jailedUntil", "type": "int64"},
+          {"internalType": "bool", "name": "tombstoned", "type": "bool"},
+          {"internalType": "int64", "name": "missedBlocksCounter", "type": "int64"}
+        ],
+        "internalType": "struct SigningInfo[]",
+        "name": "signingInfos",
+        "type": "tuple[]"
+      },
+      {
+        "components": [
+          {"internalType": "bytes", "name": "nextKey", "type": "bytes"},
+          {"internalType": "uint64", "name": "total", "type": "uint64"}
+        ],
+        "internalType": "struct PageResponse",
+        "name": "pageResponse",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "validatorAddress", "type": "address"}
+    ],
+    "name": "unjail",
+    "outputs": [
+      {"internalType": "bool", "name": "success", "type": "bool"}
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
+```
+
+</details>
+
+<details>
+<summary>Solidity Interface</summary>
+
+```solidity
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.17;
+
+import "../common/Types.sol";
+
+/// @dev The ISlashing contract's address.
+address constant SLASHING_PRECOMPILE_ADDRESS = 0x0000000000000000000000000000000000000806;
+
+/// @dev The ISlashing contract's instance.
+ISlashing constant SLASHING_CONTRACT = ISlashing(SLASHING_PRECOMPILE_ADDRESS);
+
+/// @dev SigningInfo defines a validator's signing info for monitoring their
+/// liveness activity.
+struct SigningInfo {
+    /// @dev Address of the validator
+    address validatorAddress;
+    /// @dev Height at which validator was first a candidate OR was unjailed
+    int64 startHeight;
+    /// @dev Index offset into signed block bit array
+    int64 indexOffset;
+    /// @dev Timestamp until which validator is jailed due to liveness downtime
+    int64 jailedUntil;
+    /// @dev Whether or not a validator has been tombstoned (killed out of validator set)
+    bool tombstoned;
+    /// @dev Missed blocks counter (to avoid scanning the array every time)
+    int64 missedBlocksCounter;
+}
+
+/// @dev Params defines the parameters for the slashing module.
+struct Params {
+    /// @dev SignedBlocksWindow defines how many blocks the validator should have signed
+    int64 signedBlocksWindow;
+    /// @dev MinSignedPerWindow defines the minimum blocks signed per window to avoid slashing
+    Dec minSignedPerWindow;
+    /// @dev DowntimeJailDuration defines how long the validator will be jailed for downtime
+    int64 downtimeJailDuration;
+    /// @dev SlashFractionDoubleSign defines the percentage of slash for double sign
+    Dec slashFractionDoubleSign;
+    /// @dev SlashFractionDowntime defines the percentage of slash for downtime
+    Dec slashFractionDowntime;
+}
+
+/// @author Evmos Team
+/// @title Slashing Precompiled Contract
+/// @dev The interface through which solidity contracts will interact with slashing.
+/// We follow this same interface including four-byte function selectors, in the precompile that
+/// wraps the pallet.
+/// @custom:address 0x0000000000000000000000000000000000000806
+interface ISlashing {
+    /// @dev Emitted when a validator is unjailed
+    /// @param validator The address of the validator
+    event ValidatorUnjailed(address indexed validator);
+
+    /// @dev GetSigningInfo returns the signing info for a specific validator.
+    /// @param consAddress The validator consensus address
+    /// @return signingInfo The validator signing info
+    function getSigningInfo(
+        address consAddress
+    ) external view returns (SigningInfo memory signingInfo);
+
+    /// @dev GetSigningInfos returns the signing info for all validators.
+    /// @param pagination Pagination configuration for the query
+    /// @return signingInfos The list of validator signing info
+    /// @return pageResponse Pagination information for the response
+    function getSigningInfos(
+        PageRequest calldata pagination
+    ) external view returns (SigningInfo[] memory signingInfos, PageResponse memory pageResponse);
+
+    /// @dev Unjail allows validators to unjail themselves after being jailed for downtime
+    /// @param validatorAddress The validator operator address to unjail
+    /// @return success true if the unjail operation was successful
+    function unjail(address validatorAddress) external returns (bool success);
+
+    /// @dev GetParams returns the slashing module parameters
+    /// @return params The slashing module parameters
+    function getParams() external view returns (Params memory params);
+}
+```
+
+</details>

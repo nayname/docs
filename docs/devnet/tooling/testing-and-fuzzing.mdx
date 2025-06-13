@@ -1,0 +1,66 @@
+---
+title: "Smart Contract Testing & Fuzzing"
+description: "Key frameworks, libraries, and practices for writing robust, secure smart contracts on Cosmos EVM."
+---
+
+Smart-contract quality hinges on **unit tests, property-based fuzzing, code-coverage checks, and static analysis**.  
+The tools below cover each layer.
+
+## 1 — Core Testing Frameworks
+
+### Foundry — Solidity-Native
+
+- Tests written directly in Solidity.  
+- Very fast runner (`forge test`) and rich cheatcodes for state manipulation.  
+- Built-in, configurable fuzzing.
+
+### Hardhat — JavaScript / TypeScript
+
+- Mocha + Chai test environment.  
+- Extensive plug-in ecosystem; integrates with the broader JS tool-chain.
+
+## 2 — Fuzz (Property-Based) Testing
+
+Random inputs are generated until a property fails.
+
+```solidity
+// test/MyContract.t.sol  (Foundry)
+function test_myFunction_fuzz(uint256 amount) public {
+    vm.assume(amount > 0 && amount < 1e18);   // constrain input
+    myContract.myFunction(amount);
+    assertEq(myContract.someState(), expectedValue);
+}
+````
+
+* **Foundry**: fuzzing enabled by default (`forge test`).
+* **Echidna**: standalone fuzzer for advanced campaigns (`echidna-test .`).
+
+## 3 — Supplementary Tools
+
+| Tool                          | Purpose                                   | Typical Command                           |
+| ----------------------------- | ----------------------------------------- | ----------------------------------------- |
+| **OpenZeppelin Test Helpers** | Time travel, revert checks (Hardhat)      | see example ↓                             |
+| **solidity-coverage**         | Identify untested code paths              | `npx hardhat coverage` · `forge coverage` |
+| **Slither**                   | Static-analysis / vulnerability detectors | `slither .`                               |
+
+### Example — OpenZeppelin Test Helpers
+
+```js
+const { time, expectRevert } = require('@openzeppelin/test-helpers');
+
+// advance clock by one day
+await time.increase(time.duration.days(1));
+
+// expect revert with specific reason
+await expectRevert(contract.someFunction(), "Ownable: caller is not the owner");
+```
+
+---
+
+**Next steps**
+
+1. Pick **one** primary framework (Foundry *or* Hardhat).
+2. Add fuzz tests for critical invariants.
+3. Run coverage and Slither in CI to catch gaps and vulnerabilities early.
+
+```

@@ -1,0 +1,468 @@
+---
+title: "Staking"
+description: "Validator operations, delegation management, and staking functionality"
+icon: "coins"
+---
+
+# Staking Precompile
+
+**Address**: `0x0000000000000000000000000000000000000800`
+
+**Related Module**: [x/staking](https://docs.cosmos.network/main/modules/staking)
+
+The Staking precompile provides access to Cosmos SDK staking functionality, enabling smart contracts to create validators, manage delegations, and query staking information.
+
+## Functions
+
+### createValidator
+
+**Signature**: `createValidator(Description, CommissionRates, uint256, string, string, address) → bool`
+
+**Description**: Creates a new validator with the specified parameters.
+
+**Parameters**:
+- `description` (Description): Validator description and metadata
+- `commission` (CommissionRates): Commission rate configuration
+- `minSelfDelegation` (uint256): Minimum self-delegation amount
+- `validatorAddress` (string): Validator operator address
+- `pubkey` (string): Validator consensus public key
+- `value` (address): Address making the initial delegation
+
+**Returns**: Boolean indicating success
+
+### editValidator
+
+**Signature**: `editValidator(Description, string, uint256) → bool`
+
+**Description**: Edits an existing validator's parameters.
+
+**Parameters**:
+- `description` (Description): Updated validator description
+- `validatorAddress` (string): Validator operator address to edit
+- `commissionRate` (uint256): New commission rate
+
+**Returns**: Boolean indicating success
+
+### delegate
+
+**Signature**: `delegate(address, string, uint256) → bool`
+
+**Description**: Delegates tokens to a validator.
+
+**Parameters**:
+- `delegatorAddress` (address): Address of the delegator
+- `validatorAddress` (string): Validator to delegate to
+- `amount` (uint256): Amount to delegate
+
+**Returns**: Boolean indicating success
+
+### undelegate
+
+**Signature**: `undelegate(address, string, uint256) → bool`
+
+**Description**: Undelegates tokens from a validator.
+
+**Parameters**:
+- `delegatorAddress` (address): Address of the delegator
+- `validatorAddress` (string): Validator to undelegate from
+- `amount` (uint256): Amount to undelegate
+
+**Returns**: Boolean indicating success
+
+### redelegate
+
+**Signature**: `redelegate(address, string, string, uint256) → bool`
+
+**Description**: Redelegates tokens from one validator to another.
+
+**Parameters**:
+- `delegatorAddress` (address): Address of the delegator
+- `validatorSrcAddress` (string): Source validator address
+- `validatorDstAddress` (string): Destination validator address
+- `amount` (uint256): Amount to redelegate
+
+**Returns**: Boolean indicating success
+
+### cancelUnbondingDelegation
+
+**Signature**: `cancelUnbondingDelegation(address, string, uint256, uint256) → bool`
+
+**Description**: Cancels an unbonding delegation.
+
+**Parameters**:
+- `delegatorAddress` (address): Address of the delegator
+- `validatorAddress` (string): Validator address
+- `amount` (uint256): Amount to cancel unbonding for
+- `creationHeight` (uint256): Block height when unbonding was initiated
+
+**Returns**: Boolean indicating success
+
+### validator
+
+**Signature**: `validator(string) → Validator`
+
+**Description**: Queries information about a specific validator.
+
+**Parameters**:
+- `validatorAddress` (string): Validator address to query
+
+**Returns**: Validator struct with validator information
+
+### validators
+
+**Signature**: `validators(string, PageRequest) → (Validator[], PageResponse)`
+
+**Description**: Queries validators with optional status filter and pagination.
+
+**Parameters**:
+- `status` (string): Validator status filter
+- `pageRequest` (PageRequest): Pagination parameters
+
+**Returns**: 
+- Array of Validator structs
+- PageResponse for pagination
+
+### delegation
+
+**Signature**: `delegation(address, string) → uint256`
+
+**Description**: Queries the delegation amount between a delegator and validator.
+
+**Parameters**:
+- `delegatorAddress` (address): Delegator address
+- `validatorAddress` (string): Validator address
+
+**Returns**: Delegation amount as uint256
+
+### unbondingDelegation
+
+**Signature**: `unbondingDelegation(address, string) → UnbondingDelegation`
+
+**Description**: Queries unbonding delegation information.
+
+**Parameters**:
+- `delegatorAddress` (address): Delegator address
+- `validatorAddress` (string): Validator address
+
+**Returns**: UnbondingDelegation struct
+
+### delegatorDelegations
+
+**Signature**: `delegatorDelegations(address, PageRequest) → (DelegationResponse[], PageResponse)`
+
+**Description**: Queries all delegations for a delegator.
+
+**Parameters**:
+- `delegatorAddress` (address): Delegator address
+- `pageRequest` (PageRequest): Pagination parameters
+
+**Returns**: 
+- Array of DelegationResponse structs
+- PageResponse for pagination
+
+### delegatorUnbondingDelegations
+
+**Signature**: `delegatorUnbondingDelegations(address, PageRequest) → (UnbondingDelegationResponse[], PageResponse)`
+
+**Description**: Queries all unbonding delegations for a delegator.
+
+**Parameters**:
+- `delegatorAddress` (address): Delegator address
+- `pageRequest` (PageRequest): Pagination parameters
+
+**Returns**: 
+- Array of UnbondingDelegationResponse structs
+- PageResponse for pagination
+
+### redelegations
+
+**Signature**: `redelegations(address, string, string, PageRequest) → (RedelegationResponse[], PageResponse)`
+
+**Description**: Queries redelegations with optional filters.
+
+**Parameters**:
+- `delegatorAddress` (address): Delegator address filter
+- `srcValidatorAddress` (string): Source validator filter
+- `dstValidatorAddress` (string): Destination validator filter
+- `pageRequest` (PageRequest): Pagination parameters
+
+**Returns**: 
+- Array of RedelegationResponse structs
+- PageResponse for pagination
+
+### delegatorValidators
+
+**Signature**: `delegatorValidators(address, PageRequest) → (Validator[], PageResponse)`
+
+**Description**: Queries validators that a delegator has delegated to.
+
+**Parameters**:
+- `delegatorAddress` (address): Delegator address
+- `pageRequest` (PageRequest): Pagination parameters
+
+**Returns**: 
+- Array of Validator structs
+- PageResponse for pagination
+
+### delegatorValidator
+
+**Signature**: `delegatorValidator(address, string) → Validator`
+
+**Description**: Queries a specific validator that a delegator has delegated to.
+
+**Parameters**:
+- `delegatorAddress` (address): Delegator address
+- `validatorAddress` (string): Validator address
+
+**Returns**: Validator struct
+
+### pool
+
+**Signature**: `pool() → Pool`
+
+**Description**: Queries the current staking pool information.
+
+**Returns**: Pool struct with bonded and not bonded tokens
+
+### params
+
+**Signature**: `params() → Params`
+
+**Description**: Queries staking module parameters.
+
+**Returns**: Params struct with staking configuration
+
+## Events
+
+- `CreateValidator(string indexed validatorAddress, uint256 value)`
+- `EditValidator(string indexed validatorAddress)`
+- `Delegate(address indexed delegatorAddress, string indexed validatorAddress, uint256 amount)`
+- `Unbond(address indexed delegatorAddress, string indexed validatorAddress, uint256 amount, uint256 completionTime)`
+- `Redelegate(address indexed delegatorAddress, address indexed validatorSrcAddress, address indexed validatorDstAddress, uint256 amount, uint256 completionTime)`
+- `CancelUnbondingDelegation(address indexed delegatorAddress, address indexed validatorAddress, uint256 amount, uint256 creationHeight)`
+
+## Data Structures
+
+### Description
+- `moniker` (string): Validator name
+- `identity` (string): Identity signature
+- `website` (string): Website URL  
+- `securityContact` (string): Security contact email
+- `details` (string): Additional details
+
+### CommissionRates
+- `rate` (uint256): Current commission rate
+- `maxRate` (uint256): Maximum commission rate
+- `maxChangeRate` (uint256): Maximum daily commission change rate
+
+### Validator
+- `operatorAddress` (string): Validator operator address
+- `consensusPubkey` (string): Consensus public key
+- `jailed` (bool): Whether validator is jailed
+- `status` (BondStatus): Validator bond status
+- `tokens` (uint256): Validator token amount
+- `delegatorShares` (uint256): Total delegator shares
+- `description` (string): Validator description
+- `unbondingHeight` (int64): Unbonding block height
+- `unbondingTime` (int64): Unbonding time
+- `commission` (uint256): Commission information
+- `minSelfDelegation` (uint256): Minimum self delegation
+
+<details>
+<summary>ABI</summary>
+
+```json
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "address", "name": "delegatorAddress", "type": "address"},
+      {"indexed": true, "internalType": "address", "name": "validatorAddress", "type": "address"},
+      {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"},
+      {"indexed": false, "internalType": "uint256", "name": "creationHeight", "type": "uint256"}
+    ],
+    "name": "CancelUnbondingDelegation",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "string", "name": "validatorAddress", "type": "string"},
+      {"indexed": false, "internalType": "uint256", "name": "value", "type": "uint256"}
+    ],
+    "name": "CreateValidator",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "address", "name": "delegatorAddress", "type": "address"},
+      {"indexed": true, "internalType": "string", "name": "validatorAddress", "type": "string"},
+      {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"}
+    ],
+    "name": "Delegate",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "string", "name": "validatorAddress", "type": "string"}
+    ],
+    "name": "EditValidator",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "address", "name": "delegatorAddress", "type": "address"},
+      {"indexed": true, "internalType": "address", "name": "validatorSrcAddress", "type": "address"},
+      {"indexed": true, "internalType": "address", "name": "validatorDstAddress", "type": "address"},
+      {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"},
+      {"indexed": false, "internalType": "uint256", "name": "completionTime", "type": "uint256"}
+    ],
+    "name": "Redelegate",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "address", "name": "delegatorAddress", "type": "address"},
+      {"indexed": true, "internalType": "string", "name": "validatorAddress", "type": "string"},
+      {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"},
+      {"indexed": false, "internalType": "uint256", "name": "completionTime", "type": "uint256"}
+    ],
+    "name": "Unbond",
+    "type": "event"
+  }
+]
+```
+
+</details>
+
+<details>
+<summary>Solidity Interface</summary>
+
+```solidity
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.17;
+
+import "../common/Types.sol";
+
+/// @dev The StakingI contract's address.
+address constant STAKING_PRECOMPILE_ADDRESS = 0x0000000000000000000000000000000000000800;
+
+/// @dev The StakingI contract's instance.
+StakingI constant STAKING_CONTRACT = StakingI(STAKING_PRECOMPILE_ADDRESS);
+
+/// @dev Defines the initial description to be used for creating
+/// a validator.
+struct Description {
+    string moniker;
+    string identity;
+    string website;
+    string securityContact;
+    string details;
+}
+
+/// @dev Defines the initial commission rates to be used for creating
+/// a validator.
+struct CommissionRates {
+    uint256 rate;
+    uint256 maxRate;
+    uint256 maxChangeRate;
+}
+
+/// @dev Defines commission parameters for a given validator.
+struct Commission {
+    CommissionRates commissionRates;
+    uint256 updateTime;
+}
+
+/// @dev Represents a validator in the staking module.
+struct Validator {
+    string operatorAddress;
+    string consensusPubkey;
+    bool jailed;
+    BondStatus status;
+    uint256 tokens;
+    uint256 delegatorShares;
+    string description;
+    int64 unbondingHeight;
+    int64 unbondingTime;
+    uint256 commission;
+    uint256 minSelfDelegation;
+}
+
+/// @author Evmos Team
+/// @title Staking Precompiled Contract
+/// @dev The interface through which solidity contracts will interact with staking.
+/// @custom:address 0x0000000000000000000000000000000000000800
+interface StakingI {
+    /// @dev CreateValidator defines an Event emitted when a validator is created
+    /// @param validatorAddress the address of the validator
+    /// @param value the amount of Coins deposited to create the validator
+    event CreateValidator(
+        string indexed validatorAddress,
+        uint256 value
+    );
+
+    /// @dev EditValidator defines an Event emitted when a validator is edited
+    /// @param validatorAddress the address of the validator
+    event EditValidator(string indexed validatorAddress);
+
+    /// @dev Delegate defines an Event emitted when a delegation is created
+    /// @param delegatorAddress The address of the delegator
+    /// @param validatorAddress The address of the validator
+    /// @param amount The amount of Coin delegated. This amount has the bond denomination
+    /// precision stored in the bank metadata.
+    event Delegate(
+        address indexed delegatorAddress,
+        string indexed validatorAddress,
+        uint256 amount
+    );
+
+    /// @dev Unbond defines an Event emitted when an unbonding delegation is created
+    /// @param delegatorAddress The address of the delegator
+    /// @param validatorAddress The address of the validator
+    /// @param amount The amount of Coin to be unbonded from the validator.
+    /// This amount has the bond denomination precision stored in the bank metadata.
+    /// @param completionTime The unix timestamp when the delegation is no longer bonded
+    event Unbond(
+        address indexed delegatorAddress,
+        string indexed validatorAddress,
+        uint256 amount,
+        uint256 completionTime
+    );
+
+    /// @dev Redelegate defines an Event emitted when a redelegation is created
+    /// @param delegatorAddress The address of the delegator
+    /// @param validatorSrcAddress The address of the validator from which the delegation is moved
+    /// @param validatorDstAddress The address of the validator to which the delegation is moved
+    /// @param amount The amount of Coin to be moved between the validators.
+    /// This amount has the bond denomination precision stored in the bank metadata.
+    /// @param completionTime The unix timestamp when the redelegation is complete
+    event Redelegate(
+        address indexed delegatorAddress,
+        address indexed validatorSrcAddress,
+        address indexed validatorDstAddress,
+        uint256 amount,
+        uint256 completionTime
+    );
+
+    /// @dev CancelUnbondingDelegation defines an Event emitted when a given amount of tokens
+    /// that are in the process of unbonding from the validator address are bonded again.
+    /// @param delegatorAddress The address of the delegator
+    /// @param validatorAddress The address of the validator
+    /// @param amount The amount of bond denomination that was in the unbonding process which is to be canceled
+    /// This amount has the bond denomination precision stored in the bank metadata.
+    /// @param creationHeight The block height at which the unbonding of a delegation was initiated
+    event CancelUnbondingDelegation(
+        address indexed delegatorAddress,
+        address indexed validatorAddress,
+        uint256 amount,
+        uint256 creationHeight
+    );
+}
+```
+
+</details>

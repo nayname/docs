@@ -36,9 +36,35 @@
               "docs/devnet/overview",
               "docs/devnet/getting-started",
               "docs/devnet/how-to-get-tokens",
-              "docs/devnet/precompiles",
               "docs/devnet/launched-contracts",
-              "docs/devnet/resources"
+              {
+                "group": "Tooling",
+                "isCollapsible": true,
+                "pages": [
+                  "docs/devnet/tooling/overview",
+                  "docs/devnet/tooling/foundry",
+                  "docs/devnet/tooling/hardhat",
+                  "docs/devnet/tooling/testing-and-fuzzing"
+                ]
+              },
+              {
+                "group": "Precompiles",
+                "isCollapsible": true,
+                "pages": [
+                  "docs/devnet/precompiles/overview",
+                  "docs/devnet/precompiles/bech32",
+                  "docs/devnet/precompiles/callbacks",
+                  "docs/devnet/precompiles/distribution",
+                  "docs/devnet/precompiles/erc20",
+                  "docs/devnet/precompiles/evidence",
+                  "docs/devnet/precompiles/governance",
+                  "docs/devnet/precompiles/ics20",
+                  "docs/devnet/precompiles/p256",
+                  "docs/devnet/precompiles/slashing",
+                  "docs/devnet/precompiles/staking",
+                  "docs/devnet/precompiles/werc20"
+                ]
+              }
             ]
           }
         ]

@@ -1,0 +1,130 @@
+---
+title: "Bech32"
+description: "Address format conversion between Ethereum hex addresses and Cosmos bech32 addresses"
+icon: "arrows-rotate"
+---
+
+# Bech32 Precompile
+
+**Address**: `0x0000000000000000000000000000000000000400`
+
+**Related Module**: Address conversion utilities
+
+The Bech32 precompile provides address format conversion functionality between Ethereum hex addresses and Cosmos bech32 addresses.
+
+## Functions
+
+### hexToBech32
+
+**Signature**: `hexToBech32(address addr, string memory prefix) → string memory`
+
+**Description**: Converts an Ethereum hex address to Cosmos bech32 format using the specified prefix.
+
+**Parameters**:
+- `addr` (address): The Ethereum hex address to convert
+- `prefix` (string): The bech32 prefix to use (e.g., "cosmos", "evmos", "osmo")
+
+**Returns**: String containing the bech32 formatted address
+
+### bech32ToHex
+
+**Signature**: `bech32ToHex(string memory bech32Address) → address`
+
+**Description**: Converts a Cosmos bech32 address to Ethereum hex format.
+
+**Parameters**:
+- `bech32Address` (string): The bech32 formatted address to convert
+
+**Returns**: Ethereum address in hex format
+
+<details>
+<summary>ABI</summary>
+
+```json
+[
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "bech32Address",
+        "type": "string"
+      }
+    ],
+    "name": "bech32ToHex",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "prefix",
+        "type": "string"
+      }
+    ],
+    "name": "hexToBech32",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "bech32Address",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
+```
+
+</details>
+
+<details>
+<summary>Solidity Interface</summary>
+
+```solidity
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.17;
+
+/// @dev The Bech32I contract's address.
+address constant Bech32_PRECOMPILE_ADDRESS = 0x0000000000000000000000000000000000000400;
+
+/// @dev The Bech32I contract's instance.
+Bech32I constant BECH32_CONTRACT = Bech32I(Bech32_PRECOMPILE_ADDRESS);
+
+/// @author Evmos Team
+/// @title Bech32 Precompiled Contract
+/// @dev The interface through which solidity contracts can convert addresses from
+/// hex to bech32 and vice versa.
+/// @custom:address 0x0000000000000000000000000000000000000400
+interface Bech32I {
+    /// @dev Defines a method for converting a hex formatted address to bech32.
+    /// @param addr The hex address to be converted.
+    /// @param prefix The human readable prefix (HRP) of the bech32 address.
+    /// @return bech32Address The address in bech32 format.
+    function hexToBech32(
+        address addr,
+        string memory prefix
+    ) external returns (string memory bech32Address);
+
+    /// @dev Defines a method for converting a bech32 formatted address to hex.
+    /// @param bech32Address The bech32 address to be converted.
+    /// @return addr The address in hex format.
+    function bech32ToHex(
+        string memory bech32Address
+    ) external returns (address addr);
+}
+```
+
+</details>
