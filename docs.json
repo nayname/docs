@@ -37,7 +37,16 @@
               "docs/devnet/getting-started",
               "docs/devnet/how-to-get-tokens",
               "docs/devnet/launched-contracts",
-              "docs/devnet/resources",
+              {
+                "group": "Tooling",
+                "isCollapsible": true,
+                "pages": [
+                  "docs/devnet/tooling/overview",
+                  "docs/devnet/tooling/foundry",
+                  "docs/devnet/tooling/hardhat",
+                  "docs/devnet/tooling/testing-and-fuzzing"
+                ]
+              },
               {
                 "group": "Precompiles",
                 "isCollapsible": true,
