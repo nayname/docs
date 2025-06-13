@@ -23,29 +23,7 @@ icon: "code"
 | **Evidence**     | `0x0000000000000000000000000000000000000807` | Validator misbehavior evidence submission                        | [Details](./evidence)     |
 | **P256**         | `0x0000000000000000000000000000000000000100` | P-256 elliptic curve cryptographic operations                    | [Details](./p256)         |
 
-## Integration Patterns
 
-### Multi-Precompile Workflows
-Smart contracts can combine multiple precompiles to create complex operations. For example, auto-compounding staking rewards involves the Staking precompile for delegation management and the Distribution precompile for reward collection.
+### Other
 
-### Cross-Chain Operations
-The ICS20 precompile enables cross-chain token transfers, while the ERC20 precompile provides standard token interfaces for transferred assets.
-
-### DeFi Integration
-The combination of Bank, ERC20, and Staking precompiles enables sophisticated DeFi protocols that can interact with both native Cosmos tokens and staking operations.
-
-## Security Considerations
-
-When working with precompiles, consider these important security aspects:
-
-**Authorization Requirements**: Most precompiles require the transaction sender to be the account owner or have appropriate permissions for the operation being performed.
-
-**Gas Cost Optimization**: Precompile operations have varying gas costs. Batch operations when possible and use selective queries to minimize gas consumption.
-
-**Return Value Validation**: Always check return values from precompile function calls to ensure operations completed successfully.
-
-**Address Format Handling**: Use the Bech32 precompile for proper address conversion between Ethereum hex and Cosmos bech32 formats.
-
-## Development Resources
-
-Each precompile page provides complete Solidity interfaces, function signatures, gas cost estimates, and practical usage examples. The documentation includes both basic operations and advanced integration patterns for building sophisticated blockchain applications.
+See also: [Pre-deployed Contracts](../launched-contracts) like `multicall3`, `create2`, etc.
