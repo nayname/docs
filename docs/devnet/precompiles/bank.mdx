@@ -1,0 +1,191 @@
+---
+title: "Bank"
+description: "An ERC20 interface to native Cosmos SDK tokens for balance queries and supply information"
+icon: "building-columns"
+---
+
+# Bank Precompile
+
+**Address**: `0x0000000000000000000000000000000000000804`
+
+**Related Module**: [x/bank](https://docs.cosmos.network/main/modules/bank)
+
+The Bank precompile provides ERC20-style access to native Cosmos SDK tokens, enabling smart contracts to query balances and token supplies through standardized interfaces.
+
+## Functions
+
+### balances
+
+**Signature**: `balances(address account) → Balance[] memory`
+
+**Description**: Queries all native token balances for a specific account address. Returns an array of Balance structures containing the ERC20 contract address and amount for each token held by the account.
+
+**Parameters**:
+- `account` (address): The account address to query balances for
+
+**Returns**: Array of Balance structures with contractAddress and amount fields
+
+### totalSupply
+
+**Signature**: `totalSupply() → Balance[] memory`
+
+**Description**: Queries the total supply of all native tokens in the system. Returns comprehensive supply information for every token registered in the system.
+
+**Parameters**: None
+
+**Returns**: Array of Balance structures showing total supply for each token
+
+### supplyOf
+
+**Signature**: `supplyOf(address erc20Address) → uint256`
+
+**Description**: Queries the total supply of a specific token by providing its ERC20 contract address. More efficient when you need supply information for a single token.
+
+**Parameters**:
+- `erc20Address` (address): The ERC20 contract address of the token
+
+**Returns**: Total supply of the specified token as uint256
+
+## Data Structures
+
+### Balance
+
+The Balance struct represents a token balance with its associated ERC20 contract address:
+
+- `contractAddress` (address): The ERC20 contract address representing the native token
+- `amount` (uint256): Token amount in the smallest denomination
+
+<details>
+<summary>ABI</summary>
+
+```json
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "balances",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "contractAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Balance[]",
+        "name": "balances",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "erc20Address",
+        "type": "address"
+      }
+    ],
+    "name": "supplyOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalSupply",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [
+      {
+        "components": [
+        {
+          "internalType": "address",
+          "name": "contractAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+        ],
+        "internalType": "struct Balance[]",
+        "name": "totalSupply",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
+```
+
+</details>
+
+<details>
+<summary>Solidity Interface</summary>
+
+```solidity
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.18;
+
+/// @dev The IBank contract's address.
+address constant IBANK_PRECOMPILE_ADDRESS = 0x0000000000000000000000000000000000000804;
+
+/// @dev The IBank contract's instance.
+IBank constant IBANK_CONTRACT = IBank(IBANK_PRECOMPILE_ADDRESS);
+
+/// @dev Balance specifies the ERC20 contract address and the amount of tokens.
+struct Balance {
+    /// contractAddress defines the ERC20 contract address.
+    address contractAddress;
+    /// amount of tokens
+    uint256 amount;
+}
+
+/**
+ * @author Evmos Team
+ * @title Bank Interface
+ * @dev Interface for querying balances and supply from the Bank module.
+ */
+interface IBank {
+    /// @dev balances defines a method for retrieving all the native token balances
+    /// for a given account.
+    /// @param account the address of the account to query balances for.
+    /// @return balances the array of native token balances.
+    function balances(
+        address account
+    ) external view returns (Balance[] memory balances);
+
+    /// @dev totalSupply defines a method for retrieving the total supply of all
+    /// native tokens.
+    /// @return totalSupply the supply as an array of native token balances
+    function totalSupply() external view returns (Balance[] memory totalSupply);
+
+    /// @dev supplyOf defines a method for retrieving the total supply of a particular native coin.
+    /// @return totalSupply the supply as a uint256
+    function supplyOf(
+        address erc20Address
+    ) external view returns (uint256 totalSupply);
+}
+```
+
+</details>

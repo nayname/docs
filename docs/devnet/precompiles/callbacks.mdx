@@ -1,0 +1,157 @@
+---
+title: "Callbacks"
+description: "Interface for IBC packet lifecycle callbacks in smart contracts"
+icon: "arrows-turn-right"
+---
+
+# Callbacks Interface
+
+**Related Module**: IBC callbacks
+
+The Callbacks interface provides a standardized way for smart contracts to handle IBC (Inter-Blockchain Communication) packet lifecycle events. This interface allows contracts to implement callback functions that are invoked when packets are acknowledged or timeout during cross-chain communication.
+
+## Functions
+
+### onPacketAcknowledgement
+
+**Signature**: `onPacketAcknowledgement(string memory channelId, string memory portId, uint64 sequence, bytes memory data, bytes memory acknowledgement)`
+
+**Description**: Callback function invoked on the source chain after a packet lifecycle is completed and acknowledgement is processed. The contract implementing this interface receives packet information and acknowledgement data to execute custom callback logic.
+
+**Parameters**:
+- `channelId` (string): The channel identifier of the packet
+- `portId` (string): The port identifier of the packet
+- `sequence` (uint64): The sequence number of the packet
+- `data` (bytes): The data of the packet
+- `acknowledgement` (bytes): The acknowledgement of the packet
+
+**Returns**: None
+
+### onPacketTimeout
+
+**Signature**: `onPacketTimeout(string memory channelId, string memory portId, uint64 sequence, bytes memory data)`
+
+**Description**: Callback function invoked on the source chain after a packet lifecycle is completed and the packet has timed out. The contract implementing this interface receives packet information to execute custom timeout handling logic.
+
+**Parameters**:
+- `channelId` (string): The channel identifier of the packet
+- `portId` (string): The port identifier of the packet
+- `sequence` (uint64): The sequence number of the packet
+- `data` (bytes): The data of the packet
+
+**Returns**: None
+
+<details>
+<summary>ABI</summary>
+
+```json
+[
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "channelId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "portId",
+        "type": "string"
+      },
+      {
+        "internalType": "uint64",
+        "name": "sequence",
+        "type": "uint64"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "acknowledgement",
+        "type": "bytes"
+      }
+    ],
+    "name": "onPacketAcknowledgement",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "channelId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "portId",
+        "type": "string"
+      },
+      {
+        "internalType": "uint64",
+        "name": "sequence",
+        "type": "uint64"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "onPacketTimeout",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
+```
+
+</details>
+
+<details>
+<summary>Solidity Interface</summary>
+
+```solidity
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.18;
+
+interface ICallbacks {
+    /// @dev Callback function to be called on the source chain
+    /// after the packet life cycle is completed and acknowledgement is processed
+    /// by source chain. The contract address is passed the packet information and acknowledgmeent
+    /// to execute the callback logic.
+    /// @param channelId the channnel identifier of the packet
+    /// @param portId the port identifier of the packet
+    /// @param sequence the sequence number of the packet
+    /// @param data the data of the packet
+    /// @param acknowledgement the acknowledgement of the packet
+    function onPacketAcknowledgement(
+        string memory channelId,
+        string memory portId,
+        uint64 sequence,
+        bytes memory data,
+        bytes memory acknowledgement
+    ) external;
+
+    /// @dev Callback function to be called on the source chain
+    /// after the packet life cycle is completed and the packet is timed out
+    /// by source chain. The contract address is passed the packet information
+    /// to execute the callback logic.
+    /// @param channelId the channnel identifier of the packet
+    /// @param portId the port identifier of the packet
+    /// @param sequence the sequence number of the packet
+    /// @param data the data of the packet
+    function onPacketTimeout(
+        string memory channelId,
+        string memory portId,
+        uint64 sequence,
+        bytes memory data
+    ) external;
+}
+```
+
+</details>

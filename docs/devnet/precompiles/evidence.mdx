@@ -1,0 +1,223 @@
+---
+title: "Evidence"
+description: "Query and Submit evidence of validator misbehavior (equivocation)"
+icon: "gavel"
+---
+
+# Evidence Precompile
+
+**Address**: `0x0000000000000000000000000000000000000807`
+
+**Related Module**: [x/evidence](https://docs.cosmos.network/main/modules/evidence)
+
+The Evidence precompile enables querying and submission evidence of validator misbehavior, specifically equivocation events where validators sign conflicting blocks.
+
+## Functions
+
+### submitEvidence
+
+**Signature**: `submitEvidence(Equivocation calldata evidence) → bool`
+
+**Description**: Submit evidence of validator misbehavior (equivocation).
+
+**Parameters**:
+- `evidence` (Equivocation): The evidence of misbehavior
+
+**Returns**: Boolean indicating success
+
+### evidence
+
+**Signature**: `evidence(bytes memory evidenceHash) → Equivocation`
+
+**Description**: Query evidence by hash.
+
+**Parameters**:
+- `evidenceHash` (bytes): The hash of the evidence to query
+
+**Returns**: Equivocation evidence data
+
+### getAllEvidence
+
+**Signature**: `getAllEvidence(PageRequest calldata pageRequest) → (Equivocation[], PageResponse)`
+
+**Description**: Query all evidence with pagination.
+
+**Parameters**:
+- `pageRequest` (PageRequest): Pagination request
+
+**Returns**: 
+- Array of Equivocation evidence
+- PageResponse for pagination
+
+## Events
+
+- `SubmitEvidence(address indexed submitter, bytes hash)`
+
+## Data Structures
+
+### Equivocation
+- `height` (int64): The equivocation height
+- `time` (int64): The equivocation time
+- `power` (int64): The validator's power at the time of the equivocation
+- `consensusAddress` (string): The validator's consensus address
+
+<details>
+<summary>ABI</summary>
+
+```json
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "address", "name": "submitter", "type": "address"},
+      {"indexed": false, "internalType": "bytes", "name": "hash", "type": "bytes"}
+    ],
+    "name": "SubmitEvidence",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"internalType": "bytes", "name": "evidenceHash", "type": "bytes"}
+    ],
+    "name": "evidence",
+    "outputs": [
+      {
+        "components": [
+          {"internalType": "int64", "name": "height", "type": "int64"},
+          {"internalType": "int64", "name": "time", "type": "int64"},
+          {"internalType": "int64", "name": "power", "type": "int64"},
+          {"internalType": "string", "name": "consensusAddress", "type": "string"}
+        ],
+        "internalType": "struct Equivocation",
+        "name": "evidence",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {"internalType": "bytes", "name": "key", "type": "bytes"},
+          {"internalType": "uint64", "name": "offset", "type": "uint64"},
+          {"internalType": "uint64", "name": "limit", "type": "uint64"},
+          {"internalType": "bool", "name": "countTotal", "type": "bool"},
+          {"internalType": "bool", "name": "reverse", "type": "bool"}
+        ],
+        "internalType": "struct PageRequest",
+        "name": "pageRequest",
+        "type": "tuple"
+      }
+    ],
+    "name": "getAllEvidence",
+    "outputs": [
+      {
+        "components": [
+          {"internalType": "int64", "name": "height", "type": "int64"},
+          {"internalType": "int64", "name": "time", "type": "int64"},
+          {"internalType": "int64", "name": "power", "type": "int64"},
+          {"internalType": "string", "name": "consensusAddress", "type": "string"}
+        ],
+        "internalType": "struct Equivocation[]",
+        "name": "evidence",
+        "type": "tuple[]"
+      },
+      {
+        "components": [
+          {"internalType": "bytes", "name": "nextKey", "type": "bytes"},
+          {"internalType": "uint64", "name": "total", "type": "uint64"}
+        ],
+        "internalType": "struct PageResponse",
+        "name": "pageResponse",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {"internalType": "int64", "name": "height", "type": "int64"},
+          {"internalType": "int64", "name": "time", "type": "int64"},
+          {"internalType": "int64", "name": "power", "type": "int64"},
+          {"internalType": "string", "name": "consensusAddress", "type": "string"}
+        ],
+        "internalType": "struct Equivocation",
+        "name": "evidence",
+        "type": "tuple"
+      }
+    ],
+    "name": "submitEvidence",
+    "outputs": [
+      {"internalType": "bool", "name": "success", "type": "bool"}
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
+```
+
+</details>
+
+<details>
+<summary>Solidity Interface</summary>
+
+```solidity
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.18;
+
+import "../common/Types.sol";
+
+/// @dev The IEvidence contract's address.
+address constant EVIDENCE_PRECOMPILE_ADDRESS = 0x0000000000000000000000000000000000000807;
+
+/// @dev The IEvidence contract's instance.
+IEvidence constant EVIDENCE_CONTRACT = IEvidence(EVIDENCE_PRECOMPILE_ADDRESS);
+
+/// @dev The Equivocation struct contains information about a validator's equivocation
+struct Equivocation {
+    // height is the equivocation height
+    int64 height;
+    // time is the equivocation time
+    int64 time;
+    // power is the validator's power at the time of the equivocation
+    int64 power;
+    // consensusAddress is the validator's consensus address
+    string consensusAddress;
+}
+
+/// @author The Evmos Core Team
+/// @title Evidence Precompile Contract
+/// @dev The interface through which solidity contracts will interact with the x/evidence module
+interface IEvidence {
+    /// @dev Event emitted when evidence is submitted
+    /// @param submitter The address of the submitter
+    /// @param hash The hash of the submitted evidence
+    event SubmitEvidence(address indexed submitter, bytes hash);
+
+    /// @dev Submit evidence of misbehavior (equivocation)
+    /// @param evidence The evidence of misbehavior
+    /// @return success True if the evidence was submitted successfully
+    function submitEvidence(Equivocation calldata evidence) external returns (bool success);
+
+    /// @dev Query evidence by hash
+    /// @param evidenceHash The hash of the evidence to query
+    /// @return evidence The equivocation evidence data
+    function evidence(bytes memory evidenceHash) external view returns (Equivocation memory evidence);
+
+    /// @dev Query all evidence with pagination
+    /// @param pageRequest Pagination request
+    /// @return evidence List of equivocation evidence
+    /// @return pageResponse Pagination response
+    function getAllEvidence(PageRequest calldata pageRequest)
+        external
+        view
+        returns (Equivocation[] memory evidence, PageResponse memory pageResponse);
+}
+```
+
+</details>

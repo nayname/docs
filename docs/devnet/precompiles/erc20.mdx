@@ -1,0 +1,304 @@
+---
+title: "ERC20"
+description: "Standard ERC20 token functionality for native Cosmos tokens"
+icon: "coins"
+---
+
+# ERC20 Precompile
+
+**Address**: Dynamic (assigned per token pair registration)
+
+**Related Module**: [x/erc20](https://docs.cosmos.network/main/modules/erc20)
+
+The ERC20 precompiles provide standard ERC20 token functionality for native Cosmos tokens that have been registered for EVM compatibility. Each registered token pair receives its own unique precompile contract address.
+
+## Functions
+
+### totalSupply
+
+**Signature**: `totalSupply() → uint256`
+
+**Description**: Returns the total amount of tokens in existence.
+
+**Returns**: Total supply as uint256
+
+### balanceOf
+
+**Signature**: `balanceOf(address account) → uint256`
+
+**Description**: Returns the token balance of the specified account.
+
+**Parameters**:
+- `account` (address): The account to query the balance of
+
+**Returns**: Account balance as uint256
+
+### transfer
+
+**Signature**: `transfer(address to, uint256 amount) → bool`
+
+**Description**: Moves tokens from the caller's account to the recipient.
+
+**Parameters**:
+- `to` (address): The recipient address
+- `amount` (uint256): The amount to transfer
+
+**Returns**: Boolean indicating success
+
+### transferFrom
+
+**Signature**: `transferFrom(address from, address to, uint256 amount) → bool`
+
+**Description**: Moves tokens from one account to another using the allowance mechanism.
+
+**Parameters**:
+- `from` (address): The sender address
+- `to` (address): The recipient address
+- `amount` (uint256): The amount to transfer
+
+**Returns**: Boolean indicating success
+
+### approve
+
+**Signature**: `approve(address spender, uint256 amount) → bool`
+
+**Description**: Sets the allowance of spender over the caller's tokens.
+
+**Parameters**:
+- `spender` (address): The address authorized to spend
+- `amount` (uint256): The amount authorized
+
+**Returns**: Boolean indicating success
+
+### allowance
+
+**Signature**: `allowance(address owner, address spender) → uint256`
+
+**Description**: Returns the remaining number of tokens that spender is allowed to spend on behalf of owner.
+
+**Parameters**:
+- `owner` (address): The owner of the tokens
+- `spender` (address): The address authorized to spend
+
+**Returns**: Remaining allowance as uint256
+
+### name
+
+**Signature**: `name() → string`
+
+**Description**: Returns the name of the token.
+
+**Returns**: Token name as string
+
+### symbol
+
+**Signature**: `symbol() → string`
+
+**Description**: Returns the symbol of the token.
+
+**Returns**: Token symbol as string
+
+### decimals
+
+**Signature**: `decimals() → uint8`
+
+**Description**: Returns the number of decimals used to get its user representation.
+
+**Returns**: Number of decimals as uint8
+
+## Events
+
+- `Transfer(address indexed from, address indexed to, uint256 value)`
+- `Approval(address indexed owner, address indexed spender, uint256 value)`
+
+<details>
+<summary>ABI</summary>
+
+```json
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "address", "name": "owner", "type": "address"},
+      {"indexed": true, "internalType": "address", "name": "spender", "type": "address"},
+      {"indexed": false, "internalType": "uint256", "name": "value", "type": "uint256"}
+    ],
+    "name": "Approval",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": true, "internalType": "address", "name": "from", "type": "address"},
+      {"indexed": true, "internalType": "address", "name": "to", "type": "address"},
+      {"indexed": false, "internalType": "uint256", "name": "value", "type": "uint256"}
+    ],
+    "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "owner", "type": "address"},
+      {"internalType": "address", "name": "spender", "type": "address"}
+    ],
+    "name": "allowance",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "spender", "type": "address"},
+      {"internalType": "uint256", "name": "amount", "type": "uint256"}
+    ],
+    "name": "approve",
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
+    "name": "balanceOf",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{"internalType": "uint8", "name": "", "type": "uint8"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "name",
+    "outputs": [{"internalType": "string", "name": "", "type": "string"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [{"internalType": "string", "name": "", "type": "string"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "to", "type": "address"},
+      {"internalType": "uint256", "name": "amount", "type": "uint256"}
+    ],
+    "name": "transfer",
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "address", "name": "from", "type": "address"},
+      {"internalType": "address", "name": "to", "type": "address"},
+      {"internalType": "uint256", "name": "amount", "type": "uint256"}
+    ],
+    "name": "transferFrom",
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
+```
+
+</details>
+
+<details>
+<summary>Solidity Interface</summary>
+
+```solidity
+// SPDX-License-Identifier: MIT
+// OpenZeppelin Contracts (last updated v4.6.0) (token/ERC20/IERC20.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev Interface of the ERC20 standard as defined in the EIP.
+ */
+interface IERC20 {
+    /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to
+     * another (`to`).
+     *
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    /**
+     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+     * a call to {approve}. `value` is the new allowance.
+     */
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function totalSupply() external view returns (uint256);
+
+    /**
+     * @dev Returns the amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
+
+    /**
+     * @dev Moves `amount` tokens from the caller's account to `to`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transfer(address to, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Returns the remaining number of tokens that `spender` will be
+     * allowed to spend on behalf of `owner` through {transferFrom}. This is
+     * zero by default.
+     *
+     * This value changes when {approve} or {transferFrom} are called.
+     */
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * IMPORTANT: Beware that changing an allowance with this method brings the risk
+     * that someone may use both the old and the new allowance by unfortunate
+     * transaction ordering. One possible solution to mitigate this race
+     * condition is to first reduce the spender's allowance to 0 and set the
+     * desired value afterwards:
+     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+     *
+     * Emits an {Approval} event.
+     */
+    function approve(address spender, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Moves `amount` tokens from `from` to `to` using the
+     * allowance mechanism. `amount` is then deducted from the caller's
+     * allowance.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
+}
+```
+
+</details>

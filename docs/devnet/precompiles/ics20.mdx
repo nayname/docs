@@ -1,0 +1,308 @@
+---
+title: "ICS20"
+description: "Cross-chain token transfers via IBC (Inter-Blockchain Communication) protocol"
+icon: "arrow-right-arrow-left"
+---
+
+# ICS20 Precompile
+
+**Address**: `0x0000000000000000000000000000000000000802`
+
+**Related Module**: [x/ibc-transfer](https://ibc.cosmos.network/main/apps/transfer/overview.html)
+
+The ICS20 precompile provides access to Inter-Blockchain Communication (IBC) token transfer functionality, enabling smart contracts to initiate cross-chain token transfers between IBC-enabled blockchains.
+
+## Functions
+
+### transfer
+
+**Signature**: `transfer(string, string, string, uint256, address, string, Height, uint64, string) → uint64`
+
+**Description**: Initiates a cross-chain token transfer using the IBC protocol with timeout mechanisms.
+
+**Parameters**:
+- `sourcePort` (string): Port identifier (typically "transfer" for ICS-20 transfers)
+- `sourceChannel` (string): Channel identifier connecting to the destination chain
+- `denom` (string): Token denomination being transferred
+- `amount` (uint256): Amount to transfer in smallest unit
+- `sender` (address): Address initiating the transfer (must be msg.sender)
+- `receiver` (string): Recipient address on the destination chain (bech32 format)
+- `timeoutHeight` (Height): Block height at which the transfer expires
+- `timeoutTimestamp` (uint64): Unix timestamp at which the transfer expires
+- `memo` (string): Optional memo string for additional transfer information
+
+**Returns**: Sequence number assigned to this transfer for tracking
+
+### denom
+
+**Signature**: `denom(string) → Denom`
+
+**Description**: Queries denomination information for an IBC token by its hash.
+
+**Parameters**:
+- `hash` (string): Hash of the denomination to look up
+
+**Returns**: Denom struct containing base denomination and trace information
+
+### denoms
+
+**Signature**: `denoms(PageRequest) → (Denom[], PageResponse)`
+
+**Description**: Retrieves a paginated list of all denomination traces registered on the chain.
+
+**Parameters**:
+- `pageRequest` (PageRequest): Pagination parameters for result limiting
+
+**Returns**: Array of Denom structs and pagination information
+
+### denomHash
+
+**Signature**: `denomHash(string) → string`
+
+**Description**: Computes the hash of a denomination trace path.
+
+**Parameters**:
+- `trace` (string): Denomination trace path to hash
+
+**Returns**: Hash string of the denomination trace
+
+## Events
+
+- `IBCTransfer(address indexed sender, string indexed receiver, string sourcePort, string sourceChannel, string denom, uint256 amount, string memo)`
+
+## Data Structures
+
+### Height
+- `revisionNumber` (uint64): Chain revision number for upgrades
+- `revisionHeight` (uint64): Block height on the revision
+
+### Hop
+- `portId` (string): Port identifier
+- `channelId` (string): Channel identifier
+
+### Denom
+- `base` (string): Base denomination of the relayed fungible token
+- `trace` (Hop[]): List of hops for multi-hop transfers
+
+<details>
+<summary>ABI</summary>
+
+```json
+[
+  {
+    "inputs": [
+      {"internalType": "string", "name": "sourcePort", "type": "string"},
+      {"internalType": "string", "name": "sourceChannel", "type": "string"},
+      {"internalType": "string", "name": "denom", "type": "string"},
+      {"internalType": "uint256", "name": "amount", "type": "uint256"},
+      {"internalType": "address", "name": "sender", "type": "address"},
+      {"internalType": "string", "name": "receiver", "type": "string"},
+      {
+        "components": [
+          {"internalType": "uint64", "name": "revisionNumber", "type": "uint64"},
+          {"internalType": "uint64", "name": "revisionHeight", "type": "uint64"}
+        ],
+        "internalType": "struct Height",
+        "name": "timeoutHeight",
+        "type": "tuple"
+      },
+      {"internalType": "uint64", "name": "timeoutTimestamp", "type": "uint64"},
+      {"internalType": "string", "name": "memo", "type": "string"}
+    ],
+    "name": "transfer",
+    "outputs": [{"internalType": "uint64", "name": "nextSequence", "type": "uint64"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "string", "name": "hash", "type": "string"}
+    ],
+    "name": "denom",
+    "outputs": [
+      {
+        "components": [
+          {"internalType": "string", "name": "base", "type": "string"},
+          {
+            "components": [
+              {"internalType": "string", "name": "portId", "type": "string"},
+              {"internalType": "string", "name": "channelId", "type": "string"}
+            ],
+            "internalType": "struct Hop[]",
+            "name": "trace",
+            "type": "tuple[]"
+          }
+        ],
+        "internalType": "struct Denom",
+        "name": "denom",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {"internalType": "bytes", "name": "key", "type": "bytes"},
+          {"internalType": "uint64", "name": "offset", "type": "uint64"},
+          {"internalType": "uint64", "name": "limit", "type": "uint64"},
+          {"internalType": "bool", "name": "countTotal", "type": "bool"},
+          {"internalType": "bool", "name": "reverse", "type": "bool"}
+        ],
+        "internalType": "struct PageRequest",
+        "name": "pageRequest",
+        "type": "tuple"
+      }
+    ],
+    "name": "denoms",
+    "outputs": [
+      {
+        "components": [
+          {"internalType": "string", "name": "base", "type": "string"},
+          {
+            "components": [
+              {"internalType": "string", "name": "portId", "type": "string"},
+              {"internalType": "string", "name": "channelId", "type": "string"}
+            ],
+            "internalType": "struct Hop[]",
+            "name": "trace",
+            "type": "tuple[]"
+          }
+        ],
+        "internalType": "struct Denom[]",
+        "name": "denoms",
+        "type": "tuple[]"
+      },
+      {
+        "components": [
+          {"internalType": "bytes", "name": "nextKey", "type": "bytes"},
+          {"internalType": "uint64", "name": "total", "type": "uint64"}
+        ],
+        "internalType": "struct PageResponse",
+        "name": "pageResponse",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "string", "name": "trace", "type": "string"}
+    ],
+    "name": "denomHash",
+    "outputs": [{"internalType": "string", "name": "hash", "type": "string"}],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
+```
+
+</details>
+
+<details>
+<summary>Solidity Interface</summary>
+
+```solidity
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.18;
+
+import "../common/Types.sol";
+
+/// @dev The ICS20I contract's address.
+address constant ICS20_PRECOMPILE_ADDRESS = 0x0000000000000000000000000000000000000802;
+
+/// @dev The ICS20 contract's instance.
+ICS20I constant ICS20_CONTRACT = ICS20I(ICS20_PRECOMPILE_ADDRESS);
+
+/// @dev Denom contains the base denomination for ICS20 fungible tokens and the
+/// source tracing information path.
+struct Denom {
+    /// base denomination of the relayed fungible token.
+    string base;
+    /// trace contains a list of hops for multi-hop transfers.
+    Hop[] trace;
+}
+
+/// @dev Hop defines a port ID, channel ID pair specifying where
+/// tokens must be forwarded next in a multi-hop transfer.
+struct Hop {
+    string portId;
+    string channelId;
+}
+
+/// @author Evmos Team
+/// @title ICS20 Transfer Precompiled Contract
+/// @dev The interface through which solidity contracts will interact with IBC Transfer (ICS20)
+/// @custom:address 0x0000000000000000000000000000000000000802
+interface ICS20I {
+    /// @dev Emitted when an ICS-20 transfer is executed.
+    /// @param sender The address of the sender.
+    /// @param receiver The address of the receiver.
+    /// @param sourcePort The source port of the IBC transaction, For v2 packets, leave it empty.
+    /// @param sourceChannel The source channel of the IBC transaction, For v2 packets, set the client ID.
+    /// @param denom The denomination of the tokens transferred.
+    /// @param amount The amount of tokens transferred.
+    /// @param memo The IBC transaction memo.
+    event IBCTransfer(
+        address indexed sender,
+        string indexed receiver,
+        string sourcePort,
+        string sourceChannel,
+        string denom,
+        uint256 amount,
+        string memo
+    );
+
+    /// @dev Transfer defines a method for performing an IBC transfer.
+    /// @param sourcePort the port on which the packet will be sent
+    /// @param sourceChannel the channel by which the packet will be sent
+    /// @param denom the denomination of the Coin to be transferred to the receiver
+    /// @param amount the amount of the Coin to be transferred to the receiver
+    /// @param sender the hex address of the sender
+    /// @param receiver the bech32 address of the receiver
+    /// @param timeoutHeight the timeout height relative to the current block height. 
+    /// The timeout is disabled when set to 0
+    /// @param timeoutTimestamp the timeout timestamp in absolute nanoseconds since unix epoch. 
+    /// The timeout is disabled when set to 0
+    /// @param memo optional memo
+    /// @return nextSequence sequence number of the transfer packet sent
+    function transfer(
+        string memory sourcePort,
+        string memory sourceChannel,
+        string memory denom,
+        uint256 amount,
+        address sender,
+        string memory receiver,
+        Height memory timeoutHeight,
+        uint64 timeoutTimestamp,
+        string memory memo
+    ) external returns (uint64 nextSequence);
+
+    /// @dev denoms Defines a method for returning all denoms.
+    /// @param pageRequest Defines the pagination parameters to for the request.
+    function denoms(
+        PageRequest memory pageRequest
+    )
+        external
+        view
+        returns (
+            Denom[] memory denoms,
+            PageResponse memory pageResponse
+        );
+
+    /// @dev Denom defines a method for returning a denom.
+    function denom(
+        string memory hash
+    ) external view returns (Denom memory denom);
+
+    /// @dev DenomHash defines a method for returning a hash of the denomination info.
+    function denomHash(
+        string memory trace
+    ) external view returns (string memory hash);
+}
+```
+
+</details>
