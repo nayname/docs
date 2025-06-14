@@ -42,13 +42,13 @@ const config: HardhatUserConfig = {
   networks: {
     local: {
       url: "http://127.0.0.1:8545",
-      chainId: 262144, // Default local chain ID
+      chainId: 4321, // Default local chain ID
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       gasPrice: 20000000000,
     },
     testnet: {
-      url: "https://cevm-01-evmrpc.dev.skip.build",
-      chainId: 262144, // Cosmos EVM devnet chain ID
+      url: "https://devnet-1-evmrpc.ib.skip.build",
+      chainId: 4321, // Cosmos EVM devnet chain ID
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     }
   },
@@ -63,10 +63,10 @@ const config: HardhatUserConfig = {
     customChains: [
       {
         network: "cosmosEvmTestnet",
-        chainId: 262144, // Cosmos EVM devnet chain ID
+        chainId: 4321, // Cosmos EVM devnet chain ID
         urls: {
-          apiURL: "https://cevm-01-lcd.dev.skip.build/api",
-          browserURL: "https://cevm-01-lcd.dev.skip.build"
+          apiURL: "https://devnet-1-lcd.ib.skip.build/api",
+          browserURL: "https://devnet-1-lcd.ib.skip.build"
         }
       }
     ]
