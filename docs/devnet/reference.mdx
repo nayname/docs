@@ -32,17 +32,13 @@ Precompiles for *SDK modules*\* and other important functions are detailed in th
 \**Most modules supported; others may be added in a future release.*
 </Footnote>
 
-## Using Precompiled Contracts
+## Connecting to the Network
 
+### Using Remote Endpoints
 
+The `evmd` CLI tool and other clients require a connection to the network in order to interact with the chain.
 
-
-
-## Using Remote Endpoints
-
-The `evmd` CLI and other clients can target remote public nodes.
-
-### Method 1 — configure `evmd``
+**Method 1 — configure `evmd`**
 
 Edit `~/.evmd/config/client.toml`:
 
@@ -57,7 +53,11 @@ All subsequent `evmd` commands use the remote node:
 evmd q bank balances $(evmd keys show <wallet_name> --address)
 ```
 
-### Method 2 — direct API calls
+**Method 2 — API**
+
+Applications typically interact with the network programmatically using the EVM JSON-RPC, in addition to the standard Cosmos GRPC/REST API. Below are some basic examples of various common usecases:
+
+For a complete list of available endpoints and methods, see the [API Reference](./api-reference) documentation.
 
 #### EVM JSON-RPC
 
@@ -73,3 +73,100 @@ const balance = await provider.getBalance("0x...");
 ```sh
 curl https://devnet-1-lcd.ib.skip.build/cosmos/staking/v1beta1/params
 ```
+
+#### EVM JSON-RPC — **Python (web3.py)**
+
+```python
+from web3 import Web3
+
+provider = Web3(Web3.HTTPProvider("https://devnet-1-evmrpc.ib.skip.build"))
+
+address = "0xYourAddress"
+balance_wei = provider.eth.get_balance(address)
+balance_eth = Web3.from_wei(balance_wei, "ether")
+
+print(f"Balance: {balance_eth} DEV")
+```
+
+#### Cosmos REST API — **Python (requests)**
+
+```python
+import requests
+
+resp = requests.get(
+    "https://devnet-1-lcd.ib.skip.build/cosmos/staking/v1beta1/params",
+    timeout=10,
+)
+print(resp.json())
+```
+
+<details>
+<summary>EVM JSON-RPC — Go (go-ethereum <code>ethclient</code>)</summary>
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "math/big"
+
+    "github.com/ethereum/go-ethereum/common"
+    "github.com/ethereum/go-ethereum/ethclient"
+)
+
+func main() {
+    client, err := ethclient.Dial("https://devnet-1-evmrpc.ib.skip.build")
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    address := common.HexToAddress("0xYourAddress")
+    balance, err := client.BalanceAt(context.Background(), address, nil)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    ethValue := new(big.Float).Quo(
+        new(big.Float).SetInt(balance),
+        big.NewFloat(1e18),
+    )
+
+    fmt.Printf("Balance: %s DEV\n", ethValue)
+}
+```
+
+</details>
+
+<details>
+<summary>Cosmos REST API — Go (<code>net/http</code>)</summary>
+
+```go
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "log"
+    "net/http"
+)
+
+func main() {
+    resp, err := http.Get("https://devnet-1-lcd.ib.skip.build/cosmos/bank/v1beta1/balances/cosmos1youraddresshere")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer resp.Body.Close()
+
+    var result map[string]interface{}
+    if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+        log.Fatal(err)
+    }
+
+    pretty, _ := json.MarshalIndent(result, "", "  ")
+    fmt.Println(string(pretty))
+}
+```
+
+</details>
