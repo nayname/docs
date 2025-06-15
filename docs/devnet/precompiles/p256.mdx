@@ -4,8 +4,6 @@ description: "P-256 elliptic curve cryptographic operations for secure communica
 icon: "key"
 ---
 
-# P256 Precompile
-
 ## Overview
 
 The P256 precompile provides a suite of cryptographic functions for the NIST P-256 elliptic curve. It enables smart contracts to perform essential operations such as signature verification, scalar multiplication, and point addition, which are fundamental for building secure and privacy-preserving applications.
@@ -35,6 +33,27 @@ Compresses a P-256 point to its 33-byte representation.
 
 ### `decompressPoint`
 Decompresses a 33-byte compressed point to its full coordinates.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> with your actual RPC endpoint.
+# The `data` field must be constructed by ABI-encoding the desired
+# function selector and parameters. Refer to the Solidity interface
+# for function signatures and data types.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000100",
+            "data": "<ABI-ENCODED_DATA>"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ## Full Solidity Interface & ABI
 

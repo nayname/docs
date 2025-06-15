@@ -4,8 +4,6 @@ description: "Withdraw staking rewards and interact with the community pool"
 icon: "coins"
 ---
 
-# Distribution Precompile
-
 ## Overview
 
 The Distribution precompile provides access to the Cosmos SDK `x/distribution` module, enabling smart contracts to manage staking rewards, interact with the community pool, and handle validator commission operations.
@@ -39,26 +37,170 @@ Deposits tokens into a specific validator's rewards pool.
 ### delegationTotalRewards
 Retrieves comprehensive reward information for all of a delegator's positions.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder address with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000801",
+            "data": "0x2035859e000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### delegationRewards
 Queries pending rewards for a specific delegation.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder addresses with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000801",
+            "data": "0x38433b36000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa9604500000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ### delegatorValidators
 Retrieves a list of all validators from which a delegator has rewards.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder address with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000801",
+            "data": "0x9c438b94000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### delegatorWithdrawAddress
 Queries the address that can withdraw rewards for a given delegator.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder address with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000801",
+            "data": "0x288594aa000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ### communityPool
 Queries the current balance of the community pool.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> with your actual RPC endpoint.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000801",
+            "data": "0x5fb6c24f"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### validatorCommission
 Queries the accumulated commission for a specific validator.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder validator address with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000801",
+            "data": "0xddf24bb300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ### validatorDistributionInfo
 Queries a validator's commission and self-delegation rewards.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder validator address with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000801",
+            "data": "0x7bc2916200000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### validatorOutstandingRewards
 Queries the outstanding rewards of a validator.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder validator address with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000801",
+            "data": "0x6280384c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ## Full Solidity Interface & ABI
 

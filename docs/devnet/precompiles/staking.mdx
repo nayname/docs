@@ -4,8 +4,6 @@ description: "Validator operations, delegation management, and staking functiona
 icon: "coins"
 ---
 
-# Staking Precompile
-
 ## Overview
 
 The Staking precompile provides a comprehensive interface to the Cosmos SDK's `x/staking` module, enabling smart contracts to engage in staking activities. This includes creating and managing validators, delegating and undelegating tokens, and querying a wide range of staking-related information, such as validator details, delegation records, and staking pool status.
@@ -38,35 +36,238 @@ Cancels an unbonding delegation.
 ### `validator`
 Queries information about a specific validator.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder validator address with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000800",
+            "data": "0x3f33833b00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### `validators`
 Queries validators with optional status filtering and pagination.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> with your actual RPC endpoint.
+# This example queries for the first 10 bonded validators.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000800",
+            "data": "0x5374c43a00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000006426f6e6465640000000000000000000000000000000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ### `delegation`
 Queries the delegation amount between a delegator and a validator.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder addresses with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000800",
+            "data": "0x41f33f63000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa9604500000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### `unbondingDelegation`
 Queries unbonding delegation information.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder addresses with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000800",
+            "data": "0x813b2933000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa9604500000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ### `delegatorDelegations`
 Queries all delegations for a given delegator.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder address with your actual data.
+# This example queries for the first 10 delegations.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000800",
+            "data": "0x899a13a8000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa960450000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### `delegatorUnbondingDelegations`
 Queries all unbonding delegations for a given delegator.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder address with your actual data.
+# This example queries for the first 10 unbonding delegations.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000800",
+            "data": "0x289e728a000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa960450000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ### `redelegations`
 Queries redelegations with optional filters.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and addresses with your actual data.
+# This example queries for the first 10 redelegations.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000800",
+            "data": "0x289e728a000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa9604500000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### `delegatorValidators`
 Queries the validators a given delegator has delegated to.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder address with your actual data.
+# This example queries for the first 10 validators of a delegator.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000800",
+            "data": "0x56a64118000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa960450000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ### `delegatorValidator`
 Queries a specific validator a given delegator has delegated to.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder addresses with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000800",
+            "data": "0x4c2e1f4a000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa9604500000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### `pool`
 Queries the current staking pool information.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> with your actual RPC endpoint.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000800",
+            "data": "0x4a01a383"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### `params`
 Queries the parameters of the staking module.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> with your actual RPC endpoint.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000800",
+            "data": "0x4035236b"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ## Full Solidity Interface & ABI
 
@@ -341,8 +542,8 @@ interface StakingI {
     { "inputs": [], "name": "pool", "outputs": [ { "components": [ { "internalType": "string", "name": "notBondedTokens", "type": "string" }, { "internalType": "string", "name": "bondedTokens", "type": "string" } ], "internalType": "struct Pool", "name": "", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
     { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "internalType": "string", "name": "validatorSrcAddress", "type": "string" }, { "internalType": "string", "name": "validatorDstAddress", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "redelegate", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" },
     { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "internalType": "string", "name": "srcValidatorAddress", "type": "string" }, { "internalType": "string", "name": "dstValidatorAddress", "type": "string" }, { "components": [ { "internalType": "bytes", "name": "key", "type": "bytes" }, { "internalType": "uint64", "name": "offset", "type": "uint64" }, { "internalType": "uint64", "name": "limit", "type": "uint64" }, { "internalType": "bool", "name": "countTotal", "type": "bool" }, { "internalType": "bool", "name": "reverse", "type": "bool" } ], "internalType": "struct PageRequest", "name": "pageRequest", "type": "tuple" } ], "name": "redelegations", "outputs": [ { "components": [ { "components": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "internalType": "string", "name": "validatorSrcAddress", "type": "string" }, { "internalType": "string", "name": "validatorDstAddress", "type": "string" }, { "components": [ { "internalType": "uint256", "name": "creationHeight", "type": "uint256" }, { "internalType": "uint256", "name": "completionTime", "type": "uint256" }, { "internalType": "string", "name": "initialBalance", "type": "string" }, { "internalType": "string", "name": "sharesDst", "type": "string" } ], "internalType": "struct RedelegationEntry[]", "name": "entries", "type": "tuple[]" } ], "internalType": "struct Redelegation", "name": "redelegation", "type": "tuple" }, { "components": [ { "components": [ { "internalType": "uint256", "name": "creationHeight", "type": "uint256" }, { "internalType": "uint256", "name": "completionTime", "type": "uint256" }, { "internalType": "string", "name": "initialBalance", "type": "string" }, { "internalType": "string", "name": "sharesDst", "type": "string" } ], "internalType": "struct RedelegationEntry", "name": "redelegationEntry", "type": "tuple" }, { "internalType": "string", "name": "balance", "type": "string" } ], "internalType": "struct RedelegationEntryResponse[]", "name": "entries", "type": "tuple[]" } ], "internalType": "struct RedelegationResponse[]", "name": "", "type": "tuple[]" }, { "components": [ { "internalType": "bytes", "name": "nextKey", "type": "bytes" }, { "internalType": "uint64", "name": "total", "type": "uint64" } ], "internalType": "struct PageResponse", "name": "", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
-    { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "internalType": "string", "name": "validatorAddress", "type": "string" } ], "name": "unbondingDelegation", "outputs": [ { "components": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "internalType": "string", "name": "validatorAddress", "type": "string" }, { "components": [ { "internalType": "uint256", "name": "creationHeight", "type": "uint256" }, { "internalType": "uint256", "name": "completionTime", "type": "uint256" }, { "internalType": "string", "name": "initialBalance", "type": "string" }, { "internalType": "string", "name": "balance", "type": "string" } ], "internalType": "struct UnbondingDelegationEntry[]", "name": "entries", "type": "tuple[]" } ], "internalType": "struct UnbondingDelegation", "name": "", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
-    { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "internalType": "string", "name": "validatorAddress", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "undelegate", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "string", "name": "validatorAddress", "type": "string" } ], "name": "unbondingDelegation", "outputs": [ { "components": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "internalType": "string", "name": "validatorAddress", "type": "string" }, { "components": [ { "internalType": "uint256", "name": "creationHeight", "type": "uint256" }, { "internalType": "uint256", "name": "completionTime", "type": "uint256" }, { "internalType": "string", "name": "initialBalance", "type": "string" }, { "internalType": "string", "name": "balance", "type": "string" } ], "internalType": "struct UnbondingDelegationEntry[]", "name": "entries", "type": "tuple[]" } ], "internalType": "struct UnbondingDelegation", "name": "", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
+    { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "string", "name": "validatorAddress", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "undelegate", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" },
     { "inputs": [ { "internalType": "string", "name": "validatorAddress", "type": "string" } ], "name": "validator", "outputs": [ { "components": [ { "internalType": "string", "name": "operatorAddress", "type": "string" }, { "internalType": "string", "name": "consensusPubkey", "type": "string" }, { "internalType": "bool", "name": "jailed", "type": "bool" }, { "internalType": "uint32", "name": "status", "type": "uint32" }, { "internalType": "uint256", "name": "tokens", "type": "uint256" }, { "internalType": "string", "name": "delegatorShares", "type": "string" }, { "components": [ { "internalType": "string", "name": "moniker", "type": "string" }, { "internalType": "string", "name": "identity", "type": "string" }, { "internalType": "string", "name": "website", "type": "string" }, { "internalType": "string", "name": "securityContact", "type": "string" }, { "internalType": "string", "name": "details", "type": "string" } ], "internalType": "struct Description", "name": "description", "type": "tuple" }, { "internalType": "int64", "name": "unbondingHeight", "type": "int64" }, { "internalType": "uint256", "name": "unbondingTime", "type": "uint256" }, { "components": [ { "components": [ { "internalType": "string", "name": "rate", "type": "string" }, { "internalType": "string", "name": "maxRate", "type": "string" }, { "internalType": "string", "name": "maxChangeRate", "type": "string" } ], "internalType": "struct CommissionRates", "name": "commissionRates", "type": "tuple" }, { "internalType": "uint256", "name": "updateTime", "type": "uint256" } ], "internalType": "struct Commission", "name": "commission", "type": "tuple" }, { "internalType": "uint256", "name": "minSelfDelegation", "type": "uint256" } ], "internalType": "struct Validator", "name": "", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
     { "inputs": [ { "internalType": "string", "name": "status", "type": "string" }, { "components": [ { "internalType": "bytes", "name": "key", "type": "bytes" }, { "internalType": "uint64", "name": "offset", "type": "uint64" }, { "internalType": "uint64", "name": "limit", "type": "uint64" }, { "internalType": "bool", "name": "countTotal", "type": "bool" }, { "internalType": "bool", "name": "reverse", "type": "bool" } ], "internalType": "struct PageRequest", "name": "pageRequest", "type": "tuple" } ], "name": "validators", "outputs": [ { "components": [ { "internalType": "string", "name": "operatorAddress", "type": "string" }, { "internalType": "string", "name": "consensusPubkey", "type": "string" }, { "internalType": "bool", "name": "jailed", "type": "bool" }, { "internalType": "uint32", "name": "status", "type": "uint32" }, { "internalType": "uint256", "name": "tokens", "type": "uint256" }, { "internalType": "string", "name": "delegatorShares", "type": "string" }, { "components": [ { "internalType": "string", "name": "moniker", "type": "string" }, { "internalType": "string", "name": "identity", "type": "string" }, { "internalType": "string", "name": "website", "type": "string" }, { "internalType": "string", "name": "securityContact", "type": "string" }, { "internalType": "string", "name": "details", "type": "string" } ], "internalType": "struct Description", "name": "description", "type": "tuple" }, { "internalType": "int64", "name": "unbondingHeight", "type": "int64" }, { "internalType": "uint256", "name": "unbondingTime", "type": "uint256" }, { "components": [ { "components": [ { "internalType": "string", "name": "rate", "type": "string" }, { "internalType": "string", "name": "maxRate", "type": "string" }, { "internalType": "string", "name": "maxChangeRate", "type": "string" } ], "internalType": "struct CommissionRates", "name": "commissionRates", "type": "tuple" }, { "internalType": "uint256", "name": "updateTime", "type": "uint256" } ], "internalType": "struct Commission", "name": "commission", "type": "tuple" }, { "internalType": "uint256", "name": "minSelfDelegation", "type": "uint256" } ], "internalType": "struct Validator[]", "name": "", "type": "tuple[]" }, { "components": [ { "internalType": "bytes", "name": "nextKey", "type": "bytes" }, { "internalType": "uint64", "name": "total", "type": "uint64" } ], "internalType": "struct PageResponse", "name": "", "type": "tuple" } ], "stateMutability": "view", "type": "function" }
   ]

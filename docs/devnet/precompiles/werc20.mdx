@@ -4,8 +4,6 @@ description: "Wrapped native token functionality enabling ERC20 representation o
 icon: "refresh-ccw"
 ---
 
-# WERC20 Precompile
-
 ## Overview
 
 The WERC20 precompile provides a standardized way to wrap native EVM tokens, allowing them to be used as ERC20-compatible tokens within smart contracts. This precompile ensures a 1:1 backing between the native token and its wrapped counterpart, enabling seamless interaction with DeFi protocols and other dApps that rely on the ERC20 standard.
@@ -24,8 +22,45 @@ Withdraws native tokens from wrapped ERC20 tokens.
 ### `totalSupply`
 Returns the total supply of the wrapped token.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and <WERC20_PRECOMPILE_ADDRESS> with your actual data.
+# The WERC20 precompile address is dynamically assigned.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "<WERC20_PRECOMPILE_ADDRESS>",
+            "data": "0x18160ddd"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### `balanceOf`
 Returns the wrapped token balance for a specific account.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL>, <WERC20_PRECOMPILE_ADDRESS>, and the placeholder address with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "<WERC20_PRECOMPILE_ADDRESS>",
+            "data": "0x70a08231000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ### `transfer`
 Transfers wrapped tokens to a specified address.
@@ -39,14 +74,86 @@ Transfers wrapped tokens from one address to another, using an allowance.
 ### `allowance`
 Returns the remaining amount of tokens a spender is allowed to transfer on behalf of an owner.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL>, <WERC20_PRECOMPILE_ADDRESS>, and the placeholder addresses with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "<WERC20_PRECOMPILE_ADDRESS>",
+            "data": "0xdd62ed3e000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa9604500000000000000000000000027f320b7280911c7987a421a8138997a48d4b315"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### `name`
 Returns the name of the wrapped token.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and <WERC20_PRECOMPILE_ADDRESS> with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "<WERC20_PRECOMPILE_ADDRESS>",
+            "data": "0x06fdde03"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ### `symbol`
 Returns the symbol of the wrapped token.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and <WERC20_PRECOMPILE_ADDRESS> with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "<WERC20_PRECOMPILE_ADDRESS>",
+            "data": "0x95d89b41"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### `decimals`
 Returns the number of decimals used by the wrapped token.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and <WERC20_PRECOMPILE_ADDRESS> with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "<WERC20_PRECOMPILE_ADDRESS>",
+            "data": "0x313ce567"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ### `increaseAllowance`
 Increases the allowance granted to a spender.

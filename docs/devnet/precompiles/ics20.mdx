@@ -4,8 +4,6 @@ description: "Cross-chain token transfers via IBC (Inter-Blockchain Communicatio
 icon: "chevrons-left-right-ellipsis"
 ---
 
-# ICS20 Precompile
-
 ## Overview
 
 The ICS20 precompile provides an interface to the Inter-Blockchain Communication (IBC) protocol, allowing smart contracts to perform cross-chain token transfers. It enables sending tokens to other IBC-enabled chains and querying information about IBC denominations.
@@ -23,11 +21,66 @@ Initiates a cross-chain token transfer using the IBC protocol.
 ### `denom`
 Queries denomination information for an IBC token by its hash.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder hash with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000802",
+            "data": "0x7780092400000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000040"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### `denoms`
 Retrieves a paginated list of all denomination traces registered on the chain.
 
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> with your actual RPC endpoint.
+# This example queries for the first 10 denominations.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000802",
+            "data": "0x5310b39500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
+
 ### `denomHash`
 Computes the hash of a denomination trace path.
+
+<RequestExample>
+```bash Request
+# Note: Replace <RPC_URL> and the placeholder trace with your actual data.
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000802",
+            "data": "0x82ff49f000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</RequestExample>
 
 ## Full Solidity Interface & ABI
 
