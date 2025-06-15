@@ -1,7 +1,7 @@
 ---
 title: "Callbacks"
 description: "Interface for IBC packet lifecycle callbacks in smart contracts"
-icon: "arrows-turn-right"
+icon: "webhook"
 ---
 
 # IBC Callbacks
@@ -20,13 +20,13 @@ A contract that sends an IBC transfer may need to listen for the outcome of the 
 
 Critically, **only the IBC packet sender can set the callback**.
 
-### onPacketAcknowledgement
+### `onPacketAcknowledgement`
 
 **Signature**: `onPacketAcknowledgement(string memory channelId, string memory portId, uint64 sequence, bytes memory data, bytes memory acknowledgement)`
 
 **Description**: Callback function invoked on the source chain after a packet lifecycle is completed and acknowledgement is processed. The contract implementing this interface receives packet information and acknowledgement data to execute custom callback logic.
 
-### onPacketTimeout
+### `onPacketTimeout`
 
 **Signature**: `onPacketTimeout(string memory channelId, string memory portId, uint64 sequence, bytes memory data)`
 
@@ -34,10 +34,7 @@ Critically, **only the IBC packet sender can set the callback**.
 
 ## Full Solidity Interface & ABI
 
-<details>
-<summary>ICallbacks.sol</summary>
-
-```solidity
+```solidity title="Callbacks Solidity Interface" lines expandable
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.18;
 
@@ -76,12 +73,7 @@ interface ICallbacks {
 }
 ```
 
-</details>
-
-<details>
-<summary>ICallbacks.abi.json</summary>
-
-```json
+```json title="Callbacks ABI" lines expandable
 [
   {
     "inputs": [
@@ -146,5 +138,3 @@ interface ICallbacks {
   }
 ]
 ```
-
-</details>

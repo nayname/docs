@@ -4,12 +4,15 @@
   "description": "Build the future of interoperable blockchains with Cosmos",
   "theme": "mint",
   "colors": {
-    "primary": "#0E0E0E",
+    "primary": "#40eff2",
     "light": "#FAFAFA",
     "dark": "#0E0E0E"
   },
   "icons": {
-    "library": "lucide"
+    "library": "lucide",
+    "colors": {
+      "primary": "#40eff2"
+    }
   },
   "styling": {
     "codeblocks": "system"
@@ -45,6 +48,7 @@
                 "group": "Precompiles",
                 "pages": [
                   "docs/devnet/precompiles/overview",
+                  "docs/devnet/precompiles/bank",
                   "docs/devnet/precompiles/bech32",
                   "docs/devnet/precompiles/callbacks",
                   "docs/devnet/precompiles/distribution",
@@ -85,6 +89,6 @@
     "strict": false
   },
   "search": {
-    "prompt": "Search..."
+    "prompt": "Search docs..."
   }
 }

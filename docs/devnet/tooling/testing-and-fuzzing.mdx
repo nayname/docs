@@ -21,7 +21,7 @@ These libraries are used across the stack to write tests, simulate transactions,
 ---
 
 :::info
-Smart-contract quality hinges on **unit tests, property-based fuzzing, code-coverage checks, and static analysis**.  
+Smart-contract quality hinges on **unit tests, property-based fuzzing, code-coverage checks, and static analysis**.
 The tools below cover each layer.
 :::
 
@@ -30,22 +30,22 @@ The tools below cover each layer.
 
 ### Foundry — Solidity-Native
 
-- Tests written directly in Solidity.  
-- Very fast runner (`forge test`) and rich cheatcodes for state manipulation.  
-- Built-in, configurable fuzzing (`forge test --fuzz-runs=N`).  
+- Tests written directly in Solidity.
+- Very fast runner (`forge test`) and rich cheatcodes for state manipulation.
+- Built-in, configurable fuzzing (`forge test --fuzz-runs=N`).
 - Includes tools like `forge script`, `forge coverage`, and `forge snapshot`.
 
 ### Hardhat — JavaScript / TypeScript
 
-- Mocha + Chai test runner for JS/TS-based tests.  
-- Flexible task system (`hardhat.config.js`), plugin support, and network forking.  
+- Mocha + Chai test runner for JS/TS-based tests.
+- Flexible task system (`hardhat.config.js`), plugin support, and network forking.
 - Integrates with Ethers.js and Solidity tooling for deployments, gas tracking, and test orchestration.
 
 ## Fuzz (Property-Based) Testing
 
 Fuzz testing generates random inputs to find edge cases that violate expected properties.
 
-```solidity
+```solidity title="test/MyContract.t.sol  (Foundry)" lines expandable
 // test/MyContract.t.sol  (Foundry)
 function test_myFunction_fuzz(uint256 amount) public {
     vm.assume(amount > 0 && amount < 1e18);   // constrain input
@@ -77,7 +77,7 @@ Tools that enhance test coverage, assert correctness, or catch common vulnerabil
 
 ### Example — OpenZeppelin Test Helpers
 
-```js
+```js lines expandable
 const { time, expectRevert } = require('@openzeppelin/test-helpers');
 
 // advance clock by one day

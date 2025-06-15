@@ -1,7 +1,7 @@
 ---
 title: "Bech32"
 description: "Address format conversion between Ethereum hex addresses and Cosmos bech32 addresses"
-icon: "arrows-rotate"
+icon: "binary"
 ---
 
 # Bech32 Precompile
@@ -15,14 +15,14 @@ The Bech32 precompile provides address format conversion functionality between E
 ## Overview
 
 The Bech32 precompile exposes simple conversion helpers so Solidity contracts can:
-1. Convert an Ethereum `address` to a Bech32 string with a desired prefix (e.g. `cosmos`).
+1. Convert an Ethereum `address` to a Bech32 string with a desired `prefix` (e.g. `cosmos`).
 2. Convert any Bech32 address string back into an EVM `address`.
 
 It is a thin wrapper around the Cosmos address‐conversion library and lives at **`0x0000000000000000000000000000000000000400`**.
 
 ## Primary Methods
 
-### hexToBech32
+### `hexToBech32`
 
 **Signature**: `hexToBech32(address addr, string memory prefix) → string memory`
 
@@ -34,7 +34,7 @@ It is a thin wrapper around the Cosmos address‐conversion library and lives at
 
 **Returns**: String containing the bech32 formatted address
 
-### bech32ToHex
+### `bech32ToHex`
 
 **Signature**: `bech32ToHex(string memory bech32Address) → address`
 
@@ -47,10 +47,7 @@ It is a thin wrapper around the Cosmos address‐conversion library and lives at
 
 ## Full Interface & ABI
 
-<details>
-<summary>Bech32I.sol</summary>
-
-```solidity
+```solidity title="Bech32 Solidity Interface" lines
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.17;
 
@@ -66,12 +63,7 @@ interface Bech32I {
 }
 ```
 
-</details>
-
-<details>
-<summary>Bech32I.abi.json</summary>
-
-```json
+```json title="Bech32 ABI" lines expandable
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "Bech32I",
@@ -107,5 +99,3 @@ interface Bech32I {
   "deployedLinkReferences": {}
 }
 ```
-
-</details>

@@ -5,23 +5,29 @@ description: 'Connect with the chain / Set up your node'
 
 # Connect with the chain
 
-Sometimes all you need is to interact with the network, without the overhead of running a full node. Below are quick ways to query and broadcast transactions using public endpoints or lightweight tooling.
+Most development work can be done without the overhead of running a full node.
+Below is a brief overview of querying data and broadcasting transactions using public endpoints and lightweight tooling.
 
 ## 1. Web Wallets
 
-> **Recommended for general use and quick transactions**
+> **Recommended for real-world, E2E testing**
 
-1. Install [Keplr](https://www.keplr.app/) (Chrome/Firefox).
-2. Select or add the Cosmos Hub (or your target chain).
+1. Install [Keplr](https://www.keplr.app/), [Metamask](https://metamask.io/) or [Rabby](https://rabby.io/) (Chrome/Mobile).
+2. Add a custom network:
+    - Chain ID: `4321`
+    - RPC URL: `https://devnet-1-rpc.ib.skip.build`
+    - Chain Name: `Skip Devnet`
+    - Currency Symbol: `ATOM`
+    - Currency Decimals: `6`
 3. Use the UI to send tokens, view balances, and interact with dApps.
 
 ## 2. CLI Queries via Public RPC
 
-> **Great for scripts or CI jobs without local node**
+> **Great for one-off tasks or testing that do not require a full node**
 
 ### Download or build the chain binary
 
-```bash
+```bash lines expandable
 # Adjust version as needed
 VERSION=v9.0.0
 curl -LO "https://github.com/cosmos/gaia/releases/download/${VERSION}/gaiad_${VERSION}_linux_amd64.tar.gz"
@@ -32,7 +38,7 @@ sudo mv gaiad /usr/local/bin/
 
 ### Query examples
 
-```bash
+```bash lines expandable
 # Query account balance
 gaiad q bank balances cosmos1... --node https://devnet-1-rpc.ib.skip.build:443
 
@@ -42,7 +48,7 @@ gaiad q staking validators --node https://devnet-1-rpc.ib.skip.build:443
 
 ### Broadcast a transaction
 
-```bash
+```bash lines expandable
 # Create and sign a simple send
 gaiad tx bank send cosmos1... cosmos1... 1000uatom \
   --node https://devnet-1-rpc.ib.skip.build:443 \
@@ -51,15 +57,87 @@ gaiad tx bank send cosmos1... cosmos1... 1000uatom \
   --yes
 ```
 
+### Generate Transaction Messages
+
+You can use the `--generate-only` flag to create transaction messages without broadcasting them. This can be useful for finding the correct syntax and creating reusable transaction templates:
+
+| Field (0x02)          | Value         |
+| --------------------- | ------------- |
+| **chainId**           | `0x01`        |
+| **nonce**             | `0x`          |
+| **maxPrioFeePerGas**  | `0x01`        |
+| **maxFeePerGas**      | `0x01`        |
+| **gasLimit**          | `0x5208`      |
+| **to / value / data** | same as above |
+| **accessList**        | `[]`          |
+| **yParity (v)**       | `0x0`         |
+| **r**, **s**          | `0x0`, `0x0`  |
+
+`evmd tx evm raw 0x02e20180010182520894de0b295669a9fd93d5f28d9ec85e40f4cb697bae8080c0808080 --generate-only | jq`
+
+```json title="Generated Transaction" lines expandable
+{
+  "body": {
+    "messages": [
+      {
+        "@type": "/cosmos.evm.vm.v1.MsgEthereumTx",
+        "data": {
+          "@type": "/cosmos.evm.vm.v1.DynamicFeeTx",
+          "chain_id": "1",
+          "nonce": "0",
+          "gas_tip_cap": "1",
+          "gas_fee_cap": "1",
+          "gas": "21000",
+          "to": "0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe",
+          "value": "0",
+          "data": null,
+          "accesses": [],
+          "v": null,
+          "r": null,
+          "s": null
+        },
+        "size": 0,
+        "hash": "0x10c35e9f591e43bac6a9d01164a62e141d16ca715653ac818761c79e3eecafbc",
+        "from": ""
+      }
+    ],
+    "memo": "",
+    "timeout_height": "0",
+    "unordered": false,
+    "timeout_timestamp": null,
+    "extension_options": [
+      {
+        "@type": "/cosmos.evm.vm.v1.ExtensionOptionsEthereumTx"
+      }
+    ],
+    "non_critical_extension_options": []
+  },
+  "auth_info": {
+    "signer_infos": [],
+    "fee": {
+      "amount": [
+        {
+          "denom": "atest",
+          "amount": "21000"
+        }
+      ],
+      "gas_limit": "21000",
+      "payer": "",
+      "granter": ""
+    },
+    "tip": null
+  },
+  "signatures": []
+}
+```
+
 ## 3. REST (LCD) Endpoints
 
 > **Use for HTTP-based integrations**
 
-Cosmos SDK chains expose a REST API at port 1317 by default. For the devnet:
+Cosmos SDK chains expose a REST API at port `1317` by default. For the devnet:
 
-```
-https://devnet-1-lcd.ib.skip.build
-```
+`https://devnet-1-lcd.ib.skip.build`
 
 Basic endpoints:
 
@@ -103,14 +181,14 @@ Running a full node gives you complete control, better performance, and eliminat
 ### Quick Setup
 
 1. **Install dependencies** (Ubuntu/Debian):
-```bash
+```bash lines expandable
 sudo apt update && sudo apt install -y \
   build-essential git curl wget jq lz4 liblz4-tool \
   protobuf-compiler pkg-config unzip
 ```
 
 2. **Install Go 1.22+**:
-```bash
+```bash lines expandable
 GO_VERSION=1.22.4
 curl -LO "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz"
 sudo rm -rf /usr/local/go
@@ -120,38 +198,32 @@ source ~/.bashrc
 ```
 
 3. **Build the binary**:
-```bash
+```bash lines expandable
 git clone https://github.com/cosmos/evm.git
 cd evm
 make install  # installs 'evmd'
 ```
 
 4. **Initialize your node**:
-```bash
-evmd init "your-node-name" --chain-id 4321
-```
+`evmd init "your-node-name" --chain-id 4321`
 
 5. **Get the genesis file**:
-```bash
-curl -s https://devnet-1-rpc.ib.skip.build/genesis | jq .result.genesis > ~/.evmd/config/genesis.json
-```
+`curl -s https://devnet-1-rpc.ib.skip.build/genesis | jq .result.genesis > ~/.evmd/config/genesis.json`
 
 6. **Configure peers** (add to `~/.evmd/config/config.toml`):
-```toml
+```toml lines expandable
 persistent_peers = "peer1@ip1:26656,peer2@ip2:26656"
 seeds = "seed1@ip1:26656,seed2@ip2:26656"
 ```
 
 7. **Start syncing**:
-```bash
-evmd start
-```
+`evmd start`
 
 ### State Sync (Faster Alternative)
 
 Instead of syncing from genesis, use state sync for faster setup:
 
-```bash
+```bash title="config.toml" lines expandable
 # Configure state sync in config.toml
 [statesync]
 enable = true
@@ -176,7 +248,7 @@ EVM WebSocket:  ws://localhost:8546
 
 Monitor your node's sync status:
 
-```bash
+```bash lines expandable
 # Check if syncing
 evmd status | jq .SyncInfo.catching_up
 

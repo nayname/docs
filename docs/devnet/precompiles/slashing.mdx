@@ -6,221 +6,32 @@ icon: "gavel"
 
 # Slashing Precompile
 
-**Address**: `0x0000000000000000000000000000000000000806`
+## Overview
 
+The Slashing precompile provides an interface to the Cosmos SDK's `x/slashing` module, which is responsible for penalizing validators for misbehavior, such as downtime or double-signing. This precompile allows smart contracts to unjail validators and query slashing-related information, including validator signing info and module parameters.
+
+**Precompile Address**: `0x0000000000000000000000000000000000000806`
 **Related Module**: [x/slashing](https://docs.cosmos.network/main/modules/slashing)
 
-The Slashing precompile provides access to Cosmos SDK slashing functionality, enabling smart contracts to interact with validator punishment mechanisms, jail management, and signing information queries.
+## Transaction Methods
 
-## Functions
+### `unjail`
+Allows a validator to unjail themselves after being jailed for downtime.
 
-### unjail
+## Query Methods
 
-**Signature**: `unjail(address validatorAddress) → bool`
+### `getSigningInfo`
+Returns the signing information for a specific validator.
 
-**Description**: Allows validators to unjail themselves after being jailed for downtime.
+### `getSigningInfos`
+Returns the signing information for all validators, with pagination support.
 
-**Parameters**:
-- `validatorAddress` (address): The validator operator address to unjail
+### `getParams`
+Returns the current parameters for the slashing module.
 
-**Returns**: Boolean indicating success
+## Full Solidity Interface & ABI
 
-### getSigningInfo
-
-**Signature**: `getSigningInfo(address consAddress) → SigningInfo`
-
-**Description**: Returns the signing info for a specific validator.
-
-**Parameters**:
-- `consAddress` (address): The validator consensus address
-
-**Returns**: SigningInfo struct containing validator signing information
-
-### getSigningInfos
-
-**Signature**: `getSigningInfos(PageRequest calldata pagination) → (SigningInfo[], PageResponse)`
-
-**Description**: Returns the signing info for all validators with pagination.
-
-**Parameters**:
-- `pagination` (PageRequest): Pagination configuration for the query
-
-**Returns**: 
-- Array of SigningInfo structs
-- PageResponse with pagination information
-
-### getParams
-
-**Signature**: `getParams() → Params`
-
-**Description**: Returns the slashing module parameters.
-
-**Returns**: Params struct containing slashing module configuration
-
-## Events
-
-- `ValidatorUnjailed(address indexed validator)`
-
-## Data Structures
-
-### SigningInfo
-- `validatorAddress` (address): Address of the validator
-- `startHeight` (int64): Height at which validator was first a candidate or was unjailed
-- `indexOffset` (int64): Index offset into signed block bit array
-- `jailedUntil` (int64): Timestamp until which validator is jailed due to liveness downtime
-- `tombstoned` (bool): Whether the validator has been tombstoned
-- `missedBlocksCounter` (int64): Missed blocks counter
-
-### Params
-- `signedBlocksWindow` (int64): How many blocks the validator should have signed
-- `minSignedPerWindow` (Dec): Minimum blocks signed per window to avoid slashing
-- `downtimeJailDuration` (int64): How long the validator will be jailed for downtime
-- `slashFractionDoubleSign` (Dec): Percentage of slash for double sign
-- `slashFractionDowntime` (Dec): Percentage of slash for downtime
-
-<details>
-<summary>ABI</summary>
-
-```json
-[
-  {
-    "anonymous": false,
-    "inputs": [
-      {"indexed": true, "internalType": "address", "name": "validator", "type": "address"}
-    ],
-    "name": "ValidatorUnjailed",
-    "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "getParams",
-    "outputs": [
-      {
-        "components": [
-          {"internalType": "int64", "name": "signedBlocksWindow", "type": "int64"},
-          {
-            "components": [
-              {"internalType": "uint256", "name": "value", "type": "uint256"},
-              {"internalType": "uint8", "name": "precision", "type": "uint8"}
-            ],
-            "internalType": "struct Dec",
-            "name": "minSignedPerWindow",
-            "type": "tuple"
-          },
-          {"internalType": "int64", "name": "downtimeJailDuration", "type": "int64"},
-          {
-            "components": [
-              {"internalType": "uint256", "name": "value", "type": "uint256"},
-              {"internalType": "uint8", "name": "precision", "type": "uint8"}
-            ],
-            "internalType": "struct Dec",
-            "name": "slashFractionDoubleSign",
-            "type": "tuple"
-          },
-          {
-            "components": [
-              {"internalType": "uint256", "name": "value", "type": "uint256"},
-              {"internalType": "uint8", "name": "precision", "type": "uint8"}
-            ],
-            "internalType": "struct Dec",
-            "name": "slashFractionDowntime",
-            "type": "tuple"
-          }
-        ],
-        "internalType": "struct Params",
-        "name": "params",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "address", "name": "consAddress", "type": "address"}
-    ],
-    "name": "getSigningInfo",
-    "outputs": [
-      {
-        "components": [
-          {"internalType": "address", "name": "validatorAddress", "type": "address"},
-          {"internalType": "int64", "name": "startHeight", "type": "int64"},
-          {"internalType": "int64", "name": "indexOffset", "type": "int64"},
-          {"internalType": "int64", "name": "jailedUntil", "type": "int64"},
-          {"internalType": "bool", "name": "tombstoned", "type": "bool"},
-          {"internalType": "int64", "name": "missedBlocksCounter", "type": "int64"}
-        ],
-        "internalType": "struct SigningInfo",
-        "name": "signingInfo",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {"internalType": "bytes", "name": "key", "type": "bytes"},
-          {"internalType": "uint64", "name": "offset", "type": "uint64"},
-          {"internalType": "uint64", "name": "limit", "type": "uint64"},
-          {"internalType": "bool", "name": "countTotal", "type": "bool"},
-          {"internalType": "bool", "name": "reverse", "type": "bool"}
-        ],
-        "internalType": "struct PageRequest",
-        "name": "pagination",
-        "type": "tuple"
-      }
-    ],
-    "name": "getSigningInfos",
-    "outputs": [
-      {
-        "components": [
-          {"internalType": "address", "name": "validatorAddress", "type": "address"},
-          {"internalType": "int64", "name": "startHeight", "type": "int64"},
-          {"internalType": "int64", "name": "indexOffset", "type": "int64"},
-          {"internalType": "int64", "name": "jailedUntil", "type": "int64"},
-          {"internalType": "bool", "name": "tombstoned", "type": "bool"},
-          {"internalType": "int64", "name": "missedBlocksCounter", "type": "int64"}
-        ],
-        "internalType": "struct SigningInfo[]",
-        "name": "signingInfos",
-        "type": "tuple[]"
-      },
-      {
-        "components": [
-          {"internalType": "bytes", "name": "nextKey", "type": "bytes"},
-          {"internalType": "uint64", "name": "total", "type": "uint64"}
-        ],
-        "internalType": "struct PageResponse",
-        "name": "pageResponse",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "address", "name": "validatorAddress", "type": "address"}
-    ],
-    "name": "unjail",
-    "outputs": [
-      {"internalType": "bool", "name": "success", "type": "bool"}
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
-]
-```
-
-</details>
-
-<details>
-<summary>Solidity Interface</summary>
-
-```solidity
+```solidity title="Slashing Solidity Interface" lines expandable
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.17;
 
@@ -300,4 +111,17 @@ interface ISlashing {
 }
 ```
 
-</details>
+```json title="Slashing ABI" lines expandable
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ISlashing",
+  "sourceName": "solidity/precompiles/slashing/ISlashing.sol",
+  "abi": [
+    { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "validator", "type": "address" } ], "name": "ValidatorUnjailed", "type": "event" },
+    { "inputs": [], "name": "getParams", "outputs": [ { "components": [ { "internalType": "int64", "name": "signedBlocksWindow", "type": "int64" }, { "components": [ { "internalType": "uint256", "name": "value", "type": "uint256" }, { "internalType": "uint8", "name": "precision", "type": "uint8" } ], "internalType": "struct Dec", "name": "minSignedPerWindow", "type": "tuple" }, { "internalType": "int64", "name": "downtimeJailDuration", "type": "int64" }, { "components": [ { "internalType": "uint256", "name": "value", "type": "uint256" }, { "internalType": "uint8", "name": "precision", "type": "uint8" } ], "internalType": "struct Dec", "name": "slashFractionDoubleSign", "type": "tuple" }, { "components": [ { "internalType": "uint256", "name": "value", "type": "uint256" }, { "internalType": "uint8", "name": "precision", "type": "uint8" } ], "internalType": "struct Dec", "name": "slashFractionDowntime", "type": "tuple" } ], "internalType": "struct Params", "name": "params", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
+    { "inputs": [ { "internalType": "address", "name": "consAddress", "type": "address" } ], "name": "getSigningInfo", "outputs": [ { "components": [ { "internalType": "address", "name": "validatorAddress", "type": "address" }, { "internalType": "int64", "name": "startHeight", "type": "int64" }, { "internalType": "int64", "name": "indexOffset", "type": "int64" }, { "internalType": "int64", "name": "jailedUntil", "type": "int64" }, { "internalType": "bool", "name": "tombstoned", "type": "bool" }, { "internalType": "int64", "name": "missedBlocksCounter", "type": "int64" } ], "internalType": "struct SigningInfo", "name": "signingInfo", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
+    { "inputs": [ { "components": [ { "internalType": "bytes", "name": "key", "type": "bytes" }, { "internalType": "uint64", "name": "offset", "type": "uint64" }, { "internalType": "uint64", "name": "limit", "type": "uint64" }, { "internalType": "bool", "name": "countTotal", "type": "bool" }, { "internalType": "bool", "name": "reverse", "type": "bool" } ], "internalType": "struct PageRequest", "name": "pagination", "type": "tuple" } ], "name": "getSigningInfos", "outputs": [ { "components": [ { "internalType": "address", "name": "validatorAddress", "type": "address" }, { "internalType": "int64", "name": "startHeight", "type": "int64" }, { "internalType": "int64", "name": "indexOffset", "type": "int64" }, { "internalType": "int64", "name": "jailedUntil", "type": "int64" }, { "internalType": "bool", "name": "tombstoned", "type": "bool" }, { "internalType": "int64", "name": "missedBlocksCounter", "type": "int64" } ], "internalType": "struct SigningInfo[]", "name": "signingInfos", "type": "tuple[]" }, { "components": [ { "internalType": "bytes", "name": "nextKey", "type": "bytes" }, { "internalType": "uint64", "name": "total", "type": "uint64" } ], "internalType": "struct PageResponse", "name": "pageResponse", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
+    { "inputs": [ { "internalType": "address", "name": "validatorAddress", "type": "address" } ], "name": "unjail", "outputs": [ { "internalType": "bool", "name": "success", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }
+  ]
+}
+```
