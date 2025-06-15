@@ -12,7 +12,15 @@ icon: "arrows-rotate"
 
 The Bech32 precompile provides address format conversion functionality between Ethereum hex addresses and Cosmos bech32 addresses.
 
-## Functions
+## Overview
+
+The Bech32 precompile exposes simple conversion helpers so Solidity contracts can:
+1. Convert an Ethereum `address` to a Bech32 string with a desired prefix (e.g. `cosmos`).
+2. Convert any Bech32 address string back into an EVM `address`.
+
+It is a thin wrapper around the Cosmos address‐conversion library and lives at **`0x0000000000000000000000000000000000000400`**.
+
+## Primary Methods
 
 ### hexToBech32
 
@@ -37,61 +45,10 @@ The Bech32 precompile provides address format conversion functionality between E
 
 **Returns**: Ethereum address in hex format
 
-<details>
-<summary>ABI</summary>
-
-```json
-[
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "bech32Address",
-        "type": "string"
-      }
-    ],
-    "name": "bech32ToHex",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "addr",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "addr",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "prefix",
-        "type": "string"
-      }
-    ],
-    "name": "hexToBech32",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "bech32Address",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
-]
-```
-
-</details>
+## Full Interface & ABI
 
 <details>
-<summary>Solidity Interface</summary>
+<summary>Bech32I.sol</summary>
 
 ```solidity
 // SPDX-License-Identifier: LGPL-3.0-only
@@ -103,27 +60,51 @@ address constant Bech32_PRECOMPILE_ADDRESS = 0x000000000000000000000000000000000
 /// @dev The Bech32I contract's instance.
 Bech32I constant BECH32_CONTRACT = Bech32I(Bech32_PRECOMPILE_ADDRESS);
 
-/// @author Evmos Team
-/// @title Bech32 Precompiled Contract
-/// @dev The interface through which solidity contracts can convert addresses from
-/// hex to bech32 and vice versa.
-/// @custom:address 0x0000000000000000000000000000000000000400
 interface Bech32I {
-    /// @dev Defines a method for converting a hex formatted address to bech32.
-    /// @param addr The hex address to be converted.
-    /// @param prefix The human readable prefix (HRP) of the bech32 address.
-    /// @return bech32Address The address in bech32 format.
-    function hexToBech32(
-        address addr,
-        string memory prefix
-    ) external returns (string memory bech32Address);
+    function hexToBech32(address addr,string memory prefix) external returns (string memory bech32Address);
+    function bech32ToHex(string memory bech32Address) external returns (address addr);
+}
+```
 
-    /// @dev Defines a method for converting a bech32 formatted address to hex.
-    /// @param bech32Address The bech32 address to be converted.
-    /// @return addr The address in hex format.
-    function bech32ToHex(
-        string memory bech32Address
-    ) external returns (address addr);
+</details>
+
+<details>
+<summary>Bech32I.abi.json</summary>
+
+```json
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "Bech32I",
+  "sourceName": "solidity/precompiles/bech32/Bech32I.sol",
+  "abi": [
+    {
+      "inputs": [
+        { "internalType": "string", "name": "bech32Address", "type": "string" }
+      ],
+      "name": "bech32ToHex",
+      "outputs": [
+        { "internalType": "address", "name": "addr", "type": "address" }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "addr", "type": "address" },
+        { "internalType": "string", "name": "prefix", "type": "string" }
+      ],
+      "name": "hexToBech32",
+      "outputs": [
+        { "internalType": "string", "name": "bech32Address", "type": "string" }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
 }
 ```
 

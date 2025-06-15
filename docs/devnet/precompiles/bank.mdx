@@ -6,19 +6,21 @@ icon: "building-columns"
 
 # Bank Precompile
 
+## Overview
+
+The Bank precompile provides ERC20-style access to native Cosmos SDK tokens, enabling smart contracts to query balances and token supplies through standardized interfaces. It serves as a Solidity wrapper around the Cosmos SDK `x/bank` module.
+
 **Address**: `0x0000000000000000000000000000000000000804`
 
 **Related Module**: [x/bank](https://docs.cosmos.network/main/modules/bank)
 
-The Bank precompile provides ERC20-style access to native Cosmos SDK tokens, enabling smart contracts to query balances and token supplies through standardized interfaces.
-
-## Functions
+## Primary Methods
 
 ### balances
 
 **Signature**: `balances(address account) → Balance[] memory`
 
-**Description**: Queries all native token balances for a specific account address. Returns an array of Balance structures containing the ERC20 contract address and amount for each token held by the account.
+**Description**: Queries all native token balances for a specific account address and returns an array of `Balance` (ERC-20 contract address & amount) structures.
 
 **Parameters**:
 - `account` (address): The account address to query balances for
@@ -46,7 +48,7 @@ The Bank precompile provides ERC20-style access to native Cosmos SDK tokens, ena
 
 **Returns**: Total supply of the specified token as uint256
 
-## Data Structures
+## Data Structures ->
 
 ### Balance
 
@@ -55,93 +57,10 @@ The Balance struct represents a token balance with its associated ERC20 contract
 - `contractAddress` (address): The ERC20 contract address representing the native token
 - `amount` (uint256): Token amount in the smallest denomination
 
-<details>
-<summary>ABI</summary>
-
-```json
-[
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "balances",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "contractAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct Balance[]",
-        "name": "balances",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "erc20Address",
-        "type": "address"
-      }
-    ],
-    "name": "supplyOf",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "totalSupply",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalSupply",
-    "outputs": [
-      {
-        "components": [
-        {
-          "internalType": "address",
-          "name": "contractAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-        ],
-        "internalType": "struct Balance[]",
-        "name": "totalSupply",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  }
-]
-```
-
-</details>
+## Full Interface & ABI
 
 <details>
-<summary>Solidity Interface</summary>
+<summary>IBank.sol</summary>
 
 ```solidity
 // SPDX-License-Identifier: LGPL-3.0-only
@@ -185,6 +104,100 @@ interface IBank {
     function supplyOf(
         address erc20Address
     ) external view returns (uint256 totalSupply);
+}
+```
+
+</details>
+
+<details>
+<summary>IBank.abi.json</summary>
+
+```json
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IBank",
+  "sourceName": "solidity/precompiles/bank/IBank.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "balances",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "contractAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Balance[]",
+          "name": "balances",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "erc20Address",
+          "type": "address"
+        }
+      ],
+      "name": "supplyOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "totalSupply",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "contractAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Balance[]",
+          "name": "totalSupply",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
 }
 ```
 
