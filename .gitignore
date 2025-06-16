@@ -36,6 +36,9 @@ Thumbs.db
 .cursorrules
 .context/
 context/
+./.claude
+*/.claude/
+*/**/.claude/
 
 # Optional: lock files if using alternative package managers
 

@@ -16,6 +16,63 @@ The ICS20 precompile provides an interface to the Inter-Blockchain Communication
 ### `transfer`
 Initiates a cross-chain token transfer using the IBC protocol.
 
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the transfer function
+const precompileAbi = [
+  "function transfer(string memory sourcePort, string memory sourceChannel, string memory token, address sender, string memory receiver, uint64 timeoutHeight, uint64 timeoutTimestamp, string memory memo) payable"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000802";
+const signer = new ethers.Wallet("<PRIVATE_KEY>", provider);
+const contract = new ethers.Contract(precompileAddress, precompileAbi, signer);
+
+// Transfer parameters
+const sourcePort = "transfer";
+const sourceChannel = "channel-0";
+const token = "uatom"; // or ERC20 token address
+const sender = await signer.getAddress();
+const receiver = "cosmos1..."; // Destination address on target chain
+const timeoutHeight = 0; // 0 for no height timeout
+const timeoutTimestamp = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
+const memo = "";
+
+async function transferTokens() {
+  try {
+    const tx = await contract.transfer(
+      sourcePort,
+      sourceChannel, 
+      token,
+      sender,
+      receiver,
+      timeoutHeight,
+      timeoutTimestamp,
+      memo,
+      { value: ethers.parseEther("1.0") } // Amount to transfer
+    );
+    
+    console.log("Transfer initiated:", tx.hash);
+    await tx.wait();
+    console.log("Transfer confirmed");
+  } catch (error) {
+    console.error("Error initiating transfer:", error);
+  }
+}
+
+// transferTokens();
+```
+
+```bash cURL expandable lines
+# Note: cURL cannot be used for transaction methods as they require signatures
+# Use the ethers.js example above for IBC transfers
+echo "IBC transfer requires a signed transaction - use ethers.js or other Web3 library"
+```
+</CodeGroup>
+
 ## Query Methods
 
 ### `denom`

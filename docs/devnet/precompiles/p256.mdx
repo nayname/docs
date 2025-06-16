@@ -120,6 +120,9 @@ async function getGenerator() {
 
 getGenerator();
 ```
+
+**Note**: The P-256 precompile functions may return empty data on some devnet configurations. The cURL method is more reliable for testing function availability.
+
 ```bash cURL expandable lines
 # Note: Replace <RPC_URL> with your actual RPC endpoint.
 # This example calls getGenerator (no parameters needed)

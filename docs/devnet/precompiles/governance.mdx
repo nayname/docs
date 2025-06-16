@@ -444,6 +444,9 @@ async function getGovParams() {
 
 getGovParams();
 ```
+
+**Note**: The `getParams()` function returns a complex nested structure that may require manual ABI decoding in some ethers.js versions. The cURL method is more reliable for this specific function.
+
 ```bash cURL expandable lines
 # Note: Replace <RPC_URL> with your actual RPC endpoint.
 # Data is ABI-encoded: just the function selector.
@@ -453,7 +456,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000805",
-            "data": "0x4035236b"
+            "data": "0x5e615a6b"
         },
         "latest"
     ],
