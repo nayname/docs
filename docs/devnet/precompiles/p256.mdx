@@ -4,355 +4,268 @@ description: "P-256 elliptic curve cryptographic operations for secure communica
 icon: "key"
 ---
 
-# P256 Precompile
+## Overview
 
-**Address**: `0x0000000000000000000000000000000000000100`
+The P256 precompile provides a suite of cryptographic functions for the NIST P-256 elliptic curve. It enables smart contracts to perform essential operations such as signature verification, scalar multiplication, and point addition, which are fundamental for building secure and privacy-preserving applications.
 
+**Precompile Address**: `0x0000000000000000000000000000000000000100`
 **Related Module**: Core cryptographic functionality
 
-The P256 precompile provides P-256 elliptic curve cryptographic operations, enabling smart contracts to perform secure cryptographic computations using the NIST P-256 curve.
+## Methods
 
-## Functions
+### `verifySignature`
+Verifies a P-256 ECDSA signature against a hash and public key.
 
-### verifySignature
+### `scalarMult`
+Performs scalar multiplication on the P-256 elliptic curve.
 
-**Signature**: `verifySignature(bytes32, P256Signature, P256Point) → bool`
+### `pointAdd`
+Adds two points on the P-256 elliptic curve.
 
-**Description**: Verifies a P-256 ECDSA signature against a given hash and public key.
+### `getGenerator`
+Returns the generator point of the P-256 curve.
 
-**Parameters**:
-- `hash` (bytes32): The hash that was signed (typically SHA-256 of the original message)
-- `signature` (P256Signature): The signature to verify containing r and s components
-- `publicKey` (P256Point): The public key corresponding to the private key used for signing
+### `isOnCurve`
+Validates whether a given point lies on the P-256 curve.
 
-**Returns**: Boolean indicating whether the signature is valid
+### `compressPoint`
+Compresses a P-256 point to its 33-byte representation.
 
-### scalarMult
+### `decompressPoint`
+Decompresses a 33-byte compressed point to its full coordinates.
 
-**Signature**: `scalarMult(bytes32, P256Point) → P256Point`
+### Example: Verifying a P-256 Signature
 
-**Description**: Performs scalar multiplication on the P-256 elliptic curve.
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
 
-**Parameters**:
-- `scalar` (bytes32): The scalar value to multiply by
-- `point` (P256Point): The elliptic curve point to multiply
+// ABI definition for the verifySignature function
+const precompileAbi = [
+  "function verifySignature(bytes32 hash, tuple(bytes32 r, bytes32 s) signature, tuple(bytes32 x, bytes32 y) publicKey) pure returns (bool isValid)"
+];
 
-**Returns**: The resulting point after scalar multiplication
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000100";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
 
-### pointAdd
+// Example inputs (replace with your actual values)
+const hash = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
+const signature = {
+  r: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+  s: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+};
+const publicKey = {
+  x: "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  y: "0xfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210"
+};
 
-**Signature**: `pointAdd(P256Point, P256Point) → P256Point`
-
-**Description**: Adds two points on the P-256 elliptic curve.
-
-**Parameters**:
-- `point1` (P256Point): First point to add
-- `point2` (P256Point): Second point to add
-
-**Returns**: The sum of the two points
-
-### getGenerator
-
-**Signature**: `getGenerator() → P256Point`
-
-**Description**: Returns the generator point of the P-256 curve.
-
-**Returns**: The generator point with predefined x and y coordinates
-
-### isOnCurve
-
-**Signature**: `isOnCurve(P256Point) → bool`
-
-**Description**: Validates whether a given point lies on the P-256 elliptic curve.
-
-**Parameters**:
-- `point` (P256Point): The point to validate
-
-**Returns**: Boolean indicating whether the point is on the curve
-
-### compressPoint
-
-**Signature**: `compressPoint(P256Point) → bytes`
-
-**Description**: Compresses a P-256 point to its 33-byte representation.
-
-**Parameters**:
-- `point` (P256Point): The point to compress
-
-**Returns**: 33-byte compressed representation of the point
-
-### decompressPoint
-
-**Signature**: `decompressPoint(bytes) → P256Point`
-
-**Description**: Decompresses a 33-byte compressed point back to its full coordinates.
-
-**Parameters**:
-- `compressed` (bytes): The 33-byte compressed point data
-
-**Returns**: The full point with both x and y coordinates
-
-## Data Structures
-
-### P256Point
-- `x` (bytes32): X coordinate of the point
-- `y` (bytes32): Y coordinate of the point
-
-### P256Signature
-- `r` (bytes32): R component of the signature
-- `s` (bytes32): S component of the signature
-
-<details>
-<summary>ABI</summary>
-
-```json
-[
-  {
-    "inputs": [
-      {"internalType": "bytes32", "name": "hash", "type": "bytes32"},
-      {
-        "components": [
-          {"internalType": "bytes32", "name": "r", "type": "bytes32"},
-          {"internalType": "bytes32", "name": "s", "type": "bytes32"}
-        ],
-        "internalType": "struct P256Signature",
-        "name": "signature",
-        "type": "tuple"
-      },
-      {
-        "components": [
-          {"internalType": "bytes32", "name": "x", "type": "bytes32"},
-          {"internalType": "bytes32", "name": "y", "type": "bytes32"}
-        ],
-        "internalType": "struct P256Point",
-        "name": "publicKey",
-        "type": "tuple"
-      }
-    ],
-    "name": "verifySignature",
-    "outputs": [{"internalType": "bool", "name": "isValid", "type": "bool"}],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "bytes32", "name": "scalar", "type": "bytes32"},
-      {
-        "components": [
-          {"internalType": "bytes32", "name": "x", "type": "bytes32"},
-          {"internalType": "bytes32", "name": "y", "type": "bytes32"}
-        ],
-        "internalType": "struct P256Point",
-        "name": "point",
-        "type": "tuple"
-      }
-    ],
-    "name": "scalarMult",
-    "outputs": [
-      {
-        "components": [
-          {"internalType": "bytes32", "name": "x", "type": "bytes32"},
-          {"internalType": "bytes32", "name": "y", "type": "bytes32"}
-        ],
-        "internalType": "struct P256Point",
-        "name": "result",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {"internalType": "bytes32", "name": "x", "type": "bytes32"},
-          {"internalType": "bytes32", "name": "y", "type": "bytes32"}
-        ],
-        "internalType": "struct P256Point",
-        "name": "point1",
-        "type": "tuple"
-      },
-      {
-        "components": [
-          {"internalType": "bytes32", "name": "x", "type": "bytes32"},
-          {"internalType": "bytes32", "name": "y", "type": "bytes32"}
-        ],
-        "internalType": "struct P256Point",
-        "name": "point2",
-        "type": "tuple"
-      }
-    ],
-    "name": "pointAdd",
-    "outputs": [
-      {
-        "components": [
-          {"internalType": "bytes32", "name": "x", "type": "bytes32"},
-          {"internalType": "bytes32", "name": "y", "type": "bytes32"}
-        ],
-        "internalType": "struct P256Point",
-        "name": "result",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getGenerator",
-    "outputs": [
-      {
-        "components": [
-          {"internalType": "bytes32", "name": "x", "type": "bytes32"},
-          {"internalType": "bytes32", "name": "y", "type": "bytes32"}
-        ],
-        "internalType": "struct P256Point",
-        "name": "generator",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {"internalType": "bytes32", "name": "x", "type": "bytes32"},
-          {"internalType": "bytes32", "name": "y", "type": "bytes32"}
-        ],
-        "internalType": "struct P256Point",
-        "name": "point",
-        "type": "tuple"
-      }
-    ],
-    "name": "isOnCurve",
-    "outputs": [{"internalType": "bool", "name": "isOnCurve", "type": "bool"}],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {"internalType": "bytes32", "name": "x", "type": "bytes32"},
-          {"internalType": "bytes32", "name": "y", "type": "bytes32"}
-        ],
-        "internalType": "struct P256Point",
-        "name": "point",
-        "type": "tuple"
-      }
-    ],
-    "name": "compressPoint",
-    "outputs": [{"internalType": "bytes", "name": "compressed", "type": "bytes"}],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "bytes", "name": "compressed", "type": "bytes"}
-    ],
-    "name": "decompressPoint",
-    "outputs": [
-      {
-        "components": [
-          {"internalType": "bytes32", "name": "x", "type": "bytes32"},
-          {"internalType": "bytes32", "name": "y", "type": "bytes32"}
-        ],
-        "internalType": "struct P256Point",
-        "name": "point",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "pure",
-    "type": "function"
+async function verifySignature() {
+  try {
+    const isValid = await contract.verifySignature(hash, signature, publicKey);
+    console.log("Signature valid:", isValid);
+  } catch (error) {
+    console.error("Error verifying signature:", error);
   }
-]
+}
+
+verifySignature();
+```
+```bash cURL expandable lines
+# Note: Replace <RPC_URL> with your actual RPC endpoint.
+# This example calls verifySignature with sample data
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000100",
+            "data": "0xf9cea4ef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdefabcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678901234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdeffedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210" 
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</CodeGroup>
+
+### Example: Getting the Generator Point
+
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the getGenerator function
+const precompileAbi = [
+  "function getGenerator() pure returns (tuple(bytes32 x, bytes32 y) generator)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000100";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+async function getGenerator() {
+  try {
+    const generator = await contract.getGenerator();
+    console.log("Generator Point:", {
+      x: generator.x,
+      y: generator.y
+    });
+  } catch (error) {
+    console.error("Error getting generator:", error);
+  }
+}
+
+getGenerator();
 ```
 
-</details>
+**Note**: The P-256 precompile functions may return empty data on some devnet configurations. The cURL method is more reliable for testing function availability.
 
-<details>
-<summary>Solidity Interface</summary>
+```bash cURL expandable lines
+# Note: Replace <RPC_URL> with your actual RPC endpoint.
+# This example calls getGenerator (no parameters needed)
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000100",
+            "data": "0x7ca7a75a"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</CodeGroup>
 
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+### Example: Scalar Multiplication
 
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the scalarMult function
+const precompileAbi = [
+  "function scalarMult(bytes32 scalar, tuple(bytes32 x, bytes32 y) point) pure returns (tuple(bytes32 x, bytes32 y) result)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000100";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Example inputs
+const scalar = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+const point = {
+  x: "0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296",
+  y: "0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5"
+};
+
+async function performScalarMult() {
+  try {
+    const result = await contract.scalarMult(scalar, point);
+    console.log("Scalar Multiplication Result:", {
+      x: result.x,
+      y: result.y
+    });
+  } catch (error) {
+    console.error("Error performing scalar multiplication:", error);
+  }
+}
+
+performScalarMult();
+```
+```bash cURL expandable lines
+# Note: Replace <RPC_URL> with your actual RPC endpoint.
+# This example calls scalarMult with sample data
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000100",
+            "data": "0x9de261070123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c2964fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5"
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</CodeGroup>
+
+## Full Solidity Interface & ABI
+
+```solidity title="P256 Solidity Interface" lines expandable
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.8.18;
+
+/// @dev The P256Point struct contains the x and y coordinates of a point on the P-256 curve
 struct P256Point {
-    bytes32 x;                      // X coordinate of the point
-    bytes32 y;                      // Y coordinate of the point
+    bytes32 x;
+    bytes32 y;
 }
 
+/// @dev The P256Signature struct contains the r and s values of a P-256 signature
 struct P256Signature {
-    bytes32 r;                      // R component of the signature
-    bytes32 s;                      // S component of the signature
+    bytes32 r;
+    bytes32 s;
 }
 
+/// @author The Berachain Polaris Team
+/// @title P256 Precompile Contract
+/// @dev The interface through which solidity contracts will interact with the P256 precompile
 interface IP256 {
-    /**
-     * @dev Verifies a P-256 ECDSA signature
-     * @param hash The hash that was signed
-     * @param signature The signature to verify
-     * @param publicKey The public key to verify against
-     * @return isValid Whether the signature is valid
-     */
-    function verifySignature(
-        bytes32 hash,
-        P256Signature memory signature,
-        P256Point memory publicKey
-    ) external view returns (bool isValid);
+    /// @dev Verifies a P-256 ECDSA signature
+    /// @param hash The hash that was signed
+    /// @param signature The signature to verify
+    /// @param publicKey The public key to verify the signature with
+    /// @return isValid True if the signature is valid
+    function verifySignature(bytes32 hash, P256Signature memory signature, P256Point memory publicKey) external pure returns (bool isValid);
 
-    /**
-     * @dev Performs scalar multiplication on the P-256 curve
-     * @param scalar The scalar to multiply by
-     * @param point The point to multiply
-     * @return result The resulting point
-     */
-    function scalarMult(
-        bytes32 scalar,
-        P256Point memory point
-    ) external view returns (P256Point memory result);
+    /// @dev Performs scalar multiplication on the P-256 curve
+    /// @param scalar The scalar to multiply by
+    /// @param point The point to multiply
+    /// @return result The result of the scalar multiplication
+    function scalarMult(bytes32 scalar, P256Point memory point) external pure returns (P256Point memory result);
 
-    /**
-     * @dev Adds two points on the P-256 curve
-     * @param point1 First point to add
-     * @param point2 Second point to add
-     * @return result The sum of the two points
-     */
-    function pointAdd(
-        P256Point memory point1,
-        P256Point memory point2
-    ) external view returns (P256Point memory result);
+    /// @dev Adds two points on the P-256 curve
+    /// @param point1 The first point to add
+    /// @param point2 The second point to add
+    /// @return result The result of the point addition
+    function pointAdd(P256Point memory point1, P256Point memory point2) external pure returns (P256Point memory result);
 
-    /**
-     * @dev Gets the generator point of the P-256 curve
-     * @return generator The generator point
-     */
+    /// @dev Returns the generator point of the P-256 curve
+    /// @return generator The generator point
     function getGenerator() external pure returns (P256Point memory generator);
 
-    /**
-     * @dev Validates if a point is on the P-256 curve
-     * @param point The point to validate
-     * @return isOnCurve Whether the point is on the curve
-     */
-    function isOnCurve(P256Point memory point) external pure returns (bool isOnCurve);
+    /// @dev Checks if a point is on the P-256 curve
+    /// @param point The point to check
+    /// @return onCurve True if the point is on the curve
+    function isOnCurve(P256Point memory point) external pure returns (bool onCurve);
 
-    /**
-     * @dev Compresses a P-256 point to 33 bytes
-     * @param point The point to compress
-     * @return compressed The compressed point representation
-     */
+    /// @dev Compresses a point on the P-256 curve
+    /// @param point The point to compress
+    /// @return compressed The compressed point
     function compressPoint(P256Point memory point) external pure returns (bytes memory compressed);
 
-    /**
-     * @dev Decompresses a 33-byte representation to a P-256 point
-     * @param compressed The compressed point data
-     * @return point The decompressed point
-     */
+    /// @dev Decompresses a point on the P-256 curve
+    /// @param compressed The compressed point
+    /// @return point The decompressed point
     function decompressPoint(bytes memory compressed) external pure returns (P256Point memory point);
 }
 ```
 
-</details>
+```json title="P256 ABI" lines expandable
+[
+  { "inputs": [ { "internalType": "bytes32", "name": "hash", "type": "bytes32" }, { "components": [ { "internalType": "bytes32", "name": "r", "type": "bytes32" }, { "internalType": "bytes32", "name": "s", "type": "bytes32" } ], "internalType": "struct P256Signature", "name": "signature", "type": "tuple" }, { "components": [ { "internalType": "bytes32", "name": "x", "type": "bytes32" }, { "internalType": "bytes32", "name": "y", "type": "bytes32" } ], "internalType": "struct P256Point", "name": "publicKey", "type": "tuple" } ], "name": "verifySignature", "outputs": [ { "internalType": "bool", "name": "isValid", "type": "bool" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "internalType": "bytes32", "name": "scalar", "type": "bytes32" }, { "components": [ { "internalType": "bytes32", "name": "x", "type": "bytes32" }, { "internalType": "bytes32", "name": "y", "type": "bytes32" } ], "internalType": "struct P256Point", "name": "point", "type": "tuple" } ], "name": "scalarMult", "outputs": [ { "components": [ { "internalType": "bytes32", "name": "x", "type": "bytes32" }, { "internalType": "bytes32", "name": "y", "type": "bytes32" } ], "internalType": "struct P256Point", "name": "result", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "components": [ { "internalType": "bytes32", "name": "x", "type": "bytes32" }, { "internalType": "bytes32", "name": "y", "type": "bytes32" } ], "internalType": "struct P256Point", "name": "point1", "type": "tuple" }, { "components": [ { "internalType": "bytes32", "name": "x", "type": "bytes32" }, { "internalType": "bytes32", "name": "y", "type": "bytes32" } ], "internalType": "struct P256Point", "name": "point2", "type": "tuple" } ], "name": "pointAdd", "outputs": [ { "components": [ { "internalType": "bytes32", "name": "x", "type": "bytes32" }, { "internalType": "bytes32", "name": "y", "type": "bytes32" } ], "internalType": "struct P256Point", "name": "result", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [], "name": "getGenerator", "outputs": [ { "components": [ { "internalType": "bytes32", "name": "x", "type": "bytes32" }, { "internalType": "bytes32", "name": "y", "type": "bytes32" } ], "internalType": "struct P256Point", "name": "generator", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "components": [ { "internalType": "bytes32", "name": "x", "type": "bytes32" }, { "internalType": "bytes32", "name": "y", "type": "bytes32" } ], "internalType": "struct P256Point", "name": "point", "type": "tuple" } ], "name": "isOnCurve", "outputs": [ { "internalType": "bool", "name": "onCurve", "type": "bool" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "components": [ { "internalType": "bytes32", "name": "x", "type": "bytes32" }, { "internalType": "bytes32", "name": "y", "type": "bytes32" } ], "internalType": "struct P256Point", "name": "point", "type": "tuple" } ], "name": "compressPoint", "outputs": [ { "internalType": "bytes", "name": "compressed", "type": "bytes" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "internalType": "bytes", "name": "compressed", "type": "bytes" } ], "name": "decompressPoint", "outputs": [ { "components": [ { "internalType": "bytes32", "name": "x", "type": "bytes32" }, { "internalType": "bytes32", "name": "y", "type": "bytes32" } ], "internalType": "struct P256Point", "name": "point", "type": "tuple" } ], "stateMutability": "view", "type": "function" }
+]
+```
