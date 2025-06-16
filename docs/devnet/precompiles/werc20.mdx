@@ -22,8 +22,32 @@ Withdraws native tokens from wrapped ERC20 tokens.
 ### `totalSupply`
 Returns the total supply of the wrapped token.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// Connect to the network
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+
+// The WERC20 precompile address is dynamically assigned
+const werc20PrecompileAddress = "<WERC20_PRECOMPILE_ADDRESS>";
+const werc20Abi = ["function totalSupply() view returns (uint256)"];
+
+// Create a contract instance
+const contract = new ethers.Contract(werc20PrecompileAddress, werc20Abi, provider);
+
+async function getTotalSupply() {
+  try {
+    const totalSupply = await contract.totalSupply();
+    console.log("Total Supply:", totalSupply.toString());
+  } catch (error) {
+    console.error("Error fetching total supply:", error);
+  }
+}
+
+getTotalSupply();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and <WERC20_PRECOMPILE_ADDRESS> with your actual data.
 # The WERC20 precompile address is dynamically assigned.
 curl -X POST --data '{
@@ -39,13 +63,38 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `balanceOf`
 Returns the wrapped token balance for a specific account.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// Connect to the network
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+
+// The WERC20 precompile address is dynamically assigned
+const werc20PrecompileAddress = "<WERC20_PRECOMPILE_ADDRESS>";
+const accountAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+const werc20Abi = ["function balanceOf(address account) view returns (uint256)"];
+
+// Create a contract instance
+const contract = new ethers.Contract(werc20PrecompileAddress, werc20Abi, provider);
+
+async function getBalance() {
+  try {
+    const balance = await contract.balanceOf(accountAddress);
+    console.log(`Balance of ${accountAddress}:`, balance.toString());
+  } catch (error) {
+    console.error("Error fetching balance:", error);
+  }
+}
+
+getBalance();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL>, <WERC20_PRECOMPILE_ADDRESS>, and the placeholder address with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -60,7 +109,7 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `transfer`
 Transfers wrapped tokens to a specified address.
@@ -74,8 +123,34 @@ Transfers wrapped tokens from one address to another, using an allowance.
 ### `allowance`
 Returns the remaining amount of tokens a spender is allowed to transfer on behalf of an owner.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// Connect to the network
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+
+// The WERC20 precompile address is dynamically assigned
+const werc20PrecompileAddress = "<WERC20_PRECOMPILE_ADDRESS>";
+const ownerAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+const spenderAddress = "0x27f320b7280911c7987a421a8138997a48d4b315"; // Placeholder
+const werc20Abi = ["function allowance(address owner, address spender) view returns (uint256)"];
+
+// Create a contract instance
+const contract = new ethers.Contract(werc20PrecompileAddress, werc20Abi, provider);
+
+async function getAllowance() {
+  try {
+    const allowance = await contract.allowance(ownerAddress, spenderAddress);
+    console.log("Allowance:", allowance.toString());
+  } catch (error) {
+    console.error("Error fetching allowance:", error);
+  }
+}
+
+getAllowance();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL>, <WERC20_PRECOMPILE_ADDRESS>, and the placeholder addresses with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -90,13 +165,37 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `name`
 Returns the name of the wrapped token.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// Connect to the network
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+
+// The WERC20 precompile address is dynamically assigned
+const werc20PrecompileAddress = "<WERC20_PRECOMPILE_ADDRESS>";
+const werc20Abi = ["function name() view returns (string)"];
+
+// Create a contract instance
+const contract = new ethers.Contract(werc20PrecompileAddress, werc20Abi, provider);
+
+async function getName() {
+  try {
+    const name = await contract.name();
+    console.log("Token Name:", name);
+  } catch (error) {
+    console.error("Error fetching name:", error);
+  }
+}
+
+getName();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and <WERC20_PRECOMPILE_ADDRESS> with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -111,13 +210,37 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `symbol`
 Returns the symbol of the wrapped token.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// Connect to the network
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+
+// The WERC20 precompile address is dynamically assigned
+const werc20PrecompileAddress = "<WERC20_PRECOMPILE_ADDRESS>";
+const werc20Abi = ["function symbol() view returns (string)"];
+
+// Create a contract instance
+const contract = new ethers.Contract(werc20PrecompileAddress, werc20Abi, provider);
+
+async function getSymbol() {
+  try {
+    const symbol = await contract.symbol();
+    console.log("Token Symbol:", symbol);
+  } catch (error) {
+    console.error("Error fetching symbol:", error);
+  }
+}
+
+getSymbol();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and <WERC20_PRECOMPILE_ADDRESS> with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -132,13 +255,37 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `decimals`
 Returns the number of decimals used by the wrapped token.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// Connect to the network
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+
+// The WERC20 precompile address is dynamically assigned
+const werc20PrecompileAddress = "<WERC20_PRECOMPILE_ADDRESS>";
+const werc20Abi = ["function decimals() view returns (uint8)"];
+
+// Create a contract instance
+const contract = new ethers.Contract(werc20PrecompileAddress, werc20Abi, provider);
+
+async function getDecimals() {
+  try {
+    const decimals = await contract.decimals();
+    console.log("Token Decimals:", decimals.toString());
+  } catch (error) {
+    console.error("Error fetching decimals:", error);
+  }
+}
+
+getDecimals();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and <WERC20_PRECOMPILE_ADDRESS> with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -153,7 +300,7 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `increaseAllowance`
 Increases the allowance granted to a spender.

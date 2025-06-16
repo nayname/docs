@@ -36,8 +36,35 @@ Cancels an unbonding delegation.
 ### `validator`
 Queries information about a specific validator.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function validator(string memory validatorAddress) view returns (tuple(string operatorAddress, string consensusPubkey, bool jailed, uint32 status, uint256 tokens, string delegatorShares, tuple(string moniker, string identity, string website, string securityContact, string details) description, int64 unbondingHeight, uint256 unbondingTime, tuple(tuple(string rate, string maxRate, string maxChangeRate) commissionRates, uint256 updateTime) commission, uint256 minSelfDelegation) validator)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000800";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Input
+const validatorAddress = "cosmosvaloper1qypqxr72xk6plc6678ll42ephq2lgl7lc7225w"; // Placeholder
+
+async function getValidator() {
+  try {
+    const validator = await contract.validator(validatorAddress);
+    console.log("Validator Info:", JSON.stringify(validator, null, 2));
+  } catch (error) {
+    console.error("Error fetching validator:", error);
+  }
+}
+
+getValidator();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder validator address with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -52,13 +79,48 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `validators`
 Queries validators with optional status filtering and pagination.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function validators(string memory status, tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pageRequest) view returns (tuple(string operatorAddress, string consensusPubkey, bool jailed, uint32 status, uint256 tokens, string delegatorShares, tuple(string moniker, string identity, string website, string securityContact, string details) description, int64 unbondingHeight, uint256 unbondingTime, tuple(tuple(string rate, string maxRate, string maxChangeRate) commissionRates, uint256 updateTime) commission, uint256 minSelfDelegation)[] validators, tuple(bytes nextKey, uint64 total) pageResponse)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000800";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Inputs
+const status = "Bonded";
+const pagination = {
+  key: "0x",
+  offset: 0,
+  limit: 10,
+  countTotal: true,
+  reverse: false,
+};
+
+async function getValidators() {
+  try {
+    const result = await contract.validators(status, pagination);
+    console.log("Validators:", JSON.stringify(result.validators, null, 2));
+    console.log("Pagination Response:", result.pageResponse);
+  } catch (error) {
+    console.error("Error fetching validators:", error);
+  }
+}
+
+getValidators();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> with your actual RPC endpoint.
 # This example queries for the first 10 bonded validators.
 curl -X POST --data '{
@@ -74,13 +136,41 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `delegation`
 Queries the delegation amount between a delegator and a validator.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function delegation(address delegatorAddress, string memory validatorAddress) view returns (uint256)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000800";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Inputs
+const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+const validatorAddress = "cosmosvaloper1qypqxr72xk6plc6678ll42ephq2lgl7lc7225w"; // Placeholder
+
+async function getDelegation() {
+  try {
+    const delegationAmount = await contract.delegation(delegatorAddress, validatorAddress);
+    console.log("Delegation Amount:", delegationAmount.toString());
+  } catch (error) {
+    console.error("Error fetching delegation:", error);
+  }
+}
+
+getDelegation();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder addresses with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -95,13 +185,41 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `unbondingDelegation`
 Queries unbonding delegation information.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function unbondingDelegation(address delegatorAddress, string memory validatorAddress) view returns (tuple(address delegatorAddress, string validatorAddress, tuple(uint256 creationHeight, uint256 completionTime, string initialBalance, string balance)[] entries) unbondingDelegation)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000800";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Inputs
+const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+const validatorAddress = "cosmosvaloper1qypqxr72xk6plc6678ll42ephq2lgl7lc7225w"; // Placeholder
+
+async function getUnbondingDelegation() {
+  try {
+    const unbonding = await contract.unbondingDelegation(delegatorAddress, validatorAddress);
+    console.log("Unbonding Delegation:", JSON.stringify(unbonding, null, 2));
+  } catch (error) {
+    console.error("Error fetching unbonding delegation:", error);
+  }
+}
+
+getUnbondingDelegation();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder addresses with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -116,13 +234,48 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `delegatorDelegations`
 Queries all delegations for a given delegator.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function delegatorDelegations(address delegatorAddress, tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pageRequest) view returns (tuple(tuple(address delegatorAddress, string validatorAddress, string shares) delegation, tuple(string denom, uint256 amount) balance)[] delegations, tuple(bytes nextKey, uint64 total) pageResponse)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000800";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Inputs
+const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+const pagination = {
+  key: "0x",
+  offset: 0,
+  limit: 10,
+  countTotal: true,
+  reverse: false,
+};
+
+async function getDelegatorDelegations() {
+  try {
+    const result = await contract.delegatorDelegations(delegatorAddress, pagination);
+    console.log("Delegations:", JSON.stringify(result.delegations, null, 2));
+    console.log("Pagination Response:", result.pageResponse);
+  } catch (error) {
+    console.error("Error fetching delegator delegations:", error);
+  }
+}
+
+getDelegatorDelegations();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder address with your actual data.
 # This example queries for the first 10 delegations.
 curl -X POST --data '{
@@ -138,13 +291,48 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `delegatorUnbondingDelegations`
 Queries all unbonding delegations for a given delegator.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function delegatorUnbondingDelegations(address delegatorAddress, tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pageRequest) view returns (tuple(address delegatorAddress, string validatorAddress, tuple(uint256 creationHeight, uint256 completionTime, string initialBalance, string balance)[] entries)[] unbondingDelegations, tuple(bytes nextKey, uint64 total) pageResponse)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000800";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Inputs
+const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+const pagination = {
+  key: "0x",
+  offset: 0,
+  limit: 10,
+  countTotal: true,
+  reverse: false,
+};
+
+async function getDelegatorUnbondingDelegations() {
+  try {
+    const result = await contract.delegatorUnbondingDelegations(delegatorAddress, pagination);
+    console.log("Unbonding Delegations:", JSON.stringify(result.unbondingDelegations, null, 2));
+    console.log("Pagination Response:", result.pageResponse);
+  } catch (error) {
+    console.error("Error fetching delegator unbonding delegations:", error);
+  }
+}
+
+getDelegatorUnbondingDelegations();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder address with your actual data.
 # This example queries for the first 10 unbonding delegations.
 curl -X POST --data '{
@@ -160,13 +348,50 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `redelegations`
 Queries redelegations with optional filters.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function redelegations(address delegatorAddress, string memory srcValidatorAddress, string memory dstValidatorAddress, tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pageRequest) view returns (tuple(tuple(address delegatorAddress, string validatorSrcAddress, string validatorDstAddress, tuple(uint256 creationHeight, uint256 completionTime, string initialBalance, string sharesDst)[] entries) redelegation, tuple(tuple(uint256 creationHeight, uint256 completionTime, string initialBalance, string sharesDst) redelegationEntry, string balance)[] entries)[] redelegations, tuple(bytes nextKey, uint64 total) pageResponse)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000800";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Inputs
+const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+const srcValidatorAddress = ""; // Empty string for all
+const dstValidatorAddress = ""; // Empty string for all
+const pagination = {
+  key: "0x",
+  offset: 0,
+  limit: 10,
+  countTotal: true,
+  reverse: false,
+};
+
+async function getRedelegations() {
+  try {
+    const result = await contract.redelegations(delegatorAddress, srcValidatorAddress, dstValidatorAddress, pagination);
+    console.log("Redelegations:", JSON.stringify(result.redelegations, null, 2));
+    console.log("Pagination Response:", result.pageResponse);
+  } catch (error) {
+    console.error("Error fetching redelegations:", error);
+  }
+}
+
+getRedelegations();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and addresses with your actual data.
 # This example queries for the first 10 redelegations.
 curl -X POST --data '{
@@ -182,13 +407,48 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `delegatorValidators`
 Queries the validators a given delegator has delegated to.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function delegatorValidators(address delegatorAddress, tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pageRequest) view returns (tuple(string operatorAddress, string consensusPubkey, bool jailed, uint32 status, uint256 tokens, string delegatorShares, tuple(string moniker, string identity, string website, string securityContact, string details) description, int64 unbondingHeight, uint256 unbondingTime, tuple(tuple(string rate, string maxRate, string maxChangeRate) commissionRates, uint256 updateTime) commission, uint256 minSelfDelegation)[] validators, tuple(bytes nextKey, uint64 total) pageResponse)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000800";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Inputs
+const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+const pagination = {
+  key: "0x",
+  offset: 0,
+  limit: 10,
+  countTotal: true,
+  reverse: false,
+};
+
+async function getDelegatorValidators() {
+  try {
+    const result = await contract.delegatorValidators(delegatorAddress, pagination);
+    console.log("Delegator Validators:", JSON.stringify(result.validators, null, 2));
+    console.log("Pagination Response:", result.pageResponse);
+  } catch (error) {
+    console.error("Error fetching delegator validators:", error);
+  }
+}
+
+getDelegatorValidators();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder address with your actual data.
 # This example queries for the first 10 validators of a delegator.
 curl -X POST --data '{
@@ -204,13 +464,41 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `delegatorValidator`
 Queries a specific validator a given delegator has delegated to.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function delegatorValidator(address delegatorAddress, string memory validatorAddress) view returns (tuple(string operatorAddress, string consensusPubkey, bool jailed, uint32 status, uint256 tokens, string delegatorShares, tuple(string moniker, string identity, string website, string securityContact, string details) description, int64 unbondingHeight, uint256 unbondingTime, tuple(tuple(string rate, string maxRate, string maxChangeRate) commissionRates, uint256 updateTime) commission, uint256 minSelfDelegation) validator)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000800";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Inputs
+const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+const validatorAddress = "cosmosvaloper1qypqxr72xk6plc6678ll42ephq2lgl7lc7225w"; // Placeholder
+
+async function getDelegatorValidator() {
+  try {
+    const validator = await contract.delegatorValidator(delegatorAddress, validatorAddress);
+    console.log("Delegator Validator:", JSON.stringify(validator, null, 2));
+  } catch (error) {
+    console.error("Error fetching delegator validator:", error);
+  }
+}
+
+getDelegatorValidator();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder addresses with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -225,13 +513,37 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `pool`
 Queries the current staking pool information.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function pool() view returns (tuple(string notBondedTokens, string bondedTokens) pool)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000800";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+async function getPool() {
+  try {
+    const pool = await contract.pool();
+    console.log("Staking Pool:", JSON.stringify(pool, null, 2));
+  } catch (error) {
+    console.error("Error fetching staking pool:", error);
+  }
+}
+
+getPool();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> with your actual RPC endpoint.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -246,13 +558,37 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `params`
 Queries the parameters of the staking module.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function params() view returns (tuple(uint256 unbondingTime, uint256 maxValidators, uint256 maxEntries, uint256 historicalEntries, string bondDenom, string minCommissionRate) params)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000800";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+async function getParams() {
+  try {
+    const params = await contract.params();
+    console.log("Staking Parameters:", JSON.stringify(params, null, 2));
+  } catch (error) {
+    console.error("Error fetching staking parameters:", error);
+  }
+}
+
+getParams();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> with your actual RPC endpoint.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -267,7 +603,7 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ## Full Solidity Interface & ABI
 

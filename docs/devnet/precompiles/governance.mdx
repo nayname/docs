@@ -82,7 +82,6 @@ curl -X POST --data '{
 ```
 </CodeGroup>
 
-
 ### `getProposals`
 Retrieves a filtered and paginated list of proposals.
 
@@ -135,7 +134,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000805",
-            "data": "0x458af53700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
+            "data": "0x458af537000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
@@ -362,31 +361,92 @@ curl -X POST --data '{
 ### `getDeposits`
 Retrieves all deposits made on a proposal, with pagination.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI for the precompile
+const precompileAbi = [
+  "function getDeposits(uint64 proposalId, tuple(uint64 offset, bytes key, uint64 limit, bool count_total, bool reverse) pagination) view returns (tuple(address depositor, tuple(string denom, uint256 amount)[] amount)[] deposits, tuple(bytes next_key, uint64 total) page_response)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000805";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Inputs
+const proposalId = 1;
+const pagination = {
+  offset: 0,
+  key: "0x",
+  limit: 10,
+  count_total: true,
+  reverse: false,
+};
+
+async function getDepositsList() {
+  try {
+    const result = await contract.getDeposits(proposalId, pagination);
+    console.log(`Deposits for proposal ${proposalId}:`, JSON.stringify(result.deposits, null, 2));
+    console.log("Pagination Response:", result.page_response);
+  } catch (error) {
+    console.error("Error fetching deposits:", error);
+  }
+}
+
+getDepositsList();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> with your actual RPC endpoint.
 # This example queries for the first 10 deposits on proposal with ID 1.
+# Data is ABI-encoded: function selector + padded proposal ID + pagination struct.
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000805",
-            "data": "0x3677fd550000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
+            "data": "0x3677fd5500000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `getParams`
 Retrieves current governance parameters.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI for the precompile
+const precompileAbi = [
+  "function getParams() view returns (tuple(string[] min_deposit, string max_deposit_period, string voting_period, string yes_quorum, string veto_threshold, string min_initial_deposit_ratio, string proposal_cancel_ratio, string proposal_cancel_dest, string min_deposit_ratio) params)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000805";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+async function getGovParams() {
+  try {
+    const params = await contract.getParams();
+    console.log("Governance Parameters:", JSON.stringify(params, null, 2));
+  } catch (error) {
+    console.error("Error fetching governance parameters:", error);
+  }
+}
+
+getGovParams();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> with your actual RPC endpoint.
+# Data is ABI-encoded: just the function selector.
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
@@ -400,14 +460,39 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `getConstitution`
 Retrieves the current governance constitution.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI for the precompile
+const precompileAbi = [
+  "function getConstitution() view returns (string constitution)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000805";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+async function getGovConstitution() {
+  try {
+    const constitution = await contract.getConstitution();
+    console.log("Governance Constitution:", constitution);
+  } catch (error) {
+    console.error("Error fetching governance constitution:", error);
+  }
+}
+
+getGovConstitution();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> with your actual RPC endpoint.
+# Data is ABI-encoded: just the function selector.
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
@@ -421,7 +506,7 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ## Full Solidity Interface & ABI
 
@@ -738,4 +823,3 @@ interface IGov {
     { "inputs": [ { "internalType": "uint32", "name": "proposalStatus", "type": "uint32" }, { "internalType": "address", "name": "voter", "type": "address" }, { "internalType": "address", "name": "depositor", "type": "address" }, { "components": [ { "internalType": "bytes", "name": "key", "type": "bytes" }, { "internalType": "uint64", "name": "offset", "type": "uint64" }, { "internalType": "uint64", "name": "limit", "type": "uint64" }, { "internalType": "bool", "name": "countTotal", "type": "bool" }, { "internalType": "bool", "name": "reverse", "type": "bool" } ], "internalType": "struct PageRequest", "name": "pagination", "type": "tuple" } ], "name": "getProposals", "outputs": [ { "components": [ { "internalType": "uint64", "name": "id", "type": "uint64" }, { "internalType": "string[]", "name": "messages", "type": "string[]" }, { "internalType": "uint32", "name": "status", "type": "uint32" }, { "components": [ { "internalType": "string", "name": "yes", "type": "string" }, { "internalType": "string", "name": "abstain", "type": "string" }, { "internalType": "string", "name": "no", "type": "string" }, { "internalType": "string", "name": "noWithVeto", "type": "string" } ], "internalType": "struct TallyResultData", "name": "finalTallyResult", "type": "tuple" }, { "internalType": "uint64", "name": "submitTime", "type": "uint64" }, { "internalType": "uint64", "name": "depositEndTime", "type": "uint64" }, { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "internalType": "struct Coin[]", "name": "totalDeposit", "type": "tuple[]" }, { "internalType": "uint64", "name": "votingStartTime", "type": "uint64" }, { "internalType": "uint64", "name": "votingEndTime", "type": "uint64" }, { "internalType": "string", "name": "metadata", "type": "string" }, { "internalType": "string", "name": "title", "type": "string" }, { "internalType": "string", "name": "summary", "type": "string" }, { "internalType": "address", "name": "proposer", "type": "address" } ], "internalType": "struct ProposalData[]", "name": "proposals", "type": "tuple[]" }, { "components": [ { "internalType": "bytes", "name": "nextKey", "type": "bytes" }, { "internalType": "uint64", "name": "total", "type": "uint64" } ], "internalType": "struct PageResponse", "name": "pageResponse", "type": "tuple" } ], "stateMutability": "view", "type": "function" }
   ]
 }
-```

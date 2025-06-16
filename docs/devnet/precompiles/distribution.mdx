@@ -37,9 +37,40 @@ Deposits tokens into a specific validator's rewards pool.
 ### delegationTotalRewards
 Retrieves comprehensive reward information for all of a delegator's positions.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the relevant parts of the precompile
+const precompileAbi = [
+  "function delegationTotalRewards(address delegatorAddress) view returns (tuple(string validatorAddress, tuple(string denom, uint256 amount, uint8 precision)[] reward)[] rewards, tuple(string denom, uint256 amount, uint8 precision)[] total)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000801";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Input: The address of the delegator to query
+const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+
+async function getTotalRewards() {
+  try {
+    const result = await contract.delegationTotalRewards(delegatorAddress);
+    console.log("Total Rewards:", JSON.stringify({
+      rewards: result.rewards,
+      total: result.total
+    }, null, 2));
+  } catch (error) {
+    console.error("Error fetching total rewards:", error);
+  }
+}
+
+getTotalRewards();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder address with your actual data.
+# Data is ABI-encoded: function selector + padded delegator address
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
@@ -53,35 +84,92 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### delegationRewards
 Queries pending rewards for a specific delegation.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function delegationRewards(address delegatorAddress, string memory validatorAddress) view returns (tuple(string denom, uint256 amount, uint8 precision)[] rewards)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000801";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Inputs
+const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+const validatorAddress = "artvaloper1..."; // Placeholder
+
+async function getDelegationRewards() {
+  try {
+    const rewards = await contract.delegationRewards(delegatorAddress, validatorAddress);
+    console.log("Delegation Rewards:", JSON.stringify(rewards, null, 2));
+  } catch (error) {
+    console.error("Error fetching delegation rewards:", error);
+  }
+}
+
+getDelegationRewards();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder addresses with your actual data.
+# Data is ABI-encoded: function selector + padded delegator address + encoded validator address string.
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0x38433b36000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa9604500000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+            "data": "0x38433b36000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa960450000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e30707172737475760000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### delegatorValidators
 Retrieves a list of all validators from which a delegator has rewards.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function delegatorValidators(address delegatorAddress) view returns (string[] validators)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000801";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Input
+const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+
+async function getDelegatorValidators() {
+  try {
+    const validators = await contract.delegatorValidators(delegatorAddress);
+    console.log("Validators:", validators);
+  } catch (error) {
+    console.error("Error fetching delegator validators:", error);
+  }
+}
+
+getDelegatorValidators();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder address with your actual data.
+# Data is ABI-encoded: function selector + padded delegator address.
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
@@ -95,14 +183,42 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### delegatorWithdrawAddress
 Queries the address that can withdraw rewards for a given delegator.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function delegatorWithdrawAddress(address delegatorAddress) view returns (string withdrawAddress)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000801";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Input
+const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+
+async function getWithdrawAddress() {
+  try {
+    const withdrawAddress = await contract.delegatorWithdrawAddress(delegatorAddress);
+    console.log("Withdraw Address:", withdrawAddress);
+  } catch (error) {
+    console.error("Error fetching withdraw address:", error);
+  }
+}
+
+getWithdrawAddress();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder address with your actual data.
+# Data is ABI-encoded: function selector + padded delegator address.
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
@@ -116,91 +232,200 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### communityPool
 Queries the current balance of the community pool.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function communityPool() view returns (tuple(string denom, uint256 amount, uint8 precision)[] coins)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000801";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+async function getCommunityPoolBalance() {
+  try {
+    const balance = await contract.communityPool();
+    console.log("Community Pool Balance:", JSON.stringify(balance, null, 2));
+  } catch (error) {
+    console.error("Error fetching community pool balance:", error);
+  }
+}
+
+getCommunityPoolBalance();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> with your actual RPC endpoint.
+# Data is ABI-encoded: just the function selector.
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0x5fb6c24f"
+            "data": "0x14d140b0"
         },
         "latest"
     ],
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### validatorCommission
 Queries the accumulated commission for a specific validator.
 
-<RequestExample>
-```bash Request
-# Note: Replace <RPC_URL> and the placeholder validator address with your actual data.
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function validatorCommission(string memory validatorAddress) view returns (tuple(string denom, uint256 amount, uint8 precision)[] commission)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000801";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Input
+const validatorAddress = "artvaloper1..."; // Placeholder
+
+async function getValidatorCommission() {
+  try {
+    const commission = await contract.validatorCommission(validatorAddress);
+    console.log("Validator Commission:", JSON.stringify(commission, null, 2));
+  } catch (error) {
+    console.error("Error fetching validator commission:", error);
+  }
+}
+
+getValidatorCommission();
+```
+```bash cURL expandable lines
+# Note: Replace <RPC_URL> and the placeholder address with your actual data.
+# Data is ABI-encoded: function selector + encoded validator address string.
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0xddf24bb300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+            "data": "0xddf24bb30000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e30707172737475760000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### validatorDistributionInfo
 Queries a validator's commission and self-delegation rewards.
 
-<RequestExample>
-```bash Request
-# Note: Replace <RPC_URL> and the placeholder validator address with your actual data.
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function validatorDistributionInfo(string memory validatorAddress) view returns (tuple(string operatorAddress, tuple(string denom, uint256 amount, uint8 precision)[] selfBondRewards, tuple(string denom, uint256 amount, uint8 precision)[] commission) distributionInfo)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000801";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Input
+const validatorAddress = "artvaloper1..."; // Placeholder
+
+async function getValidatorDistInfo() {
+  try {
+    const info = await contract.validatorDistributionInfo(validatorAddress);
+    console.log("Validator Distribution Info:", JSON.stringify(info, null, 2));
+  } catch (error) {
+    console.error("Error fetching validator distribution info:", error);
+  }
+}
+
+getValidatorDistInfo();
+```
+```bash cURL expandable lines
+# Note: Replace <RPC_URL> and the placeholder address with your actual data.
+# Data is ABI-encoded: function selector + encoded validator address string.
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0x7bc2916200000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+            "data": "0x7bc291620000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e30707172737475760000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### validatorOutstandingRewards
 Queries the outstanding rewards of a validator.
 
-<RequestExample>
-```bash Request
-# Note: Replace <RPC_URL> and the placeholder validator address with your actual data.
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function validatorOutstandingRewards(string memory validatorAddress) view returns (tuple(string denom, uint256 amount, uint8 precision)[] rewards)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000801";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Input
+const validatorAddress = "artvaloper1..."; // Placeholder
+
+async function getOutstandingRewards() {
+  try {
+    const rewards = await contract.validatorOutstandingRewards(validatorAddress);
+    console.log("Validator Outstanding Rewards:", JSON.stringify(rewards, null, 2));
+  } catch (error) {
+    console.error("Error fetching outstanding rewards:", error);
+  }
+}
+
+getOutstandingRewards();
+```
+```bash cURL expandable lines
+# Note: Replace <RPC_URL> and the placeholder address with your actual data.
+# Data is ABI-encoded: function selector + encoded validator address string.
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0x6280384c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+            "data": "0x6280384c0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e30707172737475760000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ## Full Solidity Interface & ABI
 

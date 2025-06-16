@@ -21,8 +21,35 @@ Initiates a cross-chain token transfer using the IBC protocol.
 ### `denom`
 Queries denomination information for an IBC token by its hash.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function denom(string memory hash) view returns (tuple(string base, tuple(string portId, string channelId)[] trace) denom)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000802";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Input: The hash of the denomination to query
+const denomHash = "ibc/..."; // Placeholder for actual denomination hash
+
+async function getDenom() {
+  try {
+    const denom = await contract.denom(denomHash);
+    console.log("Denomination Info:", JSON.stringify(denom, null, 2));
+  } catch (error) {
+    console.error("Error fetching denomination:", error);
+  }
+}
+
+getDenom();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder hash with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -37,13 +64,47 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `denoms`
 Retrieves a paginated list of all denomination traces registered on the chain.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function denoms(tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pageRequest) view returns (tuple(string base, tuple(string portId, string channelId)[] trace)[] denoms, tuple(bytes nextKey, uint64 total) pageResponse)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000802";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Input for pagination
+const pagination = {
+  key: "0x",
+  offset: 0,
+  limit: 10,
+  countTotal: true,
+  reverse: false,
+};
+
+async function getDenoms() {
+  try {
+    const result = await contract.denoms(pagination);
+    console.log("Denominations:", JSON.stringify(result.denoms, null, 2));
+    console.log("Pagination Response:", result.pageResponse);
+  } catch (error) {
+    console.error("Error fetching denominations:", error);
+  }
+}
+
+getDenoms();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> with your actual RPC endpoint.
 # This example queries for the first 10 denominations.
 curl -X POST --data '{
@@ -59,13 +120,40 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `denomHash`
 Computes the hash of a denomination trace path.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function denomHash(string memory trace) view returns (string memory hash)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000802";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Input: The trace path to hash
+const tracePath = "transfer/channel-0/uatom"; // Placeholder for actual trace path
+
+async function getDenomHash() {
+  try {
+    const hash = await contract.denomHash(tracePath);
+    console.log("Denomination Hash:", hash);
+  } catch (error) {
+    console.error("Error computing denomination hash:", error);
+  }
+}
+
+getDenomHash();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder trace with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -80,7 +168,7 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ## Full Solidity Interface & ABI
 

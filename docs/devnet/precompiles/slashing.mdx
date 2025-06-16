@@ -21,8 +21,35 @@ Allows a validator to unjail themselves after being jailed for downtime.
 ### `getSigningInfo`
 Returns the signing information for a specific validator.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function getSigningInfo(address consAddress) view returns (tuple(address validatorAddress, int64 startHeight, int64 indexOffset, int64 jailedUntil, bool tombstoned, int64 missedBlocksCounter) signingInfo)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000806";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Input: The consensus address of the validator
+const consAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+
+async function getSigningInfo() {
+  try {
+    const signingInfo = await contract.getSigningInfo(consAddress);
+    console.log("Signing Info:", JSON.stringify(signingInfo, null, 2));
+  } catch (error) {
+    console.error("Error fetching signing info:", error);
+  }
+}
+
+getSigningInfo();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> and the placeholder consensus address with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -37,13 +64,47 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `getSigningInfos`
 Returns the signing information for all validators, with pagination support.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function getSigningInfos(tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pagination) view returns (tuple(address validatorAddress, int64 startHeight, int64 indexOffset, int64 jailedUntil, bool tombstoned, int64 missedBlocksCounter)[] signingInfos, tuple(bytes nextKey, uint64 total) pageResponse)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000806";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+// Input for pagination
+const pagination = {
+  key: "0x",
+  offset: 0,
+  limit: 10,
+  countTotal: true,
+  reverse: false,
+};
+
+async function getSigningInfos() {
+  try {
+    const result = await contract.getSigningInfos(pagination);
+    console.log("Signing Infos:", JSON.stringify(result.signingInfos, null, 2));
+    console.log("Pagination Response:", result.pageResponse);
+  } catch (error) {
+    console.error("Error fetching signing infos:", error);
+  }
+}
+
+getSigningInfos();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> with your actual RPC endpoint.
 # This example queries for the first 10 validators' signing info.
 curl -X POST --data '{
@@ -59,13 +120,37 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ### `getParams`
 Returns the current parameters for the slashing module.
 
-<RequestExample>
-```bash Request
+<CodeGroup>
+```javascript Ethers.js expandable lines
+import { ethers } from "ethers";
+
+// ABI definition for the function
+const precompileAbi = [
+  "function getParams() view returns (tuple(int64 signedBlocksWindow, tuple(uint256 value, uint8 precision) minSignedPerWindow, int64 downtimeJailDuration, tuple(uint256 value, uint8 precision) slashFractionDoubleSign, tuple(uint256 value, uint8 precision) slashFractionDowntime) params)"
+];
+
+// Provider and contract setup
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const precompileAddress = "0x0000000000000000000000000000000000000806";
+const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
+
+async function getParams() {
+  try {
+    const params = await contract.getParams();
+    console.log("Slashing Parameters:", JSON.stringify(params, null, 2));
+  } catch (error) {
+    console.error("Error fetching slashing parameters:", error);
+  }
+}
+
+getParams();
+```
+```bash cURL expandable lines
 # Note: Replace <RPC_URL> with your actual RPC endpoint.
 curl -X POST --data '{
     "jsonrpc": "2.0",
@@ -80,7 +165,7 @@ curl -X POST --data '{
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
-</RequestExample>
+</CodeGroup>
 
 ## Full Solidity Interface & ABI
 
