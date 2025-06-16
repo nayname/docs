@@ -23,14 +23,13 @@ description: 'This page provides general information to help you connect to the 
 | **Cosmos REST API** | `https://devnet-1-lcd.ib.skip.build` | Query Cosmos SDK modules (bank, staking, etc.) |
 | **gRPC** | `devnet-1-grpc.ib.skip.build:443` | High-performance Protobuf endpoint for back-ends |
 
-## Connect to the chain
+## How to Interact with the Chain
 
-Most development work can be done without the overhead of running a full node.
-Below is a brief overview of querying data and broadcasting transactions using public endpoints and lightweight tooling.
+You can interact with the Gaia EVM Devnet in several different ways. This section provides a brief overview of how to setup the various environments for testing.
 
-### Web Wallets
+### Extension-Based Wallets
 
-> **Recommended for real-world, E2E testing**
+To test out your dApp via a web UI using an extension-based wallet, you'll need to first add the Gaia EVM Devnet to the wallet like so:
 
 1. Install [Keplr](https://www.keplr.app/), [Metamask](https://metamask.io/) or [Rabby](https://rabby.io/) (Chrome/Mobile).
 2. Add a custom network:
@@ -43,11 +42,9 @@ Below is a brief overview of querying data and broadcasting transactions using p
 
 ### CLI
 
-> **Great for one-off tasks or testing that do not require a full node**
+Using the CLI may be a great choice for one-off tasks and queries that do not require a full node. To get started, download or build the chain binary:
 
-#### Download or build the chain binary
-
-```bash lines expandable
+```bash
 # Adjust version as needed
 VERSION=v9.0.0
 curl -LO "https://github.com/cosmos/gaia/releases/download/${VERSION}/gaiad_${VERSION}_linux_amd64.tar.gz"
@@ -56,100 +53,110 @@ test -f gaiad && chmod +x gaiad
 sudo mv gaiad /usr/local/bin/
 ```
 
-#### Query examples
+<AccordionGroup>
+  <Accordion title="Query Examples">
+    <CodeGroup>
+      ```bash Query balances for a given address
+      gaiad q bank balances cosmos1... --node https://devnet-1-rpc.ib.skip.build:443
+      ```
 
-```bash lines expandable
-# Query account balance
-gaiad q bank balances cosmos1... --node https://devnet-1-rpc.ib.skip.build:443
+      ```bash Query the list of validators
+      gaiad q staking validators --node https://devnet-1-rpc.ib.skip.build:443
+      ```
+    </CodeGroup>
+  </Accordion>
 
-# List staking validators
-gaiad q staking validators --node https://devnet-1-rpc.ib.skip.build:443
-```
+  <Accordion title="Broadcast a Transaction">
+    <CodeGroup>
+      ```bash Example
+      gaiad tx bank send cosmos1... cosmos1... 1000uatom \
+        --node https://devnet-1-rpc.ib.skip.build:443 \
+        --chain-id 4321 \
+        --gas auto --fees 500uatom \
+        --yes
+      ```
+    </CodeGroup>
+  </Accordion>
 
-#### Broadcast a transaction
+  <Accordion title="Generate Transaction Messages">
+    You can use the `--generate-only` flag to create transaction messages without broadcasting them. This can be useful for finding the correct syntax and creating reusable transaction templates.
 
-```bash lines expandable
-# Create and sign a simple send
-gaiad tx bank send cosmos1... cosmos1... 1000uatom \
-  --node https://devnet-1-rpc.ib.skip.build:443 \
-  --chain-id 4321 \
-  --gas auto --fees 500uatom \
-  --yes
-```
+    | Field (0x02)          | Value         |
+    | --------------------- | ------------- |
+    | **chainId**           | `0x01`        |
+    | **nonce**             | `0x`          |
+    | **maxPrioFeePerGas**  | `0x01`        |
+    | **maxFeePerGas**      | `0x01`        |
+    | **gasLimit**          | `0x5208`      |
+    | **to / value / data** | same as above |
+    | **accessList**        | `[]`          |
+    | **yParity (v)**       | `0x0`         |
+    | **r**, **s**          | `0x0`, `0x0`  |
 
-#### Generate Transaction Messages
+    <CodeGroup>
+      ```bash Example
+      evmd tx evm raw 0x02e20180010182520894de0b295669a9fd93d5f28d9ec85e40f4cb697bae8080c0808080 --generate-only | jq
+      ```
 
-You can use the `--generate-only` flag to create transaction messages without broadcasting them. This can be useful for finding the correct syntax and creating reusable transaction templates:
-
-| Field (0x02)          | Value         |
-| --------------------- | ------------- |
-| **chainId**           | `0x01`        |
-| **nonce**             | `0x`          |
-| **maxPrioFeePerGas**  | `0x01`        |
-| **maxFeePerGas**      | `0x01`        |
-| **gasLimit**          | `0x5208`      |
-| **to / value / data** | same as above |
-| **accessList**        | `[]`          |
-| **yParity (v)**       | `0x0`         |
-| **r**, **s**          | `0x0`, `0x0`  |
-
-`evmd tx evm raw 0x02e20180010182520894de0b295669a9fd93d5f28d9ec85e40f4cb697bae8080c0808080 --generate-only | jq`
-
-```json title="Generated Transaction" lines expandable
-{
-  "body": {
-    "messages": [
+      ```json Example output
       {
-        "@type": "/cosmos.evm.vm.v1.MsgEthereumTx",
-        "data": {
-          "@type": "/cosmos.evm.vm.v1.DynamicFeeTx",
-          "chain_id": "1",
-          "nonce": "0",
-          "gas_tip_cap": "1",
-          "gas_fee_cap": "1",
-          "gas": "21000",
-          "to": "0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe",
-          "value": "0",
-          "data": null,
-          "accesses": [],
-          "v": null,
-          "r": null,
-          "s": null
+        "body": {
+          "messages": [
+            {
+              "@type": "/cosmos.evm.vm.v1.MsgEthereumTx",
+              "data": {
+                "@type": "/cosmos.evm.vm.v1.DynamicFeeTx",
+                "chain_id": "1",
+                "nonce": "0",
+                "gas_tip_cap": "1",
+                "gas_fee_cap": "1",
+                "gas": "21000",
+                "to": "0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe",
+                "value": "0",
+                "data": null,
+                "accesses": [],
+                "v": null,
+                "r": null,
+                "s": null
+              },
+              "size": 0,
+              "hash": "0x10c35e9f591e43bac6a9d01164a62e141d16ca715653ac818761c79e3eecafbc",
+              "from": ""
+            }
+          ],
+          "memo": "",
+          "timeout_height": "0",
+          "unordered": false,
+          "timeout_timestamp": null,
+          "extension_options": [
+            {
+              "@type": "/cosmos.evm.vm.v1.ExtensionOptionsEthereumTx"
+            }
+          ],
+          "non_critical_extension_options": []
         },
-        "size": 0,
-        "hash": "0x10c35e9f591e43bac6a9d01164a62e141d16ca715653ac818761c79e3eecafbc",
-        "from": ""
+        "auth_info": {
+          "signer_infos": [],
+          "fee": {
+            "amount": [
+              {
+                "denom": "atest",
+                "amount": "21000"
+              }
+            ],
+            "gas_limit": "21000",
+            "payer": "",
+            "granter": ""
+          },
+          "tip": null
+        },
+        "signatures": []
       }
-    ],
-    "memo": "",
-    "timeout_height": "0",
-    "unordered": false,
-    "timeout_timestamp": null,
-    "extension_options": [
-      {
-        "@type": "/cosmos.evm.vm.v1.ExtensionOptionsEthereumTx"
-      }
-    ],
-    "non_critical_extension_options": []
-  },
-  "auth_info": {
-    "signer_infos": [],
-    "fee": {
-      "amount": [
-        {
-          "denom": "atest",
-          "amount": "21000"
-        }
-      ],
-      "gas_limit": "21000",
-      "payer": "",
-      "granter": ""
-    },
-    "tip": null
-  },
-  "signatures": []
-}
-```
+      ```
+    </CodeGroup>
+  </Accordion>
+
+</AccordionGroup>
 
 ### REST (LCD) Endpoints
 
