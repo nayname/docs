@@ -7,8 +7,8 @@ description: 'This page provides general information to help you connect to the 
 
 | Info | Value | Purpose |
 |-------------------|----------------------|---------|
-| **Cosmos Chain ID** | `4231` | Network Identifier for Cosmos tooling |
-| **EVM Chain ID** | `0x1087` | Network identifier for EVM tooling [Hexadecimal equivalent of Cosmos Chain ID] |
+| **Cosmos Chain ID** | `4321` | Network Identifier for Cosmos tooling |
+| **EVM Chain ID** | `4231` | Network identifier for EVM tooling |
 | **EVM Version** | `Istanbul` | EVM hard fork compatibility version |
 | **Native Token** | `ATOM` | Staking / gas token |
 | **Denom Exponent** | `6` | Native token has 6 decimal places (`uatom`) |
@@ -42,16 +42,46 @@ To test out your dApp via a web UI using an extension-based wallet, you'll need 
 
 ### CLI
 
-Using the CLI may be a great choice for one-off tasks and queries that do not require a full node. To get started, download or build the chain binary:
+Using the CLI may be a great choice for one-off tasks and queries that do not require a full node. **Make sure you use a binary built from the `feature/evm` branch of Gaia, which contains the EVM module used on this devnet.**
 
 ```bash
-# Adjust version as needed
-VERSION=v9.0.0
+# Option A — download a pre-built artifact (feature/evm branch)
+VERSION=v9.0.0-evm           # example tag built from feature/evm
 curl -LO "https://github.com/cosmos/gaia/releases/download/${VERSION}/gaiad_${VERSION}_linux_amd64.tar.gz"
+
 tar -xzf gaiad_${VERSION}_linux_amd64.tar.gz
-test -f gaiad && chmod +x gaiad
-sudo mv gaiad /usr/local/bin/
+chmod +x gaiad && sudo mv gaiad /usr/local/bin/
+
+# Option B — build from source
+# (requires Go ≥ 1.22)
+git clone --branch feature/evm https://github.com/cosmos/gaia.git
+cd gaia && make install   # installs gaiad into $(go env GOPATH)/bin
 ```
+
+#### Key Management & HD Paths
+
+Gaia (feature/evm) supports *two* key algorithms:
+
+| Algo flag | HD Path | Typical address format | Use-case |
+|-----------|---------|------------------------|----------|
+| `eth_secp256k1` *(default)* | `m/44'/60'/0'/0/0` | `0x…` / `cosmos1…` | **Recommended for EVM dApps** – interoperable with MetaMask & hard-fork compatible |
+| `secp256k1` | `m/44'/118'/0'/0/0` | `cosmos1…` | Classic Cosmos wallets |
+
+When you recover a mnemonic exported for EVM use, be sure to keep the algorithm & path consistent:
+
+```bash
+# create a new EVM-compatible key
+$ gaiad keys add myevmkey                    # default is --algo eth_secp256k1
+
+# recover an existing 24-word mnemonic *and* force the EVM path
+$ gaiad keys add user10 --recover \
+           --algo eth_secp256k1 \
+           --hd-path "m/44'/60'/0'/0/0"
+```
+
+If you omit the flags the CLI may derive the Cosmos HD path (m/44/118/…), producing a different `cosmos1…` address – exactly what happened in the user report quoted below.
+
+> **Why two addresses?**  The same 256-bit private key can generate *both* a Cosmos (`secp256k1`) and Ethereum (`eth_secp256k1`) address.  The devnet faucets and precompiles expect the Ethereum-style address for full EVM compatibility.
 
 <AccordionGroup>
   <Accordion title="Query Examples">
