@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "name": "Cosmos Documentation",
-  "description": "Build the future of interoperable blockchains with Cosmos",
+  "description": "Build the future of the internet of blockchains with Cosmos.",
   "theme": "mint",
   "colors": {
     "primary": "#40eff2",
@@ -26,23 +26,14 @@
     "tabs": [
       {
         "tab": "Documentation",
-        "pages": [
+        "groups": [
           {
             "group": "Gaia EVM Devnet",
             "pages": [
-              "docs/devnet/overview",
-              "docs/devnet/cli-setup",
-              "docs/devnet/how-to-get-tokens",
-              "docs/devnet/launched-contracts",
-              {
-                "group": "Tooling",
-                "pages": [
-                  "docs/devnet/tooling/overview",
-                  "docs/devnet/tooling/foundry",
-                  "docs/devnet/tooling/hardhat",
-                  "docs/devnet/tooling/testing-and-fuzzing"
-                ]
-              },
+              "docs/devnet/introduction",
+              "docs/devnet/connect-to-the-network",
+              "docs/devnet/get-tokens",
+              "docs/devnet/predeploys",
               {
                 "group": "Precompiles",
                 "pages": [
@@ -59,6 +50,15 @@
                   "docs/devnet/precompiles/slashing",
                   "docs/devnet/precompiles/staking",
                   "docs/devnet/precompiles/werc20"
+                ]
+              },
+              {
+                "group": "Tooling & Resources",
+                "pages": [
+                  "docs/devnet/tooling-and-resources/overview",
+                  "docs/devnet/tooling-and-resources/foundry",
+                  "docs/devnet/tooling-and-resources/hardhat",
+                  "docs/devnet/tooling-and-resources/testing-and-fuzzing"
                 ]
               }
             ]
