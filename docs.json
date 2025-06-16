@@ -31,7 +31,6 @@
             "group": "Gaia EVM Devnet",
             "pages": [
               "docs/devnet/overview",
-              "docs/devnet/reference",
               "docs/devnet/cli-setup",
               "docs/devnet/how-to-get-tokens",
               "docs/devnet/launched-contracts",
