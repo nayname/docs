@@ -1,12 +1,8 @@
 ---
-title: "Precompiles Overview"
-description: "Precompiles are special contracts integrated at a protocol level, to provide a solidity interface for functions that Solidity cannot realistically perform, or that would otherwise be very gas intensive.
-Many of these provide access to Cosmos SDK modules for EVM clients"
+title: "Overview"
+description: "Precompiles are predefined functions that are integrated at the protocol level but exposed as EVM smart contract interfaces. Many precompiles provide access to Cosmos SDK module functionality for EVM applications and clients to easily leverage."
 icon: "code"
-mode: "wide"
 ---
-
-
 
 ## Available Precompiles
 
@@ -23,8 +19,3 @@ mode: "wide"
 | **Slashing**     | `0x0000000000000000000000000000000000000806` | Validator slashing and jail management                           | [Details](./slashing)     |
 | **Evidence**     | `0x0000000000000000000000000000000000000807` | Validator misbehavior evidence submission                        | [Details](./evidence)     |
 | **P256**         | `0x0000000000000000000000000000000000000100` | P-256 elliptic curve cryptographic operations                    | [Details](./p256)         |
-
-
-### Other
-
-See also: [Pre-deployed Contracts](../launched-contracts) like `multicall3`, `create2`, etc.
