@@ -3,27 +3,32 @@ title: 'Connect to the Network'
 description: 'This page provides general information to help you connect to the network and get started building.'
 ---
 
-## Network Information
+## Chain Info
 
-| Endpoint / Detail | Example | Purpose |
+| Info | Value | Purpose |
 |-------------------|----------------------|---------|
-| **EVM JSON-RPC** | `https://devnet-1-evmrpc.ib.skip.build` | Ethereum-compatible tools (MetaMask, Hardhat, ethers.js) |
-| **EVM RPC WS**   | `wss://devnet-1-evmws.ib.skip.build`   | Streaming real-time, selective data for applications |
-| **Cosmos RPC** | `https://devnet-1-rpc.ib.skip.build` | Tendermint-level interactions (blocks, consensus state) |
-| **Cosmos REST API** | `https://devnet-1-lcd.ib.skip.build` | Query Cosmos SDK modules (bank, staking, etc.) |
-| **gRPC** | `devnet-1-grpc.ib.skip.build:443` | High-performance Protobuf endpoint for back-ends |
 | **Cosmos Chain ID** | `4231` | Network Identifier for Cosmos tooling |
 | **EVM Chain ID** | `0x1087` | Network identifier for EVM tooling [Hexadecimal equivalent of Cosmos Chain ID] |
 | **EVM Version** | `Istanbul` | EVM hard fork compatibility version |
 | **Native Token** | `ATOM` | Staking / gas token |
 | **Denom Exponent** | `6` | Native token has 6 decimal places (`uatom`) |
 
-# Connect with the chain
+## Public Endpoints
+
+| Endpoint | Value | Purpose |
+|-------------------|----------------------|---------|
+| **EVM JSON-RPC** | `https://devnet-1-evmrpc.ib.skip.build` | Ethereum-compatible tools (MetaMask, Hardhat, ethers.js) |
+| **EVM RPC WS**   | `wss://devnet-1-evmws.ib.skip.build`   | Streaming real-time, selective data for applications |
+| **Cosmos RPC** | `https://devnet-1-rpc.ib.skip.build` | Tendermint-level interactions (blocks, consensus state) |
+| **Cosmos REST API** | `https://devnet-1-lcd.ib.skip.build` | Query Cosmos SDK modules (bank, staking, etc.) |
+| **gRPC** | `devnet-1-grpc.ib.skip.build:443` | High-performance Protobuf endpoint for back-ends |
+
+## Connect to the chain
 
 Most development work can be done without the overhead of running a full node.
 Below is a brief overview of querying data and broadcasting transactions using public endpoints and lightweight tooling.
 
-## 1. Web Wallets
+### Web Wallets
 
 > **Recommended for real-world, E2E testing**
 
@@ -36,11 +41,11 @@ Below is a brief overview of querying data and broadcasting transactions using p
     - Currency Decimals: `6`
 3. Use the UI to send tokens, view balances, and interact with dApps.
 
-## 2. CLI Queries via Public RPC
+### CLI
 
 > **Great for one-off tasks or testing that do not require a full node**
 
-### Download or build the chain binary
+#### Download or build the chain binary
 
 ```bash lines expandable
 # Adjust version as needed
@@ -51,7 +56,7 @@ test -f gaiad && chmod +x gaiad
 sudo mv gaiad /usr/local/bin/
 ```
 
-### Query examples
+#### Query examples
 
 ```bash lines expandable
 # Query account balance
@@ -61,7 +66,7 @@ gaiad q bank balances cosmos1... --node https://devnet-1-rpc.ib.skip.build:443
 gaiad q staking validators --node https://devnet-1-rpc.ib.skip.build:443
 ```
 
-### Broadcast a transaction
+#### Broadcast a transaction
 
 ```bash lines expandable
 # Create and sign a simple send
@@ -72,7 +77,7 @@ gaiad tx bank send cosmos1... cosmos1... 1000uatom \
   --yes
 ```
 
-### Generate Transaction Messages
+#### Generate Transaction Messages
 
 You can use the `--generate-only` flag to create transaction messages without broadcasting them. This can be useful for finding the correct syntax and creating reusable transaction templates:
 
@@ -146,7 +151,7 @@ You can use the `--generate-only` flag to create transaction messages without br
 }
 ```
 
-## 3. REST (LCD) Endpoints
+### REST (LCD) Endpoints
 
 > **Use for HTTP-based integrations**
 
@@ -161,7 +166,7 @@ Basic endpoints:
 
 Refer to the [OpenAPI spec](https://api.cosmos.network/) for details.
 
-## 4. EVM RPC Endpoints
+### EVM JSON-RPC Endpoints
 
 > **For Ethereum-compatible tooling**
 
@@ -175,17 +180,17 @@ Chain ID:  4321 (0x10e1)
 
 Use with MetaMask, Hardhat, Foundry, or any Ethereum-compatible client.
 
-# Run a full node
+### Run a full node
 
 For validators, developers, or users who need full control and don't want to rely on public endpoints, you can run your own synced node.
 
 ---
 
-## Join the Devnet
+#### Join the Devnet
 
 Running a full node gives you complete control, better performance, and eliminates dependency on public infrastructure.
 
-### Prerequisites
+#### Prerequisites
 
 - Minimum hardware requirements:
   - 4+ CPU cores
@@ -193,7 +198,7 @@ Running a full node gives you complete control, better performance, and eliminat
   - 500GB+ SSD storage
   - Reliable internet connection
 
-### Quick Setup
+#### Quick Setup
 
 1. **Install dependencies** (Ubuntu/Debian):
 ```bash lines expandable
@@ -234,7 +239,7 @@ seeds = "seed1@ip1:26656,seed2@ip2:26656"
 7. **Start syncing**:
 `evmd start`
 
-### State Sync (Faster Alternative)
+#### State Sync (Faster Alternative)
 
 Instead of syncing from genesis, use state sync for faster setup:
 
@@ -247,7 +252,7 @@ trust_height = 1000000
 trust_hash = "TRUST_HASH_HERE"
 ```
 
-### Endpoints After Setup
+#### Endpoints After Setup
 
 Once your node is running, it will expose:
 
@@ -259,7 +264,7 @@ EVM RPC:        http://localhost:8545
 EVM WebSocket:  ws://localhost:8546
 ```
 
-### Monitoring
+#### Monitoring
 
 Monitor your node's sync status:
 
@@ -271,7 +276,7 @@ evmd status | jq .SyncInfo.catching_up
 evmd status | jq .SyncInfo.latest_block_height
 ```
 
-### Next Steps
+#### Next Steps
 
 - **Validator Setup**: If you want to become a validator, see the [validator guide](/docs/devnet/validators)
 - **Configuration**: Tune your node for performance and security
@@ -279,20 +284,6 @@ evmd status | jq .SyncInfo.latest_block_height
 - **Backup**: Implement backup strategies for your validator key
 
 Your node will now be fully synced with the devnet and can be used for any purpose - from development to validation to serving your own applications.
-
-import { Footnote } from '/snippets/footnote.mdx';
-
-## Pre-deployed Contracts
-
-For common contracts like (`multicall3`, `create2` and more), see the [Pre-deployed Contracts](./launched-contracts) page.
-
-## Precompiled Contracts
-
-Precompiles for *SDK modules*\* and other important functions are detailed in the [Precompiles](./precompiles/overview) section.
-
-<Footnote>
-\**Most modules supported; others may be added in a future release.*
-</Footnote>
 
 ## Connecting to the Network
 
