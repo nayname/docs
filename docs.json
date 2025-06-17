@@ -9,10 +9,7 @@
     "dark": "#0E0E0E"
   },
   "icons": {
-    "library": "lucide",
-    "colors": {
-      "primary": "#4B47CA"
-    }
+    "library": "lucide"
   },
   "styling": {
     "codeblocks": "system"

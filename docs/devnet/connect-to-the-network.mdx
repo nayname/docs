@@ -3,6 +3,8 @@ title: 'Connect to the Network'
 description: 'This page provides general information to help you connect to the network and get started building.'
 ---
 
+import { Footnote } from '/snippets/Footnote.mdx'
+
 ## Chain Info
 
 | Info | Value | Purpose |
@@ -33,8 +35,10 @@ To test out your dApp via a web UI using an extension-based wallet, you'll need 
 
 1. Install [Keplr](https://www.keplr.app/), [Metamask](https://metamask.io/) or [Rabby](https://rabby.io/) (Chrome/Mobile).
 2. Add a custom network:
-    - Chain ID: `4321`
-    - RPC URL: `https://devnet-1-rpc.ib.skip.build`
+    - [Cosmos] Chain ID: `4321`
+    - [EVM] Chain ID: `4231`
+    - [Cosmos] RPC URL: `https://devnet-1-rpc.ib.skip.build`
+    - [EVM] RPC URL: `https://devnet-1-evmrpc.ib.skip.build`
     - Chain Name: `Skip Devnet`
     - Currency Symbol: `ATOM`
     - Currency Decimals: `6`
@@ -42,66 +46,85 @@ To test out your dApp via a web UI using an extension-based wallet, you'll need 
 
 ### CLI
 
-Using the CLI may be a great choice for one-off tasks and queries that do not require a full node. **Make sure you use a binary built from the `feature/evm` branch of Gaia, which contains the EVM module used on this devnet.**
+Using the CLI may be a great choice for one-off tasks and queries that do not require a full node. **For the EVM Devnet you need the `evmd` binary built from the [`cosmos/evm`](https://github.com/cosmos/evm) repository.**
 
 ```bash
-# Option A — download a pre-built artifact (feature/evm branch)
-VERSION=v9.0.0-evm           # example tag built from feature/evm
-curl -LO "https://github.com/cosmos/gaia/releases/download/${VERSION}/gaiad_${VERSION}_linux_amd64.tar.gz"
+# Option A — download a pre-built artifact once they are published
+# (replace VERSION with the latest tag that contains evmd)
+VERSION=v1.0.0-rc1
+curl -LO "https://github.com/cosmos/evm/releases/download/${VERSION}/evmd_${VERSION}_linux_amd64.tar.gz"
 
-tar -xzf gaiad_${VERSION}_linux_amd64.tar.gz
-chmod +x gaiad && sudo mv gaiad /usr/local/bin/
+tar -xzf evmd_${VERSION}_linux_amd64.tar.gz
+chmod +x evmd && sudo mv evmd /usr/local/bin/
 
-# Option B — build from source
-# (requires Go ≥ 1.22)
-git clone --branch feature/evm https://github.com/cosmos/gaia.git
-cd gaia && make install   # installs gaiad into $(go env GOPATH)/bin
+# Option B — build from source (requires Go ≥ 1.22)
+git clone https://github.com/cosmos/evm.git
+cd evm && make install   # installs evmd into $(go env GOPATH)/bin
 ```
 
-#### Key Management & HD Paths
+#### Key Management & Wallet Derivation
 
-Gaia (feature/evm) supports *two* key algorithms:
+Gaia (feature/evm) supports two different key derivation methods, each producing different address formats from the same underlying private key:
 
-| Algo flag | HD Path | Typical address format | Use-case |
-|-----------|---------|------------------------|----------|
-| `eth_secp256k1` *(default)* | `m/44'/60'/0'/0/0` | `0x…` / `cosmos1…` | **Recommended for EVM dApps** – interoperable with MetaMask & hard-fork compatible |
-| `secp256k1` | `m/44'/118'/0'/0/0` | `cosmos1…` | Classic Cosmos wallets |
+| Algorithm | HD Path | Address Format | Characteristics |
+|-----------|---------|----------------|-----------------|
+| `eth_secp256k1` *(default)* | `m/44'/60'/0'/0/0` | `0x…` / `cosmos1…` | Uses Ethereum's derivation standard (cointype 60), full compatibility with MetaMask and EVM tooling while retaining complete Cosmos compatibility |
+| `secp256k1` | `m/44'/118'/0'/0/0` | `cosmos1…` | Uses Cosmos's derivation standard (cointype 118), compatible with traditional Cosmos wallets |
 
-When you recover a mnemonic exported for EVM use, be sure to keep the algorithm & path consistent:
+<Footnote>
+The `eth_secp256k1` algorithm with cointype 60 is the default, providing full EVM compatibility.
+</Footnote>
+
+**Key derivation behavior:**
+- The same mnemonic phrase will produce different addresses when using different algorithms and HD paths
+- When importing an existing wallet, you must use the same algorithm and derivation path that was originally used
+- The EVM-compatible path (`m/44'/60'/0'/0/0`) is what most Ethereum tools expect
+- You can derive both address formats from the same private key, effectively giving you two addresses for one account
+
+**Technical difference:**
+- `secp256k1`: Uses **SHA-256 → RIPEMD-160 → Bech32** hashing (traditional Cosmos/Bitcoin approach)
+- `eth_secp256k1`: Uses **Keccak-256** hashing on the full uncompressed public key (64 bytes after removing the 0x04 prefix), takes the last 20 bytes of the hash, then converts those bytes to either hex (`0x...`) or bech32 format
+
+This means the same private key produces two completely different addresses depending on the derivation method used. The `eth_secp256k1` method follows Ethereum's standard address derivation while maintaining compatibility with Cosmos bech32 addressing, effectively giving you both address formats for the same underlying account.
 
 ```bash
-# create a new EVM-compatible key
-$ gaiad keys add myevmkey                    # default is --algo eth_secp256k1
+# Key creation examples showing different algorithms
+evmd keys add mykey                        # uses eth_secp256k1 by default
+evmd keys add mykey --key-type secp256k1       # explicitly uses traditional Cosmos
 
-# recover an existing 24-word mnemonic *and* force the EVM path
-$ gaiad keys add user10 --recover \
-           --algo eth_secp256k1 \
-           --hd-path "m/44'/60'/0'/0/0"
+# When recovering, the algorithm must match what was originally used
+evmd keys add recovered --recover --key-type eth_secp256k1
 ```
 
-If you omit the flags the CLI may derive the Cosmos HD path (m/44/118/…), producing a different `cosmos1…` address – exactly what happened in the user report quoted below.
-
-> **Why two addresses?**  The same 256-bit private key can generate *both* a Cosmos (`secp256k1`) and Ethereum (`eth_secp256k1`) address.  The devnet faucets and precompiles expect the Ethereum-style address for full EVM compatibility.
+---
 
 <AccordionGroup>
   <Accordion title="Query Examples">
     <CodeGroup>
       ```bash Query balances for a given address
-      gaiad q bank balances cosmos1... --node https://devnet-1-rpc.ib.skip.build:443
+      evmd q bank balances cosmos1... --node https://devnet-1-rpc.ib.skip.build:443
       ```
 
       ```bash Query the list of validators
-      gaiad q staking validators --node https://devnet-1-rpc.ib.skip.build:443
+      evmd q staking validators --node https://devnet-1-rpc.ib.skip.build:443
       ```
     </CodeGroup>
   </Accordion>
 
   <Accordion title="Broadcast a Transaction">
     <CodeGroup>
-      ```bash Example
-      gaiad tx bank send cosmos1... cosmos1... 1000uatom \
+      ```bash Bank Send
+      evmd tx bank send cosmos1... cosmos1... 1000uatom \
         --node https://devnet-1-rpc.ib.skip.build:443 \
         --chain-id 4321 \
+        --gas auto --fees 500uatom \
+        --yes
+      ```
+
+      ```bash EVM Raw Transaction
+      evmd tx evm raw 0x02e20180010182520894de0b295669a9fd93d5f28d9ec85e40f4cb697bae8080c0808080 \
+        --node https://devnet-1-rpc.ib.skip.build:443 \
+        --chain-id 4231 \
         --gas auto --fees 500uatom \
         --yes
       ```
@@ -111,84 +134,18 @@ If you omit the flags the CLI may derive the Cosmos HD path (m/44/118/…), prod
   <Accordion title="Generate Transaction Messages">
     You can use the `--generate-only` flag to create transaction messages without broadcasting them. This can be useful for finding the correct syntax and creating reusable transaction templates.
 
-    | Field (0x02)          | Value         |
-    | --------------------- | ------------- |
-    | **chainId**           | `0x01`        |
-    | **nonce**             | `0x`          |
-    | **maxPrioFeePerGas**  | `0x01`        |
-    | **maxFeePerGas**      | `0x01`        |
-    | **gasLimit**          | `0x5208`      |
-    | **to / value / data** | same as above |
-    | **accessList**        | `[]`          |
-    | **yParity (v)**       | `0x0`         |
-    | **r**, **s**          | `0x0`, `0x0`  |
-
-    <CodeGroup>
-      ```bash Example
-      evmd tx evm raw 0x02e20180010182520894de0b295669a9fd93d5f28d9ec85e40f4cb697bae8080c0808080 --generate-only | jq
-      ```
-
-      ```json Example output
-      {
-        "body": {
-          "messages": [
-            {
-              "@type": "/cosmos.evm.vm.v1.MsgEthereumTx",
-              "data": {
-                "@type": "/cosmos.evm.vm.v1.DynamicFeeTx",
-                "chain_id": "1",
-                "nonce": "0",
-                "gas_tip_cap": "1",
-                "gas_fee_cap": "1",
-                "gas": "21000",
-                "to": "0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe",
-                "value": "0",
-                "data": null,
-                "accesses": [],
-                "v": null,
-                "r": null,
-                "s": null
-              },
-              "size": 0,
-              "hash": "0x10c35e9f591e43bac6a9d01164a62e141d16ca715653ac818761c79e3eecafbc",
-              "from": ""
-            }
-          ],
-          "memo": "",
-          "timeout_height": "0",
-          "unordered": false,
-          "timeout_timestamp": null,
-          "extension_options": [
-            {
-              "@type": "/cosmos.evm.vm.v1.ExtensionOptionsEthereumTx"
-            }
-          ],
-          "non_critical_extension_options": []
-        },
-        "auth_info": {
-          "signer_infos": [],
-          "fee": {
-            "amount": [
-              {
-                "denom": "atest",
-                "amount": "21000"
-              }
-            ],
-            "gas_limit": "21000",
-            "payer": "",
-            "granter": ""
-          },
-          "tip": null
-        },
-        "signatures": []
-      }
-      ```
-    </CodeGroup>
+    ```bash Generate Only Example
+    evmd tx bank send cosmos1... cosmos1... 1000uatom \
+      --node https://devnet-1-rpc.ib.skip.build:443 \
+      --chain-id 4321 \
+      --gas auto --fees 500uatom \
+      --generate-only | jq
+    ```
   </Accordion>
 
 </AccordionGroup>
 
-### REST (LCD) Endpoints
+### Cosmos REST Endpoint
 
 > **Use for HTTP-based integrations**
 
@@ -201,9 +158,13 @@ Basic endpoints:
 * `GET /cosmos/bank/v1beta1/balances/{address}`
 * `POST /cosmos/tx/v1beta1/txs` (broadcast)
 
-Refer to the [OpenAPI spec](https://api.cosmos.network/) for details.
+### Cosmos RPC
 
-### EVM JSON-RPC Endpoints
+> **For Tendermint-level interactions**
+
+`https://devnet-1-rpc.ib.skip.build`
+
+### EVM JSON-RPC
 
 > **For Ethereum-compatible tooling**
 
@@ -230,6 +191,7 @@ Edit `~/.evmd/config/client.toml`:
 ```toml title="~/.evmd/config/client.toml"
 # ~/.evmd/config/client.toml
 node = "https://devnet-1-rpc.ib.skip.build"
+chain-id = "4321"
 ```
 
 All subsequent `evmd` commands use the remote node:
@@ -240,108 +202,8 @@ evmd q bank balances $(evmd keys show <wallet_name> --address)
 
 **Method 2 — API**
 
-Applications typically interact with the network programmatically using the EVM JSON-RPC, in addition to the standard Cosmos GRPC/REST API. Below are some basic examples of various common usecases:
+Applications typically interact with the network programmatically using the EVM JSON-RPC, in addition to the standard Cosmos GRPC/REST API.
 
-For a complete list of available endpoints and methods, see the [API Reference](./api-reference) documentation.
-
-#### EVM JSON-RPC
-
-```js lines expandable
-import { ethers } from "ethers";
-
-const provider = new ethers.JsonRpcProvider("https://devnet-1-evmrpc.ib.skip.build");
-const balance = await provider.getBalance("0x...");
-```
-
-#### Cosmos REST API
-
-```sh lines
-curl https://devnet-1-lcd.ib.skip.build/cosmos/staking/v1beta1/params
-```
-
-#### EVM JSON-RPC — **Python (web3.py)**
-
-```python lines expandable
-from web3 import Web3
-
-provider = Web3(Web3.HTTPProvider("https://devnet-1-evmrpc.ib.skip.build"))
-
-address = "0xYourAddress"
-balance_wei = provider.eth.get_balance(address)
-balance_eth = Web3.from_wei(balance_wei, "ether")
-
-print(f"Balance: {balance_eth} DEV")
-```
-
-#### Cosmos REST API — **Python (requests)**
-
-```python lines expandable
-import requests
-
-resp = requests.get(
-    "https://devnet-1-lcd.ib.skip.build/cosmos/staking/v1beta1/params",
-    timeout=10,
-)
-print(resp.json())
-```
-
-```go lines expandable
-package main
-
-import (
-    "context"
-    "fmt"
-    "log"
-    "math/big"
-
-    "github.com/ethereum/go-ethereum/common"
-    "github.com/ethereum/go-ethereum/ethclient"
-)
-
-func main() {
-    client, err := ethclient.Dial("https://devnet-1-evmrpc.ib.skip.build")
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    address := common.HexToAddress("0xYourAddress")
-    balance, err := client.BalanceAt(context.Background(), address, nil)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    ethValue := new(big.Float).Quo(
-        new(big.Float).SetInt(balance),
-        big.NewFloat(1e18),
-    )
-
-    fmt.Printf("Balance: %s DEV\n", ethValue)
-}
-```
-
-```go lines expandable
-package main
-
-import (
-    "encoding/json"
-    "fmt"
-    "log"
-    "net/http"
-)
-
-func main() {
-    resp, err := http.Get("https://devnet-1-lcd.ib.skip.build/cosmos/bank/v1beta1/balances/cosmos1youraddresshere")
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer resp.Body.Close()
-
-    var result map[string]interface{}
-    if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-        log.Fatal(err)
-    }
-
-    pretty, _ := json.MarshalIndent(result, "", "  ")
-    fmt.Println(string(pretty))
-}
-```
+<Footnote>
+Full API reference page coming soon
+</Footnote>
