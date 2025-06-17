@@ -1,137 +1,151 @@
 ---
 title: 'Connect to the Network'
-description: 'Connect with the chain - Set up your node'
+description: 'This page provides general information to help you connect to the network and get started building.'
 ---
 
-# Connect with the chain
+import { Footnote } from '/snippets/Footnote.mdx'
 
-Most development work can be done without the overhead of running a full node.
-Below is a brief overview of querying data and broadcasting transactions using public endpoints and lightweight tooling.
+## Chain Info
 
-## 1. Web Wallets
+| Info | Value | Purpose |
+|-------------------|----------------------|---------|
+| **Cosmos Chain ID** | `4321` | Network Identifier for Cosmos tooling |
+| **EVM Chain ID** | `4231` | Network identifier for EVM tooling |
+| **EVM Version** | `Istanbul` | EVM hard fork compatibility version |
+| **Native Token** | `ATOM` | Staking / gas token |
+| **Denom Exponent** | `6` | Native token has 6 decimal places (`uatom`) |
 
-> **Recommended for real-world, E2E testing**
+## Public Endpoints
+
+| Endpoint | Value | Purpose |
+|-------------------|----------------------|---------|
+| **EVM JSON-RPC** | `https://devnet-1-evmrpc.ib.skip.build` | Ethereum-compatible tools (MetaMask, Hardhat, ethers.js) |
+| **EVM RPC WS**   | `wss://devnet-1-evmws.ib.skip.build`   | Streaming real-time, selective data for applications |
+| **Cosmos RPC** | `https://devnet-1-rpc.ib.skip.build` | Tendermint-level interactions (blocks, consensus state) |
+| **Cosmos REST API** | `https://devnet-1-lcd.ib.skip.build` | Query Cosmos SDK modules (bank, staking, etc.) |
+| **gRPC** | `devnet-1-grpc.ib.skip.build:443` | High-performance Protobuf endpoint for back-ends |
+
+## How to Interact with the Chain
+
+You can interact with the Gaia EVM Devnet in several different ways. This section provides a brief overview of how to setup the various environments for testing.
+
+### Extension-Based Wallets
+
+To test out your dApp via a web UI using an extension-based wallet, you'll need to first add the Gaia EVM Devnet to the wallet like so:
 
 1. Install [Keplr](https://www.keplr.app/), [Metamask](https://metamask.io/) or [Rabby](https://rabby.io/) (Chrome/Mobile).
 2. Add a custom network:
-    - Chain ID: `4321`
-    - RPC URL: `https://devnet-1-rpc.ib.skip.build`
+    - [Cosmos] Chain ID: `4321`
+    - [EVM] Chain ID: `4231`
+    - [Cosmos] RPC URL: `https://devnet-1-rpc.ib.skip.build`
+    - [EVM] RPC URL: `https://devnet-1-evmrpc.ib.skip.build`
     - Chain Name: `Skip Devnet`
     - Currency Symbol: `ATOM`
     - Currency Decimals: `6`
 3. Use the UI to send tokens, view balances, and interact with dApps.
 
-## 2. CLI Queries via Public RPC
+### CLI
 
-> **Great for one-off tasks or testing that do not require a full node**
+Using the CLI may be a great choice for one-off tasks and queries that do not require a full node. **For the EVM Devnet you need the `evmd` binary built from the [`cosmos/evm`](https://github.com/cosmos/evm) repository.**
 
-### Download or build the chain binary
+```bash
+# Option A — download a pre-built artifact once they are published
+# (replace VERSION with the latest tag that contains evmd)
+VERSION=v1.0.0-rc1
+curl -LO "https://github.com/cosmos/evm/releases/download/${VERSION}/evmd_${VERSION}_linux_amd64.tar.gz"
 
-```bash lines expandable
-# Adjust version as needed
-VERSION=v9.0.0
-curl -LO "https://github.com/cosmos/gaia/releases/download/${VERSION}/gaiad_${VERSION}_linux_amd64.tar.gz"
-tar -xzf gaiad_${VERSION}_linux_amd64.tar.gz
-test -f gaiad && chmod +x gaiad
-sudo mv gaiad /usr/local/bin/
+tar -xzf evmd_${VERSION}_linux_amd64.tar.gz
+chmod +x evmd && sudo mv evmd /usr/local/bin/
+
+# Option B — build from source (requires Go ≥ 1.22)
+git clone https://github.com/cosmos/evm.git
+cd evm && make install   # installs evmd into $(go env GOPATH)/bin
 ```
 
-### Query examples
+#### Key Management & Wallet Derivation
 
-```bash lines expandable
-# Query account balance
-gaiad q bank balances cosmos1... --node https://devnet-1-rpc.ib.skip.build:443
+Gaia (feature/evm) supports two different key derivation methods, each producing different address formats from the same underlying private key:
 
-# List staking validators
-gaiad q staking validators --node https://devnet-1-rpc.ib.skip.build:443
+| Algorithm | HD Path | Address Format | Characteristics |
+|-----------|---------|----------------|-----------------|
+| `eth_secp256k1` *(default)* | `m/44'/60'/0'/0/0` | `0x…` / `cosmos1…` | Uses Ethereum's derivation standard (cointype 60), full compatibility with MetaMask and EVM tooling while retaining complete Cosmos compatibility |
+| `secp256k1` | `m/44'/118'/0'/0/0` | `cosmos1…` | Uses Cosmos's derivation standard (cointype 118), compatible with traditional Cosmos wallets |
+
+<Footnote>
+The `eth_secp256k1` algorithm with cointype 60 is the default, providing full EVM compatibility.
+</Footnote>
+
+**Key derivation behavior:**
+- The same mnemonic phrase will produce different addresses when using different algorithms and HD paths
+- When importing an existing wallet, you must use the same algorithm and derivation path that was originally used
+- The EVM-compatible path (`m/44'/60'/0'/0/0`) is what most Ethereum tools expect
+- You can derive both address formats from the same private key, effectively giving you two addresses for one account
+
+**Technical difference:**
+- `secp256k1`: Uses **SHA-256 → RIPEMD-160 → Bech32** hashing (traditional Cosmos/Bitcoin approach)
+- `eth_secp256k1`: Uses **Keccak-256** hashing on the full uncompressed public key (64 bytes after removing the 0x04 prefix), takes the last 20 bytes of the hash, then converts those bytes to either hex (`0x...`) or bech32 format
+
+This means the same private key produces two completely different addresses depending on the derivation method used. The `eth_secp256k1` method follows Ethereum's standard address derivation while maintaining compatibility with Cosmos bech32 addressing, effectively giving you both address formats for the same underlying account.
+
+```bash
+# Key creation examples showing different algorithms
+evmd keys add mykey                        # uses eth_secp256k1 by default
+evmd keys add mykey --key-type secp256k1       # explicitly uses traditional Cosmos
+
+# When recovering, the algorithm must match what was originally used
+evmd keys add recovered --recover --key-type eth_secp256k1
 ```
 
-### Broadcast a transaction
+---
 
-```bash lines expandable
-# Create and sign a simple send
-gaiad tx bank send cosmos1... cosmos1... 1000uatom \
-  --node https://devnet-1-rpc.ib.skip.build:443 \
-  --chain-id 4321 \
-  --gas auto --fees 500uatom \
-  --yes
-```
+<AccordionGroup>
+  <Accordion title="Query Examples">
+    <CodeGroup>
+      ```bash Query balances for a given address
+      evmd q bank balances cosmos1... --node https://devnet-1-rpc.ib.skip.build:443
+      ```
 
-### Generate Transaction Messages
+      ```bash Query the list of validators
+      evmd q staking validators --node https://devnet-1-rpc.ib.skip.build:443
+      ```
+    </CodeGroup>
+  </Accordion>
 
-You can use the `--generate-only` flag to create transaction messages without broadcasting them. This can be useful for finding the correct syntax and creating reusable transaction templates:
+  <Accordion title="Broadcast a Transaction">
+    <CodeGroup>
+      ```bash Bank Send
+      evmd tx bank send cosmos1... cosmos1... 1000uatom \
+        --node https://devnet-1-rpc.ib.skip.build:443 \
+        --chain-id 4321 \
+        --gas auto --fees 500uatom \
+        --yes
+      ```
 
-| Field (0x02)          | Value         |
-| --------------------- | ------------- |
-| **chainId**           | `0x01`        |
-| **nonce**             | `0x`          |
-| **maxPrioFeePerGas**  | `0x01`        |
-| **maxFeePerGas**      | `0x01`        |
-| **gasLimit**          | `0x5208`      |
-| **to / value / data** | same as above |
-| **accessList**        | `[]`          |
-| **yParity (v)**       | `0x0`         |
-| **r**, **s**          | `0x0`, `0x0`  |
+      ```bash EVM Raw Transaction
+      evmd tx evm raw 0x02e20180010182520894de0b295669a9fd93d5f28d9ec85e40f4cb697bae8080c0808080 \
+        --node https://devnet-1-rpc.ib.skip.build:443 \
+        --chain-id 4231 \
+        --gas auto --fees 500uatom \
+        --yes
+      ```
+    </CodeGroup>
+  </Accordion>
 
-`evmd tx evm raw 0x02e20180010182520894de0b295669a9fd93d5f28d9ec85e40f4cb697bae8080c0808080 --generate-only | jq`
+  <Accordion title="Generate Transaction Messages">
+    You can use the `--generate-only` flag to create transaction messages without broadcasting them. This can be useful for finding the correct syntax and creating reusable transaction templates.
 
-```json title="Generated Transaction" lines expandable
-{
-  "body": {
-    "messages": [
-      {
-        "@type": "/cosmos.evm.vm.v1.MsgEthereumTx",
-        "data": {
-          "@type": "/cosmos.evm.vm.v1.DynamicFeeTx",
-          "chain_id": "1",
-          "nonce": "0",
-          "gas_tip_cap": "1",
-          "gas_fee_cap": "1",
-          "gas": "21000",
-          "to": "0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe",
-          "value": "0",
-          "data": null,
-          "accesses": [],
-          "v": null,
-          "r": null,
-          "s": null
-        },
-        "size": 0,
-        "hash": "0x10c35e9f591e43bac6a9d01164a62e141d16ca715653ac818761c79e3eecafbc",
-        "from": ""
-      }
-    ],
-    "memo": "",
-    "timeout_height": "0",
-    "unordered": false,
-    "timeout_timestamp": null,
-    "extension_options": [
-      {
-        "@type": "/cosmos.evm.vm.v1.ExtensionOptionsEthereumTx"
-      }
-    ],
-    "non_critical_extension_options": []
-  },
-  "auth_info": {
-    "signer_infos": [],
-    "fee": {
-      "amount": [
-        {
-          "denom": "atest",
-          "amount": "21000"
-        }
-      ],
-      "gas_limit": "21000",
-      "payer": "",
-      "granter": ""
-    },
-    "tip": null
-  },
-  "signatures": []
-}
-```
+    ```bash Generate Only Example
+    evmd tx bank send cosmos1... cosmos1... 1000uatom \
+      --node https://devnet-1-rpc.ib.skip.build:443 \
+      --chain-id 4321 \
+      --gas auto --fees 500uatom \
+      --generate-only | jq
+    ```
+  </Accordion>
 
-## 3. REST (LCD) Endpoints
+</AccordionGroup>
+
+### Cosmos REST Endpoint
 
 > **Use for HTTP-based integrations**
 
@@ -144,9 +158,13 @@ Basic endpoints:
 * `GET /cosmos/bank/v1beta1/balances/{address}`
 * `POST /cosmos/tx/v1beta1/txs` (broadcast)
 
-Refer to the [OpenAPI spec](https://api.cosmos.network/) for details.
+### Cosmos RPC
 
-## 4. EVM RPC Endpoints
+> **For Tendermint-level interactions**
+
+`https://devnet-1-rpc.ib.skip.build`
+
+### EVM JSON-RPC
 
 > **For Ethereum-compatible tooling**
 
@@ -160,107 +178,32 @@ Chain ID:  4321 (0x10e1)
 
 Use with MetaMask, Hardhat, Foundry, or any Ethereum-compatible client.
 
-# Run a full node
+## Connecting to the Network
 
-For validators, developers, or users who need full control and don't want to rely on public endpoints, you can run your own synced node.
+### Using Remote Endpoints
 
----
+The `evmd` CLI tool and other clients require a connection to the network in order to interact with the chain.
 
-## Join the Devnet
+**Method 1 — configure `evmd`**
 
-Running a full node gives you complete control, better performance, and eliminates dependency on public infrastructure.
+Edit `~/.evmd/config/client.toml`:
 
-### Prerequisites
-
-- Minimum hardware requirements:
-  - 4+ CPU cores
-  - 8GB+ RAM
-  - 500GB+ SSD storage
-  - Reliable internet connection
-
-### Quick Setup
-
-1. **Install dependencies** (Ubuntu/Debian):
-```bash lines expandable
-sudo apt update && sudo apt install -y \
-  build-essential git curl wget jq lz4 liblz4-tool \
-  protobuf-compiler pkg-config unzip
+```toml title="~/.evmd/config/client.toml"
+# ~/.evmd/config/client.toml
+node = "https://devnet-1-rpc.ib.skip.build"
+chain-id = "4321"
 ```
 
-2. **Install Go 1.22+**:
-```bash lines expandable
-GO_VERSION=1.22.4
-curl -LO "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz"
-sudo rm -rf /usr/local/go
-tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
-echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> ~/.bashrc
-source ~/.bashrc
+All subsequent `evmd` commands use the remote node:
+
+```sh lines
+evmd q bank balances $(evmd keys show <wallet_name> --address)
 ```
 
-3. **Build the binary**:
-```bash lines expandable
-git clone https://github.com/cosmos/evm.git
-cd evm
-make install  # installs 'evmd'
-```
+**Method 2 — API**
 
-4. **Initialize your node**:
-`evmd init "your-node-name" --chain-id 4321`
+Applications typically interact with the network programmatically using the EVM JSON-RPC, in addition to the standard Cosmos GRPC/REST API.
 
-5. **Get the genesis file**:
-`curl -s https://devnet-1-rpc.ib.skip.build/genesis | jq .result.genesis > ~/.evmd/config/genesis.json`
-
-6. **Configure peers** (add to `~/.evmd/config/config.toml`):
-```toml lines expandable
-persistent_peers = "peer1@ip1:26656,peer2@ip2:26656"
-seeds = "seed1@ip1:26656,seed2@ip2:26656"
-```
-
-7. **Start syncing**:
-`evmd start`
-
-### State Sync (Faster Alternative)
-
-Instead of syncing from genesis, use state sync for faster setup:
-
-```bash title="config.toml" lines expandable
-# Configure state sync in config.toml
-[statesync]
-enable = true
-rpc_servers = "https://devnet-1-rpc.ib.skip.build:443,https://devnet-1-rpc.ib.skip.build:443"
-trust_height = 1000000
-trust_hash = "TRUST_HASH_HERE"
-```
-
-### Endpoints After Setup
-
-Once your node is running, it will expose:
-
-```
-Cosmos RPC:     http://localhost:26657
-Cosmos gRPC:    http://localhost:9090
-Cosmos REST:    http://localhost:1317
-EVM RPC:        http://localhost:8545
-EVM WebSocket:  ws://localhost:8546
-```
-
-### Monitoring
-
-Monitor your node's sync status:
-
-```bash lines expandable
-# Check if syncing
-evmd status | jq .SyncInfo.catching_up
-
-# View latest block
-evmd status | jq .SyncInfo.latest_block_height
-```
-
-### Next Steps
-
-- **Validator Setup**: If you want to become a validator, see the [validator guide](/docs/devnet/validators)
-- **Configuration**: Tune your node for performance and security
-- **Monitoring**: Set up alerting and metrics collection
-- **Backup**: Implement backup strategies for your validator key
-
-Your node will now be fully synced with the devnet and can be used for any purpose - from development to validation to serving your own applications.
+<Footnote>
+Full API reference page coming soon
+</Footnote>

@@ -9,10 +9,7 @@
     "dark": "#0E0E0E"
   },
   "icons": {
-    "library": "lucide",
-    "colors": {
-      "primary": "#4B47CA"
-    }
+    "library": "lucide"
   },
   "styling": {
     "codeblocks": "system"
@@ -32,6 +29,7 @@
             "pages": [
               "docs/devnet/introduction",
               "docs/devnet/connect-to-the-network",
+              "docs/devnet/run-a-full-node",
               "docs/devnet/get-tokens",
               "docs/devnet/predeploys",
               {
