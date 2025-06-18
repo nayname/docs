@@ -31,8 +31,14 @@ You can interact with the Gaia EVM Devnet in several different ways. This sectio
 
 ### Extension-Based Wallets
 
-To test out your dApp via a web UI using an extension-based wallet, you'll need to first add the Gaia EVM Devnet to the wallet like so:
 
+To test out your dApp via a web UI using an extension-based wallet, you'll need to first add the Gaia EVM Devnet to the wallet:
+
+<Info>
+**For dApp developers**: Instead of having users manually add networks, implement [EIP-6963](https://eips.ethereum.org/EIPS/eip-6963) for wallet discovery and the "Add Chain" functionality to prompt users to add the network, as well as the "Switch Network" prompt to switch to the network if it already exists..
+</Info>
+
+#### Manual Setup
 1. Install [Keplr](https://www.keplr.app/), [Metamask](https://metamask.io/) or [Rabby](https://rabby.io/) (Chrome/Mobile).
 2. Add a custom network:
     - [Cosmos] Chain ID: `4321`
@@ -43,6 +49,32 @@ To test out your dApp via a web UI using an extension-based wallet, you'll need 
     - Currency Symbol: `ATOM`
     - Currency Decimals: `6`
 3. Use the UI to send tokens, view balances, and interact with dApps.
+
+<Tip>
+*Users can quickly add the network by using the [Devnet Faucet](https://faucet.cosmos.network).*
+</Tip>
+
+#### Programmatic Setup (Recommended)
+For the best user experience, implement the `wallet_addEthereumChain` method to automatically add the network:
+
+```javascript Add Chain Example
+const chainConfig = {
+  chainId: '0x1087', // 4231 in hex
+  chainName: 'Cosmos-EVM-Devnet',
+  nativeCurrency: {
+    name: 'ATOM',
+    symbol: 'ATOM',
+    decimals: 6
+  },
+  rpcUrls: ['https://devnet-1-evmrpc.ib.skip.build'],
+  blockExplorerUrls: ['https://evm-devnet-1.cloud.blockscout.com/'] // Replace with actual explorer
+};
+
+await window.ethereum.request({
+  method: 'wallet_addEthereumChain',
+  params: [chainConfig]
+});
+```
 
 ### CLI
 
