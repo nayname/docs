@@ -35,7 +35,7 @@ You can interact with the Gaia EVM Devnet in several different ways. This sectio
 To test out your dApp via a web UI using an extension-based wallet, you'll need to first add the Gaia EVM Devnet to the wallet:
 
 <Info>
-**For dApp developers**: Instead of having users manually add networks, implement [EIP-6963](https://eips.ethereum.org/EIPS/eip-6963) for wallet discovery and the "Add Chain" functionality to prompt users to add the network, as well as the "Switch Network" prompt to switch to the network if it already exists..
+**For dApp developers**: Use an [EIP-6963](https://eips.ethereum.org/EIPS/eip-6963) compatible wallet connector* for your dApp and use the "Add Chain" function to prompt adding the network. If it already exists, the "switch network" prompt will handle it.
 </Info>
 
 #### Manual Setup
@@ -75,6 +75,10 @@ await window.ethereum.request({
   params: [chainConfig]
 });
 ```
+
+<Footnote>
+See the [tooling/libraries](./tooling-and-resources/testing-and-fuzzing.mdx) page for wallet connector ideas.
+</Footnote>
 
 ### CLI
 
