@@ -14,24 +14,26 @@ These libraries are used across the stack to write tests, simulate transactions,
 | **Ethers.js** | Contract interaction, transaction signing, provider management in JS/TS environments     | Provides `Contract`, `Provider`, `Wallet`, and `Interface` abstractions. Deep Hardhat integration. ABI coder, calldata utilities, and ENS support. |
 | **Viem**      | Modular TypeScript-first library for RPC, contract access, encoding, and data formatting | Tree-shakeable. Supports batching, client-side caching, EIP-1559 fees, multicalls, typed reads/writes. Used by Wagmi. |
 | **Wagmi**     | React hooks for wallet connection, chain state, and contract calls in frontend apps      | Built on Viem. Includes `useAccount`, `useConnect`, `useContractRead`, and event subscriptions. Enables seamless integration with wallet modals. |
-| **Web3.js**   | Legacy Ethereum contract and RPC library                                                  | One of the earliest libraries. Now largely unmaintained. Lacks EIP-1559 support and modern modularity. |
+| **Web3.js**   | Legacy Ethereum contract and RPC library                                                 | One of the earliest libraries. Now largely unmaintained. Lacks EIP-1559 support and modern modularity. |
+| **RainbowKit** | React component library for wallet connection UI and chain management | Pre-built wallet connect buttons, chain switch UI, and custom themes. Integrates with Wagmi for wallet state management and tx handling. |
 
 > Ethers and Viem serve similar purposes, but Viem is optimized for frontend apps. Wagmi builds on Viem. Web3.js is no longer recommended for new projects.
 
 ---
 
+
+## Testing Frameworks
+
 > **Note**
-> Smart contract quality and security depend on a comprehensive testing strategy that includes:
+> Smart contract quality and security depend on a comprehensive testing strategy including but not limited to:
 >
 > - **Unit Tests**: Verify individual functions and components
 > - **Property-Based Fuzzing**: Test invariants with random inputs
 > - **Code Coverage**: Ensure all code paths are tested
 > - **Static Analysis**: Detect common vulnerabilities and anti-patterns
 >
-> The tools and frameworks below provide robust support forW each of these testing layers.
+> The tools and frameworks below provide a foundation for each of these testing layers.
 
-
-## Testing Frameworks
 
 ### Foundry — Solidity-Native
 

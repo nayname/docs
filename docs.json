@@ -31,7 +31,6 @@
               "docs/devnet/connect-to-the-network",
               "docs/devnet/run-a-full-node",
               "docs/devnet/get-tokens",
-              "docs/devnet/predeploys",
               {
                 "group": "Precompiles",
                 "pages": [
@@ -46,8 +45,7 @@
                   "docs/devnet/precompiles/ics20",
                   "docs/devnet/precompiles/p256",
                   "docs/devnet/precompiles/slashing",
-                  "docs/devnet/precompiles/staking",
-                  "docs/devnet/precompiles/werc20"
+                  "docs/devnet/precompiles/staking"
                 ]
               },
               {
