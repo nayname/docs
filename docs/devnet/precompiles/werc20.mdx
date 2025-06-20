@@ -1,101 +1,115 @@
 ---
 title: "WERC20"
-description: "Wrapped native token functionality enabling ERC20 representation of native tokens"
+description: "Single token representation: An ERC20 interface for any token"
 icon: "refresh-ccw"
 ---
 
 ## Overview
 
-The WERC20 precompile provides a standardized way to wrap native EVM tokens, allowing them to be used as ERC20-compatible tokens within smart contracts. This precompile ensures a 1:1 backing between the native token and its wrapped counterpart, enabling seamless interaction with DeFi protocols and other dApps that rely on the ERC20 standard.
+The WERC20 precompile provides a standard ERC20 interface to native Cosmos tokens through Cosmos EVM's **[Single Token Representation](/docs/evm/single-token-representation)** architecture. Unlike traditional wrapped tokens that maintain separate balances, WERC20 gives smart contracts direct access to native bank module balances through familiar ERC20 methods.
+
+**Key Concept**: *"Schrodinger's Wrap"* ATOM and WATOM are not separate tokens—they are two different interfaces to the same token stored in the bank module.
 
 **Precompile Address**: Dynamic (assigned per wrapped token)
-**Related Module**: Token wrapping utilities
+**Related Module**: x/bank (via ERC20 module integration)
+
+<Note>
+For a comprehensive understanding of how single token representation works and its benefits over traditional wrapping, see the [Single Token Representation](/docs/evm/single-token-representation) documentation.
+</Note>
+
+## Technical Implementation
+
+### Architecture Deep Dive
+
+The ERC20 module creates a **unified token representation** that bridges native Cosmos tokens with ERC20 interfaces:
+
+```go
+// Simplified conceptual flow (not actual implementation)
+func (k Keeper) ERC20Transfer(from, to common.Address, amount *big.Int) error {
+    // Convert EVM addresses to Cosmos addresses
+    cosmosFrom := sdk.AccAddress(from.Bytes())
+    cosmosTo := sdk.AccAddress(to.Bytes())
+
+    // Use bank module directly - no separate ERC20 state
+    coin := sdk.NewCoin(k.denom, sdk.NewIntFromBigInt(amount))
+    return k.bankKeeper.SendCoins(ctx, cosmosFrom, cosmosTo, sdk.Coins{coin})
+}
+
+func (k Keeper) ERC20BalanceOf(account common.Address) *big.Int {
+    // Query bank module directly
+    cosmosAddr := sdk.AccAddress(account.Bytes())
+    balance := k.bankKeeper.GetBalance(ctx, cosmosAddr, k.denom)
+    return balance.Amount.BigInt()
+}
+```
+
+### Why Deposit/Withdraw are No-Ops
+
+Since ATOM and WATOM represent the same underlying token, traditional deposit/withdraw operations are meaningless:
+
+```solidity
+// These functions exist for interface compatibility but do nothing
+function deposit() external payable {
+    // No-op: msg.value automatically increases your bank balance
+    // Your WATOM balance is identical to your ATOM balance
+}
+
+function withdraw(uint256 amount) external {
+    // No-op: your ATOM balance is already accessible
+    // No conversion needed as they're the same token
+}
+```
+
+### Real-World Example
+
+```javascript
+// User starts with 100 ATOM in bank module
+const atomBalance = await bankPrecompile.balances(userAddress);
+// Returns: [{contractAddress: "0x...", amount: "100000000"}] // 100 ATOM (6 decimals)
+
+const watomBalance = await werc20Contract.balanceOf(userAddress);
+// Returns: "100000000" // Same 100 ATOM, accessed via ERC20 interface
+
+// User transfers 50 WATOM via ERC20
+await werc20Contract.transfer(recipientAddress, "50000000");
+
+// Check balances again
+const newAtomBalance = await bankPrecompile.balances(userAddress);
+// Returns: [{contractAddress: "0x...", amount: "50000000"}] // 50 ATOM remaining
+
+const newWatomBalance = await werc20Contract.balanceOf(userAddress);
+// Returns: "50000000" // Same 50 ATOM, both queries return identical values
+```
 
 ## Methods
 
-### `deposit`
-Deposits native tokens in exchange for wrapped ERC20 tokens.
+### Standard ERC20 Interface
 
-### `withdraw`
-Withdraws native tokens from wrapped ERC20 tokens.
-
-### `totalSupply`
-Returns the total supply of the wrapped token.
-
-<CodeGroup>
-```javascript Ethers.js expandable lines
-import { ethers } from "ethers";
-
-// Connect to the network
-const provider = new ethers.JsonRpcProvider("<RPC_URL>");
-
-// The WERC20 precompile address is dynamically assigned
-const werc20PrecompileAddress = "<WERC20_PRECOMPILE_ADDRESS>";
-const werc20Abi = ["function totalSupply() view returns (uint256)"];
-
-// Create a contract instance
-const contract = new ethers.Contract(werc20PrecompileAddress, werc20Abi, provider);
-
-async function getTotalSupply() {
-  try {
-    const totalSupply = await contract.totalSupply();
-    console.log("Total Supply:", totalSupply.toString());
-  } catch (error) {
-    console.error("Error fetching total supply:", error);
-  }
-}
-
-getTotalSupply();
-```
-```bash cURL expandable lines
-# Note: Replace <RPC_URL> and <WERC20_PRECOMPILE_ADDRESS> with your actual data.
-# The WERC20 precompile address is dynamically assigned.
-curl -X POST --data '{
-    "jsonrpc": "2.0",
-    "method": "eth_call",
-    "params": [
-        {
-            "to": "<WERC20_PRECOMPILE_ADDRESS>",
-            "data": "0x18160ddd"
-        },
-        "latest"
-    ],
-    "id": 1
-}' -H "Content-Type: application/json" <RPC_URL>
-```
-</CodeGroup>
+All standard ERC20 methods are available and operate on the underlying bank balance:
 
 ### `balanceOf`
-Returns the wrapped token balance for a specific account.
+Returns the native token balance for a specific account (same as bank module balance).
 
 <CodeGroup>
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
-// Connect to the network
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
-
-// The WERC20 precompile address is dynamically assigned
-const werc20PrecompileAddress = "<WERC20_PRECOMPILE_ADDRESS>";
-const accountAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+const werc20Address = "<WERC20_PRECOMPILE_ADDRESS>";
 const werc20Abi = ["function balanceOf(address account) view returns (uint256)"];
 
-// Create a contract instance
-const contract = new ethers.Contract(werc20PrecompileAddress, werc20Abi, provider);
+const contract = new ethers.Contract(werc20Address, werc20Abi, provider);
 
 async function getBalance() {
   try {
-    const balance = await contract.balanceOf(accountAddress);
-    console.log(`Balance of ${accountAddress}:`, balance.toString());
+    const balance = await contract.balanceOf("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045");
+    console.log("Balance (both ATOM and WATOM):", balance.toString());
   } catch (error) {
-    console.error("Error fetching balance:", error);
+    console.error("Error:", error);
   }
 }
-
-getBalance();
 ```
 ```bash cURL expandable lines
-# Note: Replace <RPC_URL>, <WERC20_PRECOMPILE_ADDRESS>, and the placeholder address with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
@@ -112,53 +126,38 @@ curl -X POST --data '{
 </CodeGroup>
 
 ### `transfer`
-Transfers wrapped tokens to a specified address.
+Transfers tokens using the bank module (identical to native Cosmos transfer).
 
-### `approve`
-Approves a spender to transfer wrapped tokens on behalf of the caller.
-
-### `transferFrom`
-Transfers wrapped tokens from one address to another, using an allowance.
-
-### `allowance`
-Returns the remaining amount of tokens a spender is allowed to transfer on behalf of an owner.
+### `totalSupply`
+Returns the total supply from the bank module.
 
 <CodeGroup>
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
-// Connect to the network
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const werc20Address = "<WERC20_PRECOMPILE_ADDRESS>";
+const werc20Abi = ["function totalSupply() view returns (uint256)"];
 
-// The WERC20 precompile address is dynamically assigned
-const werc20PrecompileAddress = "<WERC20_PRECOMPILE_ADDRESS>";
-const ownerAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
-const spenderAddress = "0x27f320b7280911c7987a421a8138997a48d4b315"; // Placeholder
-const werc20Abi = ["function allowance(address owner, address spender) view returns (uint256)"];
+const contract = new ethers.Contract(werc20Address, werc20Abi, provider);
 
-// Create a contract instance
-const contract = new ethers.Contract(werc20PrecompileAddress, werc20Abi, provider);
-
-async function getAllowance() {
+async function getTotalSupply() {
   try {
-    const allowance = await contract.allowance(ownerAddress, spenderAddress);
-    console.log("Allowance:", allowance.toString());
+    const supply = await contract.totalSupply();
+    console.log("Total Supply:", supply.toString());
   } catch (error) {
-    console.error("Error fetching allowance:", error);
+    console.error("Error:", error);
   }
 }
-
-getAllowance();
 ```
 ```bash cURL expandable lines
-# Note: Replace <RPC_URL>, <WERC20_PRECOMPILE_ADDRESS>, and the placeholder addresses with your actual data.
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
     "params": [
         {
             "to": "<WERC20_PRECOMPILE_ADDRESS>",
-            "data": "0xdd62ed3e000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa9604500000000000000000000000027f320b7280911c7987a421a8138997a48d4b315"
+            "data": "0x18160ddd"
         },
         "latest"
     ],
@@ -167,148 +166,132 @@ curl -X POST --data '{
 ```
 </CodeGroup>
 
-### `name`
-Returns the name of the wrapped token.
+### `approve` / `allowance` / `transferFrom`
+Standard ERC20 approval mechanisms for delegated transfers.
+
+### `name` / `symbol` / `decimals`
+Token metadata (e.g., "Wrapped ATOM", "WATOM", 6).
 
 <CodeGroup>
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
-// Connect to the network
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const werc20Address = "<WERC20_PRECOMPILE_ADDRESS>";
+const werc20Abi = [
+  "function name() view returns (string)",
+  "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)"
+];
 
-// The WERC20 precompile address is dynamically assigned
-const werc20PrecompileAddress = "<WERC20_PRECOMPILE_ADDRESS>";
-const werc20Abi = ["function name() view returns (string)"];
+const contract = new ethers.Contract(werc20Address, werc20Abi, provider);
 
-// Create a contract instance
-const contract = new ethers.Contract(werc20PrecompileAddress, werc20Abi, provider);
-
-async function getName() {
+async function getTokenInfo() {
   try {
-    const name = await contract.name();
-    console.log("Token Name:", name);
+    const [name, symbol, decimals] = await Promise.all([
+      contract.name(),
+      contract.symbol(),
+      contract.decimals()
+    ]);
+    console.log(`Token: ${name} (${symbol}) - ${decimals} decimals`);
   } catch (error) {
-    console.error("Error fetching name:", error);
+    console.error("Error:", error);
   }
 }
-
-getName();
 ```
 ```bash cURL expandable lines
-# Note: Replace <RPC_URL> and <WERC20_PRECOMPILE_ADDRESS> with your actual data.
+# Get token name
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
-    "params": [
-        {
-            "to": "<WERC20_PRECOMPILE_ADDRESS>",
-            "data": "0x06fdde03"
-        },
-        "latest"
-    ],
+    "params": [{"to": "<WERC20_PRECOMPILE_ADDRESS>", "data": "0x06fdde03"}],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+
+# Get token symbol
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [{"to": "<WERC20_PRECOMPILE_ADDRESS>", "data": "0x95d89b41"}],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+
+# Get decimals
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [{"to": "<WERC20_PRECOMPILE_ADDRESS>", "data": "0x313ce567"}],
     "id": 1
 }' -H "Content-Type: application/json" <RPC_URL>
 ```
 </CodeGroup>
 
-### `symbol`
-Returns the symbol of the wrapped token.
+### Legacy Methods (Interface Compatibility)
 
-<CodeGroup>
-```javascript Ethers.js expandable lines
-import { ethers } from "ethers";
+These methods exist for WETH compatibility but are no-ops:
 
-// Connect to the network
-const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+### `deposit`
+**No-op function** - Included for interface compatibility with WETH contracts.
 
-// The WERC20 precompile address is dynamically assigned
-const werc20PrecompileAddress = "<WERC20_PRECOMPILE_ADDRESS>";
-const werc20Abi = ["function symbol() view returns (string)"];
+<Warning>
+This function does nothing because ATOM and WATOM are the same token. Sending native tokens to this function will increase your balance, but the function itself performs no conversion logic.
+</Warning>
 
-// Create a contract instance
-const contract = new ethers.Contract(werc20PrecompileAddress, werc20Abi, provider);
+### `withdraw`
+**No-op function** - Included for interface compatibility with WETH contracts.
 
-async function getSymbol() {
-  try {
-    const symbol = await contract.symbol();
-    console.log("Token Symbol:", symbol);
-  } catch (error) {
-    console.error("Error fetching symbol:", error);
-  }
+<Warning>
+This function does nothing because ATOM and WATOM are the same token. Your native token balance is always directly accessible without any unwrapping process.
+</Warning>
+
+## Usage Examples
+
+### DeFi Integration Example
+```solidity
+contract LiquidityPool {
+    IERC20 public immutable WATOM;
+
+    constructor(address _watom) {
+        WATOM = IERC20(_watom);
+    }
+
+    function addLiquidity(uint256 amount) external {
+        // This transfers from the user's bank balance
+        WATOM.transferFrom(msg.sender, address(this), amount);
+
+        // Pool now has tokens in its bank balance
+        // No wrapping/unwrapping needed - it's all the same token!
+    }
+
+    function removeLiquidity(uint256 amount) external {
+        // This transfers back to user's bank balance
+        WATOM.transfer(msg.sender, amount);
+
+        // User can now use these tokens as native ATOM
+        // or continue using WATOM interface - both access same balance
+    }
 }
-
-getSymbol();
 ```
-```bash cURL expandable lines
-# Note: Replace <RPC_URL> and <WERC20_PRECOMPILE_ADDRESS> with your actual data.
-curl -X POST --data '{
-    "jsonrpc": "2.0",
-    "method": "eth_call",
-    "params": [
-        {
-            "to": "<WERC20_PRECOMPILE_ADDRESS>",
-            "data": "0x95d89b41"
-        },
-        "latest"
-    ],
-    "id": 1
-}' -H "Content-Type: application/json" <RPC_URL>
-```
-</CodeGroup>
 
-### `decimals`
-Returns the number of decimals used by the wrapped token.
+### Cross-Interface Balance Verification
+```javascript
+// Verify that both interfaces show the same balance
+async function verifyBalanceConsistency(userAddress) {
+    // Query via bank precompile (native interface)
+    const bankBalance = await bankContract.balances(userAddress);
+    const atomAmount = bankBalance.find(b => b.contractAddress === werc20Address)?.amount || "0";
 
-<CodeGroup>
-```javascript Ethers.js expandable lines
-import { ethers } from "ethers";
+    // Query via WERC20 precompile (ERC20 interface)
+    const watomAmount = await werc20Contract.balanceOf(userAddress);
 
-// Connect to the network
-const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+    // These MUST always be equal
+    assert(atomAmount === watomAmount, "Balance mismatch - this should never happen!");
 
-// The WERC20 precompile address is dynamically assigned
-const werc20PrecompileAddress = "<WERC20_PRECOMPILE_ADDRESS>";
-const werc20Abi = ["function decimals() view returns (uint8)"];
-
-// Create a contract instance
-const contract = new ethers.Contract(werc20PrecompileAddress, werc20Abi, provider);
-
-async function getDecimals() {
-  try {
-    const decimals = await contract.decimals();
-    console.log("Token Decimals:", decimals.toString());
-  } catch (error) {
-    console.error("Error fetching decimals:", error);
-  }
+    console.log(`Consistent balance: ${atomAmount} (both ATOM and WATOM)`);
 }
-
-getDecimals();
 ```
-```bash cURL expandable lines
-# Note: Replace <RPC_URL> and <WERC20_PRECOMPILE_ADDRESS> with your actual data.
-curl -X POST --data '{
-    "jsonrpc": "2.0",
-    "method": "eth_call",
-    "params": [
-        {
-            "to": "<WERC20_PRECOMPILE_ADDRESS>",
-            "data": "0x313ce567"
-        },
-        "latest"
-    ],
-    "id": 1
-}' -H "Content-Type: application/json" <RPC_URL>
-```
-</CodeGroup>
 
-### `increaseAllowance`
-Increases the allowance granted to a spender.
-
-### `decreaseAllowance`
-Decreases the allowance granted to a spender.
-
-## Full Solidity Interface & ABI
+## Solidity Interface & ABI
 
 ```solidity title="WERC20 Solidity Interface" lines expandable
 // SPDX-License-Identifier: LGPL-3.0-only
@@ -316,25 +299,27 @@ pragma solidity >=0.8.18;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-/// @author The Berachain Polaris Team
 /// @title WERC20 Precompile Contract
-/// @dev The interface through which solidity contracts will interact with the WERC20 precompile
+/// @dev Provides ERC20 interface to native Cosmos tokens via bank module
+/// @notice This is NOT a traditional wrapped token - both native and ERC20 interfaces access the same balance
 interface IWERC20 is IERC20 {
-    /// @dev Emitted when a user deposits tokens into the contract
-    /// @param dst The address of the user who deposited tokens
-    /// @param wad The amount of tokens deposited
+    /// @dev Emitted when deposit() is called (no-op for compatibility)
+    /// @param dst The address that called deposit
+    /// @param wad The amount specified (though no conversion occurs)
     event Deposit(address indexed dst, uint256 wad);
 
-    /// @dev Emitted when a user withdraws tokens from the contract
-    /// @param src The address of the user who withdrew tokens
-    /// @param wad The amount of tokens withdrawn
+    /// @dev Emitted when withdraw() is called (no-op for compatibility)
+    /// @param src The address that called withdraw
+    /// @param wad The amount specified (though no conversion occurs)
     event Withdrawal(address indexed src, uint256 wad);
 
-    /// @dev Deposits tokens into the contract
+    /// @dev No-op function for WETH compatibility - native tokens automatically update balance
+    /// @notice This function exists for interface compatibility but performs no conversion
     function deposit() external payable;
 
-    /// @dev Withdraws tokens from the contract
-    /// @param wad The amount of tokens to withdraw
+    /// @dev No-op function for WETH compatibility - native tokens always accessible
+    /// @param wad Amount to "withdraw" (no conversion performed)
+    /// @notice This function exists for interface compatibility but performs no conversion
     function withdraw(uint256 wad) external;
 }
 ```
@@ -359,4 +344,3 @@ interface IWERC20 is IERC20 {
     { "inputs": [ { "internalType": "uint256", "name": "wad", "type": "uint256" } ], "name": "withdraw", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
   ]
 }
-```

@@ -45,7 +45,8 @@
                   "docs/devnet/precompiles/ics20",
                   "docs/devnet/precompiles/p256",
                   "docs/devnet/precompiles/slashing",
-                  "docs/devnet/precompiles/staking"
+                  "docs/devnet/precompiles/staking",
+                  "docs/devnet/precompiles/werc20"
                 ]
               },
               {
