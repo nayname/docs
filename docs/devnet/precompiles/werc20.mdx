@@ -6,9 +6,11 @@ icon: "refresh-ccw"
 
 ## Overview
 
-The WERC20 precompile provides a standard ERC20 interface to native Cosmos tokens through Cosmos EVM's **[Single Token Representation](/docs/evm/single-token-representation)** architecture. Unlike traditional wrapped tokens that maintain separate balances, WERC20 gives smart contracts direct access to native bank module balances through familiar ERC20 methods.
+The WERC20 precompile provides a standard ERC20 interface to native Cosmos tokens through Cosmos EVM's **[Single Token Representation](/docs/evm/single-token-representation)** architecture.
+Unlike traditional wrapped tokens that are functionally two separate tokens with unique individual properties and behaviors, Cosmos EVM's WERC20 logic gives smart contracts direct access to native bank module balances through familiar ERC20 methods.
 
-**Key Concept**: *"Schrodinger's Wrap"* ATOM and WATOM are not separate tokens—they are two different interfaces to the same token stored in the bank module.
+**Key Concept**: ATOM and WATOM are not separate tokens—they are two different interfaces to the same token stored in the bank module.
+They exist in both wrapped and unwrapped states at all times, allowing the developer to choose the interaction method which most fits their use case..
 
 **Precompile Address**: Dynamic (assigned per wrapped token)
 **Related Module**: x/bank (via ERC20 module integration)
