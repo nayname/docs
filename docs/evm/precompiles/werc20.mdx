@@ -10,9 +10,13 @@ The WERC20 precompile provides a standard ERC20 interface to native Cosmos token
 Unlike traditional wrapped tokens that are functionally two separate tokens with unique individual properties and behaviors, Cosmos EVM's WERC20 logic gives smart contracts direct access to native bank module balances through familiar ERC20 methods.
 
 **Key Concept**: ATOM and WATOM are not separate tokens—they are two different interfaces to the same token stored in the bank module.
-They exist in both wrapped and unwrapped states at all times, allowing the developer to choose the interaction method which most fits their use case..
+Native Cosmos tokens (including ATOM and all IBC tokens) exist in both wrapped and unwrapped states at all times, allowing developers to choose the interaction method that best fits their use case:
+- Use it normally through Cosmos bank send (unwrapped state)
+- Use it like you would normally use ether or 'wei' on the EVM (native value transfers)
+- Use it as ERC20 WATOM with the contract address below (wrapped state)
 
-**Precompile Address**: Dynamic (assigned per wrapped token)
+**WATOM Contract Address**: `0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE`
+**Precompile Type**: Dynamic (unique address per wrapped token)
 **Related Module**: x/bank (via ERC20 module integration)
 
 <Note>
@@ -67,19 +71,19 @@ function withdraw(uint256 amount) external {
 ```javascript
 // User starts with 100 ATOM in bank module
 const atomBalance = await bankPrecompile.balances(userAddress);
-// Returns: [{contractAddress: "0x...", amount: "100000000"}] // 100 ATOM (6 decimals)
+// Returns: [{denom: "uatom", amount: "100000000"}] // 100 ATOM (6 decimals)
 
-const watomBalance = await werc20Contract.balanceOf(userAddress);
+const watomBalance = await watom.balanceOf(userAddress);
 // Returns: "100000000" // Same 100 ATOM, accessed via ERC20 interface
 
 // User transfers 50 WATOM via ERC20
-await werc20Contract.transfer(recipientAddress, "50000000");
+await watom.transfer(recipientAddress, "50000000");
 
 // Check balances again
 const newAtomBalance = await bankPrecompile.balances(userAddress);
-// Returns: [{contractAddress: "0x...", amount: "50000000"}] // 50 ATOM remaining
+// Returns: [{denom: "uatom", amount: "50000000"}] // 50 ATOM remaining
 
-const newWatomBalance = await werc20Contract.balanceOf(userAddress);
+const newWatomBalance = await watom.balanceOf(userAddress);
 // Returns: "50000000" // Same 50 ATOM, both queries return identical values
 ```
 
@@ -93,107 +97,190 @@ All standard ERC20 methods are available and operate on the underlying bank bala
 Returns the native token balance for a specific account (same as bank module balance).
 
 <CodeGroup>
-```javascript Ethers.js expandable lines
+```javascript Ethers.js
 import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
-const werc20Address = "<WERC20_PRECOMPILE_ADDRESS>";
+const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = ["function balanceOf(address account) view returns (uint256)"];
 
-const contract = new ethers.Contract(werc20Address, werc20Abi, provider);
+const watom = new ethers.Contract(watomAddress, werc20Abi, provider);
 
 async function getBalance() {
   try {
-    const balance = await contract.balanceOf("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045");
+    const userAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045";
+    const balance = await watom.balanceOf(userAddress);
     console.log("Balance (both ATOM and WATOM):", balance.toString());
   } catch (error) {
     console.error("Error:", error);
   }
 }
 ```
-```bash cURL expandable lines
-curl -X POST --data '{
+
+```bash cURL
+curl -X POST <RPC_URL> \
+  -H "Content-Type: application/json" \
+  --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
     "params": [
         {
-            "to": "<WERC20_PRECOMPILE_ADDRESS>",
+            "to": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
             "data": "0x70a08231000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
         },
         "latest"
     ],
     "id": 1
-}' -H "Content-Type: application/json" <RPC_URL>
+}'
 ```
 </CodeGroup>
 
 ### `transfer`
 Transfers tokens using the bank module (identical to native Cosmos transfer).
 
+<CodeGroup>
+```javascript Ethers.js
+import { ethers } from "ethers";
+
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const signer = new ethers.Wallet("<PRIVATE_KEY>", provider);
+const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const werc20Abi = ["function transfer(address to, uint256 amount) returns (bool)"];
+
+const watom = new ethers.Contract(watomAddress, werc20Abi, signer);
+
+async function transferTokens() {
+  try {
+    const recipientAddress = "0x742d35Cc6634C0532925a3b844Bc9e7595f5b899";
+    const amount = ethers.parseUnits("10.0", 6); // 10 ATOM (6 decimals)
+    
+    const tx = await watom.transfer(recipientAddress, amount);
+    const receipt = await tx.wait();
+    
+    console.log("Transfer successful:", receipt.hash);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+```
+
+```bash cURL
+# First, sign the transaction offline, then:
+curl -X POST <RPC_URL> \
+  -H "Content-Type: application/json" \
+  --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_sendRawTransaction",
+    "params": ["<SIGNED_TRANSACTION_DATA>"],
+    "id": 1
+}'
+```
+</CodeGroup>
+
 ### `totalSupply`
 Returns the total supply from the bank module.
 
 <CodeGroup>
-```javascript Ethers.js expandable lines
+```javascript Ethers.js
 import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
-const werc20Address = "<WERC20_PRECOMPILE_ADDRESS>";
+const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = ["function totalSupply() view returns (uint256)"];
 
-const contract = new ethers.Contract(werc20Address, werc20Abi, provider);
+const watom = new ethers.Contract(watomAddress, werc20Abi, provider);
 
 async function getTotalSupply() {
   try {
-    const supply = await contract.totalSupply();
+    const supply = await watom.totalSupply();
     console.log("Total Supply:", supply.toString());
   } catch (error) {
     console.error("Error:", error);
   }
 }
 ```
-```bash cURL expandable lines
-curl -X POST --data '{
+
+```bash cURL
+curl -X POST <RPC_URL> \
+  -H "Content-Type: application/json" \
+  --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
     "params": [
         {
-            "to": "<WERC20_PRECOMPILE_ADDRESS>",
+            "to": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
             "data": "0x18160ddd"
         },
         "latest"
     ],
     "id": 1
-}' -H "Content-Type: application/json" <RPC_URL>
+}'
 ```
 </CodeGroup>
 
 ### `approve` / `allowance` / `transferFrom`
 Standard ERC20 approval mechanisms for delegated transfers.
 
+<CodeGroup>
+```javascript Ethers.js
+import { ethers } from "ethers";
+
+const provider = new ethers.JsonRpcProvider("<RPC_URL>");
+const signer = new ethers.Wallet("<PRIVATE_KEY>", provider);
+const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const werc20Abi = [
+  "function approve(address spender, uint256 amount) returns (bool)",
+  "function allowance(address owner, address spender) view returns (uint256)",
+  "function transferFrom(address from, address to, uint256 amount) returns (bool)"
+];
+
+const watom = new ethers.Contract(watomAddress, werc20Abi, signer);
+
+async function approveAndTransfer() {
+  try {
+    const spenderAddress = "0x742d35Cc6634C0532925a3b844Bc9e7595f5b899";
+    const amount = ethers.parseUnits("50.0", 6); // 50 ATOM
+    
+    // Approve spending
+    const approveTx = await watom.approve(spenderAddress, amount);
+    await approveTx.wait();
+    
+    // Check allowance
+    const allowance = await watom.allowance(signer.address, spenderAddress);
+    console.log("Allowance:", allowance.toString());
+    
+    // Transfer from (would be called by spender)
+    // const transferTx = await watom.transferFrom(ownerAddress, recipientAddress, amount);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+```
+</CodeGroup>
+
 ### `name` / `symbol` / `decimals`
 Token metadata (e.g., "Wrapped ATOM", "WATOM", 6).
 
 <CodeGroup>
-```javascript Ethers.js expandable lines
+```javascript Ethers.js
 import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
-const werc20Address = "<WERC20_PRECOMPILE_ADDRESS>";
+const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = [
   "function name() view returns (string)",
   "function symbol() view returns (string)",
   "function decimals() view returns (uint8)"
 ];
 
-const contract = new ethers.Contract(werc20Address, werc20Abi, provider);
+const watom = new ethers.Contract(watomAddress, werc20Abi, provider);
 
 async function getTokenInfo() {
   try {
     const [name, symbol, decimals] = await Promise.all([
-      contract.name(),
-      contract.symbol(),
-      contract.decimals()
+      watom.name(),
+      watom.symbol(),
+      watom.decimals()
     ]);
     console.log(`Token: ${name} (${symbol}) - ${decimals} decimals`);
   } catch (error) {
@@ -201,30 +288,46 @@ async function getTokenInfo() {
   }
 }
 ```
-```bash cURL expandable lines
+
+```bash cURL
 # Get token name
-curl -X POST --data '{
+curl -X POST <RPC_URL> \
+  -H "Content-Type: application/json" \
+  --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
-    "params": [{"to": "<WERC20_PRECOMPILE_ADDRESS>", "data": "0x06fdde03"}],
+    "params": [
+        {"to": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", "data": "0x06fdde03"},
+        "latest"
+    ],
     "id": 1
-}' -H "Content-Type: application/json" <RPC_URL>
+}'
 
 # Get token symbol
-curl -X POST --data '{
+curl -X POST <RPC_URL> \
+  -H "Content-Type: application/json" \
+  --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
-    "params": [{"to": "<WERC20_PRECOMPILE_ADDRESS>", "data": "0x95d89b41"}],
+    "params": [
+        {"to": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", "data": "0x95d89b41"},
+        "latest"
+    ],
     "id": 1
-}' -H "Content-Type: application/json" <RPC_URL>
+}'
 
 # Get decimals
-curl -X POST --data '{
+curl -X POST <RPC_URL> \
+  -H "Content-Type: application/json" \
+  --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
-    "params": [{"to": "<WERC20_PRECOMPILE_ADDRESS>", "data": "0x313ce567"}],
+    "params": [
+        {"to": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", "data": "0x313ce567"},
+        "latest"
+    ],
     "id": 1
-}' -H "Content-Type: application/json" <RPC_URL>
+}'
 ```
 </CodeGroup>
 
@@ -281,16 +384,31 @@ contract LiquidityPool {
 async function verifyBalanceConsistency(userAddress) {
     // Query via bank precompile (native interface)
     const bankBalance = await bankContract.balances(userAddress);
-    const atomAmount = bankBalance.find(b => b.contractAddress === werc20Address)?.amount || "0";
+    const atomAmount = bankBalance.find(b => b.denom === "uatom")?.amount || "0";
 
     // Query via WERC20 precompile (ERC20 interface)
-    const watomAmount = await werc20Contract.balanceOf(userAddress);
+    const watomAmount = await watom.balanceOf(userAddress);
 
-    // These MUST always be equal
-    assert(atomAmount === watomAmount, "Balance mismatch - this should never happen!");
-
+    // These will always be equal since the ERC20 balance is just
+    // an abstracted bank module balance query
     console.log(`Consistent balance: ${atomAmount} (both ATOM and WATOM)`);
 }
+```
+
+### Working with IBC Tokens
+```javascript
+// IBC tokens work exactly the same way
+const ibcTokenAddress = "0x..."; // Each IBC token gets its own WERC20 address
+const ibcToken = new ethers.Contract(ibcTokenAddress, werc20Abi, signer);
+
+// Check balance (same as bank module balance)
+const balance = await ibcToken.balanceOf(userAddress);
+
+// Transfer IBC tokens via ERC20 interface
+await ibcToken.transfer(recipientAddress, amount);
+
+// Use in DeFi protocols just like any ERC20 token
+await defiProtocol.stake(ibcTokenAddress, amount);
 ```
 
 ## Solidity Interface & ABI
