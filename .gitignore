@@ -65,6 +65,7 @@ proto-sources/
 
 # Misc
 
+logs/
 dist/
 build/
 .yarn/
@@ -73,3 +74,4 @@ docs/devnet/tests/*
 # Markdown lint cache
 
 .md-cache
+.claude/settings.local.json
