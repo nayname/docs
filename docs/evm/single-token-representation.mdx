@@ -11,7 +11,7 @@ Single Token Representation is a fundamental architectural principle in Cosmos E
 
 ## The Problem with Traditional Wrapping
 
-Traditional blockchain ecosystems require complex wrapping mechanisms to bridge different token standards:
+Wrapping tokens is a tedious process requiring additional user actions that are unavoidable for certain applications:
 
 ### Ethereum's WETH Model
 ```solidity
@@ -31,12 +31,11 @@ contract WETH {
 
 **Issues with this approach:**
 - **Liquidity fragmentation** - ETH and WETH have separate, incompatible pools
-- **Smart contract risk** - Bugs in wrapping contract can lock funds permanently
-- **Complexity** - Users must manually wrap/unwrap, understand two tokens
+- **Smart contract risk** - Users can be misled to interact with unsafe or malicious contracts
+- **Complexity** - Users must manually wrap/unwrap, understand the concept to some degree
 - **Gas overhead** - Every wrap/unwrap operation requires additional transactions
-- **State synchronization** - Wrapped balances must be carefully maintained separately
 
-## Cosmos EVM's Solution: Unified Representation
+## The Solution: Single Token Representation
 
 Cosmos EVM takes a radically different approach by providing multiple interfaces to the same underlying token:
 
