@@ -17,7 +17,7 @@ For each source repository, add a webhook that triggers the documentation update
 - **Content Type**: `application/json`
 - **Secret**: Set to your `OPENAPI_WEBHOOK_SECRET`
 - **Events**: Select "Push" events
-- **Active**: ✅ Enabled
+- **Active**:  Enabled
 
 #### Webhook Payload Example
 ```json

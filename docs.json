@@ -4,7 +4,7 @@
   "description": "Build the future of the internet of blockchains with Cosmos.",
   "theme": "mint",
   "colors": {
-    "primary": "#40eff2",
+    "primary": "#4251FA",
     "light": "#FAFAFA",
     "dark": "#0E0E0E"
   },
@@ -94,7 +94,7 @@
     "socials": {
       "twitter": "https://twitter.com/cosmos",
       "github": "https://github.com/cosmos",
-      "discord": "https://discord.gg/cosmosnetwork",
+      "discord": "https://discord.gg/interchain",
       "website": "https://cosmos.network"
     }
   },
