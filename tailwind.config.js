@@ -14,9 +14,8 @@ module.exports = {
     },
   },
   plugins: [],
-  // Work with Mintlify's styling
   important: false,
   corePlugins: {
-    preflight: false // Let Mintlify handle base styles
+    preflight: false
   }
 }
