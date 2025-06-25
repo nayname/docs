@@ -13,38 +13,38 @@ Cosmos EVM chains implement the Ethereum JSON-RPC API specification, providing f
 | Method | Namespace | Supported | Notes | Goto |
 |--------|-----------|-----------|-------|------|
 | **Account & Balance** |||||
-| `eth_accounts` | eth | Y | Returns addresses owned by client | [📖](./eth/eth_accounts) |
-| `eth_getBalance` | eth | Y | Returns account balance | [📖](./eth/eth_getBalance) |
-| `eth_getCode` | eth | Y | Returns contract code | [📖](./eth/eth_getCode) |
-| `eth_getStorageAt` | eth | Y | Returns storage value | [📖](./eth/eth_getStorageAt) |
-| `eth_getTransactionCount` | eth | Y | Returns nonce (transaction count) | [📖](./eth/eth_getTransactionCount) |
+| `eth_accounts` | eth | Y | Returns addresses owned by client | [](./eth/eth_accounts) |
+| `eth_getBalance` | eth | Y | Returns account balance | [](./eth/eth_getBalance) |
+| `eth_getCode` | eth | Y | Returns contract code | [](./eth/eth_getCode) |
+| `eth_getStorageAt` | eth | Y | Returns storage value | [](./eth/eth_getStorageAt) |
+| `eth_getTransactionCount` | eth | Y | Returns nonce (transaction count) | [](./eth/eth_getTransactionCount) |
 | **Block Methods** |||||
-| `eth_blockNumber` | eth | Y | Returns latest block number | [📖](./eth/eth_blockNumber) |
-| `eth_getBlockByHash` | eth | Y | Returns block by hash | [📖](./eth/eth_getBlockByHash) |
-| `eth_getBlockByNumber` | eth | Y | Returns block by number | [📖](./eth/eth_getBlockByNumber) |
-| `eth_getBlockTransactionCountByHash` | eth | Y | Transaction count in block by hash | [📖](./eth/eth_getBlockTransactionCountByHash) |
-| `eth_getBlockTransactionCountByNumber` | eth | Y | Transaction count in block by number | [📖](./eth/eth_getBlockTransactionCountByNumber) |
+| `eth_blockNumber` | eth | Y | Returns latest block number | [](./eth/eth_blockNumber) |
+| `eth_getBlockByHash` | eth | Y | Returns block by hash | [](./eth/eth_getBlockByHash) |
+| `eth_getBlockByNumber` | eth | Y | Returns block by number | [](./eth/eth_getBlockByNumber) |
+| `eth_getBlockTransactionCountByHash` | eth | Y | Transaction count in block by hash | [](./eth/eth_getBlockTransactionCountByHash) |
+| `eth_getBlockTransactionCountByNumber` | eth | Y | Transaction count in block by number | [](./eth/eth_getBlockTransactionCountByNumber) |
 | `eth_getUncleByBlockHashAndIndex` | eth | Y | Returns `null` (no uncles in Tendermint) | - |
 | `eth_getUncleByBlockNumberAndIndex` | eth | Y | Returns `null` (no uncles in Tendermint) | - |
 | `eth_getUncleCountByBlockHash` | eth | Y | Returns `0x0` (no uncles) | - |
 | `eth_getUncleCountByBlockNumber` | eth | Y | Returns `0x0` (no uncles) | - |
 | **Transaction Methods** |||||
-| `eth_sendTransaction` | eth | Y | Creates and sends transaction | [📖](./eth/eth_sendTransaction) |
-| `eth_sendRawTransaction` | eth | Y | Sends pre-signed transaction | [📖](./eth/eth_sendRawTransaction) |
-| `eth_getTransactionByHash` | eth | Y | Returns transaction by hash | [📖](./eth/eth_getTransactionByHash) |
-| `eth_getTransactionByBlockHashAndIndex` | eth | Y | Transaction by block hash and index | [📖](./eth/eth_getTransactionByBlockHashAndIndex) |
-| `eth_getTransactionByBlockNumberAndIndex` | eth | Y | Transaction by block number and index | [📖](./eth/eth_getTransactionByBlockNumberAndIndex) |
-| `eth_getTransactionReceipt` | eth | Y | Returns transaction receipt | [📖](./eth/eth_getTransactionReceipt) |
+| `eth_sendTransaction` | eth | Y | Creates and sends transaction | [](./eth/eth_sendTransaction) |
+| `eth_sendRawTransaction` | eth | Y | Sends pre-signed transaction | [](./eth/eth_sendRawTransaction) |
+| `eth_getTransactionByHash` | eth | Y | Returns transaction by hash | [](./eth/eth_getTransactionByHash) |
+| `eth_getTransactionByBlockHashAndIndex` | eth | Y | Transaction by block hash and index | [](./eth/eth_getTransactionByBlockHashAndIndex) |
+| `eth_getTransactionByBlockNumberAndIndex` | eth | Y | Transaction by block number and index | [](./eth/eth_getTransactionByBlockNumberAndIndex) |
+| `eth_getTransactionReceipt` | eth | Y | Returns transaction receipt | [](./eth/eth_getTransactionReceipt) |
 | `eth_sign` | eth | Y | Signs data (requires unlocked account) | - |
 | `eth_signTransaction` | eth | Y | Signs transaction (requires unlocked account) | - |
 | **Gas & Fee Methods** |||||
-| `eth_gasPrice` | eth | Y | Returns current gas price | [📖](./eth/eth_gasPrice) |
-| `eth_estimateGas` | eth | Y | Estimates gas for transaction | [📖](./eth/eth_estimateGas) |
-| `eth_feeHistory` | eth | N | EIP-1559 method, relies on baseFee | [📖](./eth/eth_feeHistory) |
-| `eth_maxPriorityFeePerGas` | eth | N | EIP-1559 method (London fork) | [📖](./eth/eth_maxPriorityFeePerGas) |
+| `eth_gasPrice` | eth | Y | Returns current gas price | [](./eth/eth_gasPrice) |
+| `eth_estimateGas` | eth | Y | Estimates gas for transaction | [](./eth/eth_estimateGas) |
+| `eth_feeHistory` | eth | N | EIP-1559 method, relies on baseFee | [](./eth/eth_feeHistory) |
+| `eth_maxPriorityFeePerGas` | eth | N | EIP-1559 method (London fork) | [](./eth/eth_maxPriorityFeePerGas) |
 | **Call & Simulation** |||||
-| `eth_call` | eth | Y | Execute message call without transaction | [📖](./eth/eth_call) |
-| `eth_chainId` | eth | Y | Returns chain ID | [📖](./eth/eth_chainId) |
+| `eth_call` | eth | Y | Execute message call without transaction | [](./eth/eth_call) |
+| `eth_chainId` | eth | Y | Returns chain ID | [](./eth/eth_chainId) |
 | `eth_syncing` | eth | Y | Returns sync status or `false` | - |
 | **Filters & Logs** |||||
 | `eth_newFilter` | eth | Y | Creates filter for logs | - |
@@ -55,8 +55,8 @@ Cosmos EVM chains implement the Ethereum JSON-RPC API specification, providing f
 | `eth_getFilterLogs` | eth | Y | Returns logs matching filter ID | - |
 | `eth_getLogs` | eth | Y | Returns logs matching filter object | - |
 | **WebSocket Subscriptions** |||||
-| `eth_subscribe` | eth | Y | Subscribe to events | [📖](./eth/eth_subscribe) |
-| `eth_unsubscribe` | eth | Y | Unsubscribe from events | [📖](./eth/eth_unsubscribe) |
+| `eth_subscribe` | eth | Y | Subscribe to events | [](./eth/eth_subscribe) |
+| `eth_unsubscribe` | eth | Y | Unsubscribe from events | [](./eth/eth_unsubscribe) |
 | **Network Methods** |||||
 | `net_version` | net | Y | Returns network ID | - |
 | `net_listening` | net | Y | Returns listening status | - |

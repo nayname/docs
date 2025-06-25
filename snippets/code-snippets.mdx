@@ -11,7 +11,7 @@ export const LargeCodeBlock = ({ title, code, language = "solidity", filename = 
     <Expandable title={title} icon="file-code">
       {filename && (
         <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 font-mono">
-          📁 {filename}
+           {filename}
         </div>
       )}
       <div className="relative">
@@ -27,7 +27,7 @@ export const LargeCodeBlock = ({ title, code, language = "solidity", filename = 
 
 export const ConfigurationExample = ({ title, config, format = "json" }) => {
   return (
-    <Expandable title={`⚙️ ${title}`} icon="settings">
+    <Expandable title={` ${title}`} icon="settings">
       <CodeGroup>
         <CodeBlock language={format}>
           {config}
@@ -39,7 +39,7 @@ export const ConfigurationExample = ({ title, config, format = "json" }) => {
 
 export const TestingExample = ({ title, testCode, language = "solidity" }) => {
   return (
-    <Expandable title={`🧪 ${title}`} icon="flask">
+    <Expandable title={` ${title}`} icon="flask">
       <CodeGroup>
         <CodeBlock language={language}>
           {testCode}

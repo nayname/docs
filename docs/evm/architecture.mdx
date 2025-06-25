@@ -30,10 +30,10 @@ Before diving into architecture details, developers migrating from Ethereum must
 **Impact on Smart Contracts:**
 ```solidity
 contract TimeDependentContract {
-    // ❌ Don't rely on Ethereum block timing assumptions
+    //  Don't rely on Ethereum block timing assumptions
     uint256 constant ETHEREUM_BLOCKS_PER_DAY = 7200; // 12s blocks
 
-    // ✅ Use timestamp-based logic instead
+    //  Use timestamp-based logic instead
     uint256 constant SECONDS_PER_DAY = 86400;
 
     function dailyFunction() external {
