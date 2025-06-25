@@ -4,8 +4,8 @@
   "description": "Build the future of the internet of blockchains with Cosmos.",
   "theme": "mint",
   "colors": {
-    "primary": "#4251FA",
-    "light": "#FAFAFA",
+    "primary": "#000",
+    "light": "#cccccc",
     "dark": "#0E0E0E"
   },
   "icons": {
@@ -14,7 +14,10 @@
   "styling": {
     "codeblocks": "system"
   },
-  "favicon": "/assets/brand/cosmos.svg",
+  "favicon": {
+    "light": "/assets/brand/cosmos.svg",
+    "dark": "/assets/brand/cosmos-dark.svg"
+  },
   "logo": {
     "light": "/assets/brand/cosmos-wordmark-dark.svg",
     "dark": "/assets/brand/cosmos-wordmark.svg"
