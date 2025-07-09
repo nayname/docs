@@ -10,8 +10,9 @@
     "reset": "yarn clean && yarn install"
   },
   "dependencies": {
-    "next":"15.3.4",
-    "react":"19.1.0",
-    "react-dom":"19.1.0"
+    "mint": "^4.2.7",
+    "next": "15.3.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   }
 }
