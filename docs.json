@@ -84,7 +84,7 @@
           "group": "EVM",
           "pages": [
             "docs/concepts/index",
-            "docs/concepts/single-token-representation.mdx"
+            "docs/concepts/single-token-representation"
           ]
         }
       ]
