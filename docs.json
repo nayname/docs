@@ -22,63 +22,92 @@
     "light": "/assets/brand/cosmos-wordmark-dark.svg",
     "dark": "/assets/brand/cosmos-wordmark.svg"
   },
-  "navigation": {
-    "tabs": [
-      {
-        "tab": "Documentation",
-        "groups": [
-          {
-            "group": "Gaia EVM Devnet",
-            "pages": [
-              "docs/devnet/introduction",
-              "docs/devnet/connect-to-the-network",
-              "docs/devnet/run-a-full-node",
-              "docs/devnet/get-tokens",
-              {
-                "group": "Precompiles",
-                "pages": [
-                  "docs/devnet/precompiles/overview",
-                  "docs/devnet/precompiles/bank",
-                  "docs/devnet/precompiles/bech32",
-                  "docs/devnet/precompiles/callbacks",
-                  "docs/devnet/precompiles/distribution",
-                  "docs/devnet/precompiles/erc20",
-                  "docs/devnet/precompiles/evidence",
-                  "docs/devnet/precompiles/governance",
-                  "docs/devnet/precompiles/ics20",
-                  "docs/devnet/precompiles/p256",
-                  "docs/devnet/precompiles/slashing",
-                  "docs/devnet/precompiles/staking"
-                ]
-              },
-              {
-                "group": "Tooling & Resources",
-                "pages": [
-                  "docs/devnet/tooling-and-resources/overview",
-                  "docs/devnet/tooling-and-resources/foundry",
-                  "docs/devnet/tooling-and-resources/hardhat",
-                  "docs/devnet/tooling-and-resources/testing-and-fuzzing"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Developer Guides (Coming Soon)",
-        "pages": ["docs/guides/coming-soon"]
-      },
-      {
-        "tab": "API Reference (Coming Soon)",
-        "pages": ["docs/api-reference/coming-soon"]
-      }
-    ]
-  },
+"navigation": {
+  "tabs": [
+    {
+      "tab": "Documentation",
+      "groups": [
+        {
+          "group": "Gaia EVM Devnet",
+          "pages": [
+            "docs/devnet/introduction",
+            "docs/devnet/connect-to-the-network",
+            "docs/devnet/run-a-full-node",
+            "docs/devnet/get-tokens",
+            {
+              "group": "Tooling & Resources",
+              "pages": [
+                "docs/evm/developers/tooling-and-resources/overview",
+                "docs/evm/developers/tooling-and-resources/foundry",
+                "docs/evm/developers/tooling-and-resources/hardhat",
+                "docs/evm/developers/tooling-and-resources/testing-and-fuzzing"
+              ]
+            }
+          ]
+        },
+        {
+          "group": "EVM",
+          "pages": [
+            "docs/evm/index",
+            {
+              "group": "Smart Contracts",
+              "pages": [
+                "docs/evm/developers/smart-contracts/overview"
+              ]
+            },
+            {
+              "group": "Precompiles",
+              "pages": [
+                "docs/evm/precompiles/overview",
+                "docs/evm/precompiles/bank",
+                "docs/evm/precompiles/bech32",
+                "docs/evm/precompiles/callbacks",
+                "docs/evm/precompiles/distribution",
+                "docs/evm/precompiles/erc20",
+                "docs/evm/precompiles/evidence",
+                "docs/evm/precompiles/governance",
+                "docs/evm/precompiles/ics20",
+                "docs/evm/precompiles/p256",
+                "docs/evm/precompiles/slashing",
+                "docs/evm/precompiles/staking",
+                "docs/evm/precompiles/werc20"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tab": "Concepts",
+      "groups": [
+        {
+          "group": "EVM",
+          "pages": [
+            "docs/concepts/index",
+            "docs/concepts/single-token-representation.mdx"
+          ]
+        }
+      ]
+    },
+    {
+      "tab": "Developer Guides (Coming Soon)",
+      "pages": [
+        "docs/guides/coming-soon"
+      ]
+    },
+    {
+      "tab": "API Reference (Coming Soon)",
+      "pages": [
+        "docs/api-reference/coming-soon"
+      ]
+    }
+  ]
+},
   "footer": {
     "socials": {
       "twitter": "https://twitter.com/cosmos",
       "github": "https://github.com/cosmos",
-      "discord": "https://discord.gg/cosmosnetwork",
+      "discord": "https://discord.gg/interchain",
       "website": "https://cosmos.network"
     }
   },
