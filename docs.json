@@ -22,76 +22,88 @@
     "light": "/assets/brand/cosmos-wordmark-dark.svg",
     "dark": "/assets/brand/cosmos-wordmark.svg"
   },
-  "navigation": {
-    "tabs": [
-      {
-        "tab": "Documentation",
-        "groups": [
-          {
-            "group": "Gaia EVM Devnet",
-            "pages": [
-              "docs/devnet/introduction",
-              "docs/devnet/connect-to-the-network",
-              "docs/devnet/run-a-full-node",
-              "docs/devnet/get-tokens",
-              {
-                "group": "Tooling & Resources",
-                "pages": [
-                  "docs/devnet/tooling-and-resources/overview",
-                  "docs/devnet/tooling-and-resources/foundry",
-                  "docs/devnet/tooling-and-resources/hardhat",
-                  "docs/devnet/tooling-and-resources/testing-and-fuzzing"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "EVM",
-            "pages": [
-              "docs/evm/index",
-              "docs/evm/single-token-representation",
-              {
-                "group": "Smart Contracts",
-                "pages": [
-                  "docs/evm/developers/smart-contracts/overview"
-                ]
-              },
-              {
-                "group": "Precompiles",
-                "pages": [
-                  "docs/evm/precompiles/overview",
-                  "docs/evm/precompiles/bank",
-                  "docs/evm/precompiles/bech32",
-                  "docs/evm/precompiles/callbacks",
-                  "docs/evm/precompiles/distribution",
-                  "docs/evm/precompiles/erc20",
-                  "docs/evm/precompiles/evidence",
-                  "docs/evm/precompiles/governance",
-                  "docs/evm/precompiles/ics20",
-                  "docs/evm/precompiles/p256",
-                  "docs/evm/precompiles/slashing",
-                  "docs/evm/precompiles/staking",
-                  "docs/evm/precompiles/werc20"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Developer Guides (Coming Soon)",
-        "pages": [
-          "docs/guides/coming-soon"
-        ]
-      },
-      {
-        "tab": "API Reference (Coming Soon)",
-        "pages": [
-          "docs/api-reference/coming-soon"
-        ]
-      }
-    ]
-  },
+"navigation": {
+  "tabs": [
+    {
+      "tab": "Documentation",
+      "groups": [
+        {
+          "group": "Gaia EVM Devnet",
+          "pages": [
+            "docs/devnet/introduction",
+            "docs/devnet/connect-to-the-network",
+            "docs/devnet/run-a-full-node",
+            "docs/devnet/get-tokens",
+            {
+              "group": "Tooling & Resources",
+              "pages": [
+                "docs/devnet/tooling-and-resources/overview",
+                "docs/devnet/tooling-and-resources/foundry",
+                "docs/devnet/tooling-and-resources/hardhat",
+                "docs/devnet/tooling-and-resources/testing-and-fuzzing"
+              ]
+            }
+          ]
+        },
+        {
+          "group": "EVM",
+          "pages": [
+            "docs/evm/index",
+            "docs/evm/single-token-representation",
+            {
+              "group": "Smart Contracts",
+              "pages": [
+                "docs/evm/developers/smart-contracts/overview"
+              ]
+            },
+            {
+              "group": "Precompiles",
+              "pages": [
+                "docs/evm/precompiles/overview",
+                "docs/evm/precompiles/bank",
+                "docs/evm/precompiles/bech32",
+                "docs/evm/precompiles/callbacks",
+                "docs/evm/precompiles/distribution",
+                "docs/evm/precompiles/erc20",
+                "docs/evm/precompiles/evidence",
+                "docs/evm/precompiles/governance",
+                "docs/evm/precompiles/ics20",
+                "docs/evm/precompiles/p256",
+                "docs/evm/precompiles/slashing",
+                "docs/evm/precompiles/staking",
+                "docs/evm/precompiles/werc20"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tab": "Concepts",
+      "groups": [
+        {
+          "group": "EVM",
+          "pages": [
+            "docs/concepts/index",
+            "docs/concepts/single-token-representation.mdx"
+          ]
+        }
+      ]
+    },
+    {
+      "tab": "Developer Guides (Coming Soon)",
+      "pages": [
+        "docs/guides/coming-soon"
+      ]
+    },
+    {
+      "tab": "API Reference (Coming Soon)",
+      "pages": [
+        "docs/api-reference/coming-soon"
+      ]
+    }
+  ]
+},
   "footer": {
     "socials": {
       "twitter": "https://twitter.com/cosmos",
