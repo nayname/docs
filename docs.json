@@ -37,10 +37,10 @@
             {
               "group": "Tooling & Resources",
               "pages": [
-                "docs/devnet/tooling-and-resources/overview",
-                "docs/devnet/tooling-and-resources/foundry",
-                "docs/devnet/tooling-and-resources/hardhat",
-                "docs/devnet/tooling-and-resources/testing-and-fuzzing"
+                "docs/evm/developers/tooling-and-resources/overview",
+                "docs/evm/developers/tooling-and-resources/foundry",
+                "docs/evm/developers/tooling-and-resources/hardhat",
+                "docs/evm/developers/tooling-and-resources/testing-and-fuzzing"
               ]
             }
           ]
