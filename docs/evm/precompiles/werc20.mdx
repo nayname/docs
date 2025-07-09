@@ -6,7 +6,7 @@ icon: "refresh-ccw"
 
 ## Overview
 
-The WERC20 precompile provides a standard ERC20 interface to native Cosmos tokens through Cosmos EVM's **[Single Token Representation](/docs/evm/single-token-representation)** architecture.
+The WERC20 precompile provides a standard ERC20 interface to native Cosmos tokens through Cosmos EVM's **[Single Token Representation](/docs/concepts/single-token-representation)** architecture.
 Unlike traditional wrapped tokens that are functionally two separate tokens with unique individual properties and behaviors, Cosmos EVM's WERC20 logic gives smart contracts direct access to native bank module balances through familiar ERC20 methods.
 
 **Key Concept**: ATOM and WATOM are not separate tokens—they are two different interfaces to the same token stored in the bank module.
@@ -20,7 +20,7 @@ Native Cosmos tokens (including ATOM and all IBC tokens) exist in both wrapped a
 **Related Module**: x/bank (via ERC20 module integration)
 
 <Note>
-For a comprehensive understanding of how single token representation works and its benefits over traditional wrapping, see the [Single Token Representation](/docs/evm/single-token-representation) documentation.
+For a comprehensive understanding of how single token representation works and its benefits over traditional wrapping, see the [Single Token Representation](/docs/concepts/single-token-representation) documentation.
 </Note>
 
 ## Technical Implementation
@@ -153,10 +153,10 @@ async function transferTokens() {
   try {
     const recipientAddress = "0x742d35Cc6634C0532925a3b844Bc9e7595f5b899";
     const amount = ethers.parseUnits("10.0", 6); // 10 ATOM (6 decimals)
-    
+
     const tx = await watom.transfer(recipientAddress, amount);
     const receipt = await tx.wait();
-    
+
     console.log("Transfer successful:", receipt.hash);
   } catch (error) {
     console.error("Error:", error);
@@ -240,15 +240,15 @@ async function approveAndTransfer() {
   try {
     const spenderAddress = "0x742d35Cc6634C0532925a3b844Bc9e7595f5b899";
     const amount = ethers.parseUnits("50.0", 6); // 50 ATOM
-    
+
     // Approve spending
     const approveTx = await watom.approve(spenderAddress, amount);
     await approveTx.wait();
-    
+
     // Check allowance
     const allowance = await watom.allowance(signer.address, spenderAddress);
     console.log("Allowance:", allowance.toString());
-    
+
     // Transfer from (would be called by spender)
     // const transferTx = await watom.transferFrom(ownerAddress, recipientAddress, amount);
   } catch (error) {
