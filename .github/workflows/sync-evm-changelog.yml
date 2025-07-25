@@ -1,0 +1,398 @@
+# .github/workflows/sync-evm-changelog.yml
+name: Sync EVM Changelog to Docs
+
+on:
+  repository_dispatch:
+    types: [evm-release]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'EVM release tag to sync'
+        required: true
+        type: string
+
+jobs:
+  sync-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout docs repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Fetch EVM changelog
+        id: fetch-changelog
+        run: |
+          # Get the release tag from either repository_dispatch or workflow_dispatch
+          if [[ "${{ github.event_name }}" == "repository_dispatch" ]]; then
+            RELEASE_TAG="${{ github.event.client_payload.tag_name }}"
+          else
+            RELEASE_TAG="${{ github.event.inputs.release_tag }}"
+          fi
+
+          echo "release_tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
+
+          # Fetch the CHANGELOG.md from the EVM repo
+          curl -s "https://raw.githubusercontent.com/cosmos/evm/$RELEASE_TAG/CHANGELOG.md" > /tmp/changelog.md
+
+          if [ ! -s /tmp/changelog.md ]; then
+            echo "Failed to fetch changelog or changelog is empty"
+            exit 1
+          fi
+
+      - name: Parse and convert changelog
+        id: convert
+        run: |
+          cat << 'EOF' > parse_changelog.js
+          const fs = require('fs');
+
+          function parseChangelog(content, releaseTag, initMode = false) {
+            const lines = content.split('\n');
+            let inUnreleasedSection = false;
+            let currentContent = [];
+            let currentCategory = null;
+            let categories = {};
+            let allVersions = [];
+
+            if (initMode) {
+              // Parse all versions for initialization
+              let currentVersion = null;
+              let currentVersionContent = {};
+              let inVersionSection = false;
+
+              for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+
+                // Look for version headers (## [version] - date or ## version - date or ## version)
+                const versionMatch = line.match(/^##\s*(?:\[([^\]]+)\](?:\s*-\s*(.+))?|([^-\s]+)(?:\s*-\s*(.+))?)/);
+
+                if (versionMatch && line !== '## UNRELEASED') {
+                  // Save previous version if exists
+                  if (currentVersion && Object.keys(currentVersionContent).length > 0) {
+                    allVersions.push({
+                      version: currentVersion,
+                      date: currentVersionDate || 'Unknown',
+                      categories: currentVersionContent
+                    });
+                  }
+
+                  currentVersion = versionMatch[1] || versionMatch[3];
+                  var currentVersionDate = versionMatch[2] || versionMatch[4];
+                  currentVersionContent = {};
+                  currentCategory = null;
+                  inVersionSection = true;
+                  continue;
+                }
+
+                // Skip UNRELEASED section for init mode
+                if (line === '## UNRELEASED') {
+                  inVersionSection = false;
+                  continue;
+                }
+
+                // Look for category headers (### CATEGORY)
+                if (inVersionSection && line.startsWith('### ')) {
+                  currentCategory = line.replace('### ', '').trim();
+                  currentVersionContent[currentCategory] = [];
+                  continue;
+                }
+
+                // Collect content under each category
+                if (inVersionSection && currentCategory && line && !line.startsWith('#')) {
+                  currentVersionContent[currentCategory].push(line);
+                }
+              }
+
+              // Don't forget the last version
+              if (currentVersion && Object.keys(currentVersionContent).length > 0) {
+                allVersions.push({
+                  version: currentVersion,
+                  date: currentVersionDate || 'Unknown',
+                  categories: currentVersionContent
+                });
+              }
+
+              return { allVersions, hasContent: allVersions.length > 0 };
+            }
+
+            // Original single version parsing for regular updates
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i].trim();
+
+              // Check for UNRELEASED section - skip this line entirely
+              if (line === '## UNRELEASED') {
+                inUnreleasedSection = true;
+                continue;
+              }
+
+              // If we hit another ## section after UNRELEASED, we're done
+              if (inUnreleasedSection && line.startsWith('## ') && line !== '## UNRELEASED') {
+                break;
+              }
+
+              // Look for category headers (### CATEGORY)
+              if (inUnreleasedSection && line.startsWith('### ')) {
+                currentCategory = line.replace('### ', '').trim();
+                categories[currentCategory] = [];
+                continue;
+              }
+
+              // Collect content under each category
+              if (inUnreleasedSection && currentCategory && line && !line.startsWith('#')) {
+                categories[currentCategory].push(line);
+              }
+            }
+
+            return {
+              categories,
+              hasContent: Object.keys(categories).length > 0
+            };
+          }
+
+          function convertToMintlifyUpdate(changelogData, releaseTag, initMode = false) {
+            if (initMode) {
+              const { allVersions, hasContent } = changelogData;
+
+              if (!hasContent) {
+                return '';
+              }
+
+              let allUpdates = '';
+
+              allVersions.forEach(versionData => {
+                const { version, date, categories } = versionData;
+                let processedContent = '';
+
+                // Define the order we want to display categories
+                const categoryOrder = [
+                  'FEATURES',
+                  'IMPROVEMENTS',
+                  'BUG FIXES',
+                  'DEPENDENCIES',
+                  'STATE BREAKING',
+                  'API-Breaking'
+                ];
+
+                // Process categories in preferred order
+                categoryOrder.forEach(category => {
+                  if (categories[category] && categories[category].length > 0) {
+                    processedContent += `## ${category.toLowerCase().replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}\n\n`;
+
+                    categories[category].forEach(item => {
+                      if (item.trim()) {
+                        let cleanItem = item
+                          .replace(/^[\-\*] /, '* ')
+                          .replace(/\\\[/g, '[')
+                          .replace(/\\\]/g, ']');
+
+                        processedContent += `${cleanItem}\n`;
+                      }
+                    });
+
+                    processedContent += '\n';
+                  }
+                });
+
+                // Add any remaining categories not in our predefined order
+                Object.keys(categories).forEach(category => {
+                  if (!categoryOrder.includes(category) && categories[category].length > 0) {
+                    processedContent += `## ${category.toLowerCase().replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}\n\n`;
+
+                    categories[category].forEach(item => {
+                      if (item.trim()) {
+                        let cleanItem = item
+                          .replace(/^[\-\*] /, '* ')
+                          .replace(/\\\[/g, '[')
+                          .replace(/\\\]/g, ']');
+
+                        processedContent += `${cleanItem}\n`;
+                      }
+                    });
+
+                    processedContent += '\n';
+                  }
+                });
+
+                if (processedContent.trim()) {
+                  allUpdates += `<Update label="${date}" description="${version}" tags={["EVM", "Release"]}>
+          ${processedContent.trim()}
+          </Update>
+
+          `;
+                }
+              });
+
+              return allUpdates;
+            }
+
+            // Regular single update processing
+            const { categories, hasContent } = changelogData;
+
+            if (!hasContent) {
+              throw new Error('No unreleased changes found in changelog');
+            }
+
+            let processedContent = '';
+
+            // Define the order we want to display categories
+            const categoryOrder = [
+              'FEATURES',
+              'IMPROVEMENTS',
+              'BUG FIXES',
+              'DEPENDENCIES',
+              'STATE BREAKING',
+              'API-Breaking'
+            ];
+
+            // Process categories in preferred order
+            categoryOrder.forEach(category => {
+              if (categories[category] && categories[category].length > 0) {
+                processedContent += `## ${category.toLowerCase().replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}\n\n`;
+
+                categories[category].forEach(item => {
+                  if (item.trim()) {
+                    // Clean up the bullet points and links
+                    let cleanItem = item
+                      .replace(/^[\-\*] /, '* ')
+                      .replace(/\\\[/g, '[')
+                      .replace(/\\\]/g, ']');
+
+                    processedContent += `${cleanItem}\n`;
+                  }
+                });
+
+                processedContent += '\n';
+              }
+            });
+
+            // Add any remaining categories not in our predefined order
+            Object.keys(categories).forEach(category => {
+              if (!categoryOrder.includes(category) && categories[category].length > 0) {
+                processedContent += `## ${category.toLowerCase().replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}\n\n`;
+
+                categories[category].forEach(item => {
+                  if (item.trim()) {
+                    let cleanItem = item
+                      .replace(/^[\-\*] /, '* ')
+                      .replace(/\\\[/g, '[')
+                      .replace(/\\\]/g, ']');
+
+                    processedContent += `${cleanItem}\n`;
+                  }
+                });
+
+                processedContent += '\n';
+              }
+            });
+
+            // Get current date for the label
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            const updateComponent = `<Update label="${currentDate}" description="${releaseTag}" tags={["EVM", "Release"]}>
+          ${processedContent.trim()}
+          </Update>
+
+          `;
+
+            return updateComponent;
+          }
+
+          // Main execution
+          try {
+            const changelogContent = fs.readFileSync('/tmp/changelog.md', 'utf8');
+            const releaseTag = process.argv[2];
+            const initMode = process.argv[3] === 'init';
+
+            const parsedData = parseChangelog(changelogContent, releaseTag, initMode);
+            const mintlifyUpdate = convertToMintlifyUpdate(parsedData, releaseTag, initMode);
+
+            fs.writeFileSync('/tmp/update_component.mdx', mintlifyUpdate);
+            console.log('Successfully converted changelog to Mintlify format');
+
+          } catch (error) {
+            console.error('Error:', error.message);
+            process.exit(1);
+          }
+          EOF
+
+          # Check if this is initialization mode (changelog file doesn't exist)
+          CHANGELOG_FILE="docs/evm/changelog.mdx"
+          if [ ! -f "$CHANGELOG_FILE" ]; then
+            echo "Initializing changelog with all previous versions..."
+            node parse_changelog.js "${{ steps.fetch-changelog.outputs.release_tag }}" init
+          else
+            echo "Updating existing changelog with new release..."
+            node parse_changelog.js "${{ steps.fetch-changelog.outputs.release_tag }}"
+          fi
+
+      - name: Update changelog file
+        run: |
+          CHANGELOG_FILE="docs/evm/changelog.mdx"
+          UPDATE_CONTENT=$(cat /tmp/update_component.mdx)
+
+          # Check if the changelog file exists
+          if [ ! -f "$CHANGELOG_FILE" ]; then
+            echo "Creating new changelog file with all historical versions"
+            # Create the directory if it doesn't exist
+            mkdir -p "$(dirname "$CHANGELOG_FILE")"
+
+            # Create the file with proper YAML front matter using printf
+            printf '%s\n' '---' > "$CHANGELOG_FILE"
+            printf '%s\n' 'title: "EVM Changelog"' >> "$CHANGELOG_FILE"
+            printf '%s\n' 'description: "Track changes and updates to the Cosmos EVM"' >> "$CHANGELOG_FILE"
+            printf '%s\n' '---' >> "$CHANGELOG_FILE"
+            printf '\n' >> "$CHANGELOG_FILE"
+            printf '%s\n' '# EVM Changelog' >> "$CHANGELOG_FILE"
+            printf '\n' >> "$CHANGELOG_FILE"
+            printf '%s\n' 'This page tracks all releases and changes to the Cosmos EVM module.' >> "$CHANGELOG_FILE"
+            printf '\n' >> "$CHANGELOG_FILE"
+
+            # Append the update content
+            cat /tmp/update_component.mdx >> "$CHANGELOG_FILE"
+          else
+            echo "Updating existing changelog with new release..."
+            # Find the insertion point (after the front matter and title)
+            # Insert the new update at the top of the changelog entries
+            awk -v update="$UPDATE_CONTENT" '
+            BEGIN { found_title = 0; inserted = 0 }
+            /^# / && found_title == 0 {
+              print $0
+              print ""
+              print update
+              inserted = 1
+              found_title = 1
+              next
+            }
+            /^<Update/ && inserted == 0 {
+              print update
+              inserted = 1
+            }
+            { print }
+            END {
+              if (inserted == 0) {
+                print ""
+                print update
+              }
+            }' "$CHANGELOG_FILE" > /tmp/updated_changelog.mdx
+
+            mv /tmp/updated_changelog.mdx "$CHANGELOG_FILE"
+          fi
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          git add docs/evm/changelog.mdx
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "docs: update EVM changelog for ${{ steps.fetch-changelog.outputs.release_tag }}"
+            git push
+          fi
