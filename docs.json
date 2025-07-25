@@ -49,6 +49,7 @@
           "group": "EVM",
           "pages": [
             "docs/evm/index",
+            "docs/evm/changelog",
             {
               "group": "Smart Contracts",
               "pages": [
