@@ -28,28 +28,18 @@
       "tab": "Documentation",
       "groups": [
         {
-          "group": "Gaia EVM Devnet",
-          "pages": [
-            "docs/devnet/introduction",
-            "docs/devnet/connect-to-the-network",
-            "docs/devnet/run-a-full-node",
-            "docs/devnet/get-tokens",
-            {
-              "group": "Tooling & Resources",
-              "pages": [
-                "docs/evm/developers/tooling-and-resources/overview",
-                "docs/evm/developers/tooling-and-resources/foundry",
-                "docs/evm/developers/tooling-and-resources/hardhat",
-                "docs/evm/developers/tooling-and-resources/testing-and-fuzzing"
-              ]
-            }
-          ]
-        },
-        {
           "group": "EVM",
           "pages": [
             "docs/evm/index",
+            "docs/evm/introduction",
             "docs/evm/changelog",
+            {
+              "group": "Concepts",
+              "pages": [
+                "docs/concepts/index",
+                "docs/concepts/single-token-representation"
+              ]
+            },
             {
               "group": "Smart Contracts",
               "pages": [
@@ -73,19 +63,38 @@
                 "docs/evm/precompiles/staking",
                 "docs/evm/precompiles/werc20"
               ]
+            },
+            {
+              "group": "Tooling & Resources",
+              "pages": [
+                "docs/evm/developers/tooling-and-resources/overview",
+                "docs/evm/developers/tooling-and-resources/foundry",
+                "docs/evm/developers/tooling-and-resources/hardhat",
+                "docs/evm/developers/tooling-and-resources/testing-and-fuzzing"
+              ]
+            },
+            {
+              "group": "EVM Devnet",
+              "pages": [
+                "docs/devnet/introduction",
+                "docs/devnet/connect-to-the-network",
+                "docs/devnet/run-a-full-node",
+                "docs/devnet/get-tokens"
+              ]
             }
           ]
         }
       ]
     },
     {
-      "tab": "Concepts",
+      "tab": "IBC",
       "groups": [
         {
-          "group": "EVM",
+          "group": "IBC",
           "pages": [
-            "docs/concepts/index",
-            "docs/concepts/single-token-representation"
+            "docs/ibc/index",
+            "docs/ibc/introduction",
+            "docs/ibc/spdc"
           ]
         }
       ]
