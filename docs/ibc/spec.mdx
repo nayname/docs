@@ -1,6 +1,6 @@
 ---
-title: "Specification"
-description: "IBC Core Protocol Spec"
+title: "IBC Core Protocol Spec"
+description: "These basic structures form the foundation of the IBC protocol"
 ---
 <Footnote>
 For legacy IBC implementations, refer to the [IBC‑go docs](https://ibc.cosmos.network/main/).
@@ -40,8 +40,8 @@ appData: bytes;    // Opaque application data
 ```json packet.json
 {
   "sourceClientId": "07‑tendermint‑0",
-  "destClientId": "07‑tendermint‑1",
-  "sequence": 42,
+  "destClientId": "07‑tendermint‑0",
+  "sequence": 1,
   "timeout": 1617348393,
   "data": [
     {
