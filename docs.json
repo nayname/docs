@@ -25,12 +25,12 @@
 "navigation": {
   "tabs": [
     {
-      "tab": "Documentation",
+      "tab": "EVM",
       "groups": [
         {
-          "group": "EVM",
+          "group": "Cosmos-EVM",
           "pages": [
-            "docs/evm/index",
+            "docs/evm/overview",
             "docs/evm/introduction",
             "docs/evm/changelog",
             {
@@ -77,9 +77,8 @@
               "group": "EVM Devnet",
               "pages": [
                 "docs/devnet/introduction",
-                "docs/devnet/connect-to-the-network",
-                "docs/devnet/run-a-full-node",
-                "docs/devnet/get-tokens"
+                "docs/devnet/get-tokens",
+                "docs/devnet/connect-to-the-network"
               ]
             }
           ]
@@ -97,18 +96,6 @@
             "docs/ibc/spec"
           ]
         }
-      ]
-    },
-    {
-      "tab": "Developer Guides (Coming Soon)",
-      "pages": [
-        "docs/guides/coming-soon"
-      ]
-    },
-    {
-      "tab": "API Reference (Coming Soon)",
-      "pages": [
-        "docs/api-reference/coming-soon"
       ]
     }
   ]
