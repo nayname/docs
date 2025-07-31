@@ -1,57 +1,59 @@
 ---
-title: "IBC Core Protocol Spec"
-description: "These basic structures form the foundation of the IBC protocol"
+title: "Core Protocol Spec"
+description: "The foundation of the Inter-Blockchain Communication Protocol"
 ---
-<Footnote>
+<footnote>
 For legacy IBC implementations, refer to the [IBC‑go docs](https://ibc.cosmos.network/main/).
-</Footnote>
+</footnote>
 
-import { Footnote } from '/snippets/Footnote.mdx'
-
-
-The latest version of Inter‑Blockchain Communication (**IBC**) enables token transfers across multiple blockchain environments through a standard set of components, interfaces, and a defined packet flow.
+import { footnote } from '/snippets/footnote.mdx'
 
 
-## Core Data Structures
+The latest version of Inter‑Blockchain Communication Protocol (**IBC**) enables token transfers across multiple blockchain environments through a standard set of components, interfaces, and a defined packet flow.
 
-The **`Packet`** is the primary container for cross‑chain communication. Each packet wraps one or more application‑specific **`Payload`** objects.
+
+### Core Data Structures
+
+The **`Packet`** is the primary container for cross-chain communication. Each packet wraps one or more application-specific **`Payload`** objects.
 
 <CodeGroup>
+
 ```typescript packet.ts
 // The main data container sent between chains
 interface Packet {
-  sourceClientId: bytes; // Client ID for destination chain (stored on source)
-  destClientId: bytes;   // Client ID for source chain (stored on destination)
-  sequence: uint64;      // Monotonically increasing nonce for ordering
-  timeout: uint64;       // UNIX timestamp (seconds) when the packet expires
-  data: Payload[];       // List of application payloads
+  sourceClientId: bytes; // Client ID for destination chain (stored on source)
+  destClientId: bytes;   // Client ID for source chain (stored on destination)
+  sequence: uint64;      // Monotonically increasing nonce for ordering
+  timeoutTimestamp: uint64; // UNIX timestamp (seconds) when the packet expires
+  data: Payload[];       // List of application payloads
 }
 
-// Application‑specific data and routing information
+// Application-specific data and routing information
 interface Payload {
 sourcePort: bytes; // Identifies sending application module
-destPort: bytes;   // Identifies receiving application module
-version: string;   // App‑specific version for interpretation
-encoding: string;  // MIME‑type for decoding appData
-appData: bytes;    // Opaque application data
+destPort: bytes;   // Identifies receiving application module
+version: string;   // App-specific version for interpretation
+encoding: string;  // MIME-type for decoding value
+value: bytes;    // Opaque application data
 }
+
 ```
 
 ```json packet.json
 {
-  "sourceClientId": "07‑tendermint‑0",
-  "destClientId": "07‑tendermint‑0",
-  "sequence": 1,
-  "timeout": 1617348393,
-  "data": [
-    {
-      "sourcePort": "transfer",
-      "destPort": "transfer",
-      "version": "ics20‑1",
-      "encoding": "application/json",
-      "appData": "<base64‑encoded application data>"
-    }
-  ]
+  "sourceClientId": "07-tendermint-0",
+  "destClientId": "07-tendermint-0",
+  "sequence": 1,
+  "timeoutTimestamp": 1617348393,
+  "data": [
+    {
+      "sourcePort": "transfer",
+      "destPort": "transfer",
+      "version": "ics20-1",
+      "encoding": "application/json",
+      "value": "<base64-encoded application data>"
+    }
+  ]
 }
 ```
 
@@ -87,14 +89,16 @@ A Merkle‑proof‑capable key‑value store required on the host chain. Standar
 Applications must bind to unique **`portId`** values during initialization. The port is referenced in every `Payload` to route incoming packets.
 </Accordion>
 
-<Accordion title="Application Callbacks (ICS‑26)">
-An IBC‑enabled application **must** implement these callbacks:
+### Application Callbacks (ICS-26)
 
-* **`OnRecvPacket(payload)`** – Executed on the **destination chain** to process incoming data. Must return an **Acknowledgement** (success or error).
-* **`OnAcknowledgePacket(payload, acknowledgement)`** – Executed on the **source chain** once an acknowledgement is verified, finalizing or compensating the originating action.
-* **`OnTimeoutPacket(payload)`** – Executed on the **source chain** if no acknowledgement is received before `timeout`, allowing rollback or refunds.
+An IBC-enabled application **must** implement these callbacks. The IBC handler provides key identifiers like client IDs and the packet sequence so the application has the full context for every call.
 
-</Accordion>
+  * **`OnRecvPacket(sourceClientId, destClientId, sequence, payload)`** – Executed on the **destination chain** to process incoming data. It must return an **Acknowledgement** (success or error).
+  * **`OnAcknowledgePacket(sourceClientId, destClientId, sequence, payload, acknowledgement)`** – Executed on the **source chain** once an acknowledgement is verified, finalizing or compensating the originating action.
+  * **`OnTimeoutPacket(sourceClientId, destClientId, sequence, payload)`** – Executed on the **source chain** if no acknowledgement is received before `timeoutTimestamp`, allowing rollback or refunds.
+
+<Warning>For packets with multiple payloads, execution is **atomic**. If the `OnRecvPacket` callback fails for even one payload, the entire packet operation is considered a failure. Any state changes from other successful callbacks in the same packet **must be reverted**.</Warning>
+
 
 
 ## Packet Lifecycle
@@ -115,8 +119,10 @@ A relayer delivers the `Packet` together with a proof of its commitment. The des
 
 </Accordion>
 
-<Accordion title="3. WriteAcknowledgement (Destination Chain)">
-The destination application returns an **Acknowledgement** (success data or error) from `OnRecvPacket`. The IBC handler commits this acknowledgement at the **Acknowledgement** path, making it available for relayers.
+<Accordion title="3. WriteAcknowledgement (Destination Chain)">
+The destination application returns an **Acknowledgement** (success data or error) from `OnRecvPacket`. The IBC handler commits this acknowledgement at the **Acknowledgement** path, making it ava>
+
+For applications with long-running logic, this process can be asynchronous. The app can process the packet later and call a separate `WriteAcknowledgement` function to submit the result.
 </Accordion>
 
 <Accordion title="4. AcknowledgePacket (Source Chain)">
