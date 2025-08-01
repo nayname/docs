@@ -1,9 +1,9 @@
 ---
 title: 'Connect to the Network'
-description: 'This page provides general information to help you connect to the network and get started building.'
+description: 'General information to connect with the network and get started.'
 ---
 
-import { Footnote } from '/snippets/Footnote.mdx'
+import { footnote } from '/snippets/footnote.mdx'
 
 ## Chain Info
 
@@ -71,9 +71,9 @@ await window.ethereum.request({
 *Users can quickly add the network by using the [Devnet Faucet](https://faucet.cosmos.network).*
 </Tip>
 
-<Footnote>
+<footnote>
 See the [tooling/libraries](docs/evm/developers/tooling-and-resources/testing-and-fuzzing) page for more wallet-related resources.
-</Footnote>
+</footnote>
 
 ### CLI
 
@@ -102,9 +102,9 @@ Gaia (feature/evm) supports two different key derivation methods, each producing
 | `eth_secp256k1` *(default)* | `m/44'/60'/0'/0/0` | `0x…` / `cosmos1…` | Uses Ethereum's derivation standard (cointype 60), full compatibility with MetaMask and EVM tooling while retaining complete Cosmos compatibility |
 | `secp256k1` | `m/44'/118'/0'/0/0` | `cosmos1…` | Uses Cosmos's derivation standard (cointype 118), compatible with traditional Cosmos wallets |
 
-<Footnote>
+<footnote>
 The `eth_secp256k1` algorithm with cointype 60 is the default, providing full EVM compatibility.
-</Footnote>
+</footnote>
 
 **Key derivation behavior:**
 - The same mnemonic phrase will produce different addresses when using different algorithms and HD paths
@@ -237,6 +237,6 @@ Applications typically interact with the network programmatically using the EVM 
 
 See the ["Popular Librariess"](docs/evm/developers/tooling-and-resources/testing-and-fuzzing) section for more information.
 
-<Footnote>
+<footnote>
 Full API reference page coming soon
-</Footnote>
+</footnote>
