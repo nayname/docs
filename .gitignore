@@ -65,7 +65,7 @@ build/
 .yarn/
 docs/devnet/tests/*
 scripts/*
-tests/
+tests/*
 .ingress/
 
 # Markdown lint cache
