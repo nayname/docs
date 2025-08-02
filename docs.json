@@ -73,7 +73,6 @@
               {
                 "group": "Cosmos SDK",
                 "pages": [
-                  "docs/documentation/cosmos-sdk/index",
                   "docs/documentation/cosmos-sdk/overview",
                   "docs/documentation/cosmos-sdk/cli",
                   "docs/documentation/cosmos-sdk/integrate",
