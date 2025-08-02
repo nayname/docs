@@ -5,7 +5,7 @@ description: "Core components, data structures, and packet flow of the Inter-Blo
 
 ### Core Data Structures
 
-The **`Packet`** is the primary container for cross-chain communication. Each packet wraps one or more application-specific **`Payload`** objects.
+The `Packet` is the primary container for cross-chain communication. Each packet wraps one or more application-specific **`Payload`** objects.
 
 <CodeGroup>
 
@@ -31,8 +31,6 @@ interface Payload {
 
 </CodeGroup>
 
------
-
 ## Key On-Chain Components
 
 <Accordion title="Client (ICS-02) – Light Client">
@@ -56,8 +54,6 @@ A Merkle-proof-capable key-value store required on the host chain. Standardized 
 Applications must bind to unique **`portId`** values during initialization. The port is referenced in every `Payload` to route incoming packets.
 </Accordion>
 
------
-
 ## Application Interface (ICS-26)
 
 An IBC-enabled application **must** implement these callbacks to manage the packet lifecycle.
@@ -67,8 +63,6 @@ An IBC-enabled application **must** implement these callbacks to manage the pack
   * **`OnTimeoutPacket(...)`** – Executed on the **source chain** if a timeout occurs, allowing for a clean rollback or refund.
 
 <Warning>For packets with multiple payloads, execution is **atomic**. If the `OnRecvPacket` callback fails for even one payload, the entire packet operation is considered a failure. Any state changes from other successful callbacks in the same packet **must be reverted**.</Warning>
-
------
 
 ## Packet Lifecycle
 
