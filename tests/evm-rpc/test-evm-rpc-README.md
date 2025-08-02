@@ -48,6 +48,7 @@ node test-evm-rpc.js http://your-node:8545 ws://your-node:8546
 ## Output
 
 The script provides:
+
 - Real-time test results with color coding:
   - 🟢 **PASS** - Method works correctly
   - 🔴 **FAIL** - Method failed unexpectedly
