@@ -4,7 +4,7 @@ description: "Find below a list of JSON-RPC methods supported on Cosmos EVM, sor
 ---
 
 <Info>
-  This documentation lists all Ethereum JSON-RPC methods and their implementation status in Cosmos EVM. For the official Ethereum JSON-RPC specification, see the [Ethereum Execution APIs](https://github.com/ethereum/execution-apis) repository.
+This documentation lists all Ethereum JSON-RPC methods and their implementation status in Cosmos EVM. For the official Ethereum JSON-RPC specification, see the [Ethereum Execution APIs](https://github.com/ethereum/execution-apis) repository.
 </Info>
 
 ## Endpoints
@@ -198,27 +198,27 @@ description: "Find below a list of JSON-RPC methods supported on Cosmos EVM, sor
 | `trace_transaction`                                                                   | Trace     | ❌          | ❌     | Not implemented    |
 
 <Check>
-  Block Number can be entered as a Hex string, `"earliest"`, `"latest"` or `"pending"`.
+Block Number can be entered as a Hex string, `"earliest"`, `"latest"` or `"pending"`.
 </Check>
 
 <Info>
-  **EIP-1559 Support**: Cosmos EVM fully supports EIP-1559 transaction types and includes methods like `eth_feeHistory` and `eth_maxPriorityFeePerGas`.
+**EIP-1559 Support**: Cosmos EVM fully supports EIP-1559 transaction types and includes methods like `eth_feeHistory` and `eth_maxPriorityFeePerGas`.
 
-  **Consensus Differences**: Due to using Tendermint BFT consensus instead of Proof of Work/Stake:
-  * Mining methods (`miner_*`) are no-ops or return static values
-  * Uncle-related methods always return 0 or null
-  * Block reorganizations are not possible
-  * Engine API (`engine_*`) is not applicable - Tendermint handles consensus
+**Consensus Differences**: Due to using Tendermint BFT consensus instead of Proof of Work/Stake:
+* Mining methods (`miner_*`) are no-ops or return static values
+* Uncle-related methods always return 0 or null
+* Block reorganizations are not possible
+* Engine API (`engine_*`) is not applicable - Tendermint handles consensus
 
-  **Methods Not Implemented**:
-  * `eth_createAccessList` (EIP-2930) - Access list transactions
-  * `trace_*` methods - Advanced tracing functionality (except limited debug methods)
-  * `engine_*` methods - Post-merge Engine API (uses Tendermint instead)
-  * `admin_*` methods - Node administration
-  * `les_*` methods - Light Ethereum Subprotocol
-  * `clique_*` methods - Proof of Authority consensus
+**Methods Not Implemented**:
+* `eth_createAccessList` (EIP-2930) - Access list transactions
+* `trace_*` methods - Advanced tracing functionality (except limited debug methods)
+* `engine_*` methods - Post-merge Engine API (uses Tendermint instead)
+* `admin_*` methods - Node administration
+* `les_*` methods - Light Ethereum Subprotocol
+* `clique_*` methods - Proof of Authority consensus
 
-  For more details on how Cosmos EVM differs from standard Ethereum implementations, see [Differences from Standard EVMs](/docs/documentation/differences).
+For more details on how Cosmos EVM differs from standard Ethereum implementations, see [Differences from Standard EVMs](/docs/documentation/differences).
 </Info>
 
 ## Examples
@@ -396,7 +396,7 @@ Returns the account balance for a given account address and Block Number.
   - Account Address
   - Block Number or Block Hash ([EIP-1898](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1898.md))
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -415,7 +415,7 @@ Returns the storage address for a given account address.
   - Integer of the position in the storage
   - Block Number or Block Hash ([EIP-1898](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1898.md))
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -433,7 +433,7 @@ Returns the total transaction for a given account address and Block Number.
   - Account Address
   - Block Number or Block Hash ([EIP-1898](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1898.md))
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -450,7 +450,7 @@ Returns the total transaction count for a given block number.
 
   - Block number
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -467,7 +467,7 @@ Returns the total transaction count for a given block hash.
 
   - Block Hash
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -485,7 +485,7 @@ Returns the code for a given account address and Block Number.
   - Account Address
   - Block Number or Block Hash ([EIP-1898](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1898.md))
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -500,16 +500,16 @@ The `sign` method calculates an Ethereum specific signature with: `sign(keccak25
 
 By adding a prefix to the message makes the calculated signature recognizable as an Ethereum specific signature. This prevents misuse where a malicious DApp can sign arbitrary data (e.g. transaction) and use the signature to impersonate the victim.
 
-\<Warning\>
+<Warning>
 The address to sign with must be unlocked.
-\</Warning\>
+</Warning>
 
 #### Parameters
 
   - Account Address
   - Message to sign
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -534,7 +534,7 @@ Sends transaction from given account to a given account.
     `data`: `DATA` - The compiled code of a contract OR the hash of the invoked method signature and encoded parameters. For details see Ethereum Contract ABI.
     `nonce`: QUANTITY - (optional) Integer of a nonce. This allows to overwrite your own pending transactions that use the same nonce.
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -551,7 +551,7 @@ Creates new message call transaction or a contract creation for signed transacti
 
   - The signed transaction data
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -577,7 +577,7 @@ Executes a new message call immediately without creating a transaction on the bl
 
   - Block number or Block Hash ([EIP-1898](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1898.md))
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -598,7 +598,7 @@ Returns an estimate value of the gas required to send the transaction.
     `to`: `DATA`, 20 Bytes - (optional when creating new contract) The address the transaction is directed to.
     `value`: `QUANTITY` - value sent with this transaction
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -616,7 +616,7 @@ Returns information about a block by block number.
   - Block Number
   - If true it returns the full transaction objects, if false only the hashes of the transactions.
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -634,7 +634,7 @@ Returns the block info given the hash found in the command above and a bool.
   - Hash of a block.
   - If true it returns the full transaction objects, if false only the hashes of the transactions.
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -651,7 +651,7 @@ Returns transaction details given the ethereum tx something.
 
   - hash of a transaction
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -669,7 +669,7 @@ Returns transaction details given the block hash and the transaction index.
   - Hash of a block.
   - Transaction index position.
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -693,7 +693,7 @@ Note: Tx Code from CometBFT and the Ethereum receipt status are switched:
 
   - Hash of a transaction
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -710,7 +710,7 @@ Create new filter using topics of some kind.
 
   - hash of a transaction
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -749,7 +749,7 @@ Removes the filter with the given filter id. Returns true if the filter was succ
 
   - The filter id
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -766,7 +766,7 @@ Polling method for a filter, which returns an array of logs which occurred since
 
   - The filter id
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -783,7 +783,7 @@ Returns an array of all logs matching filter with given id.
 
   - `QUANTITY` - The filter id
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -806,7 +806,7 @@ Returns an array of all logs matching a given filter object.
     `topics`: Array of `DATA`, - (optional) Array of 32 Bytes `DATA` topics. Topics are order-dependent. Each topic can also be an array of `DATA` with “or” options.
     `blockhash`: (optional, future) With the addition of [EIP-234](https://eips.ethereum.org/EIPS/eip-234), `blockHash` will be a new filter option which restricts the logs returned to the single block with the 32-byte hash `blockHash`. Using `blockHash` is equivalent to `fromBlock` = `toBlock` = the block number with hash `blockHash`. If `blockHash` is present in in the filter criteria, then neither `fromBlock` nor `toBlock` are allowed.
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -836,7 +836,7 @@ Returns the account- and storage-values of the specified account including the M
   - Integer of the position in the storage
   - Block Number or Block Hash ([EIP-1898](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1898.md))
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -858,7 +858,7 @@ subscribe using JSON-RPC notifications. This allows clients to wait for events i
   - Subscription Name
   - Optional Arguments
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -875,7 +875,7 @@ Unsubscribe from an event using the subscription id
 
   - Subscription ID
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -888,9 +888,9 @@ Unsubscribe from an event using the subscription id
 
 ### `personal_importRawKey`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Imports the given unencrypted private key (hex encoded string) into the key store, encrypting it with the passphrase. Returns the address of the new account.
 
@@ -904,7 +904,7 @@ Imports the given unencrypted private key (hex encoded string) into the key stor
 
   - Required: ✓ Yes
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -913,9 +913,9 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"personal_importRawKey","params":
 
 ### `personal_listAccounts`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Returns a list of addresses for accounts this node manages.
 
@@ -928,9 +928,9 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"personal_listAccounts","params":
 
 ### `personal_lockAccount`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Removes the private key with given address from memory. The account can no longer be used to send transactions.
 
@@ -938,7 +938,7 @@ Removes the private key with given address from memory. The account can no longe
 
   - Account Address
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -949,9 +949,9 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"personal_lockAccount","params":[
 
 ### `personal_newAccount`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Generates a new private key and stores it in the key store directory. The key file is encrypted with the given passphrase. It returns the address of the new account.
 
@@ -959,7 +959,7 @@ Generates a new private key and stores it in the key store directory. The key fi
 
   - Passphrase
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -970,9 +970,9 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"personal_newAccount","params":["
 
 ### `personal_unlockAccount`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Decrypts the key with the given address from the key store.
 
@@ -986,7 +986,7 @@ The account can be used with [`eth_sign`](https://www.google.com/search?q=%23eth
   - Passphrase
   - Duration
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -997,17 +997,17 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"personal_unlockAccount","params"
 
 ### `personal_sendTransaction`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Validate the given passphrase and submit transaction.
 
 The transaction is the same argument as for [`eth_sendTransaction`](https://www.google.com/search?q=%23eth_sendtransaction) and contains the `from` address. If the passphrase can be used to decrypt the private key belonging to `tx.from` the transaction is verified, signed and send onto the network.
 
-\<Warning\>
+<Warning>
 The account is not unlocked globally in the node and cannot be used in other RPC calls.
-\</Warning\>
+</Warning>
 
 #### Parameters
 
@@ -1019,7 +1019,7 @@ The account is not unlocked globally in the node and cannot be used in other RPC
 
   - Passphrase
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -1030,9 +1030,9 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"personal_sendTransaction","param
 
 ### `personal_sign`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 The sign method calculates an Ethereum specific signature with: `sign(keccack256("\x19Ethereum Signed Message:\n" + len(message) + message)))`,
 
@@ -1042,7 +1042,7 @@ The sign method calculates an Ethereum specific signature with: `sign(keccack256
   - Account Address
   - Password
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -1053,9 +1053,9 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"personal_sign","params":["0xdead
 
 ### `personal_ecRecover`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 `ecRecover` returns the address associated with the private key that was used to calculate the signature in [`personal_sign`](https://www.google.com/search?q=%23personal-sign).
 
@@ -1064,7 +1064,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"personal_sign","params":["0xdead
   - Message
   - Signature returned from [`personal_sign`](https://www.google.com/search?q=%23personal-sign)
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -1075,9 +1075,9 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"personal_ecRecover","params":["0
 
 ### `personal_initializeWallet`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Initializes a new wallet at the provided URL, by generating and returning a new private key.
 
@@ -1111,9 +1111,9 @@ personal.initializeWallet(url);
 
 ### `personal_unpair`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Unpair deletes a pairing between wallet and the node.
 
@@ -1152,7 +1152,7 @@ The `traceTransaction` debugging method will attempt to run the transaction in t
 
   - Trace Config
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -1169,7 +1169,7 @@ The `traceBlockByNumber` endpoint accepts a block number and will replay the blo
 
   - Trace Config
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -1182,15 +1182,15 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"debug_traceBlockByNumber","param
 
 ### `miner_getHashrate`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Get the hashrate in H/s (Hash operations per second).
 
-\<Warning\>
+<Warning>
 Proof-of-Work specific. This endpoint always returns `0`.
-\</Warning\>
+</Warning>
 
 ```shell
 // Request
@@ -1201,21 +1201,21 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"miner_setGasPrice","params":[],"
 
 ### `miner_setExtra`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Sets the extra data a validator can include when proposing blocks. This is capped at 32 bytes.
 
-\<Warning\>
+<Warning>
 Unsupported. This endpoint always returns an error
-\</Warning\>
+</Warning>
 
 #### Parameters
 
   - Data
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -1226,9 +1226,9 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"miner_setExtra","params":["data"
 
 ### `miner_setGasPrice`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Sets the minimal gas price used to accept transactions. Any transaction below this limit is excluded from the validator block proposal process.
 
@@ -1240,7 +1240,7 @@ Make sure your `appd start` call is not using the flag `minimum-gas-prices`, bec
 
   - Hex Gas Price
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -1251,21 +1251,21 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"miner_setGasPrice","params":["0x
 
 ### `miner_start`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Start the CPU validation process with the given number of threads.
 
-\<Warning\>
+<Warning>
 Unsupported. This endpoint always returns an error
-\</Warning\>
+</Warning>
 
 #### Parameters
 
   - Hex Number of threads
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -1276,15 +1276,15 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"miner_start","params":["0x1"],"i
 
 ### `miner_stop`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Stop the validation operation.
 
-\<Warning\>
+<Warning>
 Unsupported. This endpoint always performs a no-op.
-\</Warning\>
+</Warning>
 
 ```shell
 // Request
@@ -1293,21 +1293,21 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"miner_stop","params":[],"id":1}'
 
 ### `miner_setGasLimit`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Sets the gas limit the miner will target when mining. Note: on networks where [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559) is activated, this should be set to twice what you want the gas target (i.e. the effective gas used on average per block) to be.
 
-\<Warning\>
+<Warning>
 Unsupported. This endpoint always returns `false`
-\</Warning\>
+</Warning>
 
 #### Parameters
 
   - Hex gas limit
 
-<!-- end list -->
+
 
 ```shell
 // Request
@@ -1318,17 +1318,15 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"miner_setGasLimit","params":["0x
 
 ### `miner_setEtherbase`
 
-\<Check\>
+<Check>
 **Private**: Requires authentication.
-\</Check\>
+</Check>
 
 Sets the etherbase. It changes the wallet where the validator rewards will be deposited.
 
 #### Parameters
 
   - Account Address
-
-<!-- end list -->
 
 ```shell
 // Request
