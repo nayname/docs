@@ -82,30 +82,49 @@ Cosmos EVM implements most standard Ethereum JSON-RPC methods with some limitati
 | Method Category | Examples | Notes |
 |----------------|----------|-------|
 | **✅ Core Methods** | `eth_getBalance`, `eth_call`, `eth_sendTransaction`, `eth_getTransactionReceipt` | Full compatibility |
-| **✅ Gas Methods** | `eth_gasPrice`, `eth_estimateGas`, `eth_feeHistory`, `eth_maxPriorityFeePerGas` | EIP-1559 supported |
+| **⚠️ Gas Methods** | `eth_gasPrice`, `eth_estimateGas`, `eth_maxPriorityFeePerGas` | EIP-1559 partial - `eth_feeHistory` not implemented |
 | **✅ Block Methods** | `eth_blockNumber`, `eth_getBlockByHash`, `eth_getBlockByNumber` | Immediate finality |
-| **⚠️ Mining Methods** | `eth_mining` (always false), `eth_hashrate` (always 0) | PoS consensus - no mining |
-| **⚠️ Uncle Methods** | `eth_getUncleCount*` (always 0), `eth_getUncleBy*` (always null) | Single proposer model |
-| **✅ Debug Methods** | `debug_traceTransaction`, `debug_traceBlockByNumber` | Available but not public |
+| **❌ Mining Methods** | All `miner_*` methods | Not implemented - Tendermint consensus |
+| **✅ Uncle Methods** | `eth_getUncleCount*` (always 0), `eth_getUncleBy*` (always null) | Returns expected values for no uncles |
+| **⚠️ Debug Methods** | `debug_traceTransaction`, `debug_traceBlockByNumber` | Limited functionality, some issues |
 | **❌ Admin Methods** | `admin_*` methods | Not implemented |
+| **⚠️ Filter Methods** | `eth_newFilter`, `eth_newBlockFilter` | Filters created but `eth_getFilterChanges` fails |
 
 For a complete list of all JSON-RPC methods with implementation status, see the [Ethereum JSON-RPC Methods](/docs/api-reference/ethereum-json-rpc/methods) reference.
 
-### Cosmos-Specific JSON-RPC Extensions
+### Additional JSON-RPC Methods
 
-Cosmos EVM includes several methods not found in standard Ethereum implementations:
+Cosmos EVM implements these non-standard methods:
 
 | Method | Purpose |
 |--------|---------|
 | `eth_getTransactionLogs` | Retrieve logs for a specific transaction |
-| `eth_getPendingTransactions` | Get all pending transactions |
-| `eth_fillTransaction` | Auto-fill transaction fields (nonce, gas) |
+| `eth_getBlockReceipts` | Get all receipts for a given block |
 | `debug_freeOSMemory` | Force garbage collection |
 | `debug_setGCPercent` | Configure garbage collector |
-| `debug_getRaw*` methods | Access raw RLP-encoded blockchain data |
-| `debug_printBlock` | Human-readable block format |
+| `debug_memStats` | Return detailed memory statistics |
+| `debug_setBlockProfileRate` | Set block profiling rate |
+| `debug_writeBlockProfile` | Write block profile to file |
+| `debug_writeMemProfile` | Write memory profile to file |
+| `debug_writeMutexProfile` | Write mutex profile to file |
 
-These extensions provide additional debugging and convenience features specific to Cosmos EVM.
+### Unimplemented Standard Methods
+
+These standard Ethereum methods are not available:
+
+| Method | Category | Reason |
+|--------|----------|--------|
+| `eth_getFilterChanges` | Filters | Filter management not implemented |
+| `eth_getFilterLogs` | Filters | Filter management not implemented |
+| `eth_feeHistory` | EIP-1559 | Fee history tracking not implemented |
+| `eth_createAccessList` | EIP-2930 | Access lists not supported |
+| `eth_resend` | Transaction Pool | Transaction replacement not supported |
+| `eth_pendingTransactions` | Transaction Pool | Pending transaction queries not implemented |
+| `personal_sendTransaction` | Personal | Personal transaction sending not implemented |
+| `personal_ecRecover` | Personal | Signature recovery not implemented |
+| All `miner_*` methods | Mining | No mining with Tendermint consensus |
+| All `admin_*` methods | Administration | Node administration not exposed |
+| `eth_subscribe` syncing | WebSocket | Only newHeads, logs, and newPendingTransactions events supported |
 
 ## Address Format Examples
 

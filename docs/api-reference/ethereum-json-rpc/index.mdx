@@ -12,25 +12,38 @@ More on Ethereum JSON-RPC:
 * [Ethereum's PubSub JSON-RPC API](https://geth.ethereum.org/docs/interacting-with-geth/rpc/pubsub)
 
 <Tip>
-  **Cosmos EVM Extensions**: Cosmos EVM includes several methods not found in standard Ethereum implementations:
+  **Cosmos-Specific Extensions**: These methods are unique to Cosmos EVM and not found in standard Ethereum:
 
-  **Additional Methods:**
+  **Additional Eth Methods:**
   * `eth_getTransactionLogs` - Returns logs for a specific transaction
-  * `eth_getPendingTransactions` - Returns all pending transactions
-  * `eth_fillTransaction` - Fills transaction defaults like nonce and gas
+  * `eth_getPendingTransactions` - Returns all pending transactions (currently not working)
+  * `eth_getBlockReceipts` - Returns all receipts for a given block
 
   **Extended Debug Methods:**
   * `debug_freeOSMemory` - Forces garbage collection
   * `debug_setGCPercent` - Sets garbage collection percentage
-  * `debug_getRawBlock` - Returns raw RLP-encoded block data
-  * `debug_getRawHeader` - Returns raw RLP-encoded header data
-  * `debug_getRawReceipts` - Returns raw RLP-encoded receipts
-  * `debug_getRawTransaction` - Returns raw RLP-encoded transaction
-  * `debug_printBlock` - Returns human-readable block format
-  * `debug_writeMutexProfile` - Writes mutex contention profile
-
-  These provide additional functionality beyond the Ethereum standard and may not be portable to other EVM implementations.
+  * `debug_memStats` - Returns detailed memory statistics
+  * `debug_setBlockProfileRate` - Sets block profiling rate
+  * `debug_writeBlockProfile` - Writes block profile to file
+  * `debug_writeMemProfile` - Writes memory profile to file
+  * `debug_writeMutexProfile` - Writes mutex contention profile to file
 </Tip>
+
+<Warning>
+  **Notable Unsupported Methods**: The following standard Ethereum methods are not implemented:
+
+  * `eth_getFilterChanges` / `eth_getFilterLogs` - Filter management issues
+  * `eth_feeHistory` - Fee history for EIP-1559
+  * `eth_createAccessList` - EIP-2930 access lists
+  * `eth_fillTransaction` - Transaction filling utility
+  * `eth_resend` / `eth_pendingTransactions` - Transaction pool management
+  * `personal_sendTransaction` / `personal_ecRecover` - Some personal namespace methods
+  * All `miner_*` methods - Mining not applicable with Tendermint consensus
+  * All `debug_getRaw*` methods - Raw data access not implemented
+  * `eth_subscribe` syncing events - Only newHeads, logs, and newPendingTransactions work
+
+  See the [methods page](./methods) for complete details.
+</Warning>
 
 ## Enabling the JSON-RPC Server
 
@@ -106,7 +119,11 @@ Response:
 }
 ```
 
-Find below the JSON-RPC namespaces supported on Cosmos EVM or head over to the documentation for the individual API endpoints and their respective curl commands on the [JSON-RPC Methods](./methods) page.
+### Namespaces supported on Cosmos EVM
+
+<Info>
+See the [methods](./methods) page for an exhaustive list and working examples.
+</Info>
 
 | Namespace | Description | Supported | Enabled by Default |
 |-----------|-------------|-----------|-------------------|

@@ -41,8 +41,8 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | [`eth_newBlockFilter`](#eth_newblockfilter)                                           | Eth       | ✅          | ✅     |                    |
 | [`eth_newPendingTransactionFilter`](#eth_newpendingtransactionfilter)                 | Eth       | ✅          | ✅     |                    |
 | [`eth_uninstallFilter`](#eth_uninstallfilter)                                         | Eth       | ✅          | ✅     |                    |
-| [`eth_getFilterChanges`](#eth_getfilterchanges)                                       | Eth       | ✅          | ✅     |                    |
-| [`eth_getFilterLogs`](#eth_getfilterlogs)                                             | Eth       | ✅          | ✅     |                    |
+| [`eth_getFilterChanges`](#eth_getfilterchanges)                                       | Eth       | ❌          | ❌     | Filter not found   |
+| [`eth_getFilterLogs`](#eth_getfilterlogs)                                             | Eth       | ❌          | ❌     | Filter not found   |
 | [`eth_getLogs`](#eth_getlogs)                                                         | Eth       | ✅          | ✅     |                    |
 | [`eth_getTransactionByBlockNumberAndIndex`](#eth_gettransactionbyblocknumberandindex) | Eth       | ✅          | ✅     |                    |
 | `eth_getWork`                                                                         | Eth       | N/A         | N/A    | PoW-only           |
@@ -60,24 +60,24 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | `eth_getUncleCountByBlockNumber`                                                      | Eth       | ✅          | ✅     | Always 0           |
 | `eth_getUncleByBlockHashAndIndex`                                                     | Eth       | ✅          | ✅     | Always null        |
 | `eth_getUncleByBlockNumberAndIndex`                                                   | Eth       | ✅          | ✅     | Always null        |
-| [`eth_getProof`](#eth_getproof)                                                       | Eth       | ✅          | ✅     |                    |
-| `eth_feeHistory`                                                                      | Eth       | ✅          | ✅     | EIP-1559           |
+| [`eth_getProof`](#eth_getproof)                                                       | Eth       | ⚠️         | ✅     | Height > 2 required|
+| `eth_feeHistory`                                                                      | Eth       | ❌          | ❌     | Not implemented    |
 | `eth_maxPriorityFeePerGas`                                                            | Eth       | ✅          | ✅     | EIP-1559           |
 | `eth_chainId`                                                                         | Eth       | ✅          | ✅     |                    |
 | `eth_getBlockReceipts`                                                                | Eth       | ✅          | ✅     |                    |
-| `eth_resend`                                                                          | Eth       | ✅          | ❌     |                    |
-| `eth_pendingTransactions`                                                             | Eth       | ✅          | ❌     |                    |
+| `eth_resend`                                                                          | Eth       | ❌          | ❌     | Not implemented    |
+| `eth_pendingTransactions`                                                             | Eth       | ❌          | ❌     | Not implemented    |
 | `eth_createAccessList`                                                                | Eth       | ❌          | ❌     | EIP-2930           |
-| [`eth_subscribe`](#eth_subscribe)                                                     | Websocket | ✅          | ✅     |                    |
+| [`eth_subscribe`](#eth_subscribe)                                                     | Websocket | ⚠️         | ✅     | syncing not impl.  |
 | [`eth_unsubscribe`](#eth_unsubscribe)                                                 | Websocket | ✅          | ✅     |                    |
 | [`personal_importRawKey`](#personal_importrawkey)                                     | Personal  | ✅          | ❌     |                    |
 | [`personal_listAccounts`](#personal_listaccounts)                                     | Personal  | ✅          | ❌     |                    |
-| [`personal_lockAccount`](#personal_lockaccount)                                       | Personal  | ⚠️         | ❌     | Limited support    |
+| [`personal_lockAccount`](#personal_lockaccount)                                       | Personal  | ❌          | ❌     | Not supported      |
 | [`personal_newAccount`](#personal_newaccount)                                         | Personal  | ✅          | ❌     |                    |
-| [`personal_unlockAccount`](#personal_unlockaccount)                                   | Personal  | ⚠️         | ❌     | Limited support    |
-| [`personal_sendTransaction`](#personal_sendtransaction)                               | Personal  | ✅          | ❌     |                    |
+| [`personal_unlockAccount`](#personal_unlockaccount)                                   | Personal  | ⚠️         | ❌     | Always returns false|
+| [`personal_sendTransaction`](#personal_sendtransaction)                               | Personal  | ❌          | ❌     | Not implemented    |
 | [`personal_sign`](#personal_sign)                                                     | Personal  | ✅          | ❌     |                    |
-| [`personal_ecRecover`](#personal_ecrecover)                                           | Personal  | ✅          | ❌     |                    |
+| [`personal_ecRecover`](#personal_ecrecover)                                           | Personal  | ❌          | ❌     | Not implemented    |
 | [`personal_initializeWallet`](#personal_initializewallet)                             | Personal  | ❌          | ❌     | Not supported      |
 | [`personal_unpair`](#personal_unpair)                                                 | Personal  | ❌          | ❌     | Not supported      |
 | `personal_listWallets`                                                                | Personal  | ✅          | ❌     | Returns empty      |
@@ -136,18 +136,18 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | `debug_traceBlockFromFile`                                                            | Debug     |             |        |                    |
 | `debug_standardTraceBlockToFile`                                                      | Debug     |             |        |                    |
 | `debug_standardTraceBadBlockToFile`                                                   | Debug     |             |        |                    |
-| [`debug_traceTransaction`](#debug_tracetransaction)                                   | Debug     | ✅          | ❌     |                    |
+| [`debug_traceTransaction`](#debug_tracetransaction)                                   | Debug     | ⚠️         | ❌     | Height issues      |
 | `debug_traceCall`                                                                     | Debug     | ❌          | ❌     | Not implemented    |
 | `debug_verbosity`                                                                     | Debug     | ❌          | ❌     | Not implemented    |
 | `debug_vmodule`                                                                       | Debug     | ❌          | ❌     | Not implemented    |
 | `debug_writeBlockProfile`                                                             | Debug     | ✅          | ❌     |                    |
 | `debug_writeMemProfile`                                                               | Debug     | ✅          | ❌     |                    |
 | `debug_writeMutexProfile`                                                             | Debug     | ✅          | ❌     | **Cosmos-specific**|
-| `debug_getRawBlock`                                                                   | Debug     | ✅          | ❌     | **Cosmos-specific**|
-| `debug_getRawHeader`                                                                  | Debug     | ✅          | ❌     | **Cosmos-specific**|
-| `debug_getRawReceipts`                                                                | Debug     | ✅          | ❌     | **Cosmos-specific**|
-| `debug_getRawTransaction`                                                             | Debug     | ✅          | ❌     | **Cosmos-specific**|
-| `debug_printBlock`                                                                    | Debug     | ✅          | ❌     | **Cosmos-specific**|
+| `debug_getRawBlock`                                                                   | Debug     | ❌          | ❌     | Not implemented    |
+| `debug_getRawHeader`                                                                  | Debug     | ❌          | ❌     | Not implemented    |
+| `debug_getRawReceipts`                                                                | Debug     | ❌          | ❌     | Not implemented    |
+| `debug_getRawTransaction`                                                             | Debug     | ❌          | ❌     | Not implemented    |
+| `debug_printBlock`                                                                    | Debug     | ❌          | ❌     | Not implemented    |
 | `les_serverInfo`                                                                      | Les       | N/A         | N/A    | LES protocol       |
 | `les_clientInfo`                                                                      | Les       | N/A         | N/A    | LES protocol       |
 | `les_priorityClientInfo`                                                              | Les       | N/A         | N/A    | LES protocol       |
@@ -157,19 +157,19 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | `les_latestCheckpoint`                                                                | Les       | N/A         | N/A    | LES protocol       |
 | `les_getCheckpoint`                                                                   | Les       | N/A         | N/A    | LES protocol       |
 | `les_getCheckpointContractAddress`                                                    | Les       | N/A         | N/A    | LES protocol       |
-| [`miner_getHashrate`](#miner_gethashrate)                                             | Miner     | ✅          | ❌     | Always 0           |
-| [`miner_setExtra`](#miner_setextra)                                                   | Miner     | ✅          | ❌     | Not supported      |
-| [`miner_setGasPrice`](#miner_setgasprice)                                             | Miner     | ✅          | ❌     | Needs node restart |
-| [`miner_start`](#miner_start)                                                         | Miner     | ✅          | ❌     | Not supported      |
-| [`miner_stop`](#miner_stop)                                                           | Miner     | ✅          | ❌     | Not supported      |
-| [`miner_setGasLimit`](#miner_setgaslimit)                                             | Miner     | ✅          | ❌     | Not supported      |
-| [`miner_setEtherbase`](#miner_setetherbase)                                           | Miner     | ✅          | ❌     |                    |
+| [`miner_getHashrate`](#miner_gethashrate)                                             | Miner     | ❌          | ❌     | Not implemented    |
+| [`miner_setExtra`](#miner_setextra)                                                   | Miner     | ❌          | ❌     | Not implemented    |
+| [`miner_setGasPrice`](#miner_setgasprice)                                             | Miner     | ❌          | ❌     | Not implemented    |
+| [`miner_start`](#miner_start)                                                         | Miner     | ❌          | ❌     | Not implemented    |
+| [`miner_stop`](#miner_stop)                                                           | Miner     | ❌          | ❌     | Not implemented    |
+| [`miner_setGasLimit`](#miner_setgaslimit)                                             | Miner     | ❌          | ❌     | Not implemented    |
+| [`miner_setEtherbase`](#miner_setetherbase)                                           | Miner     | ❌          | ❌     | Not implemented    |
 | [`txpool_content`](#txpool_content)                                                   | TxPool    | ✅          | ✅     | Empty impl         |
 | [`txpool_inspect`](#txpool_inspect)                                                   | TxPool    | ✅          | ✅     | Empty impl         |
 | [`txpool_status`](#txpool_status)                                                     | TxPool    | ✅          | ✅     | Returns zeros      |
 | `trace_callMany`                                                                      | Trace     | ❌          | ❌     | Not implemented    |
-| `eth_signTypedData`                                                                   | Eth       | ✅          | ❌     | EIP-712            |
-| `eth_fillTransaction`                                                                 | Eth       | ✅          | ❌     | **Cosmos-specific**|
+| `eth_signTypedData`                                                                   | Eth       | ⚠️         | ❌     | EIP-712 partial    |
+| `eth_fillTransaction`                                                                 | Eth       | ❌          | ❌     | Not implemented    |
 | `eth_getTransactionLogs`                                                              | Eth       | ✅          | ✅     | **Cosmos-specific**|
 | `eth_getPendingTransactions`                                                          | Eth       | ✅          | ❌     | **Cosmos-specific**|
 | `engine_newPayloadV1`                                                                 | Engine    | ❌          | ❌     | Post-merge API     |
@@ -202,21 +202,37 @@ Block Number can be entered as a Hex string, `"earliest"`, `"latest"` or `"pendi
 </Check>
 
 <Info>
-**EIP-1559 Support**: Cosmos EVM fully supports EIP-1559 transaction types and includes methods like `eth_feeHistory` and `eth_maxPriorityFeePerGas`.
+**EIP-1559 Support**: Cosmos EVM supports EIP-1559 transaction types with `eth_maxPriorityFeePerGas`, though `eth_feeHistory` is not yet implemented.
 
 **Consensus Differences**: Due to using Tendermint BFT consensus instead of Proof of Work/Stake:
-* Mining methods (`miner_*`) are no-ops or return static values
+* Mining methods (`miner_*`) are not implemented
 * Uncle-related methods always return 0 or null
 * Block reorganizations are not possible
 * Engine API (`engine_*`) is not applicable - Tendermint handles consensus
 
 **Methods Not Implemented**:
 * `eth_createAccessList` (EIP-2930) - Access list transactions
-* `trace_*` methods - Advanced tracing functionality (except limited debug methods)
+* `eth_feeHistory` - Fee history for EIP-1559
+* `eth_getFilterChanges` / `eth_getFilterLogs` - Filter management issues
+* `eth_fillTransaction` - Transaction filling utility
+* `eth_resend` / `eth_pendingTransactions` - Transaction pool management
+* `personal_sendTransaction` / `personal_ecRecover` - Personal namespace methods
+* `personal_lockAccount` - Always returns false (not supported)
+* `debug_getRaw*` methods - Raw data access methods
+* `debug_printBlock` - Block printing utility
+* `miner_*` methods - All mining-related functionality
+* `trace_*` methods - Advanced tracing functionality
 * `engine_*` methods - Post-merge Engine API (uses Tendermint instead)
 * `admin_*` methods - Node administration
 * `les_*` methods - Light Ethereum Subprotocol
 * `clique_*` methods - Proof of Authority consensus
+
+**Partial Implementations**:
+* `eth_getProof` - Requires block height > 2
+* `eth_signTypedData` (EIP-712) - Partial implementation
+* `eth_subscribe` - Works for newHeads, logs, and newPendingTransactions but not syncing
+* `personal_unlockAccount` - Always returns false
+* `debug_traceTransaction` - Has issues with block height
 
 For more details on how Cosmos EVM differs from standard Ethereum implementations, see [Differences from Standard EVMs](/docs/documentation/differences).
 </Info>
@@ -826,6 +842,193 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_coinbase","params":[],"id":1
 {"jsonrpc":"2.0","id":1,"result":"0x7cB61D4117AE31a12E393a1Cfa3BaC666481D02E"}
 ```
 
+### `eth_mining`
+
+Returns whether the client is actively mining new blocks.
+
+<Info>
+Always returns `false` as Cosmos EVM uses Tendermint consensus instead of mining.
+</Info>
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_mining","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":false}
+```
+
+### `eth_hashrate`
+
+Returns the number of hashes per second that the node is mining with.
+
+<Info>
+Always returns `0x0` as Cosmos EVM uses Tendermint consensus instead of mining.
+</Info>
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_hashrate","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0x0"}
+```
+
+### `eth_chainId`
+
+Returns the chain ID used for signing replay-protected transactions.
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0x40000"}
+```
+
+### `eth_getUncleCountByBlockHash`
+
+Returns the number of uncles in a block matching the given block hash.
+
+<Info>
+Always returns `0x0` as Cosmos EVM does not have uncles due to using Tendermint consensus.
+</Info>
+
+#### Parameters
+
+- Block hash
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getUncleCountByBlockHash","params":["0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0x0"}
+```
+
+### `eth_getUncleCountByBlockNumber`
+
+Returns the number of uncles in a block matching the given block number.
+
+<Info>
+Always returns `0x0` as Cosmos EVM does not have uncles due to using Tendermint consensus.
+</Info>
+
+#### Parameters
+
+- Block number
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getUncleCountByBlockNumber","params":["latest"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0x0"}
+```
+
+### `eth_getUncleByBlockHashAndIndex`
+
+Returns information about an uncle by block hash and uncle index position.
+
+<Info>
+Always returns `null` as Cosmos EVM does not have uncles due to using Tendermint consensus.
+</Info>
+
+#### Parameters
+
+- Block hash
+- Uncle index position
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getUncleByBlockHashAndIndex","params":["0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4", "0x0"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `eth_getUncleByBlockNumberAndIndex`
+
+Returns information about an uncle by block number and uncle index position.
+
+<Info>
+Always returns `null` as Cosmos EVM does not have uncles due to using Tendermint consensus.
+</Info>
+
+#### Parameters
+
+- Block number
+- Uncle index position
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getUncleByBlockNumberAndIndex","params":["0x1", "0x0"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `eth_getTransactionByBlockNumberAndIndex`
+
+Returns information about a transaction by block number and transaction index position.
+
+#### Parameters
+
+- Block number
+- Transaction index position
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionByBlockNumberAndIndex","params":["0x1", "0x0"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":{"blockHash":"0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4","blockNumber":"0x1","from":"0xddd64b4712f7c8f1ace3c145c950339eddaf221d","gas":"0x4c4b40","gasPrice":"0x3b9aca00","hash":"0xae64961cb206a9773a6e5efeb337773a6fd0a2085ce480a174135a029afea615","input":"0x4f2be91f","nonce":"0x0","to":"0x439c697e0742a0ddb124a376efd62a72a94ac35a","transactionIndex":"0x0","value":"0x0","v":"0xa96","r":"0xced57d973e58b0f634f776d57daf41d3d3387ceb347a3a72ca0746e5ec2b709e","s":"0x384e89e209a5eb147a2bac3a4e399507400ac7b29cd155531f9d6203a89db3f2"}}
+```
+
+### `eth_maxPriorityFeePerGas`
+
+Returns the current maxPriorityFeePerGas per gas in wei.
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_maxPriorityFeePerGas","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0x0"}
+```
+
+### `eth_getBlockReceipts`
+
+Returns all transaction receipts for a given block.
+
+#### Parameters
+
+- Block number or block hash
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockReceipts","params":["latest"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":[{"blockHash":"0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4","blockNumber":"0xc","contractAddress":"0x0000000000000000000000000000000000000000","cumulativeGasUsed":null,"from":"0xddd64b4712f7c8f1ace3c145c950339eddaf221d","gasUsed":"0x5289","logs":[],"logsBloom":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","status":"0x1","to":"0x439c697e0742a0ddb124a376efd62a72a94ac35a","transactionHash":"0xae64961cb206a9773a6e5efeb337773a6fd0a2085ce480a174135a029afea615","transactionIndex":"0x0"}]}
+```
+
+### `eth_getPendingTransactions`
+
+Returns a list of pending transactions.
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getPendingTransactions","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":[]}
+```
+
+### `eth_getTransactionLogs`
+
+Returns the logs for a specific transaction.
+
+#### Parameters
+
+- Transaction hash
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionLogs","params":["0xae64961cb206a9773a6e5efeb337773a6fd0a2085ce480a174135a029afea615"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":[{"address":"0x439c697e0742a0ddb124a376efd62a72a94ac35a","topics":["0x64a55044d1f2eddebe1b90e8e2853e8e96931cefadbfa0b2ceb34bee36061941"],"data":"0x0000000000000000000000000000000000000000000000000000000000000002","blockNumber":"0xc","transactionHash":"0xae64961cb206a9773a6e5efeb337773a6fd0a2085ce480a174135a029afea615","transactionIndex":"0x0","blockHash":"0x0000000000000000000000000000000000000000000000000000000000000000","logIndex":"0x0","removed":false}]}
+```
+
 ### `eth_getProof`
 
 Returns the account- and storage-values of the specified account including the Merkle-proof.
@@ -1142,6 +1345,25 @@ Javascript Console
 personal.unpair(url,pin);
 ```
 
+### `personal_listWallets`
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+Returns a list of wallets this node manages.
+
+<Info>
+Currently returns `null` as wallet-level management is not supported.
+</Info>
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"personal_listWallets","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
 ## Debug Methods
 
 ### `debug_traceTransaction`
@@ -1167,15 +1389,155 @@ The `traceBlockByNumber` endpoint accepts a block number and will replay the blo
 
 #### Parameters
 
-  - Trace Config
-
-
+  - Block number
+  - Trace Config (optional)
 
 ```shell
 // Request
 curl -X POST --data '{"jsonrpc":"2.0","method":"debug_traceBlockByNumber","params":["0xe", {"tracer": "{data: [], fault: function(log) {}, step: function(log) { if(log.op.toString() == \"CALL\") this.data.push(log.stack.peek(0)); }, result: function() { return this.data; }}"}],"id":1}' -H "Content-Type: application/json" http://localhost:8545
 //Result
 {"jsonrpc":"2.0","id":1,"result":[{"result":["68410", "51470"]}]}
+```
+
+### `debug_traceBlockByHash`
+
+Similar to `debug_traceBlockByNumber`, this method accepts a block hash and will replay the block that is already present in the database.
+
+#### Parameters
+
+  - Block hash
+  - Trace Config (optional)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_traceBlockByHash","params":["0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4", {}],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":[{"result":{"failed":false,"gas":21000,"returnValue":"0x","structLogs":[]}}]}
+```
+
+### `debug_freeOSMemory`
+
+Forces the Go runtime to perform a garbage collection and return unused memory to the OS.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_freeOSMemory","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_setGCPercent`
+
+Sets the garbage collection target percentage. A negative value disables garbage collection.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+  - GC percentage (integer)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_setGCPercent","params":[100],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":100}
+```
+
+### `debug_memStats`
+
+Returns detailed runtime memory statistics.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_memStats","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":{"Alloc":83328680,"TotalAlloc":451796592,"Sys":166452520,"Lookups":0,"Mallocs":4071615,"Frees":3772501,"HeapAlloc":83328680,"HeapSys":153452544,"HeapIdle":51568640,"HeapInuse":101883904,"HeapReleased":44720128,"HeapObjects":299114,"StackInuse":1736704,"StackSys":1736704,"MSpanInuse":1119520,"MSpanSys":1958400,"MCacheInuse":16912,"MCacheSys":31408,"BuckHashSys":1583603,"GCSys":5251008,"OtherSys":2438853,"NextGC":142217095,"LastGC":1754180652189080000,"PauseTotalNs":1266251,"NumGC":18,"NumForcedGC":1,"GCCPUFraction":0.0002128524091018015,"EnableGC":true,"DebugGC":false}}
+```
+
+### `debug_setBlockProfileRate`
+
+Sets the rate of goroutine block profile data collection. A non-zero value enables block profiling.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+  - Profile rate (integer)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_setBlockProfileRate","params":[1],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_writeBlockProfile`
+
+Writes a goroutine blocking profile to the specified file.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+  - File path (string)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_writeBlockProfile","params":["block.prof"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_writeMemProfile`
+
+Writes an allocation profile to the specified file.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+  - File path (string)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_writeMemProfile","params":["mem.prof"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_writeMutexProfile`
+
+Writes a mutex contention profile to the specified file.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+  - File path (string)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_writeMutexProfile","params":["mutex.prof"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
 ```
 
 ## Miner Methods
