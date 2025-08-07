@@ -11,6 +11,39 @@ The ERC20 precompile provides standard ERC20 token functionality for native Cosm
 
 **Related Module**: [x/erc20](https://docs.cosmos.network/main/modules/erc20)
 
+## Gas Costs
+
+<Callout type="info">
+  Gas costs are approximated and may vary based on token complexity and chain settings.
+</Callout>
+
+| Method | Gas Cost |
+|---|---|
+| `name()` | ~3,000 gas |
+| `symbol()` | ~3,000 gas |
+| `decimals()` | ~2,000 gas |
+| `totalSupply()` | ~2,500 gas |
+| `balanceOf(address)` | ~2,900 gas |
+| `allowance(address,address)` | ~3,000 gas |
+| `transfer(address,uint256)` | ~35,000 gas |
+| `transferFrom(address,address,uint256)` | ~40,000 gas |
+| `approve(address,uint256)` | ~30,000 gas |
+| `increaseAllowance(address,uint256)` | ~30,500 gas |
+| `decreaseAllowance(address,uint256)` | ~30,500 gas |
+
+## Token Pair Mapping
+
+The ERC20 precompile works through a token pair mapping system:
+
+1. **Native Cosmos Token**: Each Cosmos SDK denomination (e.g., `uatom`, `stake`) exists as a native token
+2. **ERC20 Contract**: A corresponding ERC20 precompile contract is created at a unique address
+3. **Bidirectional Conversion**: Tokens can be converted between native and ERC20 representations
+4. **Dynamic Addresses**: Each token pair gets its own precompile address when registered
+
+<Callout type="info">
+  The precompile address is deterministically generated based on the token denomination. Query the x/erc20 module to find the precompile address for a specific token.
+</Callout>
+
 ## Methods
 
 ### `totalSupply`
@@ -239,6 +272,10 @@ curl -X POST --data '{
 
 ### `decimals`
 Returns the number of decimals used for the token.
+
+<Callout type="warning">
+  **Decimal Handling**: The ERC20 precompile may need to handle complex decimal conversions between Cosmos native tokens and ERC20 representation. Some Cosmos tokens use 6 decimals (e.g., `uatom`) while ERC20 typically uses 18. Always verify the decimal count for accurate amount calculations.
+</Callout>
 
 <CodeGroup>
 ```javascript Ethers.js expandable lines

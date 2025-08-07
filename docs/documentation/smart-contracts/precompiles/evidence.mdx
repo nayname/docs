@@ -4,6 +4,10 @@ description: "Query and Submit evidence of validator misbehavior (equivocation)"
 icon: "gavel"
 ---
 
+<Callout type="warning" title="Implementation Status">
+  The Evidence precompile is not currently implemented in the EVM repository. While the interface is defined and documented here for completeness, attempting to call this precompile will result in errors. This functionality may be added in future releases.
+</Callout>
+
 ## Overview
 
 The Evidence precompile allows for the submission and querying of evidence related to validator misbehavior, such as equivocation (double-signing blocks). It serves as the Solidity interface for the Cosmos SDK's `x/evidence` module.

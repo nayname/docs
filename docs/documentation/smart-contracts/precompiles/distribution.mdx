@@ -12,10 +12,36 @@ The Distribution precompile provides access to the Cosmos SDK `x/distribution` m
 
 **Related Module**: [x/distribution](https://docs.cosmos.network/main/modules/distribution)
 
+## Gas Costs
+
+<Callout type="info">
+  Gas costs are approximated and may vary based on call complexity and chain settings.
+</Callout>
+
+| Method | Gas Cost |
+|---|---|
+| **Transactions** | `2000 + (30 × bytes of input)` |
+| **Queries** | `1000 + (3 × bytes of input)` |
+
+## Message Type Constants
+
+The precompile defines the following constants for the various Cosmos SDK message types:
+
+```solidity
+// Transaction message type URLs
+string constant MSG_CLAIM_REWARDS = "/cosmos.distribution.v1beta1.MsgClaimRewards";
+string constant MSG_SET_WITHDRAW_ADDRESS = "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress";
+string constant MSG_WITHDRAW_DELEGATOR_REWARD = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward";
+```
+
 ## Transaction Methods
 
 ### claimRewards
 Claims staking rewards from multiple validators.
+
+<Callout type="info">
+  The `maxRetrieve` parameter limits the number of validators from which to claim rewards in a single transaction. This prevents excessive gas consumption when a delegator has rewards from many validators.
+</Callout>
 
 ### withdrawDelegatorRewards
 Withdraws staking rewards from a single, specific validator.

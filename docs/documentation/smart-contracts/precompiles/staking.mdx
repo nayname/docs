@@ -11,6 +11,17 @@ The Staking precompile provides a comprehensive interface to the Cosmos SDK's `x
 **Precompile Address**: `0x0000000000000000000000000000000000000800`
 **Related Module**: [x/staking](https://docs.cosmos.network/main/modules/staking)
 
+## Gas Costs
+
+<Callout type="info">
+  Gas costs are approximated and may vary based on the complexity of the staking operation and chain settings.
+</Callout>
+
+| Method | Gas Cost |
+|---|---|
+| **Transactions** | `2000 + (30 × bytes of input)` |
+| **Queries** | `1000 + (3 × bytes of input)` |
+
 ## Transaction Methods
 
 ### `createValidator`

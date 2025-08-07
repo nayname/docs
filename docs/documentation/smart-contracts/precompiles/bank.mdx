@@ -12,6 +12,12 @@ The Bank precompile provides ERC20-style access to native Cosmos SDK tokens, ena
 
 **Related Module**: [x/bank](https://docs.cosmos.network/main/modules/bank)
 
+## Gas Costs
+
+- **balances**: 2,851 + (2,851 × (n-1)) where n = number of tokens returned
+- **totalSupply**: 2,477 + (2,477 × (n-1)) where n = number of tokens returned  
+- **supplyOf**: 2,477
+
 ## Primary Methods
 
 ### balances
@@ -331,3 +337,26 @@ interface IBank {
   "deployedLinkReferences": {}
 }
 ```
+
+## Implementation Details
+
+### Token Resolution
+
+The precompile resolves native Cosmos SDK denominations to their corresponding ERC-20 contract addresses through the `x/erc20` module's token pair registry. Only tokens with registered token pairs are returned in query results.
+
+### Decimal Precision
+
+All amounts returned preserve the original decimal precision stored in the `x/bank` module. No decimal conversion is performed by the precompile.
+
+### Gas Metering
+
+The precompile implements efficient gas metering by:
+- Charging base gas for the first result
+- Incrementally charging for each additional result in batch queries
+- Consuming gas before returning results to prevent DoS vectors
+
+### Error Handling
+
+- Invalid token addresses in `supplyOf` return 0 rather than reverting
+- Queries for accounts with no balances return empty arrays
+- All methods are read-only and cannot modify state

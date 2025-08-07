@@ -18,6 +18,10 @@ The Bech32 precompile exposes simple conversion helpers so Solidity contracts ca
 
 It is a thin wrapper around the Cosmos address‐conversion library and lives at **`0x0000000000000000000000000000000000000400`**.
 
+## Gas Costs
+
+Both methods use a configurable base gas amount that is set during chain initialization. The gas cost is fixed regardless of string length within reasonable bounds.
+
 ## Primary Methods
 
 ### `hexToBech32`
@@ -36,7 +40,7 @@ const provider = new ethers.JsonRpcProvider("<RPC_URL>");
 // Precompile address and ABI
 const precompileAddress = "0x0000000000000000000000000000000000000400";
 const precompileAbi = [
-  "function hexToBech32(address addr, string memory prefix) view returns (string memory)"
+  "function hexToBech32(address addr, string memory prefix) returns (string memory)"
 ];
 
 // Create a contract instance
@@ -97,7 +101,7 @@ const provider = new ethers.JsonRpcProvider("<RPC_URL>");
 // Precompile address and ABI
 const precompileAddress = "0x0000000000000000000000000000000000000400";
 const precompileAbi = [
-  "function bech32ToHex(string memory bech32Address) view returns (address)"
+  "function bech32ToHex(string memory bech32Address) returns (address)"
 ];
 
 // Create a contract instance
@@ -153,8 +157,8 @@ address constant Bech32_PRECOMPILE_ADDRESS = 0x000000000000000000000000000000000
 Bech32I constant BECH32_CONTRACT = Bech32I(Bech32_PRECOMPILE_ADDRESS);
 
 interface Bech32I {
-    function hexToBech32(address addr,string memory prefix) external view returns (string memory bech32Address);
-    function bech32ToHex(string memory bech32Address) external view returns (address addr);
+    function hexToBech32(address addr,string memory prefix) external returns (string memory bech32Address);
+    function bech32ToHex(string memory bech32Address) external returns (address addr);
 }
 ```
 
@@ -194,3 +198,26 @@ interface Bech32I {
   "deployedLinkReferences": {}
 }
 ```
+
+## Implementation Details
+
+### Address Validation
+
+Both methods perform validation on the address format:
+- **hexToBech32**: Validates that the hex address is exactly 20 bytes and the prefix is non-empty
+- **bech32ToHex**: Validates that the bech32 address contains the separator character "1" and decodes to 20 bytes
+
+### Prefix Handling
+
+For `hexToBech32`:
+- The prefix parameter determines the human-readable part of the bech32 address
+- Common prefixes include account addresses, validator addresses, and consensus addresses
+- Empty or whitespace-only prefixes result in an error with suggested valid prefixes
+
+For `bech32ToHex`:
+- The prefix is automatically extracted from the bech32 address
+- No prefix parameter is required as it's embedded in the address
+
+### State Mutability
+
+While both methods are marked as `nonpayable` in the ABI, they function as read-only operations and do not modify blockchain state.
