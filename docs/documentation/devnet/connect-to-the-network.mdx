@@ -19,7 +19,7 @@ import { footnote } from '/snippets/footnote.mdx'
 
 | Endpoint | Value | Purpose |
 |-------------------|----------------------|---------|
-| **EVM JSON-RPC** | `https://devnet-1-evmrpc.ib.skip.build` | Ethereum-compatible tools (MetaMask, Hardhat, ethers.js) |
+| **EVM JSON-RPC** | `<evm_rpc_url>` | Ethereum-compatible tools (MetaMask, Hardhat, ethers.js) |
 | **EVM RPC WS**   | `wss://devnet-1-evmws.ib.skip.build`   | Streaming real-time, selective data for applications |
 | **Cosmos RPC** | `https://devnet-1-rpc.ib.skip.build` | Tendermint-level interactions (blocks, consensus state) |
 | **Cosmos REST API** | `https://devnet-1-lcd.ib.skip.build` | Query Cosmos SDK modules (bank, staking, etc.) |
@@ -45,7 +45,7 @@ const chainConfig = {
     symbol: 'ATOM',
     decimals: 6
   },
-  rpcUrls: ['https://devnet-1-evmrpc.ib.skip.build'],
+  rpcUrls: ['<evm_rpc_url>'],
   blockExplorerUrls: ['https://evm-devnet-1.cloud.blockscout.com/']
 };
 
@@ -61,7 +61,7 @@ await window.ethereum.request({
     - [Cosmos] Chain ID: `4321`
     - [EVM] Chain ID: `4231`
     - [Cosmos] RPC URL: `https://devnet-1-rpc.ib.skip.build`
-    - [EVM] RPC URL: `https://devnet-1-evmrpc.ib.skip.build`
+    - [EVM] RPC URL: `<evm_rpc_url>`
     - Chain Name: `Skip Devnet`
     - Currency Symbol: `ATOM`
     - Currency Decimals: `6`
@@ -202,7 +202,7 @@ Basic endpoints:
 Connect your Ethereum tools to the EVM module:
 
 ```
-RPC:       https://devnet-1-evmrpc.ib.skip.build
+RPC:       <evm_rpc_url>
 WebSocket: wss://devnet-1-evmws.ib.skip.build
 Chain ID:  4321 (0x10e1)
 ```

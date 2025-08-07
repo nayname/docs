@@ -50,14 +50,14 @@ Here is an example of a global configuration for connecting to a local Cosmos EV
 
 # Declare your named endpoints (optional; for forge test / forking)
 [rpc_endpoints]
-cosmos = "https://devnet-1-evmrpc.ib.skip.build"
+cosmos = "<evm_rpc_url>"
 
 # Configure the default profile for cast/forge/anvil
 [profile.default]
 # Tell Foundry which chain you're targeting:
 chain_id     = 4321
 # Directly tell cast to use your endpoint:
-eth_rpc_url  = "https://devnet-1-evmrpc.ib.skip.build"
+eth_rpc_url  = "<evm_rpc_url>"
 # Set EVM version for Solidity compilation
 evm_version  = "istanbul"
 ```
@@ -169,7 +169,7 @@ In your shell's configuration file (`~/.bashrc`, `~/.zshrc`), you can alias `cas
 
 ```bash lines expandable
 # Set your default RPC endpoint
-export CDEV_RPC="https://devnet-1-evmrpc.ib.skip.build"
+export CDEV_RPC="<evm_rpc_url>"
 # Create an alias
 alias ccast='cast --rpc-url $CDEV_RPC'
 
