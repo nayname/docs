@@ -19,6 +19,26 @@ Native Cosmos tokens (including ATOM and all IBC tokens) exist in both wrapped a
 **Precompile Type**: Dynamic (unique address per wrapped token)
 **Related Module**: x/bank (via ERC20 module integration)
 
+## Gas Costs
+
+<Callout type="info">
+  Gas costs are approximated and may vary based on token complexity and chain settings.
+</Callout>
+
+| Method | Gas Cost |
+|---|---|
+| `name()` | ~3,000 gas |
+| `symbol()` | ~3,000 gas |
+| `decimals()` | ~2,000 gas |
+| `totalSupply()` | ~2,500 gas |
+| `balanceOf(address)` | ~2,900 gas |
+| `allowance(address,address)` | ~3,000 gas |
+| `transfer(address,uint256)` | ~35,000 gas |
+| `transferFrom(address,address,uint256)` | ~40,000 gas |
+| `approve(address,uint256)` | ~30,000 gas |
+| `deposit()` | ~23,000 gas (no-op) |
+| `withdraw(uint256)` | ~9,000 gas (no-op) |
+
 <Note>
 For a comprehensive understanding of how single token representation works and its benefits over traditional wrapping, see the [Single Token Representation](/docs/documentation/concepts/single-token-representation) documentation.
 </Note>
@@ -65,6 +85,15 @@ function withdraw(uint256 amount) external {
     // No conversion needed as they're the same token
 }
 ```
+
+<Callout type="info" title="Understanding the Deposit/Withdraw Pattern">
+Unlike traditional WETH implementations where the contract holds wrapped tokens:
+- **Traditional WETH**: Contract receives ETH and mints WETH tokens that it holds
+- **WERC20**: Contract never holds tokens - all balances remain in the bank module
+- **Result**: The precompile contract address has no balance; tokens stay with users
+
+This is why `deposit()` and `withdraw()` are no-ops - there's no separate wrapped token state to manage.
+</Callout>
 
 ### Real-World Example
 

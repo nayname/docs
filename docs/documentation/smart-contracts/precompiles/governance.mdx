@@ -11,6 +11,17 @@ The Governance precompile provides comprehensive access to the Cosmos SDK's `x/g
 **Precompile Address**: `0x0000000000000000000000000000000000000805`
 **Related Module**: [x/gov](https://docs.cosmos.network/main/modules/gov)
 
+## Gas Costs
+
+<Callout type="info">
+  Gas costs are approximated and may vary based on proposal complexity and chain settings.
+</Callout>
+
+| Method | Gas Cost |
+|---|---|
+| **Transactions** | `2000 + (30 × bytes of input)` |
+| **Queries** | `1000 + (3 × bytes of input)` |
+
 ## Transaction Methods
 
 ### `submitProposal`

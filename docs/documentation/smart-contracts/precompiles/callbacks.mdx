@@ -30,6 +30,41 @@ Critically, **only the IBC packet sender can set the callback**.
 
 **Description**: Callback function invoked on the source chain after a packet lifecycle is completed and the packet has timed out. The contract implementing this interface receives packet information to execute custom timeout handling logic.
 
+## Security Considerations
+
+When implementing the Callbacks interface, consider the following security aspects:
+
+### Caller Validation
+- **Critical**: Only the IBC module should invoke these callback functions
+- Implementing contracts must validate that the caller is the authorized IBC module address
+- Failure to validate the caller could allow malicious actors to trigger callbacks
+
+### Gas Considerations
+- Callback execution consumes gas from the IBC transaction
+- Complex callback logic may cause the transaction to run out of gas
+- Consider implementing gas-efficient callback logic or handling partial execution states
+- Be aware that callback failures may impact the overall IBC packet lifecycle
+
+### Example Security Pattern
+```solidity
+contract SecureIBCCallback is ICallbacks {
+    address constant IBC_MODULE = 0x...; // IBC module address
+    
+    modifier onlyIBC() {
+        require(msg.sender == IBC_MODULE, "Unauthorized");
+        _;
+    }
+    
+    function onPacketAcknowledgement(...) external onlyIBC {
+        // Callback logic
+    }
+    
+    function onPacketTimeout(...) external onlyIBC {
+        // Timeout logic
+    }
+}
+```
+
 ## Full Solidity Interface & ABI
 
 ```solidity title="Callbacks Solidity Interface" lines expandable

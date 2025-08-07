@@ -11,6 +11,39 @@ The ICS20 precompile provides an interface to the Inter-Blockchain Communication
 **Precompile Address**: `0x0000000000000000000000000000000000000802`
 **Related Module**: [x/ibc-transfer](https://ibc.cosmos.network/main/apps/transfer/overview.html)
 
+## Gas Costs
+
+<Callout type="info">
+  Gas costs are approximated and may vary based on the transfer complexity and chain settings.
+</Callout>
+
+| Method | Gas Cost |
+|---|---|
+| **Transfer** | `50,000 + (100 × memo length)` |
+| **Queries** | `1000 + (3 × bytes of input)` |
+
+## Channel Validation
+
+<Callout type="warning">
+  Before initiating a transfer, ensure that:
+  - The source channel exists and is in an OPEN state
+  - The channel is connected to the intended destination chain
+  - The port ID matches the expected value (typically "transfer")
+</Callout>
+
+You can verify channel status using the IBC module queries or chain explorers.
+
+## Timeout Mechanism
+
+IBC transfers include two timeout options to prevent tokens from being locked indefinitely:
+
+1. **Height Timeout**: Specified as `{revisionNumber, revisionHeight}`. Set both to 0 to disable.
+2. **Timestamp Timeout**: Unix timestamp in nanoseconds. Set to 0 to disable.
+
+<Callout type="info">
+  At least one timeout mechanism must be set. Recommended practice is to use timestamp timeout set to 1 hour from the current time.
+</Callout>
+
 ## Transaction Methods
 
 ### `transfer`
