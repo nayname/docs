@@ -5,6 +5,8 @@ mode: "wide"
 keywords: ['differences', 'ethereum', 'evm', 'cosmos', 'tendermint', 'consensus', 'finality', 'json-rpc', 'compatibility', 'precompiles', 'ibc', 'mev', 'gas', 'basefee', 'uncle blocks', 'reorganization', 'stub methods', 'implementation']
 ---
 
+import { footnote } from '/snippets/footnote.mdx'
+
 <Warning>
   **The EVM module is still in active development:** Some of what is detailed here may change or be removed entirely as development continues.
 </Warning>
@@ -13,9 +15,9 @@ keywords: ['differences', 'ethereum', 'evm', 'cosmos', 'tendermint', 'consensus'
 
 | Aspect | Cosmos EVM | Standard EVM | Impact |
 |--------|------------|--------------|---------|
-| **Transaction Ordering** | Arrival time to proposer | Gas price and nonce | Deterministic vs competitive ordering |
-| **Transactions per Block** | One per EOA per block | Multiple per account | Simplified transaction flow |
-| **Mempool** | No app-side mempool | Traditional mempool | Limited MEV opportunities |
+| **Transaction Ordering** | Arrival time to proposer\*\* | Gas price and nonce | Deterministic vs competitive ordering |
+| **Transactions per Block** | One per EOA per block\*\* | Multiple per account | Simplified transaction flow |
+| **Mempool** | No app-side mempool\*\* | Traditional mempool | Limited MEV opportunities |
 | **Consensus** | Tendermint BFT | Proof of Work/Stake | 1-2 second vs 12+ second blocks |
 | **Finality** | Immediate (single block) | Probabilistic (12+ confirmations) | No waiting period vs 12-15 minute finality |
 | **Chain Reorganizations** | Not possible | Possible | Event handling simplified |
@@ -24,6 +26,8 @@ keywords: ['differences', 'ethereum', 'evm', 'cosmos', 'tendermint', 'consensus'
 | **Base Fee** | Returns 0 | Dynamic based on demand | Different fee calculation |
 | **Block Time** | 1-2 seconds | 12-15 seconds (varies by L2) | Faster transaction confirmation |
 | **Cross-chain** | Native IBC | Bridge protocols | Built-in interoperability |
+
+<footnote>\*\*This will no longer be the case with the upcoming release of the [app-side mempool](https://www.notion.so/skip-protocol/EXT-Cosmos-EVM-Appside-Mempool-21e8c17818cb80028f28cfa440d7a7e7)</footnote>
 
 ## Gas Price Behavior
 
