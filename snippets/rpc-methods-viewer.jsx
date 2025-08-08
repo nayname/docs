@@ -2,11 +2,15 @@ import React from 'react';
 import { CurlIcon, TypeScriptIcon, GoIcon, RustIcon, PythonIcon, CppIcon, APIIcon, NetworkIcon, EthereumIcon, SmartContractIcon } from '/snippets/icons.mdx';
 
 export default function RPCMethodsViewer() {
-  const [selectedNamespace, setSelectedNamespace] = React.useState('eth');
+  const [selectedNamespace, setSelectedNamespace] = React.useState('all');
   const [searchTerm, setSearchTerm] = React.useState('');
   const [showOnlyImplemented, setShowOnlyImplemented] = React.useState(false);
   const [expandedMethods, setExpandedMethods] = React.useState({});
   const [selectedLanguage, setSelectedLanguage] = React.useState({});
+  const [rpcEndpoint, setRpcEndpoint] = React.useState('');
+  const [isInteractive, setIsInteractive] = React.useState(false);
+  const [requestResults, setRequestResults] = React.useState({});
+  const [isLoading, setIsLoading] = React.useState({});
 
   const languages = [
     { id: 'curl', name: 'cURL', icon: CurlIcon },
@@ -176,9 +180,6 @@ int main() {
     web3: {
       name: 'Web3',
       icon: APIIcon,
-      color: 'bg-black dark:bg-white',
-      lightTextColor: 'text-white',
-      darkTextColor: 'dark:text-black',
       methods: [
         {
           name: 'web3_clientVersion',
@@ -222,9 +223,6 @@ int main() {
     net: {
       name: 'Net',
       icon: NetworkIcon,
-      color: 'bg-gray-600 dark:bg-gray-400',
-      lightTextColor: 'text-white',
-      darkTextColor: 'dark:text-black',
       methods: [
         {
           name: 'net_version',
@@ -280,9 +278,6 @@ int main() {
     eth: {
       name: 'Eth',
       icon: EthereumIcon,
-      color: 'bg-gray-800 dark:bg-gray-200',
-      lightTextColor: 'text-white',
-      darkTextColor: 'dark:text-black',
       methods: [
         {
           name: 'eth_blockNumber',
@@ -555,9 +550,6 @@ int main() {
     personal: {
       name: 'Personal',
       icon: SmartContractIcon,
-      color: 'bg-gray-700 dark:bg-gray-300',
-      lightTextColor: 'text-white',
-      darkTextColor: 'dark:text-black',
       methods: [
         {
           name: 'personal_importRawKey',
@@ -782,9 +774,6 @@ int main() {
     debug: {
       name: 'Debug',
       icon: SmartContractIcon,
-      color: 'bg-gray-500 dark:bg-gray-500',
-      lightTextColor: 'text-white',
-      darkTextColor: 'dark:text-white',
       methods: [
         {
           name: 'debug_traceTransaction',
@@ -1023,9 +1012,6 @@ int main() {
     txpool: {
       name: 'TxPool',
       icon: NetworkIcon,
-      color: 'bg-indigo-600 dark:bg-indigo-400',
-      lightTextColor: 'text-white',
-      darkTextColor: 'dark:text-black',
       methods: [
         {
           name: 'txpool_content',
@@ -1086,9 +1072,6 @@ int main() {
     miner: {
       name: 'Miner',
       icon: SmartContractIcon,
-      color: 'bg-amber-600 dark:bg-amber-500',
-      lightTextColor: 'text-white',
-      darkTextColor: 'dark:text-black',
       methods: [
         {
           name: 'miner_getHashrate',
@@ -1223,6 +1206,49 @@ int main() {
     }));
   };
 
+  const executeRpcRequest = async (methodName, params = []) => {
+    if (!rpcEndpoint) {
+      alert('Please enter an RPC endpoint URL');
+      return;
+    }
+
+    const requestId = `${methodName}-${Date.now()}`;
+    setIsLoading(prev => ({ ...prev, [methodName]: true }));
+
+    try {
+      const response = await fetch(rpcEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: methodName,
+          params: params
+        })
+      });
+
+      const data = await response.json();
+      setRequestResults(prev => ({
+        ...prev,
+        [methodName]: data
+      }));
+    } catch (error) {
+      setRequestResults(prev => ({
+        ...prev,
+        [methodName]: {
+          error: {
+            message: error.message,
+            code: -1
+          }
+        }
+      }));
+    } finally {
+      setIsLoading(prev => ({ ...prev, [methodName]: false }));
+    }
+  };
+
   const getSelectedLanguage = (methodName) => {
     return selectedLanguage[methodName] || 'curl';
   };
@@ -1256,6 +1282,11 @@ int main() {
       });
     }
 
+    // Show all methods if 'all' is selected
+    if (selectedNamespace === 'all') {
+      return allMethods.filter(method => !showOnlyImplemented || method.implemented);
+    }
+
     // Otherwise, show methods from selected namespace
     const namespace = namespaces[selectedNamespace];
     if (!namespace) return [];
@@ -1279,7 +1310,7 @@ int main() {
     return (
       <button
         onClick={handleCopy}
-        className="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded transition-colors font-mono"
+        className="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-700 dark:text-[#cccccc] rounded transition-colors font-mono"
       >
         {copied ? '✓ Copied' : 'Copy'}
       </button>
@@ -1295,54 +1326,93 @@ int main() {
             <h1 className="text-4xl font-bold text-black dark:text-white">
               Ethereum JSON-RPC Methods
             </h1>
-            <p className="mt-2 text-[#cccccc] dark:text-gray-400">
+            <p className="mt-2 text-gray-600 dark:text-[#cccccc]">
               Complete reference for Cosmos EVM implementation
             </p>
           </div>
 
           {/* Search and Filters */}
-          <div className="pb-4 flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <input
-                type="text"
-                placeholder="Search methods..."
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-900 text-black dark:text-white placeholder-gray-500"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+          <div className="pb-4 space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Search methods..."
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-900 text-black dark:text-white placeholder-gray-500"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="rounded text-black focus:ring-black dark:text-white dark:focus:ring-white"
+                  checked={showOnlyImplemented}
+                  onChange={(e) => setShowOnlyImplemented(e.target.checked)}
+                />
+                <span className="text-gray-700 dark:text-[#cccccc]">Show only implemented</span>
+              </label>
             </div>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input
-                type="checkbox"
-                className="rounded text-black focus:ring-black dark:text-white dark:focus:ring-white"
-                checked={showOnlyImplemented}
-                onChange={(e) => setShowOnlyImplemented(e.target.checked)}
-              />
-              <span className="text-gray-700 dark:text-gray-300">Show only implemented</span>
-            </label>
+            
+            {/* Interactive RPC Section */}
+            <div className="p-4 bg-gray-50 dark:bg-[#1a1a1a] rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    placeholder="Enter EVM RPC endpoint (e.g., http://localhost:8545)"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-[#0E0E0E] text-black dark:text-white placeholder-gray-500"
+                    value={rpcEndpoint}
+                    onChange={(e) => setRpcEndpoint(e.target.value)}
+                  />
+                </div>
+                <button
+                  onClick={() => setIsInteractive(!isInteractive)}
+                  className={`px-4 py-2 rounded-lg transition-all ${
+                    isInteractive
+                      ? 'bg-green-600 dark:bg-green-500 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-[#cccccc] hover:bg-gray-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {isInteractive ? '✓ Interactive Mode' : 'Enable Interactive Mode'}
+                </button>
+              </div>
+              {isInteractive && rpcEndpoint && (
+                <p className="mt-2 text-sm text-gray-600 dark:text-[#cccccc]">
+                  Interactive mode enabled. Click "Execute" on any method to send a real request to: <code className="font-mono text-black dark:text-white">{rpcEndpoint}</code>
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Namespace Tabs */}
-      <div className="sticky top-[165px] z-10 bg-gray-50 dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
+      <div className="sticky top-[165px] z-10 bg-gray-50 dark:bg-[#1a1a1a] border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-2 overflow-x-auto py-3">
+            <button
+              onClick={() => setSelectedNamespace('all')}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all whitespace-nowrap ${
+                selectedNamespace === 'all'
+                  ? 'bg-black dark:bg-white text-white dark:text-black'
+                  : 'bg-white dark:bg-[#0E0E0E] text-gray-700 dark:text-[#cccccc] hover:bg-gray-100 dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-700'
+              }`}
+            >
+              <span className="font-medium">All</span>
+            </button>
             {Object.entries(namespaces).map(([key, namespace]) => (
               <button
                 key={key}
                 onClick={() => setSelectedNamespace(key)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all whitespace-nowrap ${
                   selectedNamespace === key
-                    ? `${namespace.color} ${namespace.lightTextColor} ${namespace.darkTextColor}`
-                    : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700'
+                    ? 'bg-black dark:bg-white text-white dark:text-black'
+                    : 'bg-white dark:bg-[#0E0E0E] text-gray-700 dark:text-[#cccccc] hover:bg-gray-100 dark:hover:bg-[#1a1a1a] border border-gray-200 dark:border-gray-700'
                 }`}
               >
                 <span className="text-lg">{namespace.icon}</span>
                 <span className="font-medium">{namespace.name}</span>
-                <span className="text-sm opacity-75">
-                  ({namespace.methods.length})
-                </span>
               </button>
             ))}
           </div>
@@ -1354,7 +1424,7 @@ int main() {
         <div className="space-y-4">
           {filteredMethods.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-500 dark:text-[#cccccc]">
                 No methods found matching your criteria
               </p>
             </div>
@@ -1373,8 +1443,8 @@ int main() {
                       <code className="text-sm font-mono text-black dark:text-white">
                         {method.name}
                       </code>
-                      {searchTerm && method.namespace && (
-                        <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 rounded">
+                      {(searchTerm || selectedNamespace === 'all') && method.namespace && (
+                        <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-[#cccccc] rounded">
                           {namespaces[method.namespace].name}
                         </span>
                       )}
@@ -1389,7 +1459,7 @@ int main() {
                         </span>
                       )}
                     </div>
-                    <p className="text-[#cccccc] dark:text-gray-400 text-left">
+                    <p className="text-gray-600 dark:text-[#cccccc] text-left">
                       {method.description}
                     </p>
                   </div>
@@ -1462,10 +1532,19 @@ int main() {
                       <div className="space-y-6">
                         {method.examples.map((example, exampleIndex) => (
                           <div key={exampleIndex} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                            <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2">
+                            <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 flex items-center justify-between">
                               <h5 className="text-sm font-medium text-gray-900 dark:text-white">
                                 Example: {example.name}
                               </h5>
+                              {isInteractive && rpcEndpoint && (
+                                <button
+                                  onClick={() => executeRpcRequest(method.name, example.params)}
+                                  disabled={isLoading[method.name]}
+                                  className="px-3 py-1 text-xs bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded transition-colors disabled:opacity-50"
+                                >
+                                  {isLoading[method.name] ? 'Loading...' : 'Execute'}
+                                </button>
+                              )}
                             </div>
 
                             {/* Language Tabs */}
@@ -1519,6 +1598,22 @@ int main() {
                                 </code>
                               </pre>
                             </div>
+
+                            {/* Live RPC Response */}
+                            {isInteractive && requestResults[method.name] && (
+                              <div className="border-t border-gray-200 dark:border-gray-700">
+                                <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30">
+                                  <h6 className="text-xs font-medium text-blue-900 dark:text-blue-200">
+                                    Live RPC Response from {rpcEndpoint}
+                                  </h6>
+                                </div>
+                                <pre className="p-4 bg-gray-900 dark:bg-black text-xs overflow-x-auto">
+                                  <code className={requestResults[method.name].error ? 'text-red-400' : 'text-green-400'}>
+{JSON.stringify(requestResults[method.name], null, 2)}
+                                  </code>
+                                </pre>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -1531,32 +1626,6 @@ int main() {
         </div>
       </div>
 
-      {/* Stats Footer */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-gray-200 dark:border-gray-800">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {Object.entries(namespaces).map(([key, namespace]) => {
-            const implemented = namespace.methods.filter(m => m.implemented).length;
-            const total = namespace.methods.length;
-            const percentage = total > 0 ? Math.round((implemented / total) * 100) : 0;
-
-            return (
-              <div key={key} className="text-center">
-                <div className="text-2xl mb-1">{namespace.icon}</div>
-                <div className="font-medium text-black dark:text-white">{namespace.name}</div>
-                <div className="text-sm text-[#cccccc] dark:text-gray-400">
-                  {implemented}/{total} implemented
-                </div>
-                <div className="mt-2 w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
-                  <div
-                    className={`${namespace.color} h-2 rounded-full transition-all duration-300`}
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }
