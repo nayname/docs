@@ -1,5 +1,5 @@
 import React from 'react';
-import { CurlIcon, TypeScriptIcon, GoIcon, RustIcon, PythonIcon, CppIcon, APIIcon, NetworkIcon, EthereumIcon, SmartContractIcon } from '/snippets/icons.mdx';
+import { CurlIcon, TypeScriptIcon, GoIcon, RustIcon, PythonIcon, CSharpIcon, APIIcon, NetworkIcon, EthereumIcon, SmartContractIcon } from '/snippets/icons.mdx';
 
 export default function RPCMethodsViewer() {
   const [selectedNamespace, setSelectedNamespace] = React.useState('all');
@@ -18,7 +18,7 @@ export default function RPCMethodsViewer() {
     { id: 'go', name: 'Go', icon: GoIcon },
     { id: 'rust', name: 'Rust', icon: RustIcon },
     { id: 'python', name: 'Python', icon: PythonIcon },
-    { id: 'cpp', name: 'C++', icon: CppIcon }
+    { id: 'csharp', name: 'C#', icon: CSharpIcon }
   ];
 
   const generateCodeExamples = (method, params = []) => {
@@ -138,40 +138,62 @@ w3 = Web3(Web3.HTTPProvider("${endpoint}"))
 result = w3.provider.make_request("${method}", ${JSON.stringify(paramValues)})
 print(result)`,
 
-      cpp: `#include <iostream>
-#include <curl/curl.h>
-#include <nlohmann/json.hpp>
+      csharp: `using System;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
-using json = nlohmann::json;
+class Program
+{
+    static async Task Main()
+    {
+        var rpcUrl = "${endpoint}";
 
-int main() {
-    CURL *curl = curl_easy_init();
-    if(curl) {
-        json request = {
-            {"jsonrpc", "2.0"},
-            {"id", 1},
-            {"method", "${method}"},
-            {"params", ${JSON.stringify(paramValues)}}
+        var requestObj = new
+        {
+            jsonrpc = "2.0",
+            id = 1,
+            method = "${method}",
+            @params = ${JSON.stringify(paramValues)}
         };
 
-        std::string jsonStr = request.dump();
+        var jsonBody = JsonSerializer.Serialize(requestObj);
+        using var http = new HttpClient();
+        using var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
-        curl_easy_setopt(curl, CURLOPT_URL, "${endpoint}");
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonStr.c_str());
+        try
+        {
+            var response = await http.PostAsync(rpcUrl, content);
+            var responseBody = await response.Content.ReadAsStringAsync();
 
-        struct curl_slist *headers = NULL;
-        headers = curl_slist_append(headers, "Content-Type: application/json");
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.Error.WriteLine($"HTTP {(int)response.StatusCode}: {responseBody}");
+                return;
+            }
 
-        CURLcode res = curl_easy_perform(curl);
-        if(res != CURLE_OK) {
-            std::cerr << "curl_easy_perform() failed: "
-                      << curl_easy_strerror(res) << std::endl;
+            using var doc = JsonDocument.Parse(responseBody);
+            var root = doc.RootElement;
+
+            if (root.TryGetProperty("error", out var error))
+            {
+                Console.Error.WriteLine($"RPC Error: {error}");
+            }
+            else if (root.TryGetProperty("result", out var result))
+            {
+                Console.WriteLine(result.ToString());
+            }
+            else
+            {
+                Console.Error.WriteLine("Unexpected RPC response format.");
+            }
         }
-
-        curl_easy_cleanup(curl);
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Request failed: {ex.Message}");
+        }
     }
-    return 0;
 }`
     };
   };
