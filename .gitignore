@@ -66,8 +66,7 @@ build/
 scripts/*
 tests/*
 .ingress/
-docs/api-reference/ethereum-json-rpc/methods-improved.mdx
-docs/api-reference/ethereum-json-rpc/methods-tabbed.mdx
+docs/api-reference/ethereum-json-rpc/methods-improved.mdx docs/api-reference/ethereum-json-rpc/methods-tabbed.mdx
 docs/api-reference/ethereum-json-rpc/openapi.yaml
 
 # Markdown lint cache
