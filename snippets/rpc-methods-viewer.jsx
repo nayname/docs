@@ -3,7 +3,6 @@ import { CurlIcon, TypeScriptIcon, GoIcon, RustIcon, PythonIcon, CSharpIcon, API
 export default function RPCMethodsViewer() {
   const [selectedNamespace, setSelectedNamespace] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showOnlyImplemented, setShowOnlyImplemented] = useState(false);
   const [expandedMethods, setExpandedMethods] = useState({});
   const [selectedLanguage, setSelectedLanguage] = useState({});
   const [rpcEndpoint, setRpcEndpoint] = useState('');
@@ -1688,14 +1687,13 @@ class Program
       return allMethods.filter(method => {
         const matchesSearch = method.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             method.description.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesImplemented = !showOnlyImplemented || method.implemented;
-        return matchesSearch && matchesImplemented;
+        return matchesSearch;
       });
     }
 
     // Show all methods if 'all' is selected
     if (selectedNamespace === 'all') {
-      return allMethods.filter(method => !showOnlyImplemented || method.implemented);
+      return allMethods;
     }
 
     // Otherwise, show methods from selected namespace
@@ -1706,8 +1704,8 @@ class Program
       ...method,
       namespace: selectedNamespace,
       namespaceName: namespace.name
-    })).filter(method => !showOnlyImplemented || method.implemented);
-  }, [selectedNamespace, searchTerm, showOnlyImplemented, allMethods]);
+    }));
+  }, [selectedNamespace, searchTerm, allMethods]);
 
   function CopyButton({ text }) {
     const [copied, setCopied] = useState(false);
@@ -1759,15 +1757,6 @@ class Program
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="rounded text-black focus:ring-black dark:text-white dark:focus:ring-white"
-                  checked={showOnlyImplemented}
-                  onChange={(e) => setShowOnlyImplemented(e.target.checked)}
-                />
-                <span className="text-gray-700 dark:text-gray-300">Implemented only</span>
-              </label>
             </div>
 
             {/* Interactive RPC Section - Right-aligned, compact */}
@@ -1907,7 +1896,7 @@ class Program
                       )}
                       {!method.implemented && (
                         <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded">
-                          Not Implemented
+                          Not implemented in the Cosmos/EVM base module
                         </span>
                       )}
                     </div>
