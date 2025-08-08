@@ -127,7 +127,8 @@
         "tab": "API Reference",
         "pages": [
           "docs/api-reference/ethereum-json-rpc/index",
-          "docs/api-reference/ethereum-json-rpc/methods"
+          "docs/api-reference/ethereum-json-rpc/methods",
+          "docs/api-reference/ethereum-json-rpc/rpc-explorer"
         ]
       },
       {
