@@ -119,14 +119,6 @@
                   }
                 ]
               },
-              {
-                "group": "Devnet",
-                "pages": [
-                  "docs/documentation/devnet/introduction",
-                  "docs/documentation/devnet/connect-to-the-network",
-                  "docs/documentation/devnet/get-tokens"
-                ]
-              },
               "docs/documentation/differences"
             ]
           }
