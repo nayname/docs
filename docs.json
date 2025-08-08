@@ -37,7 +37,6 @@
                   "docs/documentation/getting-started/index",
                   "docs/documentation/getting-started/faq",
                   "docs/documentation/getting-started/development-environment",
-                  "docs/documentation/getting-started/chain-integration",
                   {
                     "group": "Tooling and Resources",
                     "pages": [
