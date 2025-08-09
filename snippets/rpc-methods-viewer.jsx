@@ -1599,9 +1599,9 @@ class Program
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
+    <div className="min-h-screen bg-white dark:bg-black">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
+      <div className="sticky top-0 z-10 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
             <h1 className="text-4xl font-bold text-black dark:text-white">
@@ -1649,7 +1649,7 @@ class Program
                     <input
                       type="text"
                       placeholder="http://localhost:8545"
-                      className="w-64 px-2 py-1 text-sm border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:border-gray-400 bg-white dark:bg-gray-950 text-black dark:text-white placeholder-gray-500"
+                      className="w-64 px-2 py-1 text-sm border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:border-gray-400 bg-white dark:bg-black text-black dark:text-white placeholder-gray-500"
                       value={rpcEndpoint}
                       onChange={(e) => {
                         setRpcEndpoint(e.target.value);
@@ -1917,7 +1917,7 @@ class Program
                                     Example Response
                                   </h6>
                                 </div>
-                                <pre className="p-4 bg-gray-50 dark:bg-gray-950 text-xs overflow-x-auto">
+                                <pre className="p-4 bg-gray-50 dark:bg-black text-xs overflow-x-auto">
                                   <code className={example.response.error ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
 {JSON.stringify({
   jsonrpc: '2.0',

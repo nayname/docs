@@ -165,9 +165,9 @@ export default function EIPCompatibilityTable() {
   }
 
   return (
-    <div className="w-full bg-white dark:bg-gray-950 relative p-6 border border-gray-200 dark:border-gray-800 rounded-lg">
+    <div className="w-full bg-white dark:bg-black relative p-6 border border-gray-200 dark:border-gray-800 rounded-lg">
       {/* Search and Filters - Sticky */}
-      <div className="sticky top-0 z-20 bg-white dark:bg-gray-950 pb-4 border-b border-gray-200 dark:border-gray-800">
+      <div className="sticky top-0 z-20 bg-white dark:bg-black pb-4 border-b border-gray-200 dark:border-gray-800">
         <div className="space-y-4">
         <div className="flex gap-4 flex-wrap">
           <div className="flex-1 min-w-[300px]">
@@ -249,9 +249,9 @@ export default function EIPCompatibilityTable() {
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-950 divide-y divide-gray-200 dark:divide-gray-800">
+          <tbody className="bg-white dark:bg-black divide-y divide-gray-200 dark:divide-gray-800">
             {filteredData.map((eip, index) => (
-              <tr key={eip.eip} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-950' : 'bg-gray-50 dark:bg-gray-900'} hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors`}>
+              <tr key={eip.eip} className={`${index % 2 === 0 ? 'bg-white dark:bg-black' : 'bg-gray-50 dark:bg-gray-900'} hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors`}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                   <a
                     href={`https://eips.ethereum.org/EIPS/eip-${eip.eip}`}
