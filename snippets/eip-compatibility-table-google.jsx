@@ -165,9 +165,9 @@ export default function EIPCompatibilityTable() {
   }
 
   return (
-    <div className="w-full bg-white dark:bg-gray-950 relative">
+    <div className="w-full bg-white dark:bg-gray-950 relative p-6 border border-gray-200 dark:border-gray-800 rounded-lg">
       {/* Search and Filters - Sticky */}
-      <div className="sticky top-0 z-20 bg-white dark:bg-gray-950 pb-4 pt-2 border-b border-gray-200 dark:border-gray-800">
+      <div className="sticky top-0 z-20 bg-white dark:bg-gray-950 pb-4 border-b border-gray-200 dark:border-gray-800">
         <div className="space-y-4">
         <div className="flex gap-4 flex-wrap">
           <div className="flex-1 min-w-[300px]">
@@ -176,7 +176,7 @@ export default function EIPCompatibilityTable() {
               placeholder="Search by EIP number, title, or notes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-black dark:focus:ring-white"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-black dark:focus:ring-white"
             />
           </div>
           
@@ -210,7 +210,7 @@ export default function EIPCompatibilityTable() {
       </div>
 
       {/* Table with sticky header */}
-      <div className="overflow-auto shadow-[0_0_0_1px_rgba(156,163,175,0.3)] dark:shadow-[0_0_0_1px_rgba(75,85,99,0.5)] rounded-lg" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+      <div className="overflow-auto shadow-[0_0_0_1px_rgba(156,163,175,0.3)] dark:shadow-[0_0_0_1px_rgba(75,85,99,0.5)] rounded-lg mt-4" style={{ maxHeight: 'calc(100vh - 240px)' }}>
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800 relative">
           <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0 z-10">
             <tr>
