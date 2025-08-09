@@ -1,0 +1,68 @@
+---
+title: "EIP Compatibility"
+description: "Comprehensive tracking of Ethereum Improvement Proposal (EIP) support in Cosmos EVM"
+mode: "custom"
+keywords: ['eip', 'ethereum improvement proposals', 'compatibility', 'support', 'implementation', 'cosmos evm', 'differences', 'eip-7702', 'eip-1559', 'eip-155']
+---
+
+import EIPCompatibilityTable from '/snippets/eip-compatibility-table-google.jsx'
+
+# EIP Compatibility Matrix
+
+Cosmos EVM implements most Ethereum Improvement Proposals (EIPs) through the Geth EVM, with modifications for Cosmos consensus compatibility. This page provides comprehensive tracking of EIP support status.
+
+<Warning>
+  **Critical EIPs requiring attention:**
+  - **EIP-7702 (Set Code for EOAs)**: Account abstraction support coming in v0.5.0
+  - **EIP-155 (Replay protection)**: Currently enforced via chain-wide params, planned alignment with Geth ([#401](https://github.com/cosmos/evm/issues/401))
+  - **EIP-2681 (Nonce limit)**: Needs stricter overflow checking at AnteHandler ([#400](https://github.com/cosmos/evm/issues/400))
+</Warning>
+
+## Implementation Overview
+
+Cosmos EVM's EIP implementation strategy:
+
+1. **Core EVM Features**: Most opcodes and execution features are inherited directly from Geth EVM
+2. **Consensus-Related**: Features related to PoW/PoS consensus are not applicable due to Tendermint BFT
+3. **Economic Model**: EIP-1559 implemented with modifications (fees to validators instead of burning)
+4. **Future Support**: Critical EIPs like EIP-7702 are actively being developed
+
+## Compatibility Table
+
+Use the filters below to explore EIP support status. Click any column header to sort by that field. The search bar and column headers remain visible while scrolling. Data is dynamically loaded from [Google Sheets](https://docs.google.com/spreadsheets/d/1OGscheUSh-g15p7mNYjSaxI05E8O_3R3tDK0IwXaczk) for real-time updates.
+
+**Note on criticality**: The "Notes" column indicates when an EIP's behavior differs from Geth and whether it requires compatibility discussion or is considered non-critical.
+
+<EIPCompatibilityTable />
+
+## Key Implementation Differences
+
+### EIP-1559 (Dynamic Base Fee)
+- ✅ Supported with modifications
+- Base fee is **distributed to validators** instead of burned
+- Can be disabled via `NoBaseFee` parameter
+- Lower-bounded by global `min-gas-price`
+- Maintains token supply unlike Ethereum
+
+### EIP-155 (Replay Protection)
+- ⚠️ Different implementation
+- Currently enforced at chain level rather than per-transaction
+- Plans to align with Geth implementation for better compatibility
+
+### EIP-7702 (Set Code for EOAs)
+- 🚧 Coming in v0.5.0
+- Will enable account abstraction capabilities
+- Critical for wallet innovation and user experience improvements
+
+### Consensus-Related EIPs
+The following categories of EIPs are not applicable due to Cosmos using Tendermint BFT consensus:
+- Difficulty adjustments (EIP-100, 649, 1234, etc.)
+- Proof-of-Work to Proof-of-Stake transition (EIP-3675)
+- Beacon chain operations (EIP-4788, 4895, 7002, etc.)
+- Validator deposits and withdrawals (EIP-6110, 7044, etc.)
+
+## References
+
+- [Ethereum EIPs Repository](https://eips.ethereum.org/)
+- [Cosmos EVM GitHub Issues](https://github.com/cosmos/evm/issues)
+- [Differences from Ethereum Mainnet](/docs/documentation/differences)
