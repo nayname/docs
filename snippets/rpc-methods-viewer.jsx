@@ -1638,8 +1638,8 @@ class Program
                   Enter an RPC endpoint to enable interactive testing
                 </span>
                 <div className={`px-3 py-2 rounded-lg transition-all duration-200 border-2 ${
-                  isValidEndpoint 
-                    ? 'border-[#05fcf8]' 
+                  isValidEndpoint
+                    ? 'border-[#05fcf8]'
                     : isInvalidEndpoint
                     ? 'border-amber-500'
                     : 'border-gray-300 dark:border-gray-700'
