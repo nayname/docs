@@ -119,7 +119,8 @@
                   }
                 ]
               },
-              "docs/documentation/differences"
+              "docs/documentation/differences",
+              "docs/documentation/eip-compatibility"
             ]
           }
         ]
