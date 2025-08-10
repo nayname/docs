@@ -1,0 +1,363 @@
+---
+title: "EVM App-Side Mempool"
+description: "Advanced transaction pool management for Ethereum compatibility"
+---
+
+# EVM App-Side Mempool
+
+<Warning>
+The app-side mempool is available for testing in v0.4.0 but is **not yet recommended for production use**. This feature is intended for protocol integrators and core developers who need advanced transaction handling capabilities.
+</Warning>
+
+## Overview
+
+The custom application-side mempool provides Ethereum-compatible transaction handling within the Cosmos SDK framework. Unlike the standard CometBFT FIFO mempool, this implementation supports sophisticated transaction management patterns familiar to Ethereum developers.
+
+### Key Features
+
+- **Non-Sequential Nonces** - Accept transactions with gapped nonces, queuing them until dependencies are met
+- **Fee-Based Priority** - Prioritize transactions by fee to maximize validator revenue
+- **Transaction Replacement** - Replace pending transactions by increasing the fee (RBF)
+- **Spam Prevention** - Prevent network spam from non-executable transactions
+
+## Architecture
+
+### Two-Tiered Mempool System
+
+The app-side mempool implements a sophisticated two-tiered architecture to manage both executable and non-executable transactions.
+
+<Steps>
+  <Step title="Client Application">
+    **ethers.js / web3.js**
+
+    Transaction submitted via JSON-RPC
+  </Step>
+
+  <Step title="Cosmos Node">
+    **CheckTx Evaluation**
+
+    Evaluates nonce sequence to determine routing
+  </Step>
+
+  <Step title="Routing Decision">
+    Based on nonce check:
+    - **Gapped Nonce** → Local Queue (not gossiped)
+    - **Sequential Nonce** → Public Mempool (gossiped)
+  </Step>
+</Steps>
+
+<CardGroup cols={2}>
+  <Card title="Local Queue Mempool" icon="database" color="#8b5cf6">
+    **Node-local, Non-gossiped**
+    - Holds transactions with nonce gaps
+    - Returns success to maintain compatibility
+    - Not broadcast to peers (prevents spam)
+    - Periodically scans for promotion
+  </Card>
+
+  <Card title="Public Mempool" icon="globe" color="#ec4899">
+    **CometBFT, Gossiped**
+    - Contains executable transactions
+    - Passed CheckTx validation
+    - Broadcast to network peers
+    - Source for block proposals
+  </Card>
+</CardGroup>
+
+<Note>
+**Transaction Promotion**: When dependencies are met, transactions automatically move from Local Queue to Public Mempool and get gossiped to peers.
+</Note>
+
+#### Local Queue Mempool
+
+A node-local, non-gossiped pool that stores valid but not yet executable transactions:
+- Holds transactions with nonce gaps
+- Returns success to clients (maintaining Ethereum tooling compatibility)
+- Periodically scans and promotes transactions when dependencies are met
+- Not broadcast to peers, preventing spam
+
+#### Public Mempool (CometBFT)
+
+The standard CometBFT mempool for peer gossip:
+- Contains only immediately executable transactions
+- Transactions that have passed `CheckTx` validation
+- Gossiped to network peers
+
+### Transaction Flow
+
+The transaction processing follows these critical stages:
+
+<Steps>
+  <Step title="Submit">
+    Client application sends transaction via JSON-RPC
+  </Step>
+
+  <Step title="CheckTx">
+    Node validates and checks if nonce is sequential or has gaps
+  </Step>
+
+  <Step title="Route">
+    - **Sequential** → Public Mempool (gossip)
+    - **Gapped** → Local Queue (no gossip)
+  </Step>
+
+  <Step title="Promote">
+    Local Queue transactions move to Public when dependencies met
+  </Step>
+
+  <Step title="Propose">
+    Validators select transactions from Public Mempool for blocks
+  </Step>
+
+  <Step title="Finalize">
+    Transaction is permanently included in the blockchain
+  </Step>
+</Steps>
+
+## Behavior Comparison
+
+### vs. Ethereum Mainnet
+
+The app-side mempool emulates Ethereum's behavior while operating within Cosmos:
+
+**Similarities:**
+- **Nonce Gaps**: Accepts transactions with non-sequential nonces (e.g., nonce 102 when current is 100)
+- **Fee Priority**: Orders by `max_priority_fee_per_gas` (tip)
+- **RBF Support**: Replace transactions by resubmitting with same nonce and higher fee
+- **Batching**: Submit multiple transactions without waiting for confirmations
+
+**Differences:**
+- **Implementation**: Two-tiered system vs. Ethereum's single logical mempool
+- **Consensus**: Operates within CometBFT consensus framework
+- **State Management**: Integrates with Cosmos SDK state handling
+
+### vs. Standard CometBFT
+
+| Feature | Standard CometBFT | App-Side Mempool |
+|---------|------------------|------------------|
+| **Ordering** | FIFO (First-In, First-Out) | Fee-based + nonce-based |
+| **Nonce Gaps** | Rejected during `CheckTx` | Accepted and queued locally |
+| **Invalid Transactions** | Dropped when invalid | Retained (may become valid) |
+| **P2P Gossip** | All accepted transactions | Only executable transactions |
+| **Stateful Validation** | Strict validation | Flexible validation |
+
+## Technical Implementation
+
+### Transaction Validation (`CheckTx`)
+
+The modified `CheckTx` behavior handles different transaction scenarios:
+
+```go
+// Pseudo-code representation
+func CheckTx(tx Transaction) Response {
+    if tx.hasSequentialNonce() {
+        // Route to public mempool for gossip
+        return publicMempool.Add(tx)
+    } else if tx.hasGappedNonce() {
+        // Route to local queue, no gossip
+        localQueue.Add(tx)
+        // Return success to maintain Ethereum tooling compatibility
+        return Response{Code: 0}
+    }
+}
+```
+
+### Block Proposal (`PrepareProposal`)
+
+When proposing blocks, validators draw from both pools:
+
+```go
+// Pseudo-code representation
+func PrepareProposal() Block {
+    // Collect transactions from both pools
+    txs := collectExecutableTxs(localQueue, publicMempool)
+
+    // Sort by fee priority and nonce
+    sortedTxs := sortByFeeAndNonce(txs)
+
+    return buildBlock(sortedTxs)
+}
+```
+
+### Transaction Promotion
+
+The system periodically promotes queued transactions through this process:
+
+<Steps>
+  <Step title="Promotion Timer">
+    **Periodic Scanner** triggers at configured intervals
+  </Step>
+
+  <Step title="Check Local Queue">
+    Scans local queue for pending transactions
+  </Step>
+
+  <Step title="Evaluate Dependencies">
+    Checks if prior nonces have been fulfilled
+  </Step>
+</Steps>
+
+<Tabs>
+  <Tab title="✅ Dependencies Met">
+    <Card title="Promote to Public Mempool" icon="rocket" color="#10b981">
+      - Transaction moves to public mempool
+      - Gets gossiped to network peers
+      - Becomes eligible for block inclusion
+      - Removed from local queue
+    </Card>
+  </Tab>
+
+  <Tab title="❌ Dependencies Not Met">
+    <Card title="Keep in Local Queue" icon="clock" color="#ef4444">
+      - Transaction remains in local queue
+      - Not gossiped to peers
+      - Waits for next scan cycle
+      - Will retry when dependencies are met
+    </Card>
+  </Tab>
+</Tabs>
+
+<Info>
+The promotion process loops continuously, checking the local queue at regular intervals defined by the `promotion-interval` configuration parameter.
+</Info>
+
+```go
+// Pseudo-code representation
+func promoteTransactions() {
+    for tx := range localQueue {
+        if tx.dependenciesMet() {
+            publicMempool.Add(tx)
+            localQueue.Remove(tx)
+        }
+    }
+}
+```
+
+## Usage Guide
+
+### For Application Developers
+
+The app-side mempool is designed to be transparent to developers using standard Ethereum tools:
+
+- **Standard Tools** - Use Hardhat, Forge, ethers.js, web3.js without modification
+- **Batch Transactions** - Submit multiple transactions without waiting for confirmations
+- **Future Nonces** - Create transactions with future nonces; network holds until ready
+- **Replace Transactions** - Replace pending transactions with same nonce and higher fee
+
+### Configuration
+
+To enable the app-side mempool in your chain:
+
+```toml
+# app.toml configuration
+[mempool]
+# Enable app-side mempool
+enabled = true
+
+# Maximum number of transactions in local queue
+max-local-txs = 10000
+
+# Promotion check interval (milliseconds)
+promotion-interval = 1000
+
+# Maximum gas for a single block
+max-block-gas = 30000000
+```
+
+### Transaction Replacement Example
+
+Replace a pending transaction to speed up or cancel:
+
+```javascript
+// Using ethers.js
+const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
+const wallet = new ethers.Wallet(privateKey, provider);
+
+// Original transaction
+const tx1 = await wallet.sendTransaction({
+  to: recipient,
+  value: ethers.utils.parseEther("1.0"),
+  nonce: 100,
+  gasPrice: ethers.utils.parseUnits("20", "gwei")
+});
+
+// Replace with higher fee
+const tx2 = await wallet.sendTransaction({
+  to: recipient,
+  value: ethers.utils.parseEther("1.0"),
+  nonce: 100, // Same nonce
+  gasPrice: ethers.utils.parseUnits("30", "gwei") // Higher fee
+});
+```
+
+### Performance Considerations
+
+- **Local Queue Size**: Monitor local queue size to prevent memory issues
+- **Promotion Frequency**: Balance promotion interval with network latency
+- **Fee Estimation**: Use dynamic fee estimation for optimal inclusion
+- **Batch Limits**: Consider practical limits when batching transactions
+
+## Migration Guide
+
+For chains upgrading to use the app-side mempool:
+
+1. **Review Configuration** - Ensure your chain configuration supports the app-side mempool features
+2. **Test in Devnet** - Thoroughly test transaction handling patterns in a development environment
+3. **Update Client Code** - Update any custom client code to handle the new transaction patterns
+4. **Monitor Performance** - Monitor mempool performance and adjust configuration as needed
+
+## Troubleshooting
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Transactions stuck in local queue | Missing dependency transactions | Submit missing nonce transactions |
+| High memory usage | Large local queue | Reduce `max-local-txs` setting |
+| Transactions not gossiped | Nonce gaps | Expected behavior; transactions promoted when ready |
+| RBF not working | Insufficient fee increase | Ensure significant fee increase (typically 10%+) |
+
+### Debugging Commands
+
+```bash
+# Check mempool status
+evmd query mempool status
+
+# View local queue transactions
+evmd query mempool local-queue
+
+# Check specific transaction
+evmd query mempool tx <hash>
+
+# Monitor promotion events
+evmd debug mempool promotions
+```
+
+## Technical Reference
+
+### Implementation Details
+
+The app-side mempool is implemented in:
+- **Core Logic**: `x/evm/mempool/mempool.go`
+- **CheckTx Handler**: `x/evm/ante/mempool_handler.go`
+- **Promotion Logic**: `x/evm/mempool/promoter.go`
+- **Configuration**: `x/evm/types/config.go`
+
+### Related Specifications
+
+- [GitHub Issue #417](https://github.com/cosmos/evm/issues/417) - Full technical specification
+- [Pull Request #387](https://github.com/cosmos/evm/pull/387) - Implementation details
+
+## Future Enhancements
+
+Planned improvements for future releases:
+
+- **Production Readiness**: Hardening for mainnet deployment
+- **Advanced Priority**: Multi-dimensional fee priority mechanisms
+- **Cross-Chain Support**: IBC-aware transaction ordering
+- **MEV Protection**: Built-in MEV mitigation strategies
+- **Analytics Dashboard**: Real-time mempool visualization tools
+
+<Note>
+This feature is under active development. Join the discussion on [GitHub](https://github.com/cosmos/evm) or [Discord](https://discord.gg/interchain) to provide feedback and stay updated on progress.
+</Note>
