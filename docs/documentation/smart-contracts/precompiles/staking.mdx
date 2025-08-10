@@ -62,7 +62,7 @@ async function delegateTokens() {
       amount,
       { value: amount } // Must send the amount being delegated
     );
-    
+
     console.log("Delegation transaction:", tx.hash);
     await tx.wait();
     console.log("Delegation confirmed");

@@ -60,6 +60,7 @@
                   "docs/documentation/concepts/encoding",
                   "docs/documentation/concepts/gas-and-fees",
                   "docs/documentation/concepts/ibc",
+                  "docs/documentation/concepts/mempool",
                   "docs/documentation/concepts/migrations",
                   "docs/documentation/concepts/pending-state",
                   "docs/documentation/concepts/replay-protection",
