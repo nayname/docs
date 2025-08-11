@@ -18,6 +18,63 @@ The custom application-side mempool provides Ethereum-compatible transaction han
 - **Transaction Replacement** - Replace pending transactions by increasing the fee (RBF)
 - **Spam Prevention** - Prevent network spam from non-executable transactions
 
+Usage Guide
+
+### For Application Developers
+
+The app-side mempool is designed to be transparent to developers using standard Ethereum tools:
+
+- **Standard Tools** - Use Hardhat, Forge, ethers.js, web3.js without modification
+- **Batch Transactions** - Submit multiple transactions without waiting for confirmations
+- **Future Nonces** - Create transactions with future nonces; network holds until ready
+- **Replace Transactions** - Replace pending transactions with same nonce and higher fee
+
+### Configuration
+
+To enable the app-side mempool in your chain:
+
+```toml
+# app.toml configuration
+[mempool]
+# Enable app-side mempool
+enabled = true
+
+# Maximum number of transactions in local queue
+max-local-txs = 10000
+
+# Promotion check interval (milliseconds)
+promotion-interval = 1000
+
+# Maximum gas for a single block
+max-block-gas = 30000000
+```
+
+### Transaction Replacement Example
+
+Replace a pending transaction to speed up or cancel:
+
+```javascript
+// Using ethers.js
+const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
+const wallet = new ethers.Wallet(privateKey, provider);
+
+// Original transaction
+const tx1 = await wallet.sendTransaction({
+  to: recipient,
+  value: ethers.utils.parseEther("1.0"),
+  nonce: 100,
+  gasPrice: ethers.utils.parseUnits("20", "gwei")
+});
+
+// Replace with higher fee
+const tx2 = await wallet.sendTransaction({
+  to: recipient,
+  value: ethers.utils.parseEther("1.0"),
+  nonce: 100, // Same nonce
+  gasPrice: ethers.utils.parseUnits("30", "gwei") // Higher fee
+});
+```
+
 ## Architecture
 
 ### Two-Tiered Mempool System
@@ -218,72 +275,3 @@ The system periodically promotes queued transactions through this process:
 <Info>
 The promotion process loops continuously, checking the local queue at regular intervals defined by the `promotion-interval` configuration parameter.
 </Info>
-
-```go
-// Pseudo-code representation
-func promoteTransactions() {
-    for tx := range localQueue {
-        if tx.dependenciesMet() {
-            publicMempool.Add(tx)
-            localQueue.Remove(tx)
-        }
-    }
-}
-```
-
-## Usage Guide
-
-### For Application Developers
-
-The app-side mempool is designed to be transparent to developers using standard Ethereum tools:
-
-- **Standard Tools** - Use Hardhat, Forge, ethers.js, web3.js without modification
-- **Batch Transactions** - Submit multiple transactions without waiting for confirmations
-- **Future Nonces** - Create transactions with future nonces; network holds until ready
-- **Replace Transactions** - Replace pending transactions with same nonce and higher fee
-
-### Configuration
-
-To enable the app-side mempool in your chain:
-
-```toml
-# app.toml configuration
-[mempool]
-# Enable app-side mempool
-enabled = true
-
-# Maximum number of transactions in local queue
-max-local-txs = 10000
-
-# Promotion check interval (milliseconds)
-promotion-interval = 1000
-
-# Maximum gas for a single block
-max-block-gas = 30000000
-```
-
-### Transaction Replacement Example
-
-Replace a pending transaction to speed up or cancel:
-
-```javascript
-// Using ethers.js
-const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
-const wallet = new ethers.Wallet(privateKey, provider);
-
-// Original transaction
-const tx1 = await wallet.sendTransaction({
-  to: recipient,
-  value: ethers.utils.parseEther("1.0"),
-  nonce: 100,
-  gasPrice: ethers.utils.parseUnits("20", "gwei")
-});
-
-// Replace with higher fee
-const tx2 = await wallet.sendTransaction({
-  to: recipient,
-  value: ethers.utils.parseEther("1.0"),
-  nonce: 100, // Same nonce
-  gasPrice: ethers.utils.parseUnits("30", "gwei") // Higher fee
-});
-```
