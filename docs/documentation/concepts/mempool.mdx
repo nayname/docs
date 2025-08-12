@@ -202,37 +202,15 @@ The app-side mempool emulates Ethereum's behavior while operating within Cosmos:
 
 The modified `CheckTx` behavior handles different transaction scenarios:
 
-```go
-// Pseudo-code representation
-func CheckTx(tx Transaction) Response {
-    if tx.hasSequentialNonce() {
-        // Route to public mempool for gossip
-        return publicMempool.Add(tx)
-    } else if tx.hasGappedNonce() {
-        // Route to local queue, no gossip
-        localQueue.Add(tx)
-        // Return success to maintain Ethereum tooling compatibility
-        return Response{Code: 0}
-    }
-}
-```
+// add code ref
 
 ### Block Proposal (`PrepareProposal`)
 
+// add code ref
+
 When proposing blocks, validators draw from both pools:
 
-```go
-// Pseudo-code representation
-func PrepareProposal() Block {
-    // Collect transactions from both pools
-    txs := collectExecutableTxs(localQueue, publicMempool)
-
-    // Sort by fee priority and nonce
-    sortedTxs := sortByFeeAndNonce(txs)
-
-    return buildBlock(sortedTxs)
-}
-```
+// add code ref
 
 ### Transaction Promotion
 
@@ -253,8 +231,8 @@ The system periodically promotes queued transactions through this process:
 </Steps>
 
 <Tabs>
-  <Tab title="✅ Dependencies Met">
-    <Card title="Promote to Public Mempool" icon="rocket" color="#10b981">
+  <Tab title="Conitions for Pronotion Met">
+    <Card title="Promote to Public Mempool" icon="package-check" color="#10b981">
       - Transaction moves to public mempool
       - Gets gossiped to network peers
       - Becomes eligible for block inclusion
@@ -262,8 +240,8 @@ The system periodically promotes queued transactions through this process:
     </Card>
   </Tab>
 
-  <Tab title="❌ Dependencies Not Met">
-    <Card title="Keep in Local Queue" icon="clock" color="#ef4444">
+  <Tab title="Condition for Promotion Unmet">
+    <Card title="Keep in Local Queue" icon="clipboard-clock" color="#ef4444">
       - Transaction remains in local queue
       - Not gossiped to peers
       - Waits for next scan cycle
