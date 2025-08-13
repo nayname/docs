@@ -8,6 +8,9 @@
     "light": "#cccccc",
     "dark": "#0E0E0E"
   },
+    "icons": {
+    "library": "lucide"
+  },
   "styling": {
     "codeblocks": "system"
   },
