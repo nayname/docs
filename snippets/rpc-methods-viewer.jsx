@@ -2124,7 +2124,7 @@ class Program
         onClick={handleCopy}
         className="px-2 py-0.5 text-xs bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded transition-colors font-mono"
       >
-        {copied ? '✓ Copied' : 'Copy'}
+        {copied ? 'Copied' : 'Copy'}
       </button>
     );
   }
@@ -2143,7 +2143,7 @@ class Program
             </p>
             {isValidEndpoint && (
               <p className="mt-2 text-sm text-[#05fcf8]">
-                ✓ Interactive mode active - Click "Execute" on any method example to test against {rpcEndpoint}
+                Interactive mode active - Click "Execute" on any method example to test against {rpcEndpoint}
               </p>
             )}
           </div>
@@ -2215,10 +2215,10 @@ class Program
                       }}
                     />
                     {isValidEndpoint && (
-                      <span className="text-[#05fcf8] text-lg">✓</span>
+                      <span className="text-[#05fcf8] text-lg">Y</span>
                     )}
                     {isInvalidEndpoint && (
-                      <span className="text-red-500 text-lg">✗</span>
+                      <span className="text-red-500 text-lg">N</span>
                     )}
                   </div>
                 </div>
@@ -2324,7 +2324,7 @@ class Program
                     {method.issue && (
                       <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
                         <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                          ⚠️ {method.issue}
+                          Warning: {method.issue}
                         </p>
                       </div>
                     )}

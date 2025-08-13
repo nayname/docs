@@ -185,7 +185,7 @@ export default function EIPCompatibilityTable() {
 
           <div className="text-sm text-gray-600 dark:text-gray-400">
             Showing {filteredData.length} of {eipData.length} EIPs
-            {error && <span className="ml-2 text-yellow-600">⚠ Using cached data</span>}
+            {error && <span className="ml-2 text-yellow-600">Warning: Using cached data</span>}
           </div>
         </div>
       </div>
@@ -252,7 +252,7 @@ export default function EIPCompatibilityTable() {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                  {eip.critical ? '✓' : '-'}
+                  {eip.critical ? 'Yes' : '-'}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
                   {eip.cosmos}

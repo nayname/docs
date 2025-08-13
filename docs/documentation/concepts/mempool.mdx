@@ -339,10 +339,10 @@ Returns transaction counts for pending and queued pools.
 
 ```javascript
 // Ethereum tooling sends multiple transactions
-await wallet.sendTransaction({nonce: 100, ...}); // ✓ Immediate execution
-await wallet.sendTransaction({nonce: 101, ...}); // ✓ Immediate execution
-await wallet.sendTransaction({nonce: 103, ...}); // ✓ Queued locally (gap)
-await wallet.sendTransaction({nonce: 102, ...}); // ✓ Fills gap, both execute
+await wallet.sendTransaction({nonce: 100, ...}); // OK: Immediate execution
+await wallet.sendTransaction({nonce: 101, ...}); // OK: Immediate execution
+await wallet.sendTransaction({nonce: 103, ...}); // OK: Queued locally (gap)
+await wallet.sendTransaction({nonce: 102, ...}); // OK: Fills gap, both execute
 ```
 
 ### Transaction Replacement

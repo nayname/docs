@@ -123,16 +123,16 @@ See the [methods](./methods) page for an exhaustive list and working examples.
 
 | Namespace | Description | Supported | Enabled by Default |
 |-----------|-------------|-----------|-------------------|
-| [`eth`](./methods#eth-methods) | Core Ethereum JSON-RPC methods for interacting with the EVM | ✅ | ✅ |
-| [`web3`](./methods#web3-methods) | Utility functions for the web3 client | ✅ | ✅ |
-| [`net`](./methods#net-methods) | Network information about the node | ✅ | ✅ |
-| [`txpool`](./methods#txpool-methods) | Transaction pool inspection | ✅ | ❌ |
-| [`debug`](./methods#debug-methods) | Debugging and tracing functionality | ✅ | ❌ |
-| [`personal`](./methods#personal-methods) | Private key management | ✅ | ❌ |
-| [`admin`](./methods#admin-methods) | Node administration | ✅ | ❌ |
-| [`miner`](./methods#miner-methods) | Mining operations (stub for PoS) | ✅ | ❌ |
-| `clique` | Proof-of-Authority consensus | ❌ | ❌ |
-| `les` | Light Ethereum Subprotocol | ❌ | ❌ |
+| [`eth`](./methods#eth-methods) | Core Ethereum JSON-RPC methods for interacting with the EVM | Y | Y |
+| [`web3`](./methods#web3-methods) | Utility functions for the web3 client | Y | Y |
+| [`net`](./methods#net-methods) | Network information about the node | Y | Y |
+| [`txpool`](./methods#txpool-methods) | Transaction pool inspection | Y | N |
+| [`debug`](./methods#debug-methods) | Debugging and tracing functionality | Y | N |
+| [`personal`](./methods#personal-methods) | Private key management | Y | N |
+| [`admin`](./methods#admin-methods) | Node administration | Y | N |
+| [`miner`](./methods#miner-methods) | Mining operations (stub for PoS) | Y | N |
+| `clique` | Proof-of-Authority consensus | N | N |
+| `les` | Light Ethereum Subprotocol | N | N |
 
 <Warning>
   You should only expose the debug endpoint in non production settings as it could impact network performance and uptime under certain conditions.

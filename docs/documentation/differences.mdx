@@ -112,16 +112,16 @@ Cosmos EVM implements most standard Ethereum JSON-RPC methods with some limitati
 
 | Method Category | Examples | Notes |
 |----------------|----------|-------|
-| **✅ Core Methods** | `eth_getBalance`, `eth_call`, `eth_sendTransaction`, `eth_getTransactionReceipt` | Full compatibility |
-| **✅ Gas Methods** | `eth_gasPrice`, `eth_estimateGas`, `eth_maxPriorityFeePerGas`, `eth_feeHistory` | Full EIP-1559 support |
-| **✅ Block Methods** | `eth_blockNumber`, `eth_getBlockByHash`, `eth_getBlockByNumber` | Immediate finality |
-| **✅ Mining Stub Methods** | `eth_coinbase`, `eth_mining` (always false), `eth_hashrate` (always 0) | Returns static values for compatibility |
-| **✅ Uncle Methods** | `eth_getUncleCount*` (always 0), `eth_getUncleBy*` (always null) | Returns expected values for no uncles |
-| **✅ Filter Methods** | `eth_newFilter`, `eth_newBlockFilter`, `eth_getFilterChanges`, `eth_getFilterLogs` | Full filter support with block range limits |
-| **✅ Transaction Methods** | `eth_resend`, `eth_sendRawTransaction`, `eth_getTransactionByHash` | Full transaction management |
-| **✅ Personal Methods** | `personal_sign`, `personal_newAccount`, `personal_importRawKey`, `personal_sendTransaction`, `personal_ecRecover`, `personal_lockAccount`, `personal_unlockAccount` | Full implementation |
-| **✅ Debug Methods** | `debug_traceTransaction`, `debug_traceBlockByNumber`, `debug_traceCall`, `debug_memStats`, `debug_freeOSMemory`, etc. | Full implementation |
-| **✅ Admin Methods** | `admin_peers`, `admin_nodeInfo`, `admin_datadir`, `admin_startHTTP`, `admin_stopHTTP`, `admin_startWS`, `admin_stopWS` | Full implementation |
+| **Core Methods** | `eth_getBalance`, `eth_call`, `eth_sendTransaction`, `eth_getTransactionReceipt` | Full compatibility |
+| **Gas Methods** | `eth_gasPrice`, `eth_estimateGas`, `eth_maxPriorityFeePerGas`, `eth_feeHistory` | Full EIP-1559 support |
+| **Block Methods** | `eth_blockNumber`, `eth_getBlockByHash`, `eth_getBlockByNumber` | Immediate finality |
+| **Mining Stub Methods** | `eth_coinbase`, `eth_mining` (always false), `eth_hashrate` (always 0) | Returns static values for compatibility |
+| **Uncle Methods** | `eth_getUncleCount*` (always 0), `eth_getUncleBy*` (always null) | Returns expected values for no uncles |
+| **Filter Methods** | `eth_newFilter`, `eth_newBlockFilter`, `eth_getFilterChanges`, `eth_getFilterLogs` | Full filter support with block range limits |
+| **Transaction Methods** | `eth_resend`, `eth_sendRawTransaction`, `eth_getTransactionByHash` | Full transaction management |
+| **Personal Methods** | `personal_sign`, `personal_newAccount`, `personal_importRawKey`, `personal_sendTransaction`, `personal_ecRecover`, `personal_lockAccount`, `personal_unlockAccount` | Full implementation |
+| **Debug Methods** | `debug_traceTransaction`, `debug_traceBlockByNumber`, `debug_traceCall`, `debug_memStats`, `debug_freeOSMemory`, etc. | Full implementation |
+| **Admin Methods** | `admin_peers`, `admin_nodeInfo`, `admin_datadir`, `admin_startHTTP`, `admin_stopHTTP`, `admin_startWS`, `admin_stopWS` | Full implementation |
 
 For a complete list of all JSON-RPC methods with implementation status, see the [Ethereum JSON-RPC Methods](/docs/api-reference/ethereum-json-rpc/methods) reference.
 
@@ -198,30 +198,30 @@ Cosmos EVM implements most Ethereum Improvement Proposals (EIPs) through the Get
 ### Key EIP Implementation Differences
 
 #### EIP-1559 (Dynamic Base Fee)
-- ✅ Supported
+- **Supported**
 - Base fee is **distributed to validators** instead of burned
 - Can be disabled via `NoBaseFee` parameter
 - Lower-bounded by global `min-gas-price`
 - Maintains token supply unlike Ethereum
 
 #### EIP-155 (Replay Protection)
-- ⚠️ Different implementation
+- **Different implementation**
 - Currently enforced at chain level rather than per-transaction
 - Plans to align with Geth implementation for better compatibility
 - See [GitHub Issue #401](https://github.com/cosmos/evm/issues/401)
 
 #### EIP-7702 (Set Code for EOAs)
-- 🚧 Coming in v0.5.0
+- **Coming in v0.5.0**
 - Will enable account abstraction capabilities
 - Critical for wallet innovation and user experience improvements
 
 #### EIP-2681 (Nonce Limit)
-- ⚠️ Partial support
+- **Partial support**
 - Needs stricter overflow checking at AnteHandler
 - See [GitHub Issue #400](https://github.com/cosmos/evm/issues/400)
 
 #### EIP-2930 (Access Lists)
-- ✅ Fully supported
+- **Fully supported**
 - `eth_createAccessList` method implemented
 - Transaction access lists fully functional
 
