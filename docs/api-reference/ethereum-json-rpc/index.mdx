@@ -32,14 +32,11 @@ More on Ethereum JSON-RPC:
 <Warning>
   **Notable Unsupported Methods**: The following standard Ethereum methods are not implemented:
 
-  * `eth_getFilterChanges` / `eth_getFilterLogs` - Filter management issues
-  * `eth_feeHistory` - Fee history for EIP-1559
-  * `eth_createAccessList` - EIP-2930 access lists
   * `eth_fillTransaction` - Transaction filling utility
-  * `eth_resend` / `eth_pendingTransactions` - Transaction pool management
-  * `personal_sendTransaction` / `personal_ecRecover` - Some personal namespace methods
   * All `debug_getRaw*` methods - Raw data access not implemented
   * `eth_subscribe` syncing events - Only newHeads, logs, and newPendingTransactions work
+  * All `trace_*` methods - Parity/OpenEthereum trace namespace
+  * All `engine_*` methods - Post-merge Engine API
 
   See the [methods page](./methods) for complete details.
 </Warning>
@@ -132,7 +129,8 @@ See the [methods](./methods) page for an exhaustive list and working examples.
 | [`txpool`](./methods#txpool-methods) | Transaction pool inspection | ✅ | ❌ |
 | [`debug`](./methods#debug-methods) | Debugging and tracing functionality | ✅ | ❌ |
 | [`personal`](./methods#personal-methods) | Private key management | ✅ | ❌ |
-| `admin` | Node administration | ❌ | ❌ |
+| [`admin`](./methods#admin-methods) | Node administration | ✅ | ❌ |
+| [`miner`](./methods#miner-methods) | Mining operations (stub for PoS) | ✅ | ❌ |
 | `clique` | Proof-of-Authority consensus | ❌ | ❌ |
 | `les` | Light Ethereum Subprotocol | ❌ | ❌ |
 

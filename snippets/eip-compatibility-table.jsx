@@ -1,7 +1,7 @@
+import React, { useState, useEffect, useMemo } from 'react';
+
 export default function EIPCompatibilityTable() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [criticalityFilter, setCriticalityFilter] = useState('all');
   const [sortConfig, setSortConfig] = useState({ key: 'eip', direction: 'asc' });
   const [eipData, setEipData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,8 +85,15 @@ export default function EIPCompatibilityTable() {
 
   const sortedData = useMemo(() => {
     let sortableItems = [...eipData];
-    if (sortConfig.key) {
-      sortableItems.sort((a, b) => {
+    
+    // Always sort not_supported to the bottom
+    sortableItems.sort((a, b) => {
+      // First priority: put not_supported at the bottom
+      if (a.status === 'not_supported' && b.status !== 'not_supported') return 1;
+      if (b.status === 'not_supported' && a.status !== 'not_supported') return -1;
+      
+      // Then apply regular sorting
+      if (sortConfig.key) {
         let aVal = a[sortConfig.key];
         let bVal = b[sortConfig.key];
 
@@ -109,26 +116,21 @@ export default function EIPCompatibilityTable() {
         if (aVal > bVal) {
           return sortConfig.direction === 'asc' ? 1 : -1;
         }
-        return 0;
-      });
-    }
+      }
+      return 0;
+    });
     return sortableItems;
   }, [eipData, sortConfig]);
 
   const filteredData = sortedData.filter(eip => {
     if (!eip || !eip.eip) return false;
 
-    const matchesSearch =
+    const matchesSearch = searchTerm === '' || 
       String(eip.eip).includes(searchTerm) ||
       (eip.title && eip.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (eip.note && eip.note.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchesStatus = statusFilter === 'all' || eip.status === statusFilter;
-    const matchesCriticality = criticalityFilter === 'all' ||
-      (criticalityFilter === 'critical' && eip.critical) ||
-      (criticalityFilter === 'non-critical' && !eip.critical);
-
-    return matchesSearch && matchesStatus && matchesCriticality;
+    return matchesSearch;
   });
 
   const uniqueStatuses = [...new Set(eipData.map(eip => eip.status))];
@@ -170,7 +172,7 @@ export default function EIPCompatibilityTable() {
       <div className="sticky top-0 z-20 bg-white dark:bg-black pb-4 border-b border-gray-200 dark:border-gray-800">
         <div className="space-y-4">
         <div className="flex gap-4 flex-wrap">
-          <div className="flex-1 min-w-[300px]">
+          <div className="flex-1">
             <input
               type="text"
               placeholder="Search by EIP number, title, or notes..."
@@ -179,27 +181,6 @@ export default function EIPCompatibilityTable() {
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-black dark:focus:ring-white"
             />
           </div>
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white"
-          >
-            <option value="all">All Statuses</option>
-            {uniqueStatuses.map(status => (
-              <option key={status} value={status}>{status.replace(/_/g, ' ')}</option>
-            ))}
-          </select>
-
-          <select
-            value={criticalityFilter}
-            onChange={(e) => setCriticalityFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white"
-          >
-            <option value="all">All Priorities</option>
-            <option value="critical">Critical Only</option>
-            <option value="non-critical">Non-Critical Only</option>
-          </select>
         </div>
 
           <div className="text-sm text-gray-600 dark:text-gray-400">
