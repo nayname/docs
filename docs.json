@@ -2,14 +2,11 @@
   "$schema": "https://mintlify.com/docs.json",
   "name": "Cosmos Documentation",
   "description": "Build the future of the internet of blockchains with Cosmos.",
-  "theme": "mint",
+  "theme": "maple",
   "colors": {
     "primary": "#000000",
     "light": "#cccccc",
     "dark": "#0E0E0E"
-  },
-  "icons": {
-    "library": "lucide"
   },
   "styling": {
     "codeblocks": "system"
@@ -22,19 +19,6 @@
     "light": "/assets/brand/cosmos-wordmark-dark.svg",
     "dark": "/assets/brand/cosmos-wordmark.svg"
   },
-  "fonts": {
-  "heading": {
-    "family": "The Future Mono",
-    "weight": 400,
-    "source": "https://fonts.cosmoslabs.io/fonts/the-future-mono-regular.woff2",
-    "format": "woff2"
-  },
-  "body": {
-    "family": "The Future",
-    "weight": 400,
-    "source": "https://fonts.cosmoslabs.io/fonts/the-future-regular.woff2",
-    "format": "woff2"
-  }},
   "navigation": {
     "tabs": [
       {
