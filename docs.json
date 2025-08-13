@@ -8,7 +8,7 @@
     "light": "#cccccc",
     "dark": "#0E0E0E"
   },
-    "icons": {
+  "icons": {
     "library": "lucide"
   },
   "styling": {
