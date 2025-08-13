@@ -163,6 +163,23 @@ These standard Ethereum methods are not available:
 | All `admin_*` methods | Administration | Node administration not exposed |
 | `eth_subscribe` syncing | WebSocket | Only newHeads, logs, and newPendingTransactions events supported |
 
+### Non-Relevant RPC Namespaces
+
+The following Ethereum RPC namespaces are not implemented or relevant to Cosmos EVM due to architectural differences:
+
+| Namespace | Purpose | Why Not Relevant |
+|-----------|---------|------------------|
+| `les_*` | Light Ethereum Subprotocol | Cosmos uses full nodes with Tendermint consensus, no light client protocol |
+| `clique_*` | Clique PoA consensus | Cosmos uses Tendermint BFT consensus instead of Proof of Authority |
+| `engine_*` | Engine API for PoS | Used for Ethereum's execution/consensus client separation, not applicable with Tendermint |
+| `trace_*` | Parity/OpenEthereum tracing | Different tracing implementation, limited `debug_*` methods available instead |
+| `admin_*` | Node administration | Administrative functions handled differently in Cosmos SDK |
+| `miner_*` | Mining operations | No mining in Tendermint BFT consensus |
+| `parity_*` | Parity-specific methods | Client-specific methods not implemented |
+| `bor_*` | Polygon Bor consensus | Chain-specific consensus methods not applicable |
+
+Cosmos EVM focuses on implementing the core `eth_*`, `web3_*`, `net_*`, `txpool_*`, `personal_*`, and `debug_*` namespaces that are essential for Ethereum compatibility and developer tooling.
+
 ## Address Format Examples
 
 Cosmos EVM supports dual address formats with deterministic conversion:
