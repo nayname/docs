@@ -817,7 +817,7 @@ class Program
         {
           name: 'eth_getFilterChanges',
           description: 'Polling method for a filter',
-          implemented: false,
+          implemented: true,
           params: [
             { name: 'filterId', type: 'quantity', description: 'Filter ID', example: '0x16' }
           ],
@@ -837,7 +837,7 @@ class Program
         {
           name: 'eth_getFilterLogs',
           description: 'Returns all logs matching filter',
-          implemented: false,
+          implemented: true,
           params: [
             { name: 'filterId', type: 'quantity', description: 'Filter ID', example: '0x16' }
           ],
@@ -870,7 +870,7 @@ class Program
         {
           name: 'eth_feeHistory',
           description: 'Returns fee history',
-          implemented: false,
+          implemented: true,
           params: [
             { name: 'blockCount', type: 'quantity', description: 'Number of blocks', example: '0x5' },
             { name: 'newestBlock', type: 'string', description: 'Newest block', example: 'latest' },

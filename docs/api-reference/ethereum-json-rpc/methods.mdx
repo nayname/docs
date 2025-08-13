@@ -8,6 +8,10 @@ keywords: ['json-rpc', 'ethereum', 'methods', 'api', 'web3', 'eth', 'debug', 'ad
 This documentation lists all Ethereum JSON-RPC methods and their implementation status in Cosmos EVM. For the official Ethereum JSON-RPC specification, see the [Ethereum Execution APIs](https://github.com/ethereum/execution-apis) repository.
 </Info>
 
+<Note>
+**Namespace Configuration**: By default, only the `eth`, `net`, and `web3` namespaces are enabled. To enable additional namespaces like `personal`, `txpool`, `debug`, or `miner`, you must configure them in your node's JSON-RPC API settings. Methods marked as "Requires config" are implemented but need their namespace to be explicitly enabled.
+</Note>
+
 ## Endpoints
 
 | Method                                                                                | Namespace | Implemented | Public | Notes              |
@@ -42,8 +46,8 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | [`eth_newBlockFilter`](#eth_newblockfilter)                                           | Eth       | ✅          | ✅     |                    |
 | [`eth_newPendingTransactionFilter`](#eth_newpendingtransactionfilter)                 | Eth       | ✅          | ✅     |                    |
 | [`eth_uninstallFilter`](#eth_uninstallfilter)                                         | Eth       | ✅          | ✅     |                    |
-| [`eth_getFilterChanges`](#eth_getfilterchanges)                                       | Eth       | ❌          | ❌     | Filter not found   |
-| [`eth_getFilterLogs`](#eth_getfilterlogs)                                             | Eth       | ❌          | ❌     | Filter not found   |
+| [`eth_getFilterChanges`](#eth_getfilterchanges)                                       | Eth       | ✅          | ✅     |                    |
+| [`eth_getFilterLogs`](#eth_getfilterlogs)                                             | Eth       | ✅          | ✅     |                    |
 | [`eth_getLogs`](#eth_getlogs)                                                         | Eth       | ✅          | ✅     |                    |
 | [`eth_getTransactionByBlockNumberAndIndex`](#eth_gettransactionbyblocknumberandindex) | Eth       | ✅          | ✅     |                    |
 | `eth_getWork`                                                                         | Eth       | N/A         | N/A    | PoW-only           |
@@ -62,11 +66,11 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | `eth_getUncleByBlockHashAndIndex`                                                     | Eth       | ✅          | ✅     | Always null        |
 | `eth_getUncleByBlockNumberAndIndex`                                                   | Eth       | ✅          | ✅     | Always null        |
 | [`eth_getProof`](#eth_getproof)                                                       | Eth       | ⚠️         | ✅     | Height > 2 required|
-| `eth_feeHistory`                                                                      | Eth       | ❌          | ❌     | Not implemented    |
+| `eth_feeHistory`                                                                      | Eth       | ✅          | ✅     | EIP-1559           |
 | `eth_maxPriorityFeePerGas`                                                            | Eth       | ✅          | ✅     | EIP-1559           |
 | `eth_chainId`                                                                         | Eth       | ✅          | ✅     |                    |
 | `eth_getBlockReceipts`                                                                | Eth       | ✅          | ✅     |                    |
-| `eth_resend`                                                                          | Eth       | ❌          | ❌     | Not implemented    |
+| `eth_resend`                                                                          | Eth       | ✅          | ✅     |                    |
 | `eth_pendingTransactions`                                                             | Eth       | ❌          | ❌     | Not implemented    |
 | `eth_createAccessList`                                                                | Eth       | ❌          | ❌     | EIP-2930           |
 | [`eth_subscribe`](#eth_subscribe)                                                     | Websocket | ⚠️         | ✅     | syncing not impl.  |
@@ -76,9 +80,9 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | [`personal_lockAccount`](#personal_lockaccount)                                       | Personal  | ❌          | ❌     | Not supported      |
 | [`personal_newAccount`](#personal_newaccount)                                         | Personal  | ✅          | ❌     |                    |
 | [`personal_unlockAccount`](#personal_unlockaccount)                                   | Personal  | ⚠️         | ❌     | Always returns false|
-| [`personal_sendTransaction`](#personal_sendtransaction)                               | Personal  | ❌          | ❌     | Not implemented    |
+| [`personal_sendTransaction`](#personal_sendtransaction)                               | Personal  | ✅          | ❌     | Requires config    |
 | [`personal_sign`](#personal_sign)                                                     | Personal  | ✅          | ❌     |                    |
-| [`personal_ecRecover`](#personal_ecrecover)                                           | Personal  | ❌          | ❌     | Not implemented    |
+| [`personal_ecRecover`](#personal_ecrecover)                                           | Personal  | ✅          | ❌     | Requires config    |
 | [`personal_initializeWallet`](#personal_initializewallet)                             | Personal  | ❌          | ❌     | Not supported      |
 | [`personal_unpair`](#personal_unpair)                                                 | Personal  | ❌          | ❌     | Not supported      |
 | `personal_listWallets`                                                                | Personal  | ✅          | ❌     | Returns empty      |
@@ -158,9 +162,9 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | `les_latestCheckpoint`                                                                | Les       | N/A         | N/A    | LES protocol       |
 | `les_getCheckpoint`                                                                   | Les       | N/A         | N/A    | LES protocol       |
 | `les_getCheckpointContractAddress`                                                    | Les       | N/A         | N/A    | LES protocol       |
-| [`txpool_content`](#txpool_content)                                                   | TxPool    | ✅          | ✅     | Empty impl         |
-| [`txpool_inspect`](#txpool_inspect)                                                   | TxPool    | ✅          | ✅     | Empty impl         |
-| [`txpool_status`](#txpool_status)                                                     | TxPool    | ✅          | ✅     | Returns zeros      |
+| [`txpool_content`](#txpool_content)                                                   | TxPool    | ✅          | ✅     | Requires config    |
+| [`txpool_inspect`](#txpool_inspect)                                                   | TxPool    | ✅          | ✅     | Requires config    |
+| [`txpool_status`](#txpool_status)                                                     | TxPool    | ✅          | ✅     | Requires config    |
 | `trace_callMany`                                                                      | Trace     | ❌          | ❌     | Not implemented    |
 | `eth_signTypedData`                                                                   | Eth       | ⚠️         | ❌     | EIP-712 partial    |
 | `eth_fillTransaction`                                                                 | Eth       | ❌          | ❌     | Not implemented    |
