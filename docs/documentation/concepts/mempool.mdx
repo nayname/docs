@@ -5,7 +5,7 @@ description: "Two-tiered mempool architecture enabling full Ethereum tooling com
 
 ## Overview
 
-The app-side mempool is a two-tiered system that queues transactions with nonce gaps locally while broadcasting only executable transactions to the network. This allows Ethereum tooling (Hardhat, Foundry, ethers.js) to submit transaction batches out-of-order without rejection.
+The mempool is a two-tiered system that queues transactions with nonce gaps locally while broadcasting only executable transactions to the network. This allows Ethereum tooling (Hardhat, Foundry, ethers.js) to submit transaction batches out-of-order without rejection.
 
 ### Problem
 
@@ -40,7 +40,7 @@ Only nonce-gapped transactions are intercepted and queued. All other validation 
 
 ## Architecture
 
-The app-side mempool uses a two-tiered system with local and public transaction pools:
+The mempool uses a two-tiered system with local and public transaction pools:
 
 ```mermaid
 flowchart TD
@@ -160,7 +160,7 @@ Successfully validated transactions are added to the Comet mempool (FIFO).
 Transactions in the Comet mempool are broadcast to other peers across the network.
 
 ### 6. Block Building
-When a validator is selected to propose a block, ProcessProposal uses the app-side mempool to build blocks:
+When a validator is selected to propose a block, ProcessProposal uses the mempool to build blocks:
 - Sorts transactions by account (fee priority) and nonce
 - Pulls from both local queue and public pool
 - Replaces lower-fee duplicates with higher-fee versions
@@ -367,7 +367,7 @@ const tx2 = await wallet.sendTransaction({
 ### Configuration
 
 <Note>
-For chain developers looking to integrate the app-side mempool into their Cosmos SDK chain, see the [EVM Integration Guide](/docs/documentation/cosmos-sdk/integrate) for complete setup instructions.
+For chain developers looking to integrate the mempool into their Cosmos SDK chain, see the [EVM Integration Guide](/docs/documentation/cosmos-sdk/integrate) for complete setup instructions.
 </Note>
 
 The mempool is initialized with the following configuration:
@@ -393,4 +393,4 @@ The mempool maintains transaction state through the unified `ExperimentalEVMMemp
 
 ### Testing
 
-The app-side mempool behavior can be verified using the test scripts provided in the [cosmos/evm](https://github.com/cosmos/evm) repository.
+The mempool behavior can be verified using the test scripts provided in the [cosmos/evm](https://github.com/cosmos/evm) repository.

@@ -2232,10 +2232,11 @@ class Program
       </div>
 
       {/* Namespace Tabs */}
-      <div className="sticky top-[165px] z-10 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+      <div className="sticky top-[165px] z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-2 overflow-x-auto py-3">
-            <button
+          <div className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 rounded-lg">
+            <div className="flex space-x-2 overflow-x-auto py-3 px-3">
+              <button
               onClick={() => setSelectedNamespace('all')}
               className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-all whitespace-nowrap text-sm ${
                 selectedNamespace === 'all'

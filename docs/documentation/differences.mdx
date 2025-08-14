@@ -147,8 +147,6 @@ These standard Ethereum methods are not available:
 
 | Method | Category | Reason |
 |--------|----------|--------|
-| `eth_createAccessList` | EIP-2930 | Fully implemented |
-| `eth_pendingTransactions` | Transaction Pool | Fully implemented |
 | All `trace_*` methods | Trace | Parity/OpenEthereum trace methods not implemented |
 | `eth_subscribe` syncing | WebSocket | Only newHeads, logs, and newPendingTransactions events supported |
 
@@ -162,12 +160,11 @@ The following Ethereum RPC namespaces are not implemented or relevant to Cosmos 
 | `clique_*` | Clique PoA consensus | Cosmos uses Tendermint BFT consensus instead of Proof of Authority |
 | `engine_*` | Engine API for PoS | Used for Ethereum's execution/consensus client separation, not applicable with Tendermint |
 | `trace_*` | Parity/OpenEthereum tracing | Different tracing implementation, limited `debug_*` methods available instead |
-| `admin_*` | Node administration | Fully implemented with all standard admin methods |
-| `miner_*` | Mining operations | No mining in Tendermint BFT consensus |
+| `miner_*` | Mining operations | No mining in Tendermint BFT consensus, but stub methods respond for compatibility |
 | `parity_*` | Parity-specific methods | Client-specific methods not implemented |
 | `bor_*` | Polygon Bor consensus | Chain-specific consensus methods not applicable |
 
-Cosmos EVM focuses on implementing the core `eth_*`, `web3_*`, `net_*`, `txpool_*`, `personal_*`, and `debug_*` namespaces that are essential for Ethereum compatibility and developer tooling.
+Cosmos EVM focuses on implementing the core `eth_*`, `web3_*`, `net_*`, `txpool_*`, `personal_*`, `debug_*`, and `admin_*` namespaces that are essential for Ethereum compatibility and developer tooling.
 
 ## Address Format Examples
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 
 export default function EIPCompatibilityTable() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: 'eip', direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [eipData, setEipData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -86,37 +86,53 @@ export default function EIPCompatibilityTable() {
   const sortedData = useMemo(() => {
     let sortableItems = [...eipData];
     
-    // Always sort not_supported to the bottom
+    // Define status priority (higher = better)
+    const statusPriority = {
+      'supported': 4,
+      'partial': 3,
+      'not_applicable': 2,
+      'unknown': 1,
+      'not_supported': 0
+    };
+    
     sortableItems.sort((a, b) => {
-      // First priority: put not_supported at the bottom
-      if (a.status === 'not_supported' && b.status !== 'not_supported') return 1;
-      if (b.status === 'not_supported' && a.status !== 'not_supported') return -1;
+      const aPriority = statusPriority[a.status] || 0;
+      const bPriority = statusPriority[b.status] || 0;
       
-      // Then apply regular sorting
-      if (sortConfig.key) {
-        let aVal = a[sortConfig.key];
-        let bVal = b[sortConfig.key];
-
-        // Handle null/undefined
-        if (aVal == null) return 1;
-        if (bVal == null) return -1;
-
-        // Convert to comparable values
-        if (typeof aVal === 'boolean') {
-          aVal = aVal ? 1 : 0;
-          bVal = bVal ? 1 : 0;
-        } else if (typeof aVal === 'string') {
-          aVal = aVal.toLowerCase();
-          bVal = bVal.toLowerCase();
-        }
-
-        if (aVal < bVal) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
-        }
-        if (aVal > bVal) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
-        }
+      // Primary sort: Status (unless user is sorting by another column)
+      if (sortConfig.key !== 'status' && aPriority !== bPriority) {
+        return bPriority - aPriority; // Always show supported items first
       }
+      
+      // Secondary sort: User's selected column
+      const key = sortConfig.key || 'eip';
+      let aVal = a[key];
+      let bVal = b[key];
+      
+      // Special handling for status column with user direction
+      if (key === 'status') {
+        if (aPriority !== bPriority) {
+          return sortConfig.direction === 'asc' ? bPriority - aPriority : aPriority - bPriority;
+        }
+        return 0;
+      }
+      
+      // Handle null/undefined
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+      
+      // Normalize values for comparison
+      if (typeof aVal === 'boolean') {
+        aVal = aVal ? 1 : 0;
+        bVal = bVal ? 1 : 0;
+      } else if (typeof aVal === 'string') {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+      
+      // Apply sort direction
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
     return sortableItems;
