@@ -1,15 +1,15 @@
 import { CurlIcon, TypeScriptIcon, GoIcon, RustIcon, PythonIcon, CSharpIcon, APIIcon, NetworkIcon, EthereumIcon, SmartContractIcon } from '/snippets/icons.mdx';
 
 export default function RPCMethodsViewer() {
-  const [selectedNamespace, setSelectedNamespace] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [expandedMethods, setExpandedMethods] = useState({});
-  const [selectedLanguage, setSelectedLanguage] = useState({});
-  const [rpcEndpoint, setRpcEndpoint] = useState('');
-  const [isValidEndpoint, setIsValidEndpoint] = useState(false);
-  const [isInvalidEndpoint, setIsInvalidEndpoint] = useState(false);
-  const [requestResults, setRequestResults] = useState({});
-  const [isLoading, setIsLoading] = useState({});
+  const [selectedNamespace, setSelectedNamespace] = React.useState('all');
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [expandedMethods, setExpandedMethods] = React.useState({});
+  const [selectedLanguage, setSelectedLanguage] = React.useState({});
+  const [rpcEndpoint, setRpcEndpoint] = React.useState('');
+  const [isValidEndpoint, setIsValidEndpoint] = React.useState(false);
+  const [isInvalidEndpoint, setIsInvalidEndpoint] = React.useState(false);
+  const [requestResults, setRequestResults] = React.useState({});
+  const [isLoading, setIsLoading] = React.useState({});
 
   const languages = [
     { id: 'curl', name: 'cURL', icon: CurlIcon },
@@ -367,6 +367,63 @@ class Program
           ]
         },
         {
+          name: 'eth_sign',
+          description: 'Signs data with an account',
+          implemented: true,
+          private: true,
+          params: [
+            { name: 'address', type: 'address', description: 'Account address', example: '0x9b2055d370f73ec7d8a03e965129118dc8f5bf83' },
+            { name: 'message', type: 'bytes', description: 'Data to sign', example: '0xdeadbeef' }
+          ],
+          examples: [
+            {
+              name: 'Sign message',
+              params: ['0x9b2055d370f73ec7d8a03e965129118dc8f5bf83', '0xdeadbeef'],
+              response: {
+                result: '0xa3f20717a250c2b0b729b7e5becbff67fdaef7e0699da4de7ca5895b02a170a12d887fd3b17bfdce3481f10bea41f45ba9f709d39ce8325427b57afcfc994cee1b'
+              }
+            }
+          ]
+        },
+        {
+          name: 'eth_sendTransaction',
+          description: 'Creates and submits a transaction',
+          implemented: true,
+          private: true,
+          params: [
+            {
+              name: 'transaction',
+              type: 'object',
+              description: 'Transaction object',
+              fields: [
+                { name: 'from', type: 'address', description: 'Sender address' },
+                { name: 'to', type: 'address', description: 'Recipient address' },
+                { name: 'gas', type: 'quantity', description: 'Gas limit (optional)' },
+                { name: 'gasPrice', type: 'quantity', description: 'Gas price (optional)' },
+                { name: 'value', type: 'quantity', description: 'Value to send (optional)' },
+                { name: 'data', type: 'bytes', description: 'Transaction data (optional)' },
+                { name: 'nonce', type: 'quantity', description: 'Nonce (optional)' }
+              ]
+            }
+          ],
+          examples: [
+            {
+              name: 'Send transaction',
+              params: [{
+                from: '0xb60e8dd61c5d32be8058bb8eb970870f07233155',
+                to: '0xd46e8dd67c5d32be8058bb8eb970870f07244567',
+                gas: '0x76c0',
+                gasPrice: '0x9184e72a000',
+                value: '0x9184e72a',
+                data: '0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675'
+              }],
+              response: {
+                result: '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331'
+              }
+            }
+          ]
+        },
+        {
           name: 'eth_sendRawTransaction',
           description: 'Submit a signed transaction',
           implemented: true,
@@ -624,6 +681,36 @@ class Program
           ]
         },
         {
+          name: 'eth_getBlockTransactionCountByNumber',
+          description: 'Returns the number of transactions in a block by number',
+          implemented: true,
+          params: [
+            { name: 'blockNumber', type: 'string', description: 'Block number or tag', example: '0x1' }
+          ],
+          examples: [
+            {
+              name: 'Get transaction count',
+              params: ['0x1'],
+              response: { result: '0x10' }
+            }
+          ]
+        },
+        {
+          name: 'eth_getBlockTransactionCountByHash',
+          description: 'Returns the number of transactions in a block by hash',
+          implemented: true,
+          params: [
+            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0x8101cc04aea3341a6d4b3ced715e3f38de1e72867d6c0db5f5247d1a42fbb085' }
+          ],
+          examples: [
+            {
+              name: 'Get transaction count',
+              params: ['0x8101cc04aea3341a6d4b3ced715e3f38de1e72867d6c0db5f5247d1a42fbb085'],
+              response: { result: '0x10' }
+            }
+          ]
+        },
+        {
           name: 'eth_getCode',
           description: 'Returns code at a given address',
           implemented: true,
@@ -738,6 +825,66 @@ class Program
                   contractAddress: null,
                   logs: [],
                   status: '0x1'
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: 'eth_getTransactionByBlockHashAndIndex',
+          description: 'Returns transaction by block hash and index',
+          implemented: true,
+          params: [
+            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4' },
+            { name: 'index', type: 'quantity', description: 'Transaction index', example: '0x0' }
+          ],
+          examples: [
+            {
+              name: 'Get transaction by index',
+              params: ['0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4', '0x0'],
+              response: {
+                result: {
+                  blockHash: '0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4',
+                  blockNumber: '0x5daf3b',
+                  from: '0xa7d9ddbe1f17865597fbd27ec712455208b6b76d',
+                  gas: '0xc350',
+                  gasPrice: '0x4a817c800',
+                  hash: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b',
+                  input: '0x',
+                  nonce: '0x15',
+                  to: '0xf02c1c8e6114b1dbe8937a39260b5b0a374432bb',
+                  transactionIndex: '0x0',
+                  value: '0xf3dbb76162000'
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: 'eth_getTransactionByBlockNumberAndIndex',
+          description: 'Returns transaction by block number and index',
+          implemented: true,
+          params: [
+            { name: 'blockNumber', type: 'string', description: 'Block number or tag', example: '0x1' },
+            { name: 'index', type: 'quantity', description: 'Transaction index', example: '0x0' }
+          ],
+          examples: [
+            {
+              name: 'Get transaction by index',
+              params: ['0x1', '0x0'],
+              response: {
+                result: {
+                  blockHash: '0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4',
+                  blockNumber: '0x1',
+                  from: '0xa7d9ddbe1f17865597fbd27ec712455208b6b76d',
+                  gas: '0xc350',
+                  gasPrice: '0x4a817c800',
+                  hash: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b',
+                  input: '0x',
+                  nonce: '0x15',
+                  to: '0xf02c1c8e6114b1dbe8937a39260b5b0a374432bb',
+                  transactionIndex: '0x0',
+                  value: '0xf3dbb76162000'
                 }
               }
             }
@@ -881,9 +1028,11 @@ class Program
               name: 'Get fee history',
               params: ['0x5', 'latest', [20, 30]],
               response: {
-                error: {
-                  code: -32601,
-                  message: 'Method not found'
+                result: {
+                  oldestBlock: '0x3',
+                  reward: [['0x0', '0x0'], ['0x0', '0x0'], ['0x0', '0x0'], ['0x0', '0x0'], ['0x0', '0x0']],
+                  baseFeePerGas: ['0x0', '0x0', '0x0', '0x0', '0x0', '0x0'],
+                  gasUsedRatio: [0, 0, 0, 0, 0]
                 }
               }
             }
@@ -954,6 +1103,160 @@ class Program
               }
             }
           ]
+        },
+        {
+          name: 'eth_getPendingTransactions',
+          description: 'Returns pending transactions (Cosmos-specific)',
+          implemented: true,
+          params: [],
+          examples: [
+            {
+              name: 'Get pending transactions',
+              params: [],
+              response: {
+                result: []
+              }
+            }
+          ]
+        },
+        {
+          name: 'eth_pendingTransactions',
+          description: 'Standard Ethereum pending transactions method',
+          implemented: true,
+          params: [],
+          examples: [
+            {
+              name: 'Get pending transactions',
+              params: [],
+              response: {
+                error: {
+                  code: -32601,
+                  message: 'Method not found'
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: 'eth_getTransactionLogs',
+          description: 'Get logs for a specific transaction (Cosmos-specific)',
+          implemented: true,
+          params: [
+            { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0x1e2910a262b1008d0616a0beb24c1a491d78771baa54a33e66065e03b1f46bc1' }
+          ],
+          examples: [
+            {
+              name: 'Get transaction logs',
+              params: ['0x1e2910a262b1008d0616a0beb24c1a491d78771baa54a33e66065e03b1f46bc1'],
+              response: {
+                result: []
+              }
+            }
+          ]
+        },
+        {
+          name: 'eth_getBlockReceipts',
+          description: 'Get all receipts for a given block (Cosmos-specific)',
+          implemented: true,
+          params: [
+            { name: 'blockNumber', type: 'string', description: 'Block number or tag', example: 'latest' }
+          ],
+          examples: [
+            {
+              name: 'Get block receipts',
+              params: ['latest'],
+              response: {
+                result: []
+              }
+            }
+          ]
+        },
+        {
+          name: 'eth_resend',
+          description: 'Resend transaction with different gas parameters',
+          implemented: true,
+          params: [
+            { 
+              name: 'transaction',
+              type: 'object',
+              description: 'Original transaction',
+              fields: [
+                { name: 'from', type: 'address', description: 'Sender' },
+                { name: 'to', type: 'address', description: 'Recipient' },
+                { name: 'gas', type: 'quantity', description: 'Gas limit' },
+                { name: 'gasPrice', type: 'quantity', description: 'Gas price' },
+                { name: 'value', type: 'quantity', description: 'Value' },
+                { name: 'data', type: 'data', description: 'Input data' },
+                { name: 'nonce', type: 'quantity', description: 'Nonce' }
+              ]
+            },
+            { name: 'gasPrice', type: 'quantity', description: 'New gas price', example: '0x3b9aca00' },
+            { name: 'gasLimit', type: 'quantity', description: 'New gas limit', example: '0x5208' }
+          ],
+          examples: [
+            {
+              name: 'Resend with higher gas',
+              params: [
+                {
+                  from: '0x0',
+                  to: '0x0',
+                  gas: '0x5208',
+                  gasPrice: '0x3b9aca00',
+                  value: '0x0',
+                  data: '0x',
+                  nonce: '0x0'
+                },
+                '0x4a817c800',
+                '0x5208'
+              ],
+              response: {
+                result: '0x1e2910a262b1008d0616a0beb24c1a491d78771baa54a33e66065e03b1f46bc1'
+              }
+            }
+          ]
+        },
+        {
+          name: 'eth_createAccessList',
+          description: 'Generate access list for transaction (EIP-2930)',
+          implemented: true,
+          params: [
+            {
+              name: 'transaction',
+              type: 'object',
+              description: 'Transaction call object',
+              fields: [
+                { name: 'from', type: 'address', description: 'Sender address' },
+                { name: 'to', type: 'address', description: 'Contract address' },
+                { name: 'gas', type: 'quantity', description: 'Gas limit' },
+                { name: 'gasPrice', type: 'quantity', description: 'Gas price' },
+                { name: 'value', type: 'quantity', description: 'Value' },
+                { name: 'data', type: 'data', description: 'Input data' }
+              ]
+            },
+            { name: 'blockNumber', type: 'string', description: 'Block number or tag', example: 'latest' }
+          ],
+          examples: [
+            {
+              name: 'Generate access list',
+              params: [
+                {
+                  from: '0x0',
+                  to: '0x0',
+                  gas: '0x5208',
+                  gasPrice: '0x3b9aca00',
+                  value: '0x0',
+                  data: '0x'
+                },
+                'latest'
+              ],
+              response: {
+                error: {
+                  code: -32601,
+                  message: 'Method not found'
+                }
+              }
+            }
+          ]
         }
       ]
     },
@@ -1000,6 +1303,7 @@ class Program
           name: 'personal_lockAccount',
           description: 'Remove private key from memory',
           implemented: true,
+          issue: 'Not supported - always returns false',
           private: true,
           params: [
             { name: 'address', type: 'address', description: 'Account to lock', example: '0x0f54f47bf9b8e317b214ccd6a7c3e38b893cd7f0' }
@@ -1034,8 +1338,9 @@ class Program
         },
         {
           name: 'personal_unlockAccount',
-          description: 'Decrypt account key in memory',
+          description: 'Decrypt account key in memory (always returns false)',
           implemented: true,
+          issue: 'Not supported - always returns false',
           private: true,
           params: [
             { name: 'address', type: 'address', description: 'Account address', example: '0x0f54f47bf9b8e317b214ccd6a7c3e38b893cd7f0' },
@@ -1478,6 +1783,232 @@ class Program
           ]
         }
       ]
+    },
+    admin: {
+      name: 'Admin',
+      icon: NetworkIcon,
+      methods: [
+        {
+          name: 'admin_addPeer',
+          description: 'Add a new remote peer to connect to',
+          implemented: true,
+          params: [
+            { name: 'url', type: 'string', description: 'Peer URL in enode format', example: 'enode://pubkey@ip:port' }
+          ],
+          examples: [
+            {
+              name: 'Add peer',
+              params: ['enode://a979fb575495b8d6db44f750317d0f4622bf4c2aa3365d6af7c284339968eef29b69ad0dce72a4d8db5ebb4968de0e3bec910127f134779fbcb0cb6d3331163c@52.16.188.185:30303'],
+              response: { result: true }
+            }
+          ]
+        },
+        {
+          name: 'admin_removePeer',
+          description: 'Remove a remote peer',
+          implemented: true,
+          params: [
+            { name: 'url', type: 'string', description: 'Peer URL in enode format', example: 'enode://pubkey@ip:port' }
+          ],
+          examples: [
+            {
+              name: 'Remove peer',
+              params: ['enode://a979fb575495b8d6db44f750317d0f4622bf4c2aa3365d6af7c284339968eef29b69ad0dce72a4d8db5ebb4968de0e3bec910127f134779fbcb0cb6d3331163c@52.16.188.185:30303'],
+              response: { result: true }
+            }
+          ]
+        },
+        {
+          name: 'admin_peers',
+          description: 'List all connected peers',
+          implemented: true,
+          params: [],
+          examples: [
+            {
+              name: 'Get peers',
+              params: [],
+              response: { result: [] }
+            }
+          ]
+        },
+        {
+          name: 'admin_nodeInfo',
+          description: 'Get node information',
+          implemented: true,
+          params: [],
+          examples: [
+            {
+              name: 'Get node info',
+              params: [],
+              response: {
+                result: {
+                  id: 'node-id',
+                  name: 'Cosmos EVM',
+                  enode: 'enode://...',
+                  ip: '127.0.0.1',
+                  ports: { discovery: 30303, listener: 30303 },
+                  listenAddr: '[::]:30303',
+                  protocols: {}
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: 'admin_datadir',
+          description: 'Get the data directory path',
+          implemented: true,
+          params: [],
+          examples: [
+            {
+              name: 'Get data directory',
+              params: [],
+              response: { result: '/home/user/.cosmos' }
+            }
+          ]
+        },
+        {
+          name: 'admin_startHTTP',
+          description: 'Start the HTTP RPC server',
+          implemented: true,
+          params: [
+            { name: 'host', type: 'string', description: 'HTTP server host', example: 'localhost' },
+            { name: 'port', type: 'number', description: 'HTTP server port', example: 8545 },
+            { name: 'cors', type: 'string', description: 'Allowed CORS domains', example: '*' },
+            { name: 'apis', type: 'string', description: 'Enabled APIs', example: 'eth,net,web3' }
+          ],
+          examples: [
+            {
+              name: 'Start HTTP server',
+              params: ['localhost', 8545, '*', 'eth,net,web3'],
+              response: { result: true }
+            }
+          ]
+        },
+        {
+          name: 'admin_stopHTTP',
+          description: 'Stop the HTTP RPC server',
+          implemented: true,
+          params: [],
+          examples: [
+            {
+              name: 'Stop HTTP server',
+              params: [],
+              response: { result: true }
+            }
+          ]
+        },
+        {
+          name: 'admin_startWS',
+          description: 'Start the WebSocket RPC server',
+          implemented: true,
+          params: [
+            { name: 'host', type: 'string', description: 'WebSocket server host', example: 'localhost' },
+            { name: 'port', type: 'number', description: 'WebSocket server port', example: 8546 },
+            { name: 'cors', type: 'string', description: 'Allowed CORS domains', example: '*' },
+            { name: 'apis', type: 'string', description: 'Enabled APIs', example: 'eth,net,web3' }
+          ],
+          examples: [
+            {
+              name: 'Start WebSocket server',
+              params: ['localhost', 8546, '*', 'eth,net,web3'],
+              response: { result: true }
+            }
+          ]
+        },
+        {
+          name: 'admin_stopWS',
+          description: 'Stop the WebSocket RPC server',
+          implemented: true,
+          params: [],
+          examples: [
+            {
+              name: 'Stop WebSocket server',
+              params: [],
+              response: { result: true }
+            }
+          ]
+        }
+      ]
+    },
+    miner: {
+      name: 'Miner',
+      icon: SmartContractIcon,
+      methods: [
+        {
+          name: 'miner_start',
+          description: 'Start mining (stub implementation for PoS)',
+          implemented: true,
+          params: [
+            { name: 'threads', type: 'number', description: 'Number of threads', example: 1 }
+          ],
+          examples: [
+            {
+              name: 'Start mining',
+              params: [1],
+              response: { result: true }
+            }
+          ]
+        },
+        {
+          name: 'miner_stop',
+          description: 'Stop mining (stub implementation for PoS)',
+          implemented: true,
+          params: [],
+          examples: [
+            {
+              name: 'Stop mining',
+              params: [],
+              response: { result: true }
+            }
+          ]
+        },
+        {
+          name: 'miner_setEtherbase',
+          description: 'Set the etherbase (stub implementation for PoS)',
+          implemented: true,
+          params: [
+            { name: 'address', type: 'string', description: 'The etherbase address', example: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8' }
+          ],
+          examples: [
+            {
+              name: 'Set etherbase',
+              params: ['0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8'],
+              response: { result: true }
+            }
+          ]
+        },
+        {
+          name: 'miner_setGasPrice',
+          description: 'Set the gas price (stub implementation for PoS)',
+          implemented: true,
+          params: [
+            { name: 'gasPrice', type: 'string', description: 'Gas price in wei', example: '0x3b9aca00' }
+          ],
+          examples: [
+            {
+              name: 'Set gas price',
+              params: ['0x3b9aca00'],
+              response: { result: true }
+            }
+          ]
+        },
+        {
+          name: 'miner_setGasLimit',
+          description: 'Set the gas limit (stub implementation for PoS)',
+          implemented: true,
+          params: [
+            { name: 'gasLimit', type: 'string', description: 'Gas limit', example: '0x5f5e100' }
+          ],
+          examples: [
+            {
+              name: 'Set gas limit',
+              params: ['0x5f5e100'],
+              response: { result: true }
+            }
+          ]
+        }
+      ]
     }
   };
 
@@ -1543,7 +2074,7 @@ class Program
   };
 
   // Get all methods from all namespaces for global search
-  const allMethods = useMemo(() => {
+  const allMethods = React.useMemo(() => {
     const methods = [];
     Object.entries(namespaces).forEach(([key, namespace]) => {
       namespace.methods.forEach(method => {
@@ -1553,7 +2084,7 @@ class Program
     return methods;
   }, []);
 
-  const filteredMethods = useMemo(() => {
+  const filteredMethods = React.useMemo(() => {
     // If there's a search term, search all methods
     if (searchTerm) {
       return allMethods.filter(method => {
@@ -1580,7 +2111,7 @@ class Program
   }, [selectedNamespace, searchTerm, allMethods]);
 
   function CopyButton({ text }) {
-    const [copied, setCopied] = useState(false);
+    const [copied, setCopied] = React.useState(false);
 
     const handleCopy = () => {
       navigator.clipboard.writeText(text);
@@ -1593,7 +2124,7 @@ class Program
         onClick={handleCopy}
         className="px-2 py-0.5 text-xs bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded transition-colors font-mono"
       >
-        {copied ? '✓ Copied' : 'Copy'}
+        {copied ? 'Copied' : 'Copy'}
       </button>
     );
   }
@@ -1612,7 +2143,7 @@ class Program
             </p>
             {isValidEndpoint && (
               <p className="mt-2 text-sm text-[#05fcf8]">
-                ✓ Interactive mode active - Click "Execute" on any method example to test against {rpcEndpoint}
+                Interactive mode active - Click "Execute" on any method example to test against {rpcEndpoint}
               </p>
             )}
           </div>
@@ -1684,10 +2215,10 @@ class Program
                       }}
                     />
                     {isValidEndpoint && (
-                      <span className="text-[#05fcf8] text-lg">✓</span>
+                      <span className="text-[#05fcf8] text-lg">Y</span>
                     )}
                     {isInvalidEndpoint && (
-                      <span className="text-red-500 text-lg">✗</span>
+                      <span className="text-red-500 text-lg">N</span>
                     )}
                   </div>
                 </div>
@@ -1767,8 +2298,8 @@ class Program
                         </span>
                       )}
                       {!method.implemented && (
-                        <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded">
-                          Not implemented in the Cosmos/EVM base module
+                        <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 rounded">
+                          Not implemented
                         </span>
                       )}
                     </div>
@@ -1793,7 +2324,7 @@ class Program
                     {method.issue && (
                       <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
                         <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                          ⚠️ {method.issue}
+                          Warning: {method.issue}
                         </p>
                       </div>
                     )}
@@ -1873,8 +2404,8 @@ class Program
                                         : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                                     }`}
                                   >
-                                    <span className="mr-1.5 inline-block">
-                                      <lang.icon size={16} />
+                                    <span className="mr-1.5 inline-block text-base">
+                                      {lang.icon}
                                     </span>
                                     {lang.name}
                                   </button>

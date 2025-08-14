@@ -5,22 +5,42 @@ description: "Two-tiered mempool architecture enabling full Ethereum tooling com
 
 ## Overview
 
-The **app-side mempool** enables Ethereum tooling to work seamlessly with Cosmos consensus by introducing a two-tiered architecture that bridges the gap between Ethereum's transaction batching and Cosmos' sequential processing.
+The mempool is a two-tiered system that queues transactions with nonce gaps locally while broadcasting only executable transactions to the network. This allows Ethereum tooling (Hardhat, Foundry, ethers.js) to submit transaction batches out-of-order without rejection.
 
-By implementing a two-tiered pool system with local queuing for non-executable transactions, the mempool provides complete compatibility with Ethereum tooling without gossiping invalid transactions across the network. This design enables seamless integration with tools like Hardhat, Foundry, and ethers.js while preserving the integrity of the Cosmos consensus layer.
+### Problem
 
-### The Problem
+CometBFT rejects transactions with:
+- Nonce gaps (non-sequential nonces)
+- Out-of-order batches (common in deployment scripts)
 
-Standard CometBFT mempools reject transactions that don't meet immediate execution requirements:
-- **Nonce gaps**: Transactions with non-sequential nonces are rejected
-- **Out-of-order batches**: Common with Ethereum deployment scripts and tooling
-- **Fee market changes**: Transactions becoming temporarily invalid due to base fee increases
+Ethereum tooling expects these transactions to queue rather than fail.
 
-This breaks compatibility with essential Ethereum tooling like Hardhat, Foundry, and deployment scripts that expect transactions to queue even when not immediately executable.
+### Design Rationale
+
+The two-tiered approach:
+- **Local queue**: Stores gapped transactions without network propagation, preventing invalid transaction gossip
+- **Public pool**: Contains only valid transactions, maintaining consensus integrity
+- **Automatic promotion**: Moves transactions from local to public when gaps fill, ensuring eventual inclusion
+
+This preserves CometBFT's validation guarantees while providing Ethereum's expected queuing behavior.
+
+### What Gets Queued vs Rejected
+
+**Queued (Local Storage)**:
+- **Nonce gaps**: Transactions with nonce > expected nonce
+- These are stored locally and promoted when gaps fill
+
+**Rejected (Immediate Failure)**:
+- **Insufficient fees**: `GasFeeCap < BaseFee`
+- **Insufficient balance**: Transaction cost exceeds account balance
+- **Invalid signature**: Malformed or improperly signed transactions
+- **Gas limit exceeded**: Transactions exceeding block gas limit
+
+Only nonce-gapped transactions are intercepted and queued. All other validation failures result in immediate rejection with error returned to the client.
 
 ## Architecture
 
-The app-side mempool uses a two-tiered system with local and public transaction pools:
+The mempool uses a two-tiered system with local and public transaction pools:
 
 ```mermaid
 flowchart TD
@@ -81,13 +101,13 @@ flowchart TD
 ### Core Components
 
 **CheckTx Handler**
-Intercepts nonce gap errors during validation, routes gapped transactions to the local queue, and returns success to maintain compatibility with Ethereum tooling that expects queuing behavior.
+Intercepts nonce gap errors during validation, routes gapped transactions to the local queue, and returns success to maintain compatibility with Ethereum tooling that expects queuing behavior. Only nonce gaps are intercepted - other validation failures (insufficient fees, balance, etc.) are rejected immediately.
 
 **TxPool**
 Direct port of Ethereum's transaction pool that manages both pending (executable) and queued (future) transactions. Handles promotion, eviction, and replacement according to Ethereum rules.
 
 **LegacyPool**
-Stores non-executable transactions with nonce gaps, tracks dependencies between transactions, and automatically promotes them when gaps are filled.
+Stores non-executable transactions with nonce gaps, tracks dependencies between transactions, and automatically promotes them when gaps are filled. The queue contains only transactions waiting for earlier nonces - not transactions with insufficient fees.
 
 **ExperimentalEVMMempool**
 Unified structure that manages both EVM and Cosmos transaction pools while providing a single interface for transaction insertion, selection, and removal.
@@ -126,7 +146,12 @@ if txNonce > accountNonce {
 }
 ```
 
-**Other Failures** - Non-gap failures are discarded entirely and return error to client.
+**Other Failures** - Rejected and return error to client:
+- **Insufficient fees**: Transactions with `GasFeeCap < BaseFee` fail with `ErrInsufficientFee`
+- **Insufficient balance**: Transactions exceeding account balance
+- **Invalid signature**: Malformed or invalid transaction signatures
+
+Note: Only nonce gaps trigger local queuing. Fee-related failures result in immediate rejection.
 
 ### 4. Comet Mempool Addition
 Successfully validated transactions are added to the Comet mempool (FIFO).
@@ -135,7 +160,7 @@ Successfully validated transactions are added to the Comet mempool (FIFO).
 Transactions in the Comet mempool are broadcast to other peers across the network.
 
 ### 6. Block Building
-When a validator is selected to propose a block, ProcessProposal uses the app-side mempool to build blocks:
+When a validator is selected to propose a block, ProcessProposal uses the mempool to build blocks:
 - Sorts transactions by account (fee priority) and nonce
 - Pulls from both local queue and public pool
 - Replaces lower-fee duplicates with higher-fee versions
@@ -153,8 +178,8 @@ stateDiagram-v2
     Submitted --> CheckTx: Validation
 
     CheckTx --> Pending: Valid & Executable
-    CheckTx --> Queued: Nonce Gap Detected
-    CheckTx --> Rejected: Invalid
+    CheckTx --> Queued: Nonce Gap Only
+    CheckTx --> Rejected: Invalid (fees, balance, etc.)
 
     Queued --> Promoted: Gap filled
     Promoted --> Pending: Re-broadcast
@@ -314,10 +339,10 @@ Returns transaction counts for pending and queued pools.
 
 ```javascript
 // Ethereum tooling sends multiple transactions
-await wallet.sendTransaction({nonce: 100, ...}); // ✓ Immediate execution
-await wallet.sendTransaction({nonce: 101, ...}); // ✓ Immediate execution
-await wallet.sendTransaction({nonce: 103, ...}); // ✓ Queued locally (gap)
-await wallet.sendTransaction({nonce: 102, ...}); // ✓ Fills gap, both execute
+await wallet.sendTransaction({nonce: 100, ...}); // OK: Immediate execution
+await wallet.sendTransaction({nonce: 101, ...}); // OK: Immediate execution
+await wallet.sendTransaction({nonce: 103, ...}); // OK: Queued locally (gap)
+await wallet.sendTransaction({nonce: 102, ...}); // OK: Fills gap, both execute
 ```
 
 ### Transaction Replacement
@@ -342,7 +367,7 @@ const tx2 = await wallet.sendTransaction({
 ### Configuration
 
 <Note>
-For chain developers looking to integrate the app-side mempool into their Cosmos SDK chain, see the [EVM Integration Guide](/docs/documentation/cosmos-sdk/integrate) for complete setup instructions.
+For chain developers looking to integrate the mempool into their Cosmos SDK chain, see the [EVM Integration Guide](/docs/documentation/cosmos-sdk/integrate) for complete setup instructions.
 </Note>
 
 The mempool is initialized with the following configuration:
@@ -368,4 +393,4 @@ The mempool maintains transaction state through the unified `ExperimentalEVMMemp
 
 ### Testing
 
-The app-side mempool behavior can be verified using the test scripts provided in the [cosmos/evm](https://github.com/cosmos/evm) repository.
+The mempool behavior can be verified using the test scripts provided in the [cosmos/evm](https://github.com/cosmos/evm) repository.

@@ -1,8 +1,6 @@
 export default function EIPCompatibilityTable() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [criticalityFilter, setCriticalityFilter] = useState('all');
-  const [sortConfig, setSortConfig] = useState({ key: 'eip', direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [eipData, setEipData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -85,50 +83,68 @@ export default function EIPCompatibilityTable() {
 
   const sortedData = useMemo(() => {
     let sortableItems = [...eipData];
-    if (sortConfig.key) {
-      sortableItems.sort((a, b) => {
-        let aVal = a[sortConfig.key];
-        let bVal = b[sortConfig.key];
 
-        // Handle null/undefined
-        if (aVal == null) return 1;
-        if (bVal == null) return -1;
+    // Define status priority (higher = better)
+    const statusPriority = {
+      'supported': 4,
+      'partial': 3,
+      'not_applicable': 2,
+      'unknown': 1,
+      'not_supported': 0
+    };
 
-        // Convert to comparable values
-        if (typeof aVal === 'boolean') {
-          aVal = aVal ? 1 : 0;
-          bVal = bVal ? 1 : 0;
-        } else if (typeof aVal === 'string') {
-          aVal = aVal.toLowerCase();
-          bVal = bVal.toLowerCase();
-        }
+    sortableItems.sort((a, b) => {
+      const aPriority = statusPriority[a.status] || 0;
+      const bPriority = statusPriority[b.status] || 0;
 
-        if (aVal < bVal) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
-        }
-        if (aVal > bVal) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
+      // Primary sort: Status (unless user is sorting by another column)
+      if (sortConfig.key !== 'status' && aPriority !== bPriority) {
+        return bPriority - aPriority; // Always show supported items first
+      }
+
+      // Secondary sort: User's selected column
+      const key = sortConfig.key || 'eip';
+      let aVal = a[key];
+      let bVal = b[key];
+
+      // Special handling for status column with user direction
+      if (key === 'status') {
+        if (aPriority !== bPriority) {
+          return sortConfig.direction === 'asc' ? bPriority - aPriority : aPriority - bPriority;
         }
         return 0;
-      });
-    }
+      }
+
+      // Handle null/undefined
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+
+      // Normalize values for comparison
+      if (typeof aVal === 'boolean') {
+        aVal = aVal ? 1 : 0;
+        bVal = bVal ? 1 : 0;
+      } else if (typeof aVal === 'string') {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+
+      // Apply sort direction
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
     return sortableItems;
   }, [eipData, sortConfig]);
 
   const filteredData = sortedData.filter(eip => {
     if (!eip || !eip.eip) return false;
 
-    const matchesSearch =
+    const matchesSearch = searchTerm === '' ||
       String(eip.eip).includes(searchTerm) ||
       (eip.title && eip.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (eip.note && eip.note.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchesStatus = statusFilter === 'all' || eip.status === statusFilter;
-    const matchesCriticality = criticalityFilter === 'all' ||
-      (criticalityFilter === 'critical' && eip.critical) ||
-      (criticalityFilter === 'non-critical' && !eip.critical);
-
-    return matchesSearch && matchesStatus && matchesCriticality;
+    return matchesSearch;
   });
 
   const uniqueStatuses = [...new Set(eipData.map(eip => eip.status))];
@@ -170,7 +186,7 @@ export default function EIPCompatibilityTable() {
       <div className="sticky top-0 z-20 bg-white dark:bg-black pb-4 border-b border-gray-200 dark:border-gray-800">
         <div className="space-y-4">
         <div className="flex gap-4 flex-wrap">
-          <div className="flex-1 min-w-[300px]">
+          <div className="flex-1">
             <input
               type="text"
               placeholder="Search by EIP number, title, or notes..."
@@ -179,32 +195,11 @@ export default function EIPCompatibilityTable() {
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-black dark:focus:ring-white"
             />
           </div>
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white"
-          >
-            <option value="all">All Statuses</option>
-            {uniqueStatuses.map(status => (
-              <option key={status} value={status}>{status.replace(/_/g, ' ')}</option>
-            ))}
-          </select>
-
-          <select
-            value={criticalityFilter}
-            onChange={(e) => setCriticalityFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white"
-          >
-            <option value="all">All Priorities</option>
-            <option value="critical">Critical Only</option>
-            <option value="non-critical">Non-Critical Only</option>
-          </select>
         </div>
 
           <div className="text-sm text-gray-600 dark:text-gray-400">
             Showing {filteredData.length} of {eipData.length} EIPs
-            {error && <span className="ml-2 text-yellow-600">⚠ Using cached data</span>}
+            {error && <span className="ml-2 text-yellow-600">Warning: Using cached data</span>}
           </div>
         </div>
       </div>
@@ -271,7 +266,7 @@ export default function EIPCompatibilityTable() {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                  {eip.critical ? '✓' : '-'}
+                  {eip.critical ? 'Yes' : '-'}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
                   {eip.cosmos}

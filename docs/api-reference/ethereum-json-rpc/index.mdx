@@ -32,14 +32,11 @@ More on Ethereum JSON-RPC:
 <Warning>
   **Notable Unsupported Methods**: The following standard Ethereum methods are not implemented:
 
-  * `eth_getFilterChanges` / `eth_getFilterLogs` - Filter management issues
-  * `eth_feeHistory` - Fee history for EIP-1559
-  * `eth_createAccessList` - EIP-2930 access lists
   * `eth_fillTransaction` - Transaction filling utility
-  * `eth_resend` / `eth_pendingTransactions` - Transaction pool management
-  * `personal_sendTransaction` / `personal_ecRecover` - Some personal namespace methods
   * All `debug_getRaw*` methods - Raw data access not implemented
   * `eth_subscribe` syncing events - Only newHeads, logs, and newPendingTransactions work
+  * All `trace_*` methods - Parity/OpenEthereum trace namespace
+  * All `engine_*` methods - Post-merge Engine API
 
   See the [methods page](./methods) for complete details.
 </Warning>
@@ -126,15 +123,16 @@ See the [methods](./methods) page for an exhaustive list and working examples.
 
 | Namespace | Description | Supported | Enabled by Default |
 |-----------|-------------|-----------|-------------------|
-| [`eth`](./methods#eth-methods) | Core Ethereum JSON-RPC methods for interacting with the EVM | ✅ | ✅ |
-| [`web3`](./methods#web3-methods) | Utility functions for the web3 client | ✅ | ✅ |
-| [`net`](./methods#net-methods) | Network information about the node | ✅ | ✅ |
-| [`txpool`](./methods#txpool-methods) | Transaction pool inspection | ✅ | ❌ |
-| [`debug`](./methods#debug-methods) | Debugging and tracing functionality | ✅ | ❌ |
-| [`personal`](./methods#personal-methods) | Private key management | ✅ | ❌ |
-| `admin` | Node administration | ❌ | ❌ |
-| `clique` | Proof-of-Authority consensus | ❌ | ❌ |
-| `les` | Light Ethereum Subprotocol | ❌ | ❌ |
+| [`eth`](./methods#eth-methods) | Core Ethereum JSON-RPC methods for interacting with the EVM | Y | Y |
+| [`web3`](./methods#web3-methods) | Utility functions for the web3 client | Y | Y |
+| [`net`](./methods#net-methods) | Network information about the node | Y | Y |
+| [`txpool`](./methods#txpool-methods) | Transaction pool inspection | Y | N |
+| [`debug`](./methods#debug-methods) | Debugging and tracing functionality | Y | N |
+| [`personal`](./methods#personal-methods) | Private key management | Y | N |
+| [`admin`](./methods#admin-methods) | Node administration | Y | N |
+| [`miner`](./methods#miner-methods) | Mining operations (stub for PoS) | Y | N |
+| `clique` | Proof-of-Authority consensus | N | N |
+| `les` | Light Ethereum Subprotocol | N | N |
 
 <Warning>
   You should only expose the debug endpoint in non production settings as it could impact network performance and uptime under certain conditions.
