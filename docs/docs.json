@@ -1,0 +1,165 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Cosmos Documentation",
+  "description": "Build the future of the internet of blockchains with Cosmos.",
+  "theme": "mint",
+  "colors": {
+    "primary": "#000000",
+    "light": "#cccccc",
+    "dark": "#0E0E0E"
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "styling": {
+    "codeblocks": "system"
+  },
+  "favicon": {
+    "light": "/assets/brand/cosmos.svg",
+    "dark": "/assets/brand/cosmos-dark.svg"
+  },
+  "logo": {
+    "light": "/assets/brand/cosmos-wordmark-dark.svg",
+    "dark": "/assets/brand/cosmos-wordmark.svg"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Documentation",
+            "pages": [
+              "documentation/overview",
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "documentation/getting-started/index",
+                  "documentation/getting-started/faq",
+                  "documentation/getting-started/development-environment",
+                  {
+                    "group": "Tooling and Resources",
+                    "pages": [
+                      "documentation/getting-started/tooling-and-resources/overview",
+                      "documentation/getting-started/tooling-and-resources/block-explorers",
+                      "documentation/getting-started/tooling-and-resources/foundry",
+                      "documentation/getting-started/tooling-and-resources/hardhat",
+                      "documentation/getting-started/tooling-and-resources/remix",
+                      "documentation/getting-started/tooling-and-resources/testing-and-fuzzing",
+                      "documentation/getting-started/tooling-and-resources/wallet-integration"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Concepts",
+                "pages": [
+                  "documentation/concepts/index",
+                  "documentation/concepts/accounts",
+                  "documentation/concepts/chain-id",
+                  "documentation/concepts/encoding",
+                  "documentation/concepts/gas-and-fees",
+                  "documentation/concepts/ibc",
+                  "documentation/concepts/mempool",
+                  "documentation/concepts/migrations",
+                  "documentation/concepts/pending-state",
+                  "documentation/concepts/replay-protection",
+                  "documentation/concepts/signing",
+                  "documentation/concepts/single-token-representation",
+                  "documentation/concepts/tokens",
+                  "documentation/concepts/transactions"
+                ]
+              },
+              {
+                "group": "Cosmos SDK",
+                "pages": [
+                  "documentation/cosmos-sdk/overview",
+                  "documentation/cosmos-sdk/cli",
+                  "documentation/cosmos-sdk/integrate",
+                  "documentation/cosmos-sdk/protocol",
+                  {
+                    "group": "Modules",
+                    "pages": [
+                      "documentation/cosmos-sdk/modules/epochs",
+                      "documentation/cosmos-sdk/modules/erc20",
+                      "documentation/cosmos-sdk/modules/feemarket",
+                      "documentation/cosmos-sdk/modules/vm"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Smart Contracts",
+                "pages": [
+                  "documentation/smart-contracts/introduction",
+                  "documentation/smart-contracts/custom-improvement-proposals",
+                  {
+                    "group": "Precompiles",
+                    "pages": [
+                      "documentation/smart-contracts/precompiles/index",
+                      "documentation/smart-contracts/precompiles/overview",
+                      "documentation/smart-contracts/precompiles/bank",
+                      "documentation/smart-contracts/precompiles/bech32",
+                      "documentation/smart-contracts/precompiles/callbacks",
+                      "documentation/smart-contracts/precompiles/distribution",
+                      "documentation/smart-contracts/precompiles/erc20",
+                      "documentation/smart-contracts/precompiles/governance",
+                      "documentation/smart-contracts/precompiles/ics20",
+                      "documentation/smart-contracts/precompiles/p256",
+                      "documentation/smart-contracts/precompiles/slashing",
+                      "documentation/smart-contracts/precompiles/staking",
+                      "documentation/smart-contracts/precompiles/werc20"
+                    ]
+                  },
+                  {
+                    "group": "Predeployed Contracts",
+                    "pages": [
+                      "documentation/smart-contracts/predeployed-contracts/index"
+                    ]
+                  }
+                ]
+              },
+              "documentation/differences",
+              "documentation/eip-compatibility"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "pages": [
+          "api-reference/ethereum-json-rpc/index",
+          "api-reference/ethereum-json-rpc/methods",
+          "api-reference/ethereum-json-rpc/rpc-explorer"
+        ]
+      },
+      {
+        "tab": "Release Notes",
+        "pages": [
+          "changelog/release-notes"
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "twitter": "https://twitter.com/cosmos",
+      "github": "https://github.com/cosmos",
+      "discord": "https://discord.gg/interchain",
+      "website": "https://cosmos.network"
+    }
+  },
+  "appearance": {
+    "default": "system",
+    "strict": false
+  },
+  "search": {
+    "prompt": "Search docs..."
+  },
+  "background": {
+    "color": {
+      "light": "#F1F1F1",
+      "dark": "#000000"
+    }
+  } 
+}
