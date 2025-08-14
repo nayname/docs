@@ -1,5 +1,3 @@
-import React, { useState, useEffect, useMemo } from 'react';
-
 export default function EIPCompatibilityTable() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -85,7 +83,7 @@ export default function EIPCompatibilityTable() {
 
   const sortedData = useMemo(() => {
     let sortableItems = [...eipData];
-    
+
     // Define status priority (higher = better)
     const statusPriority = {
       'supported': 4,
@@ -94,21 +92,21 @@ export default function EIPCompatibilityTable() {
       'unknown': 1,
       'not_supported': 0
     };
-    
+
     sortableItems.sort((a, b) => {
       const aPriority = statusPriority[a.status] || 0;
       const bPriority = statusPriority[b.status] || 0;
-      
+
       // Primary sort: Status (unless user is sorting by another column)
       if (sortConfig.key !== 'status' && aPriority !== bPriority) {
         return bPriority - aPriority; // Always show supported items first
       }
-      
+
       // Secondary sort: User's selected column
       const key = sortConfig.key || 'eip';
       let aVal = a[key];
       let bVal = b[key];
-      
+
       // Special handling for status column with user direction
       if (key === 'status') {
         if (aPriority !== bPriority) {
@@ -116,11 +114,11 @@ export default function EIPCompatibilityTable() {
         }
         return 0;
       }
-      
+
       // Handle null/undefined
       if (aVal == null) return 1;
       if (bVal == null) return -1;
-      
+
       // Normalize values for comparison
       if (typeof aVal === 'boolean') {
         aVal = aVal ? 1 : 0;
@@ -129,7 +127,7 @@ export default function EIPCompatibilityTable() {
         aVal = aVal.toLowerCase();
         bVal = bVal.toLowerCase();
       }
-      
+
       // Apply sort direction
       if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -141,7 +139,7 @@ export default function EIPCompatibilityTable() {
   const filteredData = sortedData.filter(eip => {
     if (!eip || !eip.eip) return false;
 
-    const matchesSearch = searchTerm === '' || 
+    const matchesSearch = searchTerm === '' ||
       String(eip.eip).includes(searchTerm) ||
       (eip.title && eip.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (eip.note && eip.note.toLowerCase().includes(searchTerm.toLowerCase()));

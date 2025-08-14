@@ -1,15 +1,15 @@
 import { CurlIcon, TypeScriptIcon, GoIcon, RustIcon, PythonIcon, CSharpIcon, APIIcon, NetworkIcon, EthereumIcon, SmartContractIcon } from '/snippets/icons.mdx';
 
 export default function RPCMethodsViewer() {
-  const [selectedNamespace, setSelectedNamespace] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [expandedMethods, setExpandedMethods] = useState({});
-  const [selectedLanguage, setSelectedLanguage] = useState({});
-  const [rpcEndpoint, setRpcEndpoint] = useState('');
-  const [isValidEndpoint, setIsValidEndpoint] = useState(false);
-  const [isInvalidEndpoint, setIsInvalidEndpoint] = useState(false);
-  const [requestResults, setRequestResults] = useState({});
-  const [isLoading, setIsLoading] = useState({});
+  const [selectedNamespace, setSelectedNamespace] = React.useState('all');
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [expandedMethods, setExpandedMethods] = React.useState({});
+  const [selectedLanguage, setSelectedLanguage] = React.useState({});
+  const [rpcEndpoint, setRpcEndpoint] = React.useState('');
+  const [isValidEndpoint, setIsValidEndpoint] = React.useState(false);
+  const [isInvalidEndpoint, setIsInvalidEndpoint] = React.useState(false);
+  const [requestResults, setRequestResults] = React.useState({});
+  const [isLoading, setIsLoading] = React.useState({});
 
   const languages = [
     { id: 'curl', name: 'cURL', icon: CurlIcon },
@@ -2074,7 +2074,7 @@ class Program
   };
 
   // Get all methods from all namespaces for global search
-  const allMethods = useMemo(() => {
+  const allMethods = React.useMemo(() => {
     const methods = [];
     Object.entries(namespaces).forEach(([key, namespace]) => {
       namespace.methods.forEach(method => {
@@ -2084,7 +2084,7 @@ class Program
     return methods;
   }, []);
 
-  const filteredMethods = useMemo(() => {
+  const filteredMethods = React.useMemo(() => {
     // If there's a search term, search all methods
     if (searchTerm) {
       return allMethods.filter(method => {
@@ -2111,7 +2111,7 @@ class Program
   }, [selectedNamespace, searchTerm, allMethods]);
 
   function CopyButton({ text }) {
-    const [copied, setCopied] = useState(false);
+    const [copied, setCopied] = React.useState(false);
 
     const handleCopy = () => {
       navigator.clipboard.writeText(text);
@@ -2232,11 +2232,10 @@ class Program
       </div>
 
       {/* Namespace Tabs */}
-      <div className="sticky top-[165px] z-10">
+      <div className="sticky top-[165px] z-10 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 rounded-lg">
-            <div className="flex space-x-2 overflow-x-auto py-3 px-3">
-              <button
+          <div className="flex space-x-2 overflow-x-auto py-3">
+            <button
               onClick={() => setSelectedNamespace('all')}
               className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-all whitespace-nowrap text-sm ${
                 selectedNamespace === 'all'
@@ -2405,8 +2404,8 @@ class Program
                                         : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                                     }`}
                                   >
-                                    <span className="mr-1.5 inline-block">
-                                      <lang.icon size={16} />
+                                    <span className="mr-1.5 inline-block text-base">
+                                      {lang.icon}
                                     </span>
                                     {lang.name}
                                   </button>
