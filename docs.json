@@ -28,7 +28,7 @@
         "tab": "Documentation",
         "groups": [
           {
-            "group": "Documentation",
+            "group": "Cosmos EVM",
             "pages": [
               "docs/documentation/overview",
               {
@@ -75,7 +75,6 @@
                 "pages": [
                   "docs/documentation/cosmos-sdk/overview",
                   "docs/documentation/cosmos-sdk/cli",
-                  "docs/documentation/cosmos-sdk/integrate",
                   "docs/documentation/cosmos-sdk/protocol",
                   {
                     "group": "Modules",
@@ -86,6 +85,13 @@
                       "docs/documentation/cosmos-sdk/modules/vm"
                     ]
                   }
+                ]
+              },
+              {
+                "group": "Integration",
+                "pages": [
+                  "docs/documentation/integration/evm-module-integration",
+                  "docs/documentation/integration/mempool-integration"
                 ]
               },
               {
@@ -120,7 +126,7 @@
                 ]
               },
               "docs/documentation/differences",
-              "docs/documentation/eip-compatibility"
+              "docs/documentation/eip-support"
             ]
           }
         ]
@@ -161,5 +167,5 @@
       "light": "#F1F1F1",
       "dark": "#000000"
     }
-  } 
+  }
 }

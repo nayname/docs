@@ -168,7 +168,7 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | `les_getCheckpoint`                                                                   | Les       | N/A         | N/A    | LES protocol       |
 | `les_getCheckpointContractAddress`                                                    | Les       | N/A         | N/A    | LES protocol       |
 | [`txpool_content`](#txpool_content)                                                   | TxPool    | Y          | Y      | Requires config    |
-| `txpool_contentFrom`                                                                  | TxPool    | Y          | Y      | Requires config    |
+| [`txpool_contentFrom`](#txpool_contentfrom)                                           | TxPool    | Y          | Y      | Requires config    |
 | [`txpool_inspect`](#txpool_inspect)                                                   | TxPool    | Y          | Y      | Requires config    |
 | [`txpool_status`](#txpool_status)                                                     | TxPool    | Y          | Y      | Requires config    |
 | `trace_callMany`                                                                      | Trace     | N          | N      | Not implemented    |
@@ -1553,7 +1553,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"debug_writeMutexProfile","params
 
 Returns a list of the exact details of all the transactions currently pending for inclusion in the next block(s), as well as the ones that are being scheduled for future execution only.
 
-#### Parame (0)
+#### Parameters (0)
 
 #### Client Examples
 
@@ -1573,6 +1573,40 @@ Javascript Console
 
 ```javascript
 txpool.content();
+```
+
+#### Result
+
+```json
+{"jsonrpc":"2.0","id":1,"result":{"pending":{},"queued":{}}}
+```
+
+### `txpool_contentFrom`
+
+Returns transactions from a specific address that are currently pending for inclusion in the next block(s), as well as the ones that are being scheduled for future execution only.
+
+#### Parameters (1)
+
+1. `address` - The address to filter transactions from (20 bytes)
+
+#### Client Examples
+
+Shell HTTP
+
+```shell
+curl -X POST --data '{"jsonrpc":"2.0","method":"txpool_contentFrom","params":["0x1234567890abcdef1234567890abcdef12345678"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+```
+
+Websocket
+
+```shell
+wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "txpool_contentFrom", "params": ["0x1234567890abcdef1234567890abcdef12345678"]}'
+```
+
+Javascript Console
+
+```javascript
+txpool.contentFrom("0x1234567890abcdef1234567890abcdef12345678");
 ```
 
 #### Result
