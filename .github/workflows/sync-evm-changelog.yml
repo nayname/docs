@@ -45,23 +45,239 @@ jobs:
             echo "Failed to fetch changelog or changelog is empty"
             exit 1
           fi
-
+          
           echo "Successfully fetched changelog ($(wc -l < /tmp/changelog.md) lines)"
 
       - name: Parse and convert changelog
         id: convert
-        run: node scripts/parse-evm-changelog.js
+        run: |
+          cat << 'EOF' > parse_changelog.js
+          const fs = require('fs');
+
+          function parseFullChangelog(content) {
+            const lines = content.split('\n');
+            const versions = [];
+            let currentVersion = null;
+            let currentDate = null;
+            let currentCategory = null;
+            let categories = {};
+            
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              const trimmedLine = line.trim();
+              
+              // Match version headers like "## [v0.3.1] - 2024-10-11" or "## v0.3.1 - 2024-10-11"
+              const versionMatch = trimmedLine.match(/^##\s+\[?(v[\d\.\-\w]+)\]?\s*(?:-\s*(.+))?$/);
+              
+              if (versionMatch) {
+                // Save previous version if exists
+                if (currentVersion && Object.keys(categories).length > 0) {
+                  versions.push({
+                    version: currentVersion,
+                    date: currentDate || new Date().toISOString().split('T')[0],
+                    categories: { ...categories }
+                  });
+                }
+                
+                // Start new version
+                currentVersion = versionMatch[1];
+                currentDate = versionMatch[2] || null;
+                
+                // Try to extract date if it's in format "2024-10-11" or similar
+                if (currentDate) {
+                  const dateMatch = currentDate.match(/(\d{4}-\d{2}-\d{2})/);
+                  if (dateMatch) {
+                    currentDate = dateMatch[1];
+                  }
+                }
+                
+                categories = {};
+                currentCategory = null;
+                continue;
+              }
+              
+              // Skip UNRELEASED section
+              if (trimmedLine === '## UNRELEASED') {
+                // Save previous version before skipping
+                if (currentVersion && Object.keys(categories).length > 0) {
+                  versions.push({
+                    version: currentVersion,
+                    date: currentDate || new Date().toISOString().split('T')[0],
+                    categories: { ...categories }
+                  });
+                }
+                currentVersion = null;
+                categories = {};
+                currentCategory = null;
+                continue;
+              }
+              
+              // Match category headers (### FEATURES, ### BUG FIXES, etc.)
+              if (currentVersion && trimmedLine.startsWith('### ')) {
+                currentCategory = trimmedLine.replace('### ', '').trim();
+                if (!categories[currentCategory]) {
+                  categories[currentCategory] = [];
+                }
+                continue;
+              }
+              
+              // Collect items under categories
+              if (currentVersion && currentCategory && trimmedLine && !trimmedLine.startsWith('#')) {
+                // Skip separator lines and empty content
+                if (trimmedLine !== '---' && trimmedLine !== '___' && trimmedLine !== '***') {
+                  categories[currentCategory].push(trimmedLine);
+                }
+              }
+            }
+            
+            // Save last version if exists
+            if (currentVersion && Object.keys(categories).length > 0) {
+              versions.push({
+                version: currentVersion,
+                date: currentDate || new Date().toISOString().split('T')[0],
+                categories: { ...categories }
+              });
+            }
+            
+            return versions;
+          }
+
+          function convertToMintlify(versions) {
+            let mdxContent = `---
+title: "Changelog"
+description: "Follows the \\\`CHANGELOG.md\\\` for \\\`cosmos/evm\\\`"
+---
+
+# Changelog
+
+This page tracks all releases and changes to the Cosmos EVM module.
+
+`;
+
+            // Define the order we want to display categories
+            const categoryOrder = [
+              'FEATURES',
+              'IMPROVEMENTS', 
+              'BUG FIXES',
+              'DEPENDENCIES',
+              'STATE BREAKING',
+              'API BREAKING',
+              'API-Breaking'
+            ];
+
+            // Process each version
+            versions.forEach(({ version, date, categories }) => {
+              let updateContent = '';
+              
+              // Process categories in preferred order
+              categoryOrder.forEach(category => {
+                const matchingCategory = Object.keys(categories).find(
+                  cat => cat.toUpperCase().replace(/[-_]/g, ' ') === category.replace(/[-_]/g, ' ')
+                );
+                
+                if (matchingCategory && categories[matchingCategory].length > 0) {
+                  // Format category title
+                  const formattedCategory = category
+                    .toLowerCase()
+                    .replace(/[-_]/g, ' ')
+                    .replace(/\b\w/g, l => l.toUpperCase());
+                  
+                  updateContent += `## ${formattedCategory}\n\n`;
+                  
+                  categories[matchingCategory].forEach(item => {
+                    if (item.trim()) {
+                      // Clean up bullet points and ensure consistent formatting
+                      let cleanItem = item
+                        .replace(/^[\-\*]\s*/, '') // Remove existing bullet
+                        .replace(/\\\[/g, '[')      // Fix escaped brackets
+                        .replace(/\\\]/g, ']');
+                      
+                      updateContent += `* ${cleanItem}\n`;
+                    }
+                  });
+                  
+                  updateContent += '\n';
+                }
+              });
+              
+              // Add any remaining categories not in our predefined order
+              Object.keys(categories).forEach(category => {
+                const normalizedCategory = category.toUpperCase().replace(/[-_]/g, ' ');
+                const isProcessed = categoryOrder.some(
+                  ordered => ordered.replace(/[-_]/g, ' ') === normalizedCategory
+                );
+                
+                if (!isProcessed && categories[category].length > 0) {
+                  const formattedCategory = category
+                    .toLowerCase()
+                    .replace(/[-_]/g, ' ')
+                    .replace(/\b\w/g, l => l.toUpperCase());
+                  
+                  updateContent += `## ${formattedCategory}\n\n`;
+                  
+                  categories[category].forEach(item => {
+                    if (item.trim()) {
+                      let cleanItem = item
+                        .replace(/^[\-\*]\s*/, '')
+                        .replace(/\\\[/g, '[')
+                        .replace(/\\\]/g, ']');
+                      
+                      updateContent += `* ${cleanItem}\n`;
+                    }
+                  });
+                  
+                  updateContent += '\n';
+                }
+              });
+              
+              // Only add the Update component if there's content
+              if (updateContent.trim()) {
+                mdxContent += `<Update label="${date}" description="${version}" tags={["EVM", "Release"]}>
+${updateContent.trim()}
+</Update>
+
+`;
+              }
+            });
+            
+            return mdxContent;
+          }
+
+          // Main execution
+          try {
+            const changelogContent = fs.readFileSync('/tmp/changelog.md', 'utf8');
+            const versions = parseFullChangelog(changelogContent);
+            
+            console.log(`Parsed ${versions.length} versions from changelog`);
+            
+            if (versions.length === 0) {
+              console.error('No versions found in changelog');
+              process.exit(1);
+            }
+            
+            const mintlifyContent = convertToMintlify(versions);
+            fs.writeFileSync('/tmp/release-notes.mdx', mintlifyContent);
+            
+            console.log('Successfully converted changelog to Mintlify format');
+            
+          } catch (error) {
+            console.error('Error:', error.message);
+            process.exit(1);
+          }
+          EOF
+
+          node parse_changelog.js
 
       - name: Update changelog file
         run: |
           CHANGELOG_FILE="docs/changelog/release-notes.mdx"
-
+          
           # Create directory if it doesn't exist
           mkdir -p "$(dirname "$CHANGELOG_FILE")"
-
+          
           # Replace the entire file with the newly generated content
           cp /tmp/release-notes.mdx "$CHANGELOG_FILE"
-
+          
           echo "Changelog updated with $(grep -c '<Update' "$CHANGELOG_FILE") versions"
 
       - name: Commit and push changes
