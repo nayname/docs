@@ -1,38 +1,149 @@
 ---
 title: "Chain ID"
-description: "A chain ID is a unique identifier that represents a blockchain network. We use it to distinguish different blockchain networks from each other and to ensure that transactions and messages are sent to the correct network. Your Cosmos EVM blockchain should follow the format of  format."
+description: "Chain IDs are unique identifiers that distinguish blockchain networks from each other. Cosmos EVM uses a dual Chain ID system to maintain compatibility with both Cosmos SDK and Ethereum ecosystems."
 ---
 
 <Check>
-  You can also look up the [EIP-155](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md) `Chain ID` by referring to [chainlist.org](https://chainlist.org/).
+  You can look up existing EVM Chain IDs by referring to [chainlist.org](https://chainlist.org/) to ensure your chosen ID is not already in use.
 </Check>
 
-## The Chain Identifier[​](#the-chain-identifier "Direct link to The Chain Identifier")
+## Dual Chain ID System
 
-Every chain must have a unique identifier or `chain-id`. CometBFT requires each application to define its own `chain-id` in the [genesis.json fields](https://docs.cometbft.com/v1.0/references/config/genesis.json). However, to comply with both EIP-155 and Cosmos standard for chain upgrades, Cosmos EVM-compatible chains must implement a special structure for their chain identifiers.
+Cosmos EVM requires **two separate chain IDs** to maintain full compatibility with both the Cosmos SDK and Ethereum ecosystems:
 
-## Structure[​](#structure "Direct link to Structure")
+### 1. Cosmos Chain ID (String)
 
-A Cosmos EVM Chain ID contains 3 main components
+The **Cosmos Chain ID** is a string identifier used by:
+- CometBFT consensus engine
+- IBC (Inter-Blockchain Communication) protocol
+- Native Cosmos SDK transactions
+- Chain upgrades and governance
 
-* **Identifier**: Unstructured string that defines the name of the application.
-* **EIP-155 Number**: Immutable [EIP-155](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md) `CHAIN_ID` that defines the replay attack protection number.
-* **Version Number**: Is the version number (always positive) that the chain is currently running. This number **MUST** be incremented every time the chain is upgraded or forked to avoid network or consensus errors.
+**Format**: String with flexible naming (e.g., `"cosmosevm-1"`, `"mychain-testnet-2"`)
 
-### Format[​](#format "Direct link to Format")
-
-The format for specifying a Cosmos EVM-compatible chain-id in genesis is the following:
-
+**Example**: 
+```json
+// In genesis.json
+{
+  "chain_id": "cosmosevm-1"
+}
 ```
-{identifier}_{EIP155}-{version}
+
+### 2. EVM Chain ID (Integer)
+
+The **EVM Chain ID** is an integer used by:
+- Ethereum transactions (EIP-155 replay protection)
+- MetaMask and other Ethereum wallets
+- Smart contract deployments
+- EVM tooling (Hardhat, Foundry, etc.)
+
+**Format**: Positive integer (e.g., `9000`, `9001`)
+
+**Example**:
+```go
+// In app/app.go
+const EVMChainID = 9000
 ```
 
-The following table provides an example where the second row corresponds to an upgrade from the first one:
+## Configuration
 
-| ChainID       | Identifier | EIP-155 Number | Version Number |
-| ------------- | ---------- | -------------- | -------------- |
-| `cosmoshub-1` | cosmoshub  | 9000           | 1              |
-| `cosmoshub-2` | cosmoshub  | 9000           | 2              |
-| `...`         | ...        | ...            | ...            |
-| `cosmoshub-N` | cosmoshub  | 9000           | N              |
+Both chain IDs must be configured when setting up your chain:
 
+### In Your Application Code
+
+```go
+// app/app.go
+const (
+    CosmosChainID = "cosmosevm-1"  // String for Cosmos/IBC
+    EVMChainID    = 9000           // Integer for EVM/Ethereum
+)
+```
+
+### In Genesis Configuration
+
+The Cosmos Chain ID is set in `genesis.json`:
+```json
+{
+  "chain_id": "cosmosevm-1",
+  // ... other genesis parameters
+}
+```
+
+The EVM Chain ID is configured in the EVM module parameters:
+```go
+// During chain initialization
+evmtypes.DefaultChainConfig(9000)  // Your EVM Chain ID
+```
+
+## Important Considerations
+
+### Chain ID Selection
+
+<Warning>
+The two chain IDs serve different purposes and **must not be confused**:
+- Use the **Cosmos Chain ID** (string) for IBC connections, governance proposals, and Cosmos SDK operations
+- Use the **EVM Chain ID** (integer) for MetaMask configuration, smart contract deployments, and EIP-155 transaction signing
+</Warning>
+
+### EVM Chain ID Guidelines
+
+When selecting your EVM Chain ID:
+1. **Check availability**: Verify your chosen ID is not already in use on [chainlist.org](https://chainlist.org/)
+2. **Avoid conflicts**: Don't use well-known chain IDs (1 for Ethereum mainnet, 137 for Polygon, etc.)
+3. **Consider ranges**: 
+   - Production networks often use lower numbers
+   - Testnets commonly use higher ranges (9000+)
+   - Local development can use very high numbers (31337+)
+
+### Chain Upgrades
+
+<Note>
+Unlike traditional Cosmos chains that change their chain ID during upgrades (e.g., `cosmoshub-4` to `cosmoshub-5`), the EVM Chain ID must remain **constant** across upgrades to maintain compatibility with deployed smart contracts and existing wallets.
+</Note>
+
+Only the Cosmos Chain ID may change during chain upgrades if needed for consensus-breaking changes. The EVM Chain ID should never change once set.
+
+## Examples
+
+Here are some example configurations:
+
+| Network Type | Cosmos Chain ID | EVM Chain ID | Notes |
+|-------------|-----------------|--------------|-------|
+| Mainnet | `"cosmosevm-1"` | `9000` | Production network |
+| Testnet | `"cosmosevm-testnet-1"` | `9001` | Public testnet |
+| Devnet | `"cosmosevm-dev-1"` | `9002` | Development network |
+| Local | `"cosmosevm-local-1"` | `31337` | Local development |
+
+## Troubleshooting
+
+### Common Issues
+
+1. **"Chain ID mismatch" errors**
+   - **Cause**: Using Cosmos Chain ID where EVM Chain ID is expected (or vice versa)
+   - **Solution**: Ensure you're using the correct type of chain ID for each context
+
+2. **MetaMask connection failures**
+   - **Cause**: Incorrect EVM Chain ID in wallet configuration
+   - **Solution**: Use the integer EVM Chain ID, not the string Cosmos Chain ID
+
+3. **IBC transfer failures**
+   - **Cause**: Using EVM Chain ID for IBC operations
+   - **Solution**: IBC always uses the Cosmos Chain ID (string format)
+
+4. **Smart contract deployment issues**
+   - **Cause**: EIP-155 replay protection using wrong chain ID
+   - **Solution**: Ensure your EVM Chain ID matches what's configured in the chain
+
+### Verification Commands
+
+To verify your chain IDs are correctly configured:
+
+```bash
+# Check Cosmos Chain ID
+curl -s http://localhost:26657/status | jq '.result.node_info.network'
+
+# Check EVM Chain ID
+curl -X POST -H "Content-Type: application/json" \
+  --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' \
+  http://localhost:8545 | jq '.result'
+```

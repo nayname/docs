@@ -1,206 +1,27 @@
-import { CurlIcon, TypeScriptIcon, GoIcon, RustIcon, PythonIcon, CSharpIcon, APIIcon, NetworkIcon, EthereumIcon, SmartContractIcon } from '/snippets/icons.mdx';
-
-export default function RPCMethodsViewer() {
-  const [selectedNamespace, setSelectedNamespace] = React.useState('all');
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [expandedMethods, setExpandedMethods] = React.useState({});
-  const [selectedLanguage, setSelectedLanguage] = React.useState({});
-  const [rpcEndpoint, setRpcEndpoint] = React.useState('');
-  const [isValidEndpoint, setIsValidEndpoint] = React.useState(false);
-  const [isInvalidEndpoint, setIsInvalidEndpoint] = React.useState(false);
-  const [requestResults, setRequestResults] = React.useState({});
-  const [isLoading, setIsLoading] = React.useState({});
+export default function RPCMethodsViewerVersionA() {
+  const [selectedNamespace, setSelectedNamespace] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [expandedMethods, setExpandedMethods] = useState({});
+  const [selectedLanguage, setSelectedLanguage] = useState({});
+  const [rpcEndpoint, setRpcEndpoint] = useState('');
+  const [isValidEndpoint, setIsValidEndpoint] = useState(false);
+  const [isInvalidEndpoint, setIsInvalidEndpoint] = useState(false);
+  const [requestResults, setRequestResults] = useState({});
+  const [isLoading, setIsLoading] = useState({});
+  const [copied, setCopied] = useState({});
 
   const languages = [
-    { id: 'curl', name: 'cURL', icon: CurlIcon },
-    { id: 'typescript', name: 'TypeScript', icon: TypeScriptIcon },
-    { id: 'go', name: 'Go', icon: GoIcon },
-    { id: 'rust', name: 'Rust', icon: RustIcon },
-    { id: 'python', name: 'Python', icon: PythonIcon },
-    { id: 'csharp', name: 'C#', icon: CSharpIcon }
+    { id: 'curl', name: 'cURL' },
+    { id: 'javascript', name: 'JavaScript' },
+    { id: 'python', name: 'Python' },
+    { id: 'go', name: 'Go' },
+    { id: 'rust', name: 'Rust' },
+    { id: 'csharp', name: 'C#' }
   ];
-
-  const generateCodeExamples = (method, params = []) => {
-    const endpoint = 'http://localhost:8545';
-    const paramValues = params.length > 0 ? params : [];
-
-    return {
-      curl: `curl -X POST -H "Content-Type: application/json" \\
-  -d '{
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "${method}",
-    "params": ${JSON.stringify(paramValues, null, 2).split('\n').map((line, i) => i === 0 ? line : '    ' + line).join('\n')}
-  }' \\
-  ${endpoint}`,
-
-      typescript: `import { ethers } from 'ethers';
-
-const provider = new ethers.JsonRpcProvider('${endpoint}');
-
-// Using ethers.js
-const result = await provider.send('${method}', ${JSON.stringify(paramValues)});
-console.log(result);
-
-// Using fetch
-const response = await fetch('${endpoint}', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    jsonrpc: '2.0',
-    id: 1,
-    method: '${method}',
-    params: ${JSON.stringify(paramValues)}
-  })
-});
-const data = await response.json();
-console.log(data.result);`,
-
-      go: `package main
-
-import (
-    "bytes"
-    "encoding/json"
-    "fmt"
-    "io/ioutil"
-    "net/http"
-)
-
-type JSONRPCRequest struct {
-    JSONRPC string        \`json:"jsonrpc"\`
-    ID      int           \`json:"id"\`
-    Method  string        \`json:"method"\`
-    Params  []interface{} \`json:"params"\`
-}
-
-func main() {
-    request := JSONRPCRequest{
-        JSONRPC: "2.0",
-        ID:      1,
-        Method:  "${method}",
-        Params:  []interface{}{${paramValues.map(p => typeof p === 'string' ? `"${p}"` : p).join(', ')}},
-    }
-
-    jsonData, _ := json.Marshal(request)
-    resp, err := http.Post("${endpoint}", "application/json", bytes.NewBuffer(jsonData))
-    if err != nil {
-        panic(err)
-    }
-    defer resp.Body.Close()
-
-    body, _ := ioutil.ReadAll(resp.Body)
-    fmt.Println(string(body))
-}`,
-
-      rust: `use serde_json::json;
-use reqwest;
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = reqwest::Client::new();
-
-    let response = client
-        .post("${endpoint}")
-        .json(&json!({
-            "jsonrpc": "2.0",
-            "id": 1,
-            "method": "${method}",
-            "params": ${JSON.stringify(paramValues)}
-        }))
-        .send()
-        .await?;
-
-    let result = response.json::<serde_json::Value>().await?;
-    println!("{:#?}", result);
-
-    Ok(())
-}`,
-
-      python: `import requests
-import json
-
-# Using requests library
-payload = {
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "${method}",
-    "params": ${JSON.stringify(paramValues)}
-}
-
-response = requests.post("${endpoint}", json=payload)
-result = response.json()
-print(result)
-
-# Using web3.py (if applicable)
-from web3 import Web3
-w3 = Web3(Web3.HTTPProvider("${endpoint}"))
-result = w3.provider.make_request("${method}", ${JSON.stringify(paramValues)})
-print(result)`,
-
-      csharp: `using System;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-
-class Program
-{
-    static async Task Main()
-    {
-        var rpcUrl = "${endpoint}";
-
-        var requestObj = new
-        {
-            jsonrpc = "2.0",
-            id = 1,
-            method = "${method}",
-            @params = ${JSON.stringify(paramValues)}
-        };
-
-        var jsonBody = JsonSerializer.Serialize(requestObj);
-        using var http = new HttpClient();
-        using var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-
-        try
-        {
-            var response = await http.PostAsync(rpcUrl, content);
-            var responseBody = await response.Content.ReadAsStringAsync();
-
-            if (!response.IsSuccessStatusCode)
-            {
-                Console.Error.WriteLine($"HTTP {(int)response.StatusCode}: {responseBody}");
-                return;
-            }
-
-            using var doc = JsonDocument.Parse(responseBody);
-            var root = doc.RootElement;
-
-            if (root.TryGetProperty("error", out var error))
-            {
-                Console.Error.WriteLine($"RPC Error: {error}");
-            }
-            else if (root.TryGetProperty("result", out var result))
-            {
-                Console.WriteLine(result.ToString());
-            }
-            else
-            {
-                Console.Error.WriteLine("Unexpected RPC response format.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Request failed: {ex.Message}");
-        }
-    }
-}`
-    };
-  };
 
   const namespaces = {
     web3: {
       name: 'Web3',
-      icon: APIIcon,
       methods: [
         {
           name: 'web3_clientVersion',
@@ -229,13 +50,6 @@ class Program
               response: {
                 result: '0x1b84adea42d5b7d192fd8a61a85b25abe0757e9a65cab1da470258914053823f'
               }
-            },
-            {
-              name: 'Hash empty string',
-              params: ['0x'],
-              response: {
-                result: '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
-              }
             }
           ]
         }
@@ -243,7 +57,6 @@ class Program
     },
     net: {
       name: 'Net',
-      icon: NetworkIcon,
       methods: [
         {
           name: 'net_version',
@@ -281,11 +94,6 @@ class Program
               name: 'Node is listening',
               params: [],
               response: { result: true }
-            },
-            {
-              name: 'Node not listening',
-              params: [],
-              response: { result: false }
             }
           ]
         }
@@ -293,7 +101,6 @@ class Program
     },
     eth: {
       name: 'Eth',
-      icon: EthereumIcon,
       methods: [
         {
           name: 'eth_blockNumber',
@@ -321,11 +128,6 @@ class Program
               name: 'Get balance at latest block',
               params: ['0x407d73d8a49eeb85d32cf465507dd71d507100c1', 'latest'],
               response: { result: '0x0234c8a3397aab58' }
-            },
-            {
-              name: 'Get balance at specific block',
-              params: ['0x407d73d8a49eeb85d32cf465507dd71d507100c1', '0x1b4'],
-              response: { result: '0x0' }
             }
           ]
         },
@@ -348,77 +150,10 @@ class Program
                   gas: '0xc350',
                   gasPrice: '0x4a817c800',
                   hash: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b',
-                  input: '0x68656c6c6f21',
                   nonce: '0x15',
                   to: '0xf02c1c8e6114b1dbe8937a39260b5b0a374432bb',
-                  transactionIndex: '0x41',
-                  value: '0xf3dbb76162000',
-                  v: '0x25',
-                  r: '0x1b5e176d927f8e9ab405058b2d2457392da3e20f328b16ddabcebc33eaac5fea',
-                  s: '0x4ba69724e8f69de52f0125ad8b3c5c2cef33019bac3249e2c0a2192766d1721c'
+                  value: '0xf3dbb76162000'
                 }
-              }
-            },
-            {
-              name: 'Transaction not found',
-              params: ['0x0000000000000000000000000000000000000000000000000000000000000000'],
-              response: { result: null }
-            }
-          ]
-        },
-        {
-          name: 'eth_sign',
-          description: 'Signs data with an account',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Account address', example: '0x9b2055d370f73ec7d8a03e965129118dc8f5bf83' },
-            { name: 'message', type: 'bytes', description: 'Data to sign', example: '0xdeadbeef' }
-          ],
-          examples: [
-            {
-              name: 'Sign message',
-              params: ['0x9b2055d370f73ec7d8a03e965129118dc8f5bf83', '0xdeadbeef'],
-              response: {
-                result: '0xa3f20717a250c2b0b729b7e5becbff67fdaef7e0699da4de7ca5895b02a170a12d887fd3b17bfdce3481f10bea41f45ba9f709d39ce8325427b57afcfc994cee1b'
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_sendTransaction',
-          description: 'Creates and submits a transaction',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'transaction',
-              type: 'object',
-              description: 'Transaction object',
-              fields: [
-                { name: 'from', type: 'address', description: 'Sender address' },
-                { name: 'to', type: 'address', description: 'Recipient address' },
-                { name: 'gas', type: 'quantity', description: 'Gas limit (optional)' },
-                { name: 'gasPrice', type: 'quantity', description: 'Gas price (optional)' },
-                { name: 'value', type: 'quantity', description: 'Value to send (optional)' },
-                { name: 'data', type: 'bytes', description: 'Transaction data (optional)' },
-                { name: 'nonce', type: 'quantity', description: 'Nonce (optional)' }
-              ]
-            }
-          ],
-          examples: [
-            {
-              name: 'Send transaction',
-              params: [{
-                from: '0xb60e8dd61c5d32be8058bb8eb970870f07233155',
-                to: '0xd46e8dd67c5d32be8058bb8eb970870f07244567',
-                gas: '0x76c0',
-                gasPrice: '0x9184e72a000',
-                value: '0x9184e72a',
-                data: '0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675'
-              }],
-              response: {
-                result: '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331'
               }
             }
           ]
@@ -435,16 +170,6 @@ class Program
               name: 'Valid transaction',
               params: ['0xf86c01850465...'],
               response: { result: '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331' }
-            },
-            {
-              name: 'Invalid transaction',
-              params: ['0xinvalid'],
-              response: {
-                error: {
-                  code: -32602,
-                  message: 'Invalid params'
-                }
-              }
             }
           ]
         },
@@ -481,843 +206,12 @@ class Program
               response: { result: '0x00000000000000000000000000000000000000000000000000000000000186a0' }
             }
           ]
-        },
-        {
-          name: 'eth_getLogs',
-          description: 'Get logs matching filter criteria',
-          implemented: true,
-          params: [
-            {
-              name: 'filter',
-              type: 'object',
-              description: 'Filter object',
-              fields: [
-                { name: 'fromBlock', type: 'string', description: 'Starting block' },
-                { name: 'toBlock', type: 'string', description: 'Ending block' },
-                { name: 'address', type: 'address', description: 'Contract address(es)' },
-                { name: 'topics', type: 'array', description: 'Topic filters' }
-              ]
-            }
-          ],
-          examples: [
-            {
-              name: 'Get Transfer events',
-              params: [{
-                fromBlock: '0x1',
-                toBlock: 'latest',
-                address: '0xb59f67a8bff5d8cd03f6ac17265c550ed8f33907',
-                topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef']
-              }],
-              response: {
-                result: [{
-                  address: '0xb59f67a8bff5d8cd03f6ac17265c550ed8f33907',
-                  topics: ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'],
-                  data: '0x00000000000000000000000000000000000000000000000000000000000186a0',
-                  blockNumber: '0x1b4',
-                  transactionHash: '0x67....',
-                  transactionIndex: '0x0',
-                  blockHash: '0x78....',
-                  logIndex: '0x0',
-                  removed: false
-                }]
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_coinbase',
-          description: 'Get the mining rewards recipient address',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get coinbase',
-              params: [],
-              response: {
-                result: '0x7cB61D4117AE31a12E393a1Cfa3BaC666481D02E'
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_mining',
-          description: 'Check if client is actively mining',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Check mining status',
-              params: [],
-              response: {
-                result: false
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_hashrate',
-          description: 'Get current hashrate',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get hashrate',
-              params: [],
-              response: {
-                result: '0x0'
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_chainId',
-          description: 'Get chain ID for replay-protected transactions',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get chain ID',
-              params: [],
-              response: {
-                result: '0x40000'
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_protocolVersion',
-          description: 'Returns the current ethereum protocol version',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get protocol version',
-              params: [],
-              response: { result: '0x41' }
-            }
-          ]
-        },
-        {
-          name: 'eth_syncing',
-          description: 'Returns sync status or false',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Not syncing',
-              params: [],
-              response: { result: false }
-            },
-            {
-              name: 'Currently syncing',
-              params: [],
-              response: {
-                result: {
-                  startingBlock: '0x384',
-                  currentBlock: '0x386',
-                  highestBlock: '0x454'
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_gasPrice',
-          description: 'Returns current gas price',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get gas price',
-              params: [],
-              response: { result: '0x4a817c800' }
-            }
-          ]
-        },
-        {
-          name: 'eth_accounts',
-          description: 'Returns list of addresses owned by client',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get accounts',
-              params: [],
-              response: { result: ['0x407d73d8a49eeb85d32cf465507dd71d507100c1'] }
-            }
-          ]
-        },
-        {
-          name: 'eth_getStorageAt',
-          description: 'Returns value from a storage position at an address',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Storage address', example: '0x295a70b2de5e3953354a6a8344e616ed314d7251' },
-            { name: 'position', type: 'quantity', description: 'Integer position in storage', example: '0x0' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ],
-          examples: [
-            {
-              name: 'Get storage value',
-              params: ['0x295a70b2de5e3953354a6a8344e616ed314d7251', '0x0', 'latest'],
-              response: { result: '0x00000000000000000000000000000000000000000000000000000000000004d2' }
-            }
-          ]
-        },
-        {
-          name: 'eth_getTransactionCount',
-          description: 'Returns the number of transactions sent from an address',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'The address', example: '0x407d73d8a49eeb85d32cf465507dd71d507100c1' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ],
-          examples: [
-            {
-              name: 'Get transaction count',
-              params: ['0x407d73d8a49eeb85d32cf465507dd71d507100c1', 'latest'],
-              response: { result: '0x1' }
-            }
-          ]
-        },
-        {
-          name: 'eth_getBlockTransactionCountByNumber',
-          description: 'Returns the number of transactions in a block by number',
-          implemented: true,
-          params: [
-            { name: 'blockNumber', type: 'string', description: 'Block number or tag', example: '0x1' }
-          ],
-          examples: [
-            {
-              name: 'Get transaction count',
-              params: ['0x1'],
-              response: { result: '0x10' }
-            }
-          ]
-        },
-        {
-          name: 'eth_getBlockTransactionCountByHash',
-          description: 'Returns the number of transactions in a block by hash',
-          implemented: true,
-          params: [
-            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0x8101cc04aea3341a6d4b3ced715e3f38de1e72867d6c0db5f5247d1a42fbb085' }
-          ],
-          examples: [
-            {
-              name: 'Get transaction count',
-              params: ['0x8101cc04aea3341a6d4b3ced715e3f38de1e72867d6c0db5f5247d1a42fbb085'],
-              response: { result: '0x10' }
-            }
-          ]
-        },
-        {
-          name: 'eth_getCode',
-          description: 'Returns code at a given address',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'The address', example: '0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ],
-          examples: [
-            {
-              name: 'Get contract code',
-              params: ['0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b', 'latest'],
-              response: { result: '0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056' }
-            }
-          ]
-        },
-        {
-          name: 'eth_estimateGas',
-          description: 'Estimates gas needed for a transaction',
-          implemented: true,
-          params: [
-            {
-              name: 'transaction',
-              type: 'object',
-              description: 'Transaction call object',
-              fields: [
-                { name: 'from', type: 'address', description: 'Address to call from (optional)' },
-                { name: 'to', type: 'address', description: 'Contract address' },
-                { name: 'gas', type: 'quantity', description: 'Gas limit (optional)' },
-                { name: 'gasPrice', type: 'quantity', description: 'Gas price (optional)' },
-                { name: 'value', type: 'quantity', description: 'Value to send (optional)' },
-                { name: 'data', type: 'bytes', description: 'Call data' }
-              ]
-            }
-          ],
-          examples: [
-            {
-              name: 'Estimate gas',
-              params: [{
-                from: '0xb60e8dd61c5d32be8058bb8eb970870f07233155',
-                to: '0xd46e8dd67c5d32be8058bb8eb970870f07244567',
-                value: '0x9184e72a'
-              }],
-              response: { result: '0x5208' }
-            }
-          ]
-        },
-        {
-          name: 'eth_getBlockByNumber',
-          description: 'Returns block information by number',
-          implemented: true,
-          params: [
-            { name: 'blockNumber', type: 'string', description: 'Block number or tag', example: '0x1b4' },
-            { name: 'fullTransactions', type: 'boolean', description: 'Return full transaction objects', example: true }
-          ],
-          examples: [
-            {
-              name: 'Get block by number',
-              params: ['0x1b4', true],
-              response: {
-                result: {
-                  number: '0x1b4',
-                  hash: '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331',
-                  parentHash: '0x9646252be9520f6e71339a8df9c55e4d7619deeb018d2a3f2d21fc165dde5eb5',
-                  transactions: []
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_getBlockByHash',
-          description: 'Returns block information by hash',
-          implemented: true,
-          params: [
-            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331' },
-            { name: 'fullTransactions', type: 'boolean', description: 'Return full transaction objects', example: true }
-          ],
-          examples: [
-            {
-              name: 'Get block by hash',
-              params: ['0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331', true],
-              response: {
-                result: {
-                  number: '0x1b4',
-                  hash: '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331',
-                  parentHash: '0x9646252be9520f6e71339a8df9c55e4d7619deeb018d2a3f2d21fc165dde5eb5',
-                  transactions: []
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_getTransactionReceipt',
-          description: 'Returns the receipt of a transaction',
-          implemented: true,
-          params: [
-            { name: 'hash', type: 'hash', description: 'Transaction hash', example: '0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238' }
-          ],
-          examples: [
-            {
-              name: 'Get transaction receipt',
-              params: ['0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238'],
-              response: {
-                result: {
-                  transactionHash: '0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238',
-                  transactionIndex: '0x1',
-                  blockNumber: '0xb',
-                  blockHash: '0xc6ef2fc5426d6ad6fd9e2a26abeab0aa2411b7ab17f30a99d3cb96aed1d1055b',
-                  cumulativeGasUsed: '0x33bc',
-                  gasUsed: '0x4dc',
-                  contractAddress: null,
-                  logs: [],
-                  status: '0x1'
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_getTransactionByBlockHashAndIndex',
-          description: 'Returns transaction by block hash and index',
-          implemented: true,
-          params: [
-            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4' },
-            { name: 'index', type: 'quantity', description: 'Transaction index', example: '0x0' }
-          ],
-          examples: [
-            {
-              name: 'Get transaction by index',
-              params: ['0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4', '0x0'],
-              response: {
-                result: {
-                  blockHash: '0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4',
-                  blockNumber: '0x5daf3b',
-                  from: '0xa7d9ddbe1f17865597fbd27ec712455208b6b76d',
-                  gas: '0xc350',
-                  gasPrice: '0x4a817c800',
-                  hash: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b',
-                  input: '0x',
-                  nonce: '0x15',
-                  to: '0xf02c1c8e6114b1dbe8937a39260b5b0a374432bb',
-                  transactionIndex: '0x0',
-                  value: '0xf3dbb76162000'
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_getTransactionByBlockNumberAndIndex',
-          description: 'Returns transaction by block number and index',
-          implemented: true,
-          params: [
-            { name: 'blockNumber', type: 'string', description: 'Block number or tag', example: '0x1' },
-            { name: 'index', type: 'quantity', description: 'Transaction index', example: '0x0' }
-          ],
-          examples: [
-            {
-              name: 'Get transaction by index',
-              params: ['0x1', '0x0'],
-              response: {
-                result: {
-                  blockHash: '0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4',
-                  blockNumber: '0x1',
-                  from: '0xa7d9ddbe1f17865597fbd27ec712455208b6b76d',
-                  gas: '0xc350',
-                  gasPrice: '0x4a817c800',
-                  hash: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b',
-                  input: '0x',
-                  nonce: '0x15',
-                  to: '0xf02c1c8e6114b1dbe8937a39260b5b0a374432bb',
-                  transactionIndex: '0x0',
-                  value: '0xf3dbb76162000'
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_newFilter',
-          description: 'Creates a filter for logs',
-          implemented: true,
-          params: [
-            {
-              name: 'filter',
-              type: 'object',
-              description: 'Filter options',
-              fields: [
-                { name: 'fromBlock', type: 'string', description: 'Starting block' },
-                { name: 'toBlock', type: 'string', description: 'Ending block' },
-                { name: 'address', type: 'address', description: 'Contract address(es)' },
-                { name: 'topics', type: 'array', description: 'Topic filters' }
-              ]
-            }
-          ],
-          examples: [
-            {
-              name: 'Create filter',
-              params: [{
-                fromBlock: '0x1',
-                toBlock: 'latest',
-                address: '0x8888f1f195afa192cfee860698584c030f4c9db1',
-                topics: ['0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b']
-              }],
-              response: { result: '0x1' }
-            }
-          ]
-        },
-        {
-          name: 'eth_newBlockFilter',
-          description: 'Creates a filter for new blocks',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Create block filter',
-              params: [],
-              response: { result: '0x1' }
-            }
-          ]
-        },
-        {
-          name: 'eth_newPendingTransactionFilter',
-          description: 'Creates a filter for pending transactions',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Create pending transaction filter',
-              params: [],
-              response: { result: '0x1' }
-            }
-          ]
-        },
-        {
-          name: 'eth_uninstallFilter',
-          description: 'Uninstalls a filter',
-          implemented: true,
-          params: [
-            { name: 'filterId', type: 'quantity', description: 'Filter ID', example: '0xb' }
-          ],
-          examples: [
-            {
-              name: 'Uninstall filter',
-              params: ['0xb'],
-              response: { result: true }
-            }
-          ]
-        },
-        {
-          name: 'eth_getFilterChanges',
-          description: 'Polling method for a filter',
-          implemented: true,
-          params: [
-            { name: 'filterId', type: 'quantity', description: 'Filter ID', example: '0x16' }
-          ],
-          examples: [
-            {
-              name: 'Get filter changes',
-              params: ['0x16'],
-              response: {
-                error: {
-                  code: -32000,
-                  message: 'Filter not found'
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_getFilterLogs',
-          description: 'Returns all logs matching filter',
-          implemented: true,
-          params: [
-            { name: 'filterId', type: 'quantity', description: 'Filter ID', example: '0x16' }
-          ],
-          examples: [
-            {
-              name: 'Get filter logs',
-              params: ['0x16'],
-              response: {
-                error: {
-                  code: -32000,
-                  message: 'Filter not found'
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_maxPriorityFeePerGas',
-          description: 'Returns the current max priority fee per gas',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get max priority fee',
-              params: [],
-              response: { result: '0x3b9aca00' }
-            }
-          ]
-        },
-        {
-          name: 'eth_feeHistory',
-          description: 'Returns fee history',
-          implemented: true,
-          params: [
-            { name: 'blockCount', type: 'quantity', description: 'Number of blocks', example: '0x5' },
-            { name: 'newestBlock', type: 'string', description: 'Newest block', example: 'latest' },
-            { name: 'rewardPercentiles', type: 'array', description: 'Percentiles', example: [20, 30] }
-          ],
-          examples: [
-            {
-              name: 'Get fee history',
-              params: ['0x5', 'latest', [20, 30]],
-              response: {
-                result: {
-                  oldestBlock: '0x3',
-                  reward: [['0x0', '0x0'], ['0x0', '0x0'], ['0x0', '0x0'], ['0x0', '0x0'], ['0x0', '0x0']],
-                  baseFeePerGas: ['0x0', '0x0', '0x0', '0x0', '0x0', '0x0'],
-                  gasUsedRatio: [0, 0, 0, 0, 0]
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_getProof',
-          description: 'Returns the merkle proof for a given account',
-          implemented: true,
-          issue: 'Requires block height > 2',
-          params: [
-            { name: 'address', type: 'address', description: 'Account address', example: '0x7F0d15C7FAae65896648C8273B6d7E43f58Fa842' },
-            { name: 'storageKeys', type: 'array', description: 'Storage keys', example: ['0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'] },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ],
-          examples: [
-            {
-              name: 'Get account proof',
-              params: [
-                '0x7F0d15C7FAae65896648C8273B6d7E43f58Fa842',
-                ['0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'],
-                'latest'
-              ],
-              response: {
-                result: {
-                  address: '0x7F0d15C7FAae65896648C8273B6d7E43f58Fa842',
-                  accountProof: [],
-                  balance: '0x0',
-                  codeHash: '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470',
-                  nonce: '0x0',
-                  storageHash: '0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421',
-                  storageProof: []
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_getUncleCountByBlockHash',
-          description: 'Get uncle count by block hash',
-          implemented: true,
-          params: [
-            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4' }
-          ],
-          examples: [
-            {
-              name: 'Get uncle count',
-              params: ['0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4'],
-              response: {
-                result: '0x0'
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_getUncleCountByBlockNumber',
-          description: 'Get uncle count by block number',
-          implemented: true,
-          params: [
-            { name: 'blockNumber', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ],
-          examples: [
-            {
-              name: 'Get uncle count',
-              params: ['latest'],
-              response: {
-                result: '0x0'
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_getPendingTransactions',
-          description: 'Returns pending transactions (Cosmos-specific)',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get pending transactions',
-              params: [],
-              response: {
-                result: []
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_pendingTransactions',
-          description: 'Standard Ethereum pending transactions method',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get pending transactions',
-              params: [],
-              response: {
-                error: {
-                  code: -32601,
-                  message: 'Method not found'
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_getTransactionLogs',
-          description: 'Get logs for a specific transaction (Cosmos-specific)',
-          implemented: true,
-          params: [
-            { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0x1e2910a262b1008d0616a0beb24c1a491d78771baa54a33e66065e03b1f46bc1' }
-          ],
-          examples: [
-            {
-              name: 'Get transaction logs',
-              params: ['0x1e2910a262b1008d0616a0beb24c1a491d78771baa54a33e66065e03b1f46bc1'],
-              response: {
-                result: []
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_getBlockReceipts',
-          description: 'Get all receipts for a given block (Cosmos-specific)',
-          implemented: true,
-          params: [
-            { name: 'blockNumber', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ],
-          examples: [
-            {
-              name: 'Get block receipts',
-              params: ['latest'],
-              response: {
-                result: []
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_resend',
-          description: 'Resend transaction with different gas parameters',
-          implemented: true,
-          params: [
-            { 
-              name: 'transaction',
-              type: 'object',
-              description: 'Original transaction',
-              fields: [
-                { name: 'from', type: 'address', description: 'Sender' },
-                { name: 'to', type: 'address', description: 'Recipient' },
-                { name: 'gas', type: 'quantity', description: 'Gas limit' },
-                { name: 'gasPrice', type: 'quantity', description: 'Gas price' },
-                { name: 'value', type: 'quantity', description: 'Value' },
-                { name: 'data', type: 'data', description: 'Input data' },
-                { name: 'nonce', type: 'quantity', description: 'Nonce' }
-              ]
-            },
-            { name: 'gasPrice', type: 'quantity', description: 'New gas price', example: '0x3b9aca00' },
-            { name: 'gasLimit', type: 'quantity', description: 'New gas limit', example: '0x5208' }
-          ],
-          examples: [
-            {
-              name: 'Resend with higher gas',
-              params: [
-                {
-                  from: '0x0',
-                  to: '0x0',
-                  gas: '0x5208',
-                  gasPrice: '0x3b9aca00',
-                  value: '0x0',
-                  data: '0x',
-                  nonce: '0x0'
-                },
-                '0x4a817c800',
-                '0x5208'
-              ],
-              response: {
-                result: '0x1e2910a262b1008d0616a0beb24c1a491d78771baa54a33e66065e03b1f46bc1'
-              }
-            }
-          ]
-        },
-        {
-          name: 'eth_createAccessList',
-          description: 'Generate access list for transaction (EIP-2930)',
-          implemented: true,
-          params: [
-            {
-              name: 'transaction',
-              type: 'object',
-              description: 'Transaction call object',
-              fields: [
-                { name: 'from', type: 'address', description: 'Sender address' },
-                { name: 'to', type: 'address', description: 'Contract address' },
-                { name: 'gas', type: 'quantity', description: 'Gas limit' },
-                { name: 'gasPrice', type: 'quantity', description: 'Gas price' },
-                { name: 'value', type: 'quantity', description: 'Value' },
-                { name: 'data', type: 'data', description: 'Input data' }
-              ]
-            },
-            { name: 'blockNumber', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ],
-          examples: [
-            {
-              name: 'Generate access list',
-              params: [
-                {
-                  from: '0x0',
-                  to: '0x0',
-                  gas: '0x5208',
-                  gasPrice: '0x3b9aca00',
-                  value: '0x0',
-                  data: '0x'
-                },
-                'latest'
-              ],
-              response: {
-                error: {
-                  code: -32601,
-                  message: 'Method not found'
-                }
-              }
-            }
-          ]
         }
       ]
     },
     personal: {
       name: 'Personal',
-      icon: SmartContractIcon,
       methods: [
-        {
-          name: 'personal_importRawKey',
-          description: 'Import unencrypted private key into key store',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'privkey', type: 'string', description: 'Hex encoded private key', example: 'c5bd76cd0cd948de17a31261567d219576e992d9066fe1a6bca97496dec634e2c8e06f8949773b300b9f73fabbbc7710d5d6691e96bcf3c9145e15daf6fe07b9' },
-            { name: 'password', type: 'string', description: 'Password for encryption', example: 'the key is this' }
-          ],
-          examples: [
-            {
-              name: 'Import key',
-              params: ['c5bd76cd0cd948de17a31261567d219576e992d9066fe1a6bca97496dec634e2c8e06f8949773b300b9f73fabbbc7710d5d6691e96bcf3c9145e15daf6fe07b9', 'the key is this'],
-              response: {
-                result: '0x3b7252d007059ffc82d16d022da3cbf9992d2f70'
-              }
-            }
-          ]
-        },
-        {
-          name: 'personal_listAccounts',
-          description: 'List addresses for accounts managed by node',
-          implemented: true,
-          private: true,
-          params: [],
-          examples: [
-            {
-              name: 'List accounts',
-              params: [],
-              response: {
-                result: ['0x3b7252d007059ffc82d16d022da3cbf9992d2f70', '0xddd64b4712f7c8f1ace3c145c950339eddaf221d', '0x0f54f47bf9b8e317b214ccd6a7c3e38b893cd7f0']
-              }
-            }
-          ]
-        },
-        {
-          name: 'personal_lockAccount',
-          description: 'Remove private key from memory',
-          implemented: true,
-          issue: 'Not supported - always returns false',
-          private: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Account to lock', example: '0x0f54f47bf9b8e317b214ccd6a7c3e38b893cd7f0' }
-          ],
-          examples: [
-            {
-              name: 'Lock account',
-              params: ['0x0f54f47bf9b8e317b214ccd6a7c3e38b893cd7f0'],
-              response: {
-                result: true
-              }
-            }
-          ]
-        },
         {
           name: 'personal_newAccount',
           description: 'Generate new private key and store in key store',
@@ -1335,167 +229,17 @@ class Program
               }
             }
           ]
-        },
-        {
-          name: 'personal_unlockAccount',
-          description: 'Decrypt account key in memory (always returns false)',
-          implemented: true,
-          issue: 'Not supported - always returns false',
-          private: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Account address', example: '0x0f54f47bf9b8e317b214ccd6a7c3e38b893cd7f0' },
-            { name: 'passphrase', type: 'string', description: 'Account passphrase', example: 'secret passphrase' },
-            { name: 'duration', type: 'number', description: 'Unlock duration in seconds', example: 30 }
-          ],
-          examples: [
-            {
-              name: 'Unlock for 30 seconds',
-              params: ['0x0f54f47bf9b8e317b214ccd6a7c3e38b893cd7f0', 'secret passphrase', 30],
-              response: {
-                result: true
-              }
-            }
-          ]
-        },
-        {
-          name: 'personal_sendTransaction',
-          description: 'Validate passphrase and submit transaction',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'transaction',
-              type: 'object',
-              description: 'Transaction object',
-              fields: [
-                { name: 'from', type: 'address', description: 'Sender address' },
-                { name: 'to', type: 'address', description: 'Recipient address' },
-                { name: 'value', type: 'quantity', description: 'Value to send' }
-              ]
-            },
-            { name: 'passphrase', type: 'string', description: 'Account passphrase', example: 'passphrase' }
-          ],
-          examples: [
-            {
-              name: 'Send transaction',
-              params: [
-                {
-                  from: '0x3b7252d007059ffc82d16d022da3cbf9992d2f70',
-                  to: '0xddd64b4712f7c8f1ace3c145c950339eddaf221d',
-                  value: '0x16345785d8a0000'
-                },
-                'passphrase'
-              ],
-              response: {
-                result: '0xd2a31ec1b89615c8d1f4d08fe4e4182efa4a9c0d5758ace6676f485ea60e154c'
-              }
-            }
-          ]
-        },
-        {
-          name: 'personal_sign',
-          description: 'Sign message with account',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'message', type: 'bytes', description: 'Message to sign', example: '0xdeadbeef' },
-            { name: 'account', type: 'address', description: 'Account address', example: '0x3b7252d007059ffc82d16d022da3cbf9992d2f70' },
-            { name: 'password', type: 'string', description: 'Account password', example: 'password' }
-          ],
-          examples: [
-            {
-              name: 'Sign message',
-              params: ['0xdeadbeef', '0x3b7252d007059ffc82d16d022da3cbf9992d2f70', 'password'],
-              response: {
-                result: '0xf9ff74c86aefeb5f6019d77280bbb44fb695b4d45cfe97e6eed7acd62905f4a85034d5c68ed25a2e7a8eeb9baf1b8401e4f865d92ec48c1763bf649e354d900b1c'
-              }
-            }
-          ]
-        },
-        {
-          name: 'personal_ecRecover',
-          description: 'Recover address from signature',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'message', type: 'bytes', description: 'Original message', example: '0xdeadbeef' },
-            { name: 'signature', type: 'string', description: 'Signature from personal_sign', example: '0xf9ff74c86aefeb5f6019d77280bbb44fb695b4d45cfe97e6eed7acd62905f4a85034d5c68ed25a2e7a8eeb9baf1b8401e4f865d92ec48c1763bf649e354d900b1c' }
-          ],
-          examples: [
-            {
-              name: 'Recover address',
-              params: ['0xdeadbeef', '0xf9ff74c86aefeb5f6019d77280bbb44fb695b4d45cfe97e6eed7acd62905f4a85034d5c68ed25a2e7a8eeb9baf1b8401e4f865d92ec48c1763bf649e354d900b1c'],
-              response: {
-                result: '0x3b7252d007059ffc82d16d022da3cbf9992d2f70'
-              }
-            }
-          ]
-        },
-        {
-          name: 'personal_initializeWallet',
-          description: 'Initialize new wallet at URL',
-          implemented: false,
-          private: true,
-          params: [
-            { name: 'url', type: 'string', description: 'Wallet URL', example: 'keystore://path/to/wallet' }
-          ],
-          examples: [
-            {
-              name: 'Initialize wallet',
-              params: ['keystore://path/to/wallet'],
-              response: {
-                result: '0xNewPrivateKey'
-              }
-            }
-          ]
-        },
-        {
-          name: 'personal_unpair',
-          description: 'Delete wallet pairing',
-          implemented: false,
-          private: true,
-          params: [
-            { name: 'url', type: 'string', description: 'Wallet URL', example: 'keystore://path/to/wallet' },
-            { name: 'pin', type: 'string', description: 'Pairing password', example: '1234' }
-          ],
-          examples: [
-            {
-              name: 'Unpair wallet',
-              params: ['keystore://path/to/wallet', '1234'],
-              response: {
-                result: true
-              }
-            }
-          ]
-        },
-        {
-          name: 'personal_listWallets',
-          description: 'List wallets managed by node',
-          implemented: true,
-          private: true,
-          params: [],
-          examples: [
-            {
-              name: 'List wallets',
-              params: [],
-              response: {
-                result: null
-              }
-            }
-          ]
         }
       ]
     },
     debug: {
       name: 'Debug',
-      icon: SmartContractIcon,
       methods: [
         {
           name: 'debug_traceTransaction',
           description: 'Trace transaction execution',
           implemented: true,
           private: true,
-          issue: 'Height issues in current implementation',
           params: [
             { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0x4ed38df88f88...' },
             {
@@ -1520,205 +264,6 @@ class Program
                   structLogs: []
                 }
               }
-            },
-            {
-              name: 'Call tracer',
-              params: ['0x4ed38df88f88...', { tracer: 'callTracer' }],
-              response: {
-                result: {
-                  type: 'CALL',
-                  from: '0x...',
-                  to: '0x...',
-                  value: '0x0',
-                  gas: '0x5208',
-                  gasUsed: '0x5208',
-                  input: '0x',
-                  output: '0x'
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'debug_traceBlockByNumber',
-          description: 'Replay block by number',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'blockNumber', type: 'string', description: 'Block number', example: '0xe' },
-            { name: 'config', type: 'object', description: 'Trace config (optional)' }
-          ],
-          examples: [
-            {
-              name: 'Trace block',
-              params: ['0xe', {}],
-              response: {
-                result: [{
-                  result: {
-                    failed: false,
-                    gas: 21000,
-                    returnValue: '0x',
-                    structLogs: []
-                  }
-                }]
-              }
-            }
-          ]
-        },
-        {
-          name: 'debug_traceBlockByHash',
-          description: 'Replay block by hash',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4' },
-            { name: 'config', type: 'object', description: 'Trace config (optional)' }
-          ],
-          examples: [
-            {
-              name: 'Trace block',
-              params: ['0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4', {}],
-              response: {
-                result: [{
-                  result: {
-                    failed: false,
-                    gas: 21000,
-                    returnValue: '0x',
-                    structLogs: []
-                  }
-                }]
-              }
-            }
-          ]
-        },
-        {
-          name: 'debug_freeOSMemory',
-          description: 'Force garbage collection',
-          implemented: true,
-          private: true,
-          params: [],
-          examples: [
-            {
-              name: 'Free memory',
-              params: [],
-              response: {
-                result: null
-              }
-            }
-          ]
-        },
-        {
-          name: 'debug_setGCPercent',
-          description: 'Set garbage collection target percentage',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'percent', type: 'number', description: 'GC percentage', example: 100 }
-          ],
-          examples: [
-            {
-              name: 'Set GC to 100%',
-              params: [100],
-              response: {
-                result: 100
-              }
-            }
-          ]
-        },
-        {
-          name: 'debug_memStats',
-          description: 'Get runtime memory statistics',
-          implemented: true,
-          private: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get memory stats',
-              params: [],
-              response: {
-                result: {
-                  Alloc: 83328680,
-                  TotalAlloc: 451796592,
-                  Sys: 166452520,
-                  HeapAlloc: 83328680,
-                  HeapSys: 153452544,
-                  HeapInuse: 101883904,
-                  HeapObjects: 299114,
-                  NumGC: 18
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'debug_setBlockProfileRate',
-          description: 'Set goroutine block profile rate',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'rate', type: 'number', description: 'Profile rate', example: 1 }
-          ],
-          examples: [
-            {
-              name: 'Enable profiling',
-              params: [1],
-              response: {
-                result: null
-              }
-            }
-          ]
-        },
-        {
-          name: 'debug_writeBlockProfile',
-          description: 'Write goroutine blocking profile',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'file', type: 'string', description: 'Output file path', example: 'block.prof' }
-          ],
-          examples: [
-            {
-              name: 'Write profile',
-              params: ['block.prof'],
-              response: {
-                result: null
-              }
-            }
-          ]
-        },
-        {
-          name: 'debug_writeMemProfile',
-          description: 'Write allocation profile',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'file', type: 'string', description: 'Output file path', example: 'mem.prof' }
-          ],
-          examples: [
-            {
-              name: 'Write profile',
-              params: ['mem.prof'],
-              response: {
-                result: null
-              }
-            }
-          ]
-        },
-        {
-          name: 'debug_writeMutexProfile',
-          description: 'Write mutex contention profile',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'file', type: 'string', description: 'Output file path', example: 'mutex.prof' }
-          ],
-          examples: [
-            {
-              name: 'Write profile',
-              params: ['mutex.prof'],
-              response: {
-                result: null
-              }
             }
           ]
         }
@@ -1726,44 +271,7 @@ class Program
     },
     txpool: {
       name: 'TxPool',
-      icon: NetworkIcon,
       methods: [
-        {
-          name: 'txpool_content',
-          description: 'Get exact details of all pending and queued transactions',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get pool content',
-              params: [],
-              response: {
-                result: {
-                  pending: {},
-                  queued: {}
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'txpool_inspect',
-          description: 'Get summary of pending and queued transactions',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Inspect pool',
-              params: [],
-              response: {
-                result: {
-                  pending: {},
-                  queued: {}
-                }
-              }
-            }
-          ]
-        },
         {
           name: 'txpool_status',
           description: 'Get number of pending and queued transactions',
@@ -1783,240 +291,279 @@ class Program
           ]
         }
       ]
-    },
-    admin: {
-      name: 'Admin',
-      icon: NetworkIcon,
-      methods: [
-        {
-          name: 'admin_addPeer',
-          description: 'Add a new remote peer to connect to',
-          implemented: true,
-          params: [
-            { name: 'url', type: 'string', description: 'Peer URL in enode format', example: 'enode://pubkey@ip:port' }
-          ],
-          examples: [
-            {
-              name: 'Add peer',
-              params: ['enode://a979fb575495b8d6db44f750317d0f4622bf4c2aa3365d6af7c284339968eef29b69ad0dce72a4d8db5ebb4968de0e3bec910127f134779fbcb0cb6d3331163c@52.16.188.185:30303'],
-              response: { result: true }
-            }
-          ]
-        },
-        {
-          name: 'admin_removePeer',
-          description: 'Remove a remote peer',
-          implemented: true,
-          params: [
-            { name: 'url', type: 'string', description: 'Peer URL in enode format', example: 'enode://pubkey@ip:port' }
-          ],
-          examples: [
-            {
-              name: 'Remove peer',
-              params: ['enode://a979fb575495b8d6db44f750317d0f4622bf4c2aa3365d6af7c284339968eef29b69ad0dce72a4d8db5ebb4968de0e3bec910127f134779fbcb0cb6d3331163c@52.16.188.185:30303'],
-              response: { result: true }
-            }
-          ]
-        },
-        {
-          name: 'admin_peers',
-          description: 'List all connected peers',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get peers',
-              params: [],
-              response: { result: [] }
-            }
-          ]
-        },
-        {
-          name: 'admin_nodeInfo',
-          description: 'Get node information',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get node info',
-              params: [],
-              response: {
-                result: {
-                  id: 'node-id',
-                  name: 'Cosmos EVM',
-                  enode: 'enode://...',
-                  ip: '127.0.0.1',
-                  ports: { discovery: 30303, listener: 30303 },
-                  listenAddr: '[::]:30303',
-                  protocols: {}
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'admin_datadir',
-          description: 'Get the data directory path',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get data directory',
-              params: [],
-              response: { result: '/home/user/.cosmos' }
-            }
-          ]
-        },
-        {
-          name: 'admin_startHTTP',
-          description: 'Start the HTTP RPC server',
-          implemented: true,
-          params: [
-            { name: 'host', type: 'string', description: 'HTTP server host', example: 'localhost' },
-            { name: 'port', type: 'number', description: 'HTTP server port', example: 8545 },
-            { name: 'cors', type: 'string', description: 'Allowed CORS domains', example: '*' },
-            { name: 'apis', type: 'string', description: 'Enabled APIs', example: 'eth,net,web3' }
-          ],
-          examples: [
-            {
-              name: 'Start HTTP server',
-              params: ['localhost', 8545, '*', 'eth,net,web3'],
-              response: { result: true }
-            }
-          ]
-        },
-        {
-          name: 'admin_stopHTTP',
-          description: 'Stop the HTTP RPC server',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Stop HTTP server',
-              params: [],
-              response: { result: true }
-            }
-          ]
-        },
-        {
-          name: 'admin_startWS',
-          description: 'Start the WebSocket RPC server',
-          implemented: true,
-          params: [
-            { name: 'host', type: 'string', description: 'WebSocket server host', example: 'localhost' },
-            { name: 'port', type: 'number', description: 'WebSocket server port', example: 8546 },
-            { name: 'cors', type: 'string', description: 'Allowed CORS domains', example: '*' },
-            { name: 'apis', type: 'string', description: 'Enabled APIs', example: 'eth,net,web3' }
-          ],
-          examples: [
-            {
-              name: 'Start WebSocket server',
-              params: ['localhost', 8546, '*', 'eth,net,web3'],
-              response: { result: true }
-            }
-          ]
-        },
-        {
-          name: 'admin_stopWS',
-          description: 'Stop the WebSocket RPC server',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Stop WebSocket server',
-              params: [],
-              response: { result: true }
-            }
-          ]
-        }
-      ]
-    },
-    miner: {
-      name: 'Miner',
-      icon: SmartContractIcon,
-      methods: [
-        {
-          name: 'miner_start',
-          description: 'Start mining (stub implementation for PoS)',
-          implemented: true,
-          params: [
-            { name: 'threads', type: 'number', description: 'Number of threads', example: 1 }
-          ],
-          examples: [
-            {
-              name: 'Start mining',
-              params: [1],
-              response: { result: true }
-            }
-          ]
-        },
-        {
-          name: 'miner_stop',
-          description: 'Stop mining (stub implementation for PoS)',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Stop mining',
-              params: [],
-              response: { result: true }
-            }
-          ]
-        },
-        {
-          name: 'miner_setEtherbase',
-          description: 'Set the etherbase (stub implementation for PoS)',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'string', description: 'The etherbase address', example: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8' }
-          ],
-          examples: [
-            {
-              name: 'Set etherbase',
-              params: ['0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb8'],
-              response: { result: true }
-            }
-          ]
-        },
-        {
-          name: 'miner_setGasPrice',
-          description: 'Set the gas price (stub implementation for PoS)',
-          implemented: true,
-          params: [
-            { name: 'gasPrice', type: 'string', description: 'Gas price in wei', example: '0x3b9aca00' }
-          ],
-          examples: [
-            {
-              name: 'Set gas price',
-              params: ['0x3b9aca00'],
-              response: { result: true }
-            }
-          ]
-        },
-        {
-          name: 'miner_setGasLimit',
-          description: 'Set the gas limit (stub implementation for PoS)',
-          implemented: true,
-          params: [
-            { name: 'gasLimit', type: 'string', description: 'Gas limit', example: '0x5f5e100' }
-          ],
-          examples: [
-            {
-              name: 'Set gas limit',
-              params: ['0x5f5e100'],
-              response: { result: true }
-            }
-          ]
-        }
-      ]
     }
   };
 
-  const toggleMethod = (method) => {
-    setExpandedMethods(prev => ({
-      ...prev,
-      [method]: !prev[method]
-    }));
+  const generateCodeExamples = (method, params = []) => {
+    const endpoint = rpcEndpoint || 'http://localhost:8545';
+    const jsonRpcBody = {
+      jsonrpc: '2.0',
+      id: 1,
+      method: method,
+      params: params
+    };
+
+    const examples = {
+      curl: `curl -X POST -H "Content-Type: application/json" \\
+  --data '${JSON.stringify(jsonRpcBody, null, 2)}' \\
+  ${endpoint}`,
+
+      javascript: `// Using native fetch API
+const response = await fetch('${endpoint}', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(${JSON.stringify(jsonRpcBody, null, 2).split('\n').map((line, i) => i === 0 ? line : '  ' + line).join('\n')})
+});
+
+const data = await response.json();
+console.log(data.result);
+
+// Using ethers.js v6
+import { JsonRpcProvider } from 'ethers';
+const provider = new JsonRpcProvider('${endpoint}');
+const result = await provider.send('${method}', ${JSON.stringify(params)});
+console.log(result);
+
+// Using web3.js v4
+import { Web3 } from 'web3';
+const web3 = new Web3('${endpoint}');
+const result = await web3.provider.request({
+  method: '${method}',
+  params: ${JSON.stringify(params)}
+});
+console.log(result);`,
+
+      python: `import json
+import requests
+
+# Using requests library
+url = "${endpoint}"
+headers = {"Content-Type": "application/json"}
+payload = ${JSON.stringify(jsonRpcBody, null, 2).split('\n').map((line, i) => i === 0 ? line : line).join('\n')}
+
+response = requests.post(url, headers=headers, data=json.dumps(payload))
+result = response.json()
+print(result)
+
+# Using web3.py v6
+from web3 import Web3
+
+w3 = Web3(Web3.HTTPProvider("${endpoint}"))
+result = w3.provider.make_request("${method}", ${JSON.stringify(params)})
+print(result)`,
+
+      go: `package main
+
+import (
+    "bytes"
+    "encoding/json"
+    "fmt"
+    "io"
+    "net/http"
+)
+
+type JSONRPCRequest struct {
+    JSONRPC string        \`json:"jsonrpc"\`
+    ID      int           \`json:"id"\`
+    Method  string        \`json:"method"\`
+    Params  []interface{} \`json:"params"\`
+}
+
+type JSONRPCResponse struct {
+    JSONRPC string          \`json:"jsonrpc"\`
+    ID      int             \`json:"id"\`
+    Result  json.RawMessage \`json:"result"\`
+    Error   *JSONRPCError   \`json:"error,omitempty"\`
+}
+
+type JSONRPCError struct {
+    Code    int    \`json:"code"\`
+    Message string \`json:"message"\`
+}
+
+func main() {
+    request := JSONRPCRequest{
+        JSONRPC: "2.0",
+        ID:      1,
+        Method:  "${method}",
+        Params:  []interface{}{${params.map(p => {
+          if (typeof p === 'string') return `"${p}"`;
+          if (typeof p === 'object') return JSON.stringify(p);
+          return p;
+        }).join(', ')}},
+    }
+
+    jsonData, err := json.Marshal(request)
+    if err != nil {
+        panic(err)
+    }
+
+    resp, err := http.Post("${endpoint}", "application/json", bytes.NewBuffer(jsonData))
+    if err != nil {
+        panic(err)
+    }
+    defer resp.Body.Close()
+
+    body, err := io.ReadAll(resp.Body)
+    if err != nil {
+        panic(err)
+    }
+
+    var response JSONRPCResponse
+    err = json.Unmarshal(body, &response)
+    if err != nil {
+        panic(err)
+    }
+
+    if response.Error != nil {
+        fmt.Printf("Error: %s\\n", response.Error.Message)
+    } else {
+        fmt.Printf("Result: %s\\n", response.Result)
+    }
+}`,
+
+      rust: `use serde::{Deserialize, Serialize};
+use serde_json::json;
+
+#[derive(Debug, Serialize, Deserialize)]
+struct JsonRpcRequest {
+    jsonrpc: String,
+    id: u64,
+    method: String,
+    params: Vec<serde_json::Value>,
+}
+
+#[derive(Debug, Deserialize)]
+struct JsonRpcResponse {
+    jsonrpc: String,
+    id: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    result: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    error: Option<JsonRpcError>,
+}
+
+#[derive(Debug, Deserialize)]
+struct JsonRpcError {
+    code: i32,
+    message: String,
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = reqwest::Client::new();
+
+    let request = JsonRpcRequest {
+        jsonrpc: "2.0".to_string(),
+        id: 1,
+        method: "${method}".to_string(),
+        params: vec![${params.map(p => {
+          if (typeof p === 'string') return `json!("${p}")`;
+          return `json!(${JSON.stringify(p)})`;
+        }).join(', ')}],
+    };
+
+    let response = client
+        .post("${endpoint}")
+        .json(&request)
+        .send()
+        .await?;
+
+    let json_response: JsonRpcResponse = response.json().await?;
+
+    match json_response.error {
+        Some(error) => eprintln!("Error {}: {}", error.code, error.message),
+        None => {
+            if let Some(result) = json_response.result {
+                println!("Result: {}", serde_json::to_string_pretty(&result)?);
+            }
+        }
+    }
+
+    Ok(())
+}`,
+
+      csharp: `using System;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+public class JsonRpcRequest
+{
+    public string jsonrpc { get; set; } = "2.0";
+    public int id { get; set; } = 1;
+    public string method { get; set; }
+    public object[] @params { get; set; }
+}
+
+public class JsonRpcResponse<T>
+{
+    public string jsonrpc { get; set; }
+    public int id { get; set; }
+    public T result { get; set; }
+    public JsonRpcError error { get; set; }
+}
+
+public class JsonRpcError
+{
+    public int code { get; set; }
+    public string message { get; set; }
+}
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        using var httpClient = new HttpClient();
+
+        var request = new JsonRpcRequest
+        {
+            method = "${method}",
+            @params = new object[] { ${params.map(p => {
+              if (typeof p === 'string') return `"${p}"`;
+              if (typeof p === 'object') return JSON.stringify(p);
+              return p;
+            }).join(', ')} }
+        };
+
+        var json = JsonSerializer.Serialize(request, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        try
+        {
+            var response = await httpClient.PostAsync("${endpoint}", content);
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            var jsonResponse = JsonSerializer.Deserialize<JsonRpcResponse<object>>(
+                responseBody,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            );
+
+            if (jsonResponse.error != null)
+            {
+                Console.Error.WriteLine($"Error {jsonResponse.error.code}: {jsonResponse.error.message}");
+            }
+            else
+            {
+                Console.WriteLine($"Result: {JsonSerializer.Serialize(jsonResponse.result)}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Request failed: {ex.Message}");
+        }
+    }
+}`
+    };
+
+    return examples;
   };
 
   const executeRpcRequest = async (methodName, params = []) => {
@@ -2025,15 +572,12 @@ class Program
       return;
     }
 
-    const requestId = `${methodName}-${Date.now()}`;
     setIsLoading(prev => ({ ...prev, [methodName]: true }));
 
     try {
       const response = await fetch(rpcEndpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           jsonrpc: '2.0',
           id: 1,
@@ -2043,38 +587,24 @@ class Program
       });
 
       const data = await response.json();
-      setRequestResults(prev => ({
-        ...prev,
-        [methodName]: data
-      }));
+      setRequestResults(prev => ({ ...prev, [methodName]: data }));
     } catch (error) {
       setRequestResults(prev => ({
         ...prev,
-        [methodName]: {
-          error: {
-            message: error.message,
-            code: -1
-          }
-        }
+        [methodName]: { error: { message: error.message, code: -1 } }
       }));
     } finally {
       setIsLoading(prev => ({ ...prev, [methodName]: false }));
     }
   };
 
-  const getSelectedLanguage = (methodName) => {
-    return selectedLanguage[methodName] || 'curl';
+  const handleCopy = (text, id) => {
+    navigator.clipboard.writeText(text);
+    setCopied(prev => ({ ...prev, [id]: true }));
+    setTimeout(() => setCopied(prev => ({ ...prev, [id]: false })), 2000);
   };
 
-  const setMethodLanguage = (methodName, language) => {
-    setSelectedLanguage(prev => ({
-      ...prev,
-      [methodName]: language
-    }));
-  };
-
-  // Get all methods from all namespaces for global search
-  const allMethods = React.useMemo(() => {
+  const allMethods = useMemo(() => {
     const methods = [];
     Object.entries(namespaces).forEach(([key, namespace]) => {
       namespace.methods.forEach(method => {
@@ -2084,25 +614,16 @@ class Program
     return methods;
   }, []);
 
-  const filteredMethods = React.useMemo(() => {
-    // If there's a search term, search all methods
+  const filteredMethods = useMemo(() => {
     if (searchTerm) {
-      return allMethods.filter(method => {
-        const matchesSearch = method.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            method.description.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesSearch;
-      });
+      return allMethods.filter(method =>
+        method.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        method.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
-
-    // Show all methods if 'all' is selected
-    if (selectedNamespace === 'all') {
-      return allMethods;
-    }
-
-    // Otherwise, show methods from selected namespace
+    if (selectedNamespace === 'all') return allMethods;
     const namespace = namespaces[selectedNamespace];
     if (!namespace) return [];
-
     return namespace.methods.map(method => ({
       ...method,
       namespace: selectedNamespace,
@@ -2110,367 +631,331 @@ class Program
     }));
   }, [selectedNamespace, searchTerm, allMethods]);
 
-  function CopyButton({ text }) {
-    const [copied, setCopied] = React.useState(false);
-
-    const handleCopy = () => {
-      navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    };
-
-    return (
-      <button
-        onClick={handleCopy}
-        className="px-2 py-0.5 text-xs bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded transition-colors font-mono"
-      >
-        {copied ? 'Copied' : 'Copy'}
-      </button>
-    );
-  }
+  const validateEndpoint = async () => {
+    if (rpcEndpoint && rpcEndpoint.match(/^https?:\/\//)) {
+      try {
+        const response = await fetch(rpcEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'web3_clientVersion',
+            params: []
+          })
+        });
+        setIsValidEndpoint(response.ok);
+        setIsInvalidEndpoint(!response.ok);
+      } catch {
+        setIsValidEndpoint(false);
+        setIsInvalidEndpoint(true);
+      }
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <h1 className="text-4xl font-bold text-black dark:text-white">
-              Ethereum JSON-RPC Methods
-            </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Complete reference for Cosmos EVM implementation
-            </p>
-            {isValidEndpoint && (
-              <p className="mt-2 text-sm text-[#05fcf8]">
-                Interactive mode active - Click "Execute" on any method example to test against {rpcEndpoint}
-              </p>
-            )}
-          </div>
-
-          {/* Search and Filters */}
-          <div className="pb-4 space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4">
+    <div className="min-h-screen bg-zinc-950 dark:bg-zinc-950 not-prose">
+      {/* Fixed Header */}
+      <div className="sticky top-0 z-20 bg-zinc-950 dark:bg-zinc-950 border-b border-zinc-800 dark:border-white/10">
+        <div className="max-w-7xl mx-auto">
+          {/* Title and RPC Endpoint Section - Same Level */}
+          <div className="px-6 pt-8 pb-4">
+            <div className="flex gap-6 items-start">
+              {/* Title Section - Left Half */}
               <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="Search methods..."
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-900 text-black dark:text-white placeholder-gray-500"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                <h1 className="text-4xl font-bold text-white dark:text-white mb-2">
+                  Ethereum JSON-RPC Methods
+                </h1>
+                <p className="text-zinc-400 dark:text-zinc-400">
+                  Complete reference for Cosmos EVM implementation
+                </p>
               </div>
-            </div>
 
-            {/* Interactive RPC Section - Right-aligned, compact */}
-            <div className="flex flex-col items-end gap-1">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-600 dark:text-gray-400">
-                  Enter an RPC endpoint to enable interactive testing
-                </span>
-                <div className={`px-3 py-2 rounded-lg transition-all duration-200 border-2 ${
-                  isValidEndpoint
-                    ? 'border-[#05fcf8]'
-                    : isInvalidEndpoint
-                    ? 'border-amber-500'
-                    : 'border-gray-300 dark:border-gray-700'
-                } bg-white dark:bg-gray-900`}>
-                  <div className="flex items-center gap-2">
-                    <label className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">RPC Endpoint:</label>
-                    <input
-                      type="text"
-                      placeholder="http://localhost:8545"
-                      className="w-64 px-2 py-1 text-sm border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:border-gray-400 bg-white dark:bg-black text-black dark:text-white placeholder-gray-500"
-                      value={rpcEndpoint}
-                      onChange={(e) => {
-                        setRpcEndpoint(e.target.value);
-                        setIsValidEndpoint(false);
-                        setIsInvalidEndpoint(false);
-                      }}
-                      onBlur={async () => {
-                        if (rpcEndpoint && rpcEndpoint.match(/^https?:\/\//)) {
-                          try {
-                            const response = await fetch(rpcEndpoint, {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({
-                                jsonrpc: '2.0',
-                                id: 1,
-                                method: 'web3_clientVersion',
-                                params: []
-                              })
-                            });
-                            if (response.ok) {
-                              setIsValidEndpoint(true);
-                              setIsInvalidEndpoint(false);
-                            } else {
-                              setIsValidEndpoint(false);
-                              setIsInvalidEndpoint(true);
-                            }
-                          } catch (error) {
-                            setIsValidEndpoint(false);
-                            setIsInvalidEndpoint(true);
-                          }
-                        }
-                      }}
-                    />
+              {/* RPC Endpoint Section - Right Half */}
+              <div className="flex-1 max-w-xl">
+                <div className="bg-zinc-900 dark:bg-zinc-900/50 rounded-lg p-3 border border-zinc-800 dark:border-white/10">
+                  <div className="flex items-center gap-3">
+                    <label className="text-sm font-medium text-zinc-300 dark:text-zinc-300 whitespace-nowrap">
+                      RPC Endpoint:
+                    </label>
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        placeholder="http://localhost:8545"
+                        className={`w-full px-3 py-1.5 text-sm bg-zinc-800 dark:bg-zinc-800/50 text-white rounded border ${
+                          isValidEndpoint
+                            ? 'border-green-500'
+                            : isInvalidEndpoint
+                            ? 'border-red-500'
+                            : 'border-zinc-700 dark:border-white/20'
+                        } focus:outline-none focus:border-blue-500`}
+                        value={rpcEndpoint}
+                        onChange={(e) => {
+                          setRpcEndpoint(e.target.value);
+                          setIsValidEndpoint(false);
+                          setIsInvalidEndpoint(false);
+                        }}
+                        onBlur={validateEndpoint}
+                      />
+                    </div>
                     {isValidEndpoint && (
-                      <span className="text-[#05fcf8] text-lg">Y</span>
+                      <span className="text-green-400 text-xs whitespace-nowrap">✓ Connected</span>
                     )}
                     {isInvalidEndpoint && (
-                      <span className="text-red-500 text-lg">N</span>
+                      <span className="text-red-400 text-xs whitespace-nowrap">✗ Failed</span>
                     )}
                   </div>
+                  {isValidEndpoint && (
+                    <p className="mt-1.5 text-xs text-blue-400">
+                      Interactive mode active - Click "Execute" to test
+                    </p>
+                  )}
+                  <p className="mt-0.5 text-xs text-zinc-500">
+                    Enter endpoint for interactive testing
+                  </p>
                 </div>
               </div>
-              <p className="text-[10px] text-gray-500 dark:text-gray-500 text-right max-w-md">
-                Note: Some endpoints may require CORS configuration or have other restrictions that prevent browser-based requests
-              </p>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Namespace Tabs */}
-      <div className="sticky top-[165px] z-10 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-2 overflow-x-auto py-3">
-            <button
-              onClick={() => setSelectedNamespace('all')}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-all whitespace-nowrap text-sm ${
-                selectedNamespace === 'all'
-                  ? 'bg-black dark:bg-white text-white dark:text-black shadow-[0_0_0_1px_rgba(0,0,0,0.3)]'
-                  : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 shadow-[0_0_0_1px_rgba(156,163,175,0.3)] dark:shadow-[0_0_0_1px_rgba(75,85,99,0.5)]'
-              }`}
-            >
-              <span className="font-medium">All</span>
-            </button>
-            {Object.entries(namespaces).map(([key, namespace]) => (
-              <button
-                key={key}
-                onClick={() => setSelectedNamespace(key)}
-                className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-all whitespace-nowrap text-sm ${
-                  selectedNamespace === key
-                    ? 'bg-black dark:bg-white text-white dark:text-black'
-                    : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700'
-                }`}
-              >
-                <span className="text-base">{namespace.icon}</span>
-                <span className="font-medium">{namespace.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Methods List */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-4">
-          {filteredMethods.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400">
-                No methods found matching your criteria
-              </p>
+          {/* Search Bar */}
+          <div className="px-6 pb-4">
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search methods..."
+                className="w-full pl-10 pr-4 py-3 bg-zinc-900 dark:bg-zinc-900/50 text-white rounded-lg border border-zinc-800 dark:border-white/10 focus:outline-none focus:border-blue-500"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-          ) : (
-            filteredMethods.map((method) => (
-              <div
-                key={method.name}
-                className="bg-white dark:bg-gray-900 rounded-lg shadow-[0_0_0_1px_rgba(156,163,175,0.3)] dark:shadow-[0_0_0_1px_rgba(75,85,99,0.5)] overflow-hidden"
-              >
+          </div>
+
+          {/* Namespace Tabs - Constrained Width */}
+          <div className="bg-zinc-900/50 dark:bg-zinc-900/30 border-t border-zinc-800 dark:border-white/10">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="flex gap-2 py-3 overflow-x-auto">
                 <button
-                  onClick={() => toggleMethod(method.name)}
-                  className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  onClick={() => setSelectedNamespace('all')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
+                    selectedNamespace === 'all'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-zinc-800 dark:bg-zinc-800/50 text-zinc-300 hover:bg-zinc-700 dark:hover:bg-zinc-700/50'
+                  }`}
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <code className="text-sm font-mono text-black dark:text-white">
-                        {method.name}
-                      </code>
-                      {(searchTerm || selectedNamespace === 'all') && method.namespace && (
-                        <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 rounded">
-                          {namespaces[method.namespace].name}
-                        </span>
-                      )}
-                      {method.private && (
-                        <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded">
-                          Private
-                        </span>
-                      )}
-                      {!method.implemented && (
-                        <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 rounded">
-                          Not implemented
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-gray-600 dark:text-gray-400 text-left">
-                      {method.description}
-                    </p>
-                  </div>
-                  <svg
-                    className={`w-5 h-5 text-gray-400 transform transition-transform flex-shrink-0 ${
-                      expandedMethods[method.name] ? 'rotate-180' : ''
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  All
                 </button>
+                {Object.entries(namespaces).map(([key, namespace]) => (
+                  <button
+                    key={key}
+                    onClick={() => setSelectedNamespace(key)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
+                      selectedNamespace === key
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-zinc-800 dark:bg-zinc-800/50 text-zinc-300 hover:bg-zinc-700 dark:hover:bg-zinc-700/50'
+                    }`}
+                  >
+                    {namespace.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                {expandedMethods[method.name] && (
-                  <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800">
-                    {method.issue && (
-                      <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
-                        <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                          Warning: {method.issue}
-                        </p>
-                      </div>
-                    )}
+      {/* Methods List - Constrained Width */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="space-y-4">
+          {filteredMethods.map((method) => (
+            <div
+              key={method.name}
+              className="bg-zinc-900 dark:bg-zinc-900/50 rounded-lg border border-zinc-800 dark:border-white/10 overflow-hidden"
+            >
+              <button
+                onClick={() => setExpandedMethods(prev => ({
+                  ...prev,
+                  [method.name]: !prev[method.name]
+                }))}
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-zinc-800/50 dark:hover:bg-zinc-800/30 transition-colors"
+              >
+                <div className="flex items-center gap-4">
+                  <code className="text-sm font-mono text-blue-400">
+                    {method.name}
+                  </code>
+                  {method.namespace && selectedNamespace === 'all' && (
+                    <span className="px-2 py-1 text-xs bg-zinc-800 dark:bg-zinc-800/50 text-zinc-400 rounded">
+                      {method.namespaceName}
+                    </span>
+                  )}
+                  {method.private && (
+                    <span className="px-2 py-1 text-xs bg-yellow-900/50 text-yellow-400 rounded">
+                      Private
+                    </span>
+                  )}
+                  {!method.implemented && (
+                    <span className="px-2 py-1 text-xs bg-zinc-800 dark:bg-zinc-800/50 text-zinc-500 rounded">
+                      Not implemented
+                    </span>
+                  )}
+                  <p className="text-zinc-400 text-left">{method.description}</p>
+                </div>
+                <svg
+                  className={`w-5 h-5 text-zinc-400 transform transition-transform flex-shrink-0 ${
+                    expandedMethods[method.name] ? 'rotate-180' : ''
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
 
-                    {method.params && method.params.length > 0 && (
-                      <div className="mb-6">
-                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                          Parameters
-                        </h4>
-                        <div className="space-y-3">
-                          {method.params.map((param, i) => (
-                            <div key={i} className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                              <div className="flex items-start justify-between">
-                                <div>
-                                  <code className="text-sm font-mono text-black dark:text-white">
-                                    {param.name}
-                                  </code>
-                                  <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-                                    {param.type}
-                                  </span>
-                                </div>
-                                {param.example && (
-                                  <code className="text-xs text-gray-600 dark:text-gray-400 font-mono">
-                                    Example: {param.example}
-                                  </code>
-                                )}
+              {expandedMethods[method.name] && (
+                <div className="px-6 py-4 border-t border-zinc-800 dark:border-white/10">
+                  {/* Parameters */}
+                  {method.params && method.params.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="text-sm font-semibold text-white mb-3">Parameters</h4>
+                      <div className="space-y-2">
+                        {method.params.map((param, i) => (
+                          <div key={i} className="bg-zinc-800 dark:bg-zinc-800/50 p-3 rounded">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <code className="text-sm text-blue-400">{param.name}</code>
+                                <span className="ml-2 text-xs text-zinc-500">{param.type}</span>
                               </div>
-                              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                                {param.description}
-                              </p>
-                              {param.fields && (
-                                <div className="mt-2 ml-4 space-y-1">
-                                  {param.fields.map((field, j) => (
-                                    <div key={j} className="text-xs">
-                                      <code className="text-black dark:text-white">{field.name}</code>
-                                      <span className="text-gray-500"> ({field.type})</span>
-                                      <span className="text-gray-600 dark:text-gray-400"> - {field.description}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {method.examples && method.examples.length > 0 && (
-                      <div className="space-y-6">
-                        {method.examples.map((example, exampleIndex) => (
-                          <div key={exampleIndex} className="shadow-[0_0_0_1px_rgba(156,163,175,0.3)] dark:shadow-[0_0_0_1px_rgba(75,85,99,0.5)] rounded-lg overflow-hidden">
-                            <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 flex items-center justify-between">
-                              <h5 className="text-sm font-medium text-gray-900 dark:text-white">
-                                Example: {example.name}
-                              </h5>
-                              {rpcEndpoint && rpcEndpoint.match(/^https?:\/\//) && (
-                                <button
-                                  onClick={() => executeRpcRequest(method.name, example.params)}
-                                  disabled={isLoading[method.name]}
-                                  className="px-3 py-0.5 text-xs bg-[#05fcf8] hover:bg-[#04e8e5] text-black font-medium rounded transition-colors disabled:opacity-50"
-                                >
-                                  {isLoading[method.name] ? 'Loading...' : 'Execute'}
-                                </button>
-                              )}
-                            </div>
-
-                            {/* Language Tabs */}
-                            <div className="border-b border-gray-200 dark:border-gray-700">
-                              <div className="flex overflow-x-auto">
-                                {languages.map(lang => (
-                                  <button
-                                    key={lang.id}
-                                    onClick={() => setMethodLanguage(`${method.name}-${exampleIndex}`, lang.id)}
-                                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                                      getSelectedLanguage(`${method.name}-${exampleIndex}`) === lang.id
-                                        ? 'border-black dark:border-white text-black dark:text-white'
-                                        : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                                    }`}
-                                  >
-                                    <span className="mr-1.5 inline-block text-base">
-                                      {lang.icon}
-                                    </span>
-                                    {lang.name}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Code Example */}
-                            <div className="relative">
-                              <div className="absolute top-2 right-2">
-                                <CopyButton text={generateCodeExamples(method.name, example.params)[getSelectedLanguage(`${method.name}-${exampleIndex}`)]} />
-                              </div>
-                              <pre className="p-4 bg-gray-900 dark:bg-black text-gray-100 overflow-x-auto text-xs">
-                                <code>
-                                  {generateCodeExamples(method.name, example.params)[getSelectedLanguage(`${method.name}-${exampleIndex}`)]}
+                              {param.example && (
+                                <code className="text-xs text-zinc-600 dark:text-zinc-400 font-mono">
+                                  {param.example}
                                 </code>
-                              </pre>
+                              )}
                             </div>
-
-                            {/* Response */}
-                            {rpcEndpoint && rpcEndpoint.match(/^https?:\/\//) && requestResults[method.name] ? (
-                              // Show live response when interactive mode is on and we have results
-                              <div className="border-t border-gray-200 dark:border-gray-700">
-                                <div className="px-4 py-2 bg-[#05fcf8]/10 dark:bg-[#05fcf8]/10">
-                                  <h6 className="text-xs font-medium text-gray-900 dark:text-[#05fcf8]">
-                                    Live RPC Response from {rpcEndpoint}
-                                  </h6>
-                                </div>
-                                <pre className="p-4 bg-gray-900 dark:bg-black text-xs overflow-x-auto">
-                                  <code className={requestResults[method.name].error ? 'text-red-400' : 'text-green-400'}>
-{JSON.stringify(requestResults[method.name], null, 2)}
-                                  </code>
-                                </pre>
-                              </div>
-                            ) : (
-                              // Show example response when not interactive or no results yet
-                              <div className="border-t border-gray-200 dark:border-gray-700">
-                                <div className="px-4 py-2 bg-gray-100 dark:bg-gray-800">
-                                  <h6 className="text-xs font-medium text-gray-900 dark:text-white">
-                                    Example Response
-                                  </h6>
-                                </div>
-                                <pre className="p-4 bg-gray-50 dark:bg-black text-xs overflow-x-auto">
-                                  <code className={example.response.error ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
-{JSON.stringify({
-  jsonrpc: '2.0',
-  id: 1,
-  ...example.response
-}, null, 2)}
-                                  </code>
-                                </pre>
+                            <p className="mt-1 text-sm text-zinc-400">{param.description}</p>
+                            {param.fields && (
+                              <div className="mt-2 ml-4 space-y-1">
+                                {param.fields.map((field, j) => (
+                                  <div key={j} className="text-xs">
+                                    <code className="text-zinc-300">{field.name}</code>
+                                    <span className="text-zinc-500"> ({field.type})</span>
+                                    <span className="text-zinc-400"> - {field.description}</span>
+                                  </div>
+                                ))}
                               </div>
                             )}
                           </div>
                         ))}
                       </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))
-          )}
+                    </div>
+                  )}
+
+                  {/* Examples */}
+                  {method.examples && method.examples.map((example, exampleIndex) => {
+                    const exampleKey = `${method.name}-${exampleIndex}`;
+                    const currentLang = selectedLanguage[exampleKey] || 'curl';
+
+                    return (
+                      <div key={exampleIndex} className="mb-6">
+                        <div className="flex items-center justify-between mb-3">
+                          <h5 className="text-sm font-medium text-zinc-300">
+                            Example: {example.name}
+                          </h5>
+                          {rpcEndpoint && (
+                            <button
+                              onClick={() => executeRpcRequest(method.name, example.params)}
+                              disabled={isLoading[method.name]}
+                              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded disabled:opacity-50 flex items-center gap-1"
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              {isLoading[method.name] ? 'Loading...' : 'Execute'}
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Language Tabs */}
+                        <div className="flex gap-1 mb-3 flex-wrap">
+                          {languages.map(lang => (
+                            <button
+                              key={lang.id}
+                              onClick={() => setSelectedLanguage(prev => ({
+                                ...prev,
+                                [exampleKey]: lang.id
+                              }))}
+                              className={`px-3 py-1 text-xs rounded transition-colors ${
+                                currentLang === lang.id
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-zinc-800 dark:bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700 dark:hover:bg-zinc-700/50'
+                              }`}
+                            >
+                              {lang.name}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Code Example */}
+                        <div className="relative bg-zinc-950 dark:bg-black rounded-lg p-4">
+                          <button
+                            onClick={() => handleCopy(
+                              generateCodeExamples(method.name, example.params)[currentLang],
+                              exampleKey
+                            )}
+                            className="absolute top-2 right-2 p-1 text-zinc-400 hover:text-white"
+                          >
+                            {copied[exampleKey] ? (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                            ) : (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                            )}
+                          </button>
+                          <pre className="text-xs text-zinc-300 overflow-x-auto">
+                            <code>{generateCodeExamples(method.name, example.params)[currentLang]}</code>
+                          </pre>
+                        </div>
+
+                        {/* Response */}
+                        {requestResults[method.name] ? (
+                          <div className="mt-4">
+                            <h6 className="text-xs font-medium text-blue-400 mb-2">
+                              Live Response
+                            </h6>
+                            <pre className="bg-zinc-950 dark:bg-black p-4 rounded-lg text-xs overflow-x-auto">
+                              <code className={requestResults[method.name].error ? 'text-red-400' : 'text-green-400'}>
+                                {JSON.stringify(requestResults[method.name], null, 2)}
+                              </code>
+                            </pre>
+                          </div>
+                        ) : (
+                          <div className="mt-4">
+                            <h6 className="text-xs font-medium text-zinc-500 mb-2">
+                              Expected Response
+                            </h6>
+                            <pre className="bg-zinc-950 dark:bg-black p-4 rounded-lg text-xs overflow-x-auto">
+                              <code className={example.response.error ? 'text-red-400' : 'text-green-400'}>
+                                {JSON.stringify({ jsonrpc: '2.0', id: 1, ...example.response }, null, 2)}
+                              </code>
+                            </pre>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
-
     </div>
   );
 }
