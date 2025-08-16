@@ -136,13 +136,13 @@ In Cosmos EVM, both Ethereum and Cosmos transactions compete fairly for block in
     - **Cosmos**: `(fee_amount / gas_limit) - base_fee`
     - Higher tips = higher priority, regardless of transaction type
   </Tab>
-  
+
   <Tab title="Nonce Handling">
     **Ethereum transactions** support nonce gaps:
     - Correct nonce → immediate broadcast
     - Nonce gap → queued locally
     - Gap filled → automatic promotion
-    
+
     **Cosmos transactions** require sequential nonces.
   </Tab>
 </Tabs>

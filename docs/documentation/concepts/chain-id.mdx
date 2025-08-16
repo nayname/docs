@@ -21,7 +21,7 @@ The **Cosmos Chain ID** is a string identifier used by:
 
 **Format**: String with flexible naming (e.g., `"cosmosevm-1"`, `"mychain-testnet-2"`)
 
-**Example**: 
+**Example**:
 ```json
 // In genesis.json
 {
@@ -90,7 +90,7 @@ The two chain IDs serve different purposes and **must not be confused**:
 When selecting your EVM Chain ID:
 1. **Check availability**: Verify your chosen ID is not already in use on [chainlist.org](https://chainlist.org/)
 2. **Avoid conflicts**: Don't use well-known chain IDs (1 for Ethereum mainnet, 137 for Polygon, etc.)
-3. **Consider ranges**: 
+3. **Consider ranges**:
    - Production networks often use lower numbers
    - Testnets commonly use higher ranges (9000+)
    - Local development can use very high numbers (31337+)

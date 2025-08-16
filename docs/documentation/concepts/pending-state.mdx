@@ -59,11 +59,11 @@ The mempool provides dedicated RPC methods to inspect pending and queued transac
     }
     ```
   </Accordion>
-  
+
   <Accordion title="txpool_content">
     Returns detailed information about all transactions in the pool, organized by account and nonce.
   </Accordion>
-  
+
   <Accordion title="txpool_inspect">
     Provides human-readable summaries of transactions for debugging.
   </Accordion>
@@ -110,7 +110,7 @@ Additionally, the `txpool_*` namespace provides specialized methods for mempool 
 const tx = await provider.getTransaction(txHash);
 if (tx && !tx.blockNumber) {
   console.log("Transaction is pending");
-  
+
   // Check pool status
   const poolStatus = await provider.send("txpool_status", []);
   console.log(`Pool has ${poolStatus.pending} pending, ${poolStatus.queued} queued`);

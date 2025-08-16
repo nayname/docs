@@ -61,7 +61,7 @@ There are 3 main types of HRP for the `Addresses`/`PubKeys` available by default
     - **Address Length**: 20 bytes
     - **Pubkey Length**: 33 bytes (compressed)
   </Tab>
-  
+
   <Tab title="Validator Operators">
     **Purpose**: Identify validator operators
     - **Curve**: `eth_secp256k1`
@@ -70,7 +70,7 @@ There are 3 main types of HRP for the `Addresses`/`PubKeys` available by default
     - **Address Length**: 20 bytes
     - **Pubkey Length**: 33 bytes (compressed)
   </Tab>
-  
+
   <Tab title="Consensus Nodes">
     **Purpose**: Identify nodes participating in consensus
     - **Curve**: `ed25519`
@@ -146,7 +146,7 @@ We can use the `keys show` command with the flag `--bech <type>` to obtain diffe
   <Tab title="Account (acc)">
     ```bash
     $ appd keys show dev0 --bech acc
-    
+
     - name: dev0
       type: local
       address: cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw
@@ -154,11 +154,11 @@ We can use the `keys show` command with the flag `--bech <type>` to obtain diffe
       mnemonic: ""
     ```
   </Tab>
-  
+
   <Tab title="Validator (val)">
     ```bash
     $ appd keys show dev0 --bech val
-    
+
     - name: dev0
       type: local
       address: cosmosvaloper1z3t55m0l9h0eupuz3dp5t5cypyv674jjn4d6nn
@@ -166,11 +166,11 @@ We can use the `keys show` command with the flag `--bech <type>` to obtain diffe
       mnemonic: ""
     ```
   </Tab>
-  
+
   <Tab title="Consensus (cons)">
     ```bash
     $ appd keys show dev0 --bech cons
-    
+
     - name: dev0
       type: local
       address: cosmosvalcons1rllqa5d97n6zyjhy6cnscc7zu30zjn3f7wyj2n
@@ -189,7 +189,7 @@ You can query an account address using CLI, gRPC, REST, or JSON-RPC:
     ```bash
     # NOTE: the --output (-o) flag defines the output format
     appd q auth account $(appd keys show dev0 -a) -o text
-    
+
     '@type': /ethermint.types.v1.EthAccount
     base_account:
       account_number: "0"
@@ -201,7 +201,7 @@ You can query an account address using CLI, gRPC, REST, or JSON-RPC:
     code_hash: 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470
     ```
   </Tab>
-  
+
   <Tab title="REST API">
     ```bash
     # GET /cosmos/auth/v1beta1/accounts/{address}
@@ -209,7 +209,7 @@ You can query an account address using CLI, gRPC, REST, or JSON-RPC:
       -H "accept: application/json"
     ```
   </Tab>
-  
+
   <Tab title="JSON-RPC">
     ```bash
     # List accounts using eth_accounts
@@ -219,7 +219,7 @@ You can query an account address using CLI, gRPC, REST, or JSON-RPC:
       "params":[],
       "id":1
     }' -H "Content-Type: application/json" http://localhost:8545
-    
+
     # Or using personal_listAccounts
     curl -X POST --data '{
       "jsonrpc":"2.0",

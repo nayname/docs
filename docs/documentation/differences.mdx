@@ -92,7 +92,7 @@ Cosmos EVM supports EIP-1559 with dynamic base fees, but with key differences:
   <Card title="Cosmos Precompiles" icon="cube" href="/docs/documentation/smart-contracts/precompiles">
     Access staking, governance, IBC, and other Cosmos SDK modules via precompiled contracts at fixed addresses.
   </Card>
-  
+
   <Card title="Standard Precompiles" icon="shield-check">
     All standard Ethereum cryptographic precompiles (ecrecover, sha256, etc.) are fully supported.
   </Card>
@@ -140,11 +140,11 @@ Cosmos:   cosmos1wskntvnryr5qxpe4tv5k64rhc6kx6ma4dxjmav
   <Accordion title="EIP-1559: Base Fee Distribution">
     Unlike Ethereum where base fees are burned, Cosmos EVM distributes them to validators. Can be disabled via `NoBaseFee` parameter.
   </Accordion>
-  
+
   <Accordion title="EIP-155: Chain-Level Enforcement">
     Currently enforced at chain level through AnteHandler rather than per-transaction. Migration to Geth implementation planned.
   </Accordion>
-  
+
   <Accordion title="Consensus EIPs: Not Applicable">
     Difficulty adjustments, PoW→PoS transition, and beacon chain operations don't apply to Tendermint BFT consensus.
   </Accordion>
@@ -205,16 +205,16 @@ Cosmos:   cosmos1wskntvnryr5qxpe4tv5k64rhc6kx6ma4dxjmav
     - **EVM Chain ID**: Integer format (`9000`)
       - Used by: MetaMask, EIP-155, smart contracts
       - **Must remain constant** across upgrades
-    
+
     ```json
     // genesis.json
     "chain_id": "cosmosevm-1",  // Cosmos ID
-    
+
     // EVM params
     "evm_chain_id": "9000"      // EVM ID (separate)
     ```
   </Tab>
-  
+
   <Tab title="Ethermint (Old)">
     **Single Combined Chain ID:**
     - Format: `{identifier}_{EIP155}-{version}`
@@ -244,14 +244,14 @@ Cosmos:   cosmos1wskntvnryr5qxpe4tv5k64rhc6kx6ma4dxjmav
     - More precise fee calculations
     - Requires genesis state migration
   </Accordion>
-  
+
   <Accordion title="Base Fee v1 Removal">
     - Legacy base fee implementation removed
     - New EIP-1559 implementation with validator distribution
     - Base fee no longer burned (distributed to validators)
     - Migration requires parameter updates
   </Accordion>
-  
+
   <Accordion title="Fee Priority System">
     - Fair competition between EVM and Cosmos transactions
     - EVM priority: `min(gas_tip_cap, gas_fee_cap - base_fee)`
@@ -272,19 +272,19 @@ Cosmos:   cosmos1wskntvnryr5qxpe4tv5k64rhc6kx6ma4dxjmav
   <Step title="Export State">
     Export existing chain state before any migration attempts
   </Step>
-  
+
   <Step title="Update Chain IDs">
     Configure separate Cosmos and EVM chain IDs (cannot use Ethermint format)
   </Step>
-  
+
   <Step title="Update Module Names">
     Rename all references from x/evm to x/vm in code and configs
   </Step>
-  
+
   <Step title="Update Parameters">
     Migrate feemarket parameters including min_gas_price type
   </Step>
-  
+
   <Step title="Test Thoroughly">
     Verify all precompiles, transactions, and IBC functionality
   </Step>
@@ -346,23 +346,23 @@ These issues frequently cause migration failures:
   <Card title="Mempool Architecture" icon="layer-group" href="/docs/documentation/concepts/mempool">
     Two-tiered system with nonce gap handling
   </Card>
-  
+
   <Card title="Gas & Fees" icon="gas-pump" href="/docs/documentation/concepts/gas-and-fees">
     EIP-1559 implementation details
   </Card>
-  
+
   <Card title="Chain ID System" icon="link" href="/docs/documentation/concepts/chain-id">
     Dual chain ID architecture
   </Card>
-  
+
   <Card title="Pending State" icon="clock" href="/docs/documentation/concepts/pending-state">
     Ethereum-compatible pending transactions
   </Card>
-  
+
   <Card title="Integration Guide" icon="plug" href="/docs/documentation/integration/evm-module-integration">
     Add EVM to your Cosmos chain
   </Card>
-  
+
   <Card title="Migration Guide" icon="arrow-up" href="/docs/documentation/integration/migration-v0.3-to-v0.4">
     Upgrade to latest version
   </Card>

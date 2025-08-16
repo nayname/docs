@@ -25,45 +25,45 @@ The Cosmos Stargate release introduces protobuf as the main encoding format for 
 <Tabs>
   <Tab title="Protocol Buffers">
     **Primary encoding for Cosmos EVM**
-    
+
     The Cosmos [Stargate](https://stargate.cosmos.network/) release introduces [protobuf](https://developers.google.com/protocol-buffers) as the main encoding format for both client and state serialization.
-    
+
     <Info>
     All EVM module types (transaction messages, genesis, query services) are implemented as protocol buffer messages.
     </Info>
-    
+
     **Advantages:**
     - Language-agnostic binary serialization
     - Smaller message sizes than JSON
     - Faster serialization/deserialization
     - Strongly typed with schema validation
   </Tab>
-  
+
   <Tab title="RLP">
     **Ethereum compatibility encoding**
-    
+
     Recursive Length Prefix ([RLP](https://eth.wiki/en/fundamentals/rlp)) is an encoding/decoding algorithm that serializes messages for Ethereum compatibility.
-    
+
     <Note>
     Cosmos EVM uses RLP specifically for Ethereum transaction encoding to ensure JSON-RPC compatibility.
     </Note>
-    
+
     **Usage in Cosmos EVM:**
     - Encoding `MsgEthereumTx` for JSON-RPC
     - Transaction signing and verification
     - Block hash computation
     - Merkle tree data structures
   </Tab>
-  
+
   <Tab title="Amino (Legacy)">
     **Backwards compatibility only**
-    
+
     The Cosmos SDK supports legacy Amino encoding for backwards compatibility with older versions.
-    
+
     <Warning>
     Cosmos EVM does not support Amino in the EVM module. It's only available for other Cosmos SDK modules that enable it.
     </Warning>
-    
+
     **Limited use cases:**
     - Client encoding for legacy wallets
     - Signing with Ledger devices
