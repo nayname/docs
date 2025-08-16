@@ -25,12 +25,12 @@ Cosmos EVM provides Ethereum compatibility on Cosmos chains with significant arc
 1. **Instant finality** - No block reorganizations, transactions are final after one block
 2. **1-2 second blocks** - Much faster than Ethereum's 12-15 seconds
 3. **Dual Chain IDs** - ⚠️ **Two completely independent IDs** (Cosmos string + EVM integer), unlike Ethermint's single combined format
-4. **Experimental pending state** - [Two-tiered mempool](/documentation/concepts/mempool) (local queue + public pool) handles nonce gaps
+4. **Experimental pending state** - [Two-tiered mempool](/docs/documentation/concepts/mempool) (local queue + public pool) handles nonce gaps
 5. **Configurable base fee** - Can be dynamic (EIP-1559) or disabled, distributed to validators instead of burned
 6. **Native IBC** - Built-in cross-chain communication without bridges
 7. **Cosmos precompiles** - Direct access to staking, governance, and other Cosmos SDK modules
-8. **Token precision** - Native tokens use 18 decimals via [x/precisebank module](/documentation/concepts/single-token-representation)
-9. **EIP compatibility** - Most Core EIPs supported with some consensus-related exceptions ([see full matrix](/documentation/eip-support))
+8. **Token precision** - Native tokens use 18 decimals via [x/precisebank module](/docs/documentation/concepts/single-token-representation)
+9. **EIP compatibility** - Most Core EIPs supported with some consensus-related exceptions ([see full matrix](/docs/documentation/eip-support))
 
 ## Core Differences
 
@@ -89,7 +89,7 @@ Cosmos EVM supports EIP-1559 with dynamic base fees, but with key differences:
 ## Precompiled Contracts
 
 <CardGroup cols={2}>
-  <Card title="Cosmos Precompiles" icon="cube" href="/documentation/smart-contracts/precompiles">
+  <Card title="Cosmos Precompiles" icon="cube" href="/docs/documentation/smart-contracts/precompiles">
     Access staking, governance, IBC, and other Cosmos SDK modules via precompiled contracts at fixed addresses.
   </Card>
   
@@ -106,7 +106,7 @@ Precompile addresses may vary between implementations. Verify addresses with you
 
 Cosmos EVM implements most standard Ethereum JSON-RPC methods with modifications for Tendermint consensus:
 
-<Card title="JSON-RPC Implementation" icon="code" href="/api-reference/ethereum-json-rpc/methods">
+<Card title="JSON-RPC Implementation" icon="code" href="/docs/api-reference/ethereum-json-rpc/methods">
   View the complete JSON-RPC methods reference with detailed implementation status for all `eth_*`, `web3_*`, `net_*`, `txpool_*`, `personal_*`, `debug_*`, and `admin_*` namespaces.
 </Card>
 
@@ -119,7 +119,7 @@ Cosmos EVM implements most standard Ethereum JSON-RPC methods with modifications
 
 ## Address Formats
 
-<Card title="Dual Address System" icon="arrows-left-right" href="/documentation/concepts/accounts#address-formats-for-clients">
+<Card title="Dual Address System" icon="arrows-left-right" href="/docs/documentation/concepts/accounts#address-formats-for-clients">
   Same account accessible via both Ethereum (0x) and Cosmos (bech32) formats. Use Bech32 precompile for conversion.
 </Card>
 
@@ -130,7 +130,7 @@ Cosmos:   cosmos1wskntvnryr5qxpe4tv5k64rhc6kx6ma4dxjmav
 
 ## EIP Compatibility
 
-<Card title="EIP Support Matrix" icon="list-check" href="/documentation/eip-support">
+<Card title="EIP Support Matrix" icon="list-check" href="/docs/documentation/eip-support">
   View the comprehensive matrix of all 339+ Core EIPs with detailed implementation status, searchable by EIP number or feature.
 </Card>
 
@@ -291,7 +291,7 @@ Cosmos:   cosmos1wskntvnryr5qxpe4tv5k64rhc6kx6ma4dxjmav
 </Steps>
 
 <Note>
-  For detailed migration steps, see [Migration Guide v0.3 to v0.4](/documentation/integration/migration-v0.3-to-v0.4)
+  For detailed migration steps, see [Migration Guide v0.3 to v0.4](/docs/documentation/integration/migration-v0.3-to-v0.4)
 </Note>
 
 ### Common Migration Issues
@@ -343,27 +343,27 @@ These issues frequently cause migration failures:
 ## Related Documentation
 
 <CardGroup cols={3}>
-  <Card title="Mempool Architecture" icon="layer-group" href="/documentation/concepts/mempool">
+  <Card title="Mempool Architecture" icon="layer-group" href="/docs/documentation/concepts/mempool">
     Two-tiered system with nonce gap handling
   </Card>
   
-  <Card title="Gas & Fees" icon="gas-pump" href="/documentation/concepts/gas-and-fees">
+  <Card title="Gas & Fees" icon="gas-pump" href="/docs/documentation/concepts/gas-and-fees">
     EIP-1559 implementation details
   </Card>
   
-  <Card title="Chain ID System" icon="link" href="/documentation/concepts/chain-id">
+  <Card title="Chain ID System" icon="link" href="/docs/documentation/concepts/chain-id">
     Dual chain ID architecture
   </Card>
   
-  <Card title="Pending State" icon="clock" href="/documentation/concepts/pending-state">
+  <Card title="Pending State" icon="clock" href="/docs/documentation/concepts/pending-state">
     Ethereum-compatible pending transactions
   </Card>
   
-  <Card title="Integration Guide" icon="plug" href="/documentation/integration/evm-module-integration">
+  <Card title="Integration Guide" icon="plug" href="/docs/documentation/integration/evm-module-integration">
     Add EVM to your Cosmos chain
   </Card>
   
-  <Card title="Migration Guide" icon="arrow-up" href="/documentation/integration/migration-v0.3-to-v0.4">
+  <Card title="Migration Guide" icon="arrow-up" href="/docs/documentation/integration/migration-v0.3-to-v0.4">
     Upgrade to latest version
   </Card>
 </CardGroup>

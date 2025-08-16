@@ -16,7 +16,7 @@ This guide explains how to integrate the EVM mempool in your Cosmos SDK chain to
 
 Before integrating the EVM mempool:
 
-1. **EVM Module Integration**: Complete the [EVM module integration](/documentation/integration/evm-module-integration) first
+1. **EVM Module Integration**: Complete the [EVM module integration](/docs/documentation/integration/evm-module-integration) first
 2. **FeeMarket Module**: Ensure the feemarket module is properly configured for base fee calculations
 3. **Compatible AnteHandler**: Your ante handler must support EVM transaction validation
 
@@ -345,6 +345,6 @@ if err := evmmempool.SetGlobalEVMMempool(evmMempool); err != nil {
 
 ## Related Documentation
 
-- [Mempool Concepts](/documentation/concepts/mempool) - Understanding mempool behavior and design
-- [EVM Module Integration](/documentation/integration/evm-module-integration) - Prerequisites for mempool integration
-- [JSON-RPC Methods](/api-reference/ethereum-json-rpc/methods#txpool-methods) - Mempool query methods
+- [Mempool Concepts](/docs/documentation/concepts/mempool) - Understanding mempool behavior and design
+- [EVM Module Integration](/docs/documentation/integration/evm-module-integration) - Prerequisites for mempool integration
+- [JSON-RPC Methods](/docs/api-reference/ethereum-json-rpc/methods#txpool-methods) - Mempool query methods
