@@ -10,22 +10,27 @@ import { footnote } from '/snippets/footnote.mdx'
 <Warning>
   **The EVM module is still in active development:** Some of what is detailed here may change or be removed entirely as development continues. This document represents the current state of the implementation.
 
-  **Implementation Variations:** This document is specifci to the current version of [Cosmos-EVM](https://github.com/cosmos/evm) and may not be applicable in part or in full to older versions or Ethermint variants.
+  **Implementation Variations:** This document is specific to the current version of [Cosmos-EVM](https://github.com/cosmos/evm) and may not be applicable in part or in full to older versions or Ethermint variants.
 </Warning>
+
+<Info>
+  **Critical for Ethermint/Evmos Migrations:** Cosmos EVM has significant architectural differences from Ethermint/Evmos. See [Migration from Evmos/Ethermint](#migration-from-evmosethermint) for breaking changes.
+</Info>
 
 ## Quick Summary
 
-To ensure a familiar and seamless development experience for seasoned EVM builder teams, one of the main focus points of the Cosmos EVM project is to be affect developers, infrastructure operators, and users
+Cosmos EVM provides Ethereum compatibility on Cosmos chains with significant architectural improvements and differences from both standard Ethereum and Ethermint-based implementations
 
 **Most Important Differences for Developers:**
 1. **Instant finality** - No block reorganizations, transactions are final after one block
 2. **1-2 second blocks** - Much faster than Ethereum's 12-15 seconds
-3. **Experimental pending state** - [Two-tiered mempool](/documentation/concepts/mempool) (local queue + public pool) handles nonce gaps and provides Ethereum-compatible pending functionality
-4. **Configurable base fee** - Can be dynamic (EIP-1559) or disabled, distributed to validators instead of burned
-5. **Native IBC** - Built-in cross-chain communication without bridges
-6. **Cosmos precompiles** - Direct access to staking, governance, and other Cosmos SDK modules
-7. **Token precision** - Native tokens use 18 decimals via [x/precisebank module](/documentation/concepts/single-token-representation) for full EVM compatibility
-8. **EIP compatibility** - Most Core EIPs supported with some consensus-related exceptions ([see full matrix](/documentation/eip-support))
+3. **Dual Chain IDs** - ⚠️ **Two completely independent IDs** (Cosmos string + EVM integer), unlike Ethermint's single combined format
+4. **Experimental pending state** - [Two-tiered mempool](/documentation/concepts/mempool) (local queue + public pool) handles nonce gaps
+5. **Configurable base fee** - Can be dynamic (EIP-1559) or disabled, distributed to validators instead of burned
+6. **Native IBC** - Built-in cross-chain communication without bridges
+7. **Cosmos precompiles** - Direct access to staking, governance, and other Cosmos SDK modules
+8. **Token precision** - Native tokens use 18 decimals via [x/precisebank module](/documentation/concepts/single-token-representation)
+9. **EIP compatibility** - Most Core EIPs supported with some consensus-related exceptions ([see full matrix](/documentation/eip-support))
 
 ## Core Differences
 
@@ -177,9 +182,143 @@ Cosmos:   cosmos1wskntvnryr5qxpe4tv5k64rhc6kx6ma4dxjmav
 - **Block timestamps**: More reliable due to BFT consensus requirements
 - **Account abstraction**: EIP-7702 support coming in v0.5.0 for EOA code delegation
 - **Opcode differences**: DIFFICULTY/PREVRANDAO returns 0, COINBASE returns validator operator address
-- **Chain ID**: Dual system - Cosmos string ID (e.g., "cosmoshub-4") and EVM integer ID (e.g., 1), enforced at chain level (EIP-155)
+- **Chain ID**: **Two completely separate independent values** (unlike Ethermint's single ID) - Cosmos string ID for consensus/IBC and EVM integer ID for transactions/wallets
 - **Token precision**: x/precisebank module provides 18 decimal precision for native tokens
 - **Storage costs**: No state rent mechanisms, pruning configurable per node
+
+## Migration from Evmos/Ethermint
+
+<Warning>
+  **Breaking Changes:** Migrating from Evmos/Ethermint requires careful planning due to fundamental architectural differences.
+</Warning>
+
+### Critical Architectural Differences
+
+#### Chain ID System (Most Important)
+
+<Tabs>
+  <Tab title="Cosmos EVM (New)">
+    **Two Completely Independent Chain IDs:**
+    - **Cosmos Chain ID**: String format (`"cosmosevm-1"`)
+      - Used by: CometBFT, IBC, native SDK transactions
+      - Can change during upgrades
+    - **EVM Chain ID**: Integer format (`9000`)
+      - Used by: MetaMask, EIP-155, smart contracts
+      - **Must remain constant** across upgrades
+    
+    ```json
+    // genesis.json
+    "chain_id": "cosmosevm-1",  // Cosmos ID
+    
+    // EVM params
+    "evm_chain_id": "9000"      // EVM ID (separate)
+    ```
+  </Tab>
+  
+  <Tab title="Ethermint (Old)">
+    **Single Combined Chain ID:**
+    - Format: `{identifier}_{EIP155}-{version}`
+    - Example: `evmos_9001-2`
+    - Both Cosmos and EVM derive from same value
+    - EIP-155 chain ID extracted from format
+  </Tab>
+</Tabs>
+
+### State-Breaking Parameter Changes
+
+#### Module Reorganization
+- **x/evm → x/vm**: EVM module renamed to VM module
+- **Organization change**: `evmos/os` → `cosmos/evm`
+- **Protobuf changes**: Package names updated from `evmos` to `cosmos`
+- **x/precisebank**: New module for 18-decimal precision
+
+#### Feemarket Updates
+<AccordionGroup>
+  <Accordion title="MinGasPrice Type Change">
+    **Breaking change from Evmos/OS:**
+    ```diff
+    - MinGasPrice string  // Old: string type
+    + MinGasPrice sdk.Dec // New: decimal type
+    ```
+    - Global minimum gas price parameter enforcement
+    - More precise fee calculations
+    - Requires genesis state migration
+  </Accordion>
+  
+  <Accordion title="Base Fee v1 Removal">
+    - Legacy base fee implementation removed
+    - New EIP-1559 implementation with validator distribution
+    - Base fee no longer burned (distributed to validators)
+    - Migration requires parameter updates
+  </Accordion>
+  
+  <Accordion title="Fee Priority System">
+    - Fair competition between EVM and Cosmos transactions
+    - EVM priority: `min(gas_tip_cap, gas_fee_cap - base_fee)`
+    - Cosmos priority: `(fee_amount / gas_limit) - base_fee`
+    - Different from Evmos priority system
+  </Accordion>
+</AccordionGroup>
+
+#### VM/App Configuration Changes
+- **EIP Support**: Different set of activated EIPs
+- **Config Structure**: New configuration format
+- **Precompile Changes**: Removed x/authz dependency
+- **IBC Denoms**: Changed from `erc20/` to `erc20` prefix
+
+### Migration Checklist
+
+<Steps>
+  <Step title="Export State">
+    Export existing chain state before any migration attempts
+  </Step>
+  
+  <Step title="Update Chain IDs">
+    Configure separate Cosmos and EVM chain IDs (cannot use Ethermint format)
+  </Step>
+  
+  <Step title="Update Module Names">
+    Rename all references from x/evm to x/vm in code and configs
+  </Step>
+  
+  <Step title="Update Parameters">
+    Migrate feemarket parameters including min_gas_price type
+  </Step>
+  
+  <Step title="Test Thoroughly">
+    Verify all precompiles, transactions, and IBC functionality
+  </Step>
+</Steps>
+
+<Note>
+  For detailed migration steps, see [Migration Guide v0.3 to v0.4](/documentation/integration/migration-v0.3-to-v0.4)
+</Note>
+
+### Common Migration Issues
+
+<Warning>
+These issues frequently cause migration failures:
+</Warning>
+
+1. **Chain ID Format Errors**
+   - Cannot use Ethermint format `evmos_9001-2`
+   - Must configure two separate IDs
+   - EVM chain ID must remain constant post-migration
+
+2. **Genesis Migration Failures**
+   - Module name changes (x/evm → x/vm)
+   - Parameter type updates in feemarket
+   - Protobuf package name changes
+
+3. **Precompile Address Changes**
+   - Different addresses than Evmos/Ethermint
+   - Some precompiles removed or added
+   - Verify all addresses before migration
+
+4. **Transaction Pool Behavior**
+   - Different mempool architecture
+   - Changed priority calculations
+   - New nonce gap handling
 
 ## Known Limitations and Considerations
 
@@ -199,6 +338,7 @@ Cosmos:   cosmos1wskntvnryr5qxpe4tv5k64rhc6kx6ma4dxjmav
 - **EIP-155 enforcement**: Moving from chain-level to per-transaction validation
 - **EIP-7702 (Account Abstraction)**: Planned for v0.5.0
 - **EIP-2681 (Nonce Limit)**: Stricter overflow checking needed
+- **Parameter migrations**: Ongoing work to simplify upgrades from Evmos/Ethermint ([Issue #424](https://github.com/cosmos/evm/issues/424))
 
 ## Related Documentation
 
