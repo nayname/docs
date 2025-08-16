@@ -138,7 +138,7 @@ stateDiagram-v2
 
 ## Architecture
 
-![Mempool Architecture](/assets/public/mempool_architecture.png)
+![Mempool Architecture](/mempool_architecture.png)
 
 The mempool uses a two-tiered system with local and public transaction pools.
 
@@ -159,7 +159,7 @@ The two-tiered approach:
 - **Public mempool**: Contains only valid transactions, maintaining consensus integrity
 - **Automatic promotion**: Moves transactions from local to public when gaps fill, ensuring inclusion once conditions are met
 
-![Transaction Flow](/assets/public/mempool_transaction_flow.png)
+![Transaction Flow](/mempool_transaction_flow.png)
 
 ### Core Components
 
@@ -204,7 +204,7 @@ You can also explore these methods interactively using the [RPC Explorer](/docs/
 ## Integration
 
 <Note>
-For chain developers looking to integrate the mempool into their Cosmos SDK chain, see the [EVM Mempool Integration Guide](/docs/documentation/integration/mempool-integration) for complete setup instructions.
+For chain developers looking to integrate the mempool into their Cosmos SDK chain, see the [EVM Mempool Integration Guide](/documentation/integration/mempool-integration) for complete setup instructions.
 </Note>
 
 ## State Management
