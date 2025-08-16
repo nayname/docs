@@ -3,12 +3,18 @@ title: "Accounts"
 description: "Crypto Wallets (or Accounts) can be created and represented in unique ways on different blockchains. For developers who interface with account types on a Cosmos EVM chain, e.g. during wallet integration on their dApp frontend, it is therefore important to understand that accounts in the Cosmos EVM are implemented to be compatible with Ethereum type addresses."
 ---
 
-## Prerequisite Readings[​](#prerequisite-readings "Direct link to Prerequisite Readings")
+## Prerequisite Readings
 
-* [Cosmos SDK Accounts](https://docs.cosmos.network/main/learn/beginner/accounts)
-* [Ethereum Accounts](https://ethereum.org/en/whitepaper/#ethereum-accounts)
+<CardGroup cols={2}>
+  <Card title="Cosmos SDK Accounts" icon="circle-nodes" href="https://docs.cosmos.network/main/learn/beginner/accounts">
+    Learn about account structure in Cosmos SDK
+  </Card>
+  <Card title="Ethereum Accounts" icon="ethereum" href="https://ethereum.org/en/whitepaper/#ethereum-accounts">
+    Understand Ethereum account model
+  </Card>
+</CardGroup>
 
-## Creating Accounts[​](#creating-accounts "Direct link to Creating Accounts")
+## Creating Accounts
 
 To create one account you can either create a private key, a keystore file (a private key protected by a password), or a mnemonic phrase (a string of words that can access multiple private keys).
 
@@ -18,7 +24,7 @@ Cosmos blockchains, like the Cosmos Hub, support creating accounts with mnemonic
 
 HD keys generate addresses by taking the mnemonic phrase and combining it with a piece of information called a [derivation path](https://learnmeabitcoin.com/technical/derivation-paths). Blockchains can differ in which derivation path they support. To access all accounts from an mnemonic phrase on a blockchain, it is therefore important to use that blockchain's specific derivation path.
 
-## Representing Accounts[​](#representing-accounts "Direct link to Representing Accounts")
+## Representing Accounts
 
 The terms "account" and "address" are often used interchangeably to describe crypto wallets. In the Cosmos SDK, an account designates a pair of public key (PubKey) and private key (PrivKey). The derivation path defines what the private key, public key, and address would be.
 
@@ -26,7 +32,7 @@ The PubKey can be derived to generate various addresses in different formats, wh
 
 The PrivKey is used to generate digital signatures to prove that an address associated with the PrivKey approved of a given message. The proof is performed by applying a cryptographic scheme to the PrivKey, known as Elliptic Curve Digital Signature Algorithm (ECDSA), to generate a PubKey that is compared with the address in the message.
 
-## EVM Accounts[​](#evm-accounts "Direct link to EVM Accounts")
+## EVM Accounts
 
 Cosmos EVM defines its own custom `Account` type to implement a HD wallet that is compatible with Ethereum type addresses. It uses Ethereum's ECDSA secp256k1 curve for keys (`eth_secp265k1`) and satisfies the [EIP84](https://github.com/ethereum/EIPs/issues/84) for full [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) paths. This cryptographic curve is not to be confused with [Bitcoin's ECDSA secp256k1](https://en.bitcoin.it/wiki/Secp256k1) curve.
 
@@ -40,95 +46,192 @@ The custom Cosmos EVM [EthAccount](https://github.com/cosmos/evm/blob/main/types
 
 For more information on Ethereum accounts head over to the [x/evm module](/docs/documentation/cosmos-sdk/modules/vm#concepts).
 
-### Addresses and Public Keys[​](#addresses-and-public-keys "Direct link to Addresses and Public Keys")
+### Addresses and Public Keys
 
 [BIP-0173](https://github.com/satoshilabs/slips/blob/master/slip-0173.md) defines a new format for segregated witness output addresses that contains a human-readable part that identifies the Bech32 usage.
 
 There are 3 main types of HRP for the `Addresses`/`PubKeys` available by default on the Cosmos EVM:
 
-* Addresses and Keys for **accounts**, which identify users (e.g. the sender of a `message`). They are derived using the **`eth_secp256k1`** curve.
-* Addresses and Keys for **validator operators**, which identify the operators of validators. They are derived using the **`eth_secp256k1`** curve.
-* Addresses and Keys for **consensus nodes**, which identify the validator nodes participating in consensus. They are derived using the **`ed25519`** curve.
+<Tabs>
+  <Tab title="User Accounts">
+    **Purpose**: Identify users (e.g., transaction senders)
+    - **Curve**: `eth_secp256k1`
+    - **Address Prefix**: `cosmos`
+    - **Pubkey Prefix**: `cosmospub`
+    - **Address Length**: 20 bytes
+    - **Pubkey Length**: 33 bytes (compressed)
+  </Tab>
+  
+  <Tab title="Validator Operators">
+    **Purpose**: Identify validator operators
+    - **Curve**: `eth_secp256k1`
+    - **Address Prefix**: `cosmosvaloper`
+    - **Pubkey Prefix**: `cosmosvaloperpub`
+    - **Address Length**: 20 bytes
+    - **Pubkey Length**: 33 bytes (compressed)
+  </Tab>
+  
+  <Tab title="Consensus Nodes">
+    **Purpose**: Identify nodes participating in consensus
+    - **Curve**: `ed25519`
+    - **Address Prefix**: `cosmosvalcons`
+    - **Pubkey Prefix**: `cosmosvalconspub`
+    - **Address Length**: 20 bytes
+    - **Pubkey Length**: 32 bytes
+  </Tab>
+</Tabs>
 
-|                    | Address bech32 Prefix | Pubkey bech32 Prefix | Curve           | Address byte length | Pubkey byte length |
-| ------------------ | --------------------- | -------------------- | --------------- | ------------------- | ------------------ |
-| Accounts           | `cosmos`              | `cosmospub`          | `eth_secp256k1` | `20`                | `33` (compressed)  |
-| Validator Operator | `cosmosvaloper`       | `cosmosvaloperpub`   | `eth_secp256k1` | `20`                | `33` (compressed)  |
-| Consensus Nodes    | `cosmosvalcons`       | `cosmosvalconspub`   | `ed25519`       | `20`                | `32`               |
-
-### Address formats for clients[​](#address-formats-for-clients "Direct link to Address formats for clients")
+### Address formats for clients
 
 `EthAccount` can be represented in both [Bech32](https://en.bitcoin.it/wiki/Bech32) (e.g. `cosmos1...`) and hex (`0x...`) formats for Ethereum's Web3 tooling compatibility.
 
-The Bech32 format is the default format for Cosmos-SDK queries and transactions through CLI and REST clients. The hex format on the other hand, is the Ethereum `common.Address` representation of a Cosmos `sdk.AccAddress`.
+<Info>
+The Bech32 format is the default for Cosmos-SDK queries and transactions, while the hex format is used for Ethereum compatibility.
+</Info>
 
-* **Address (Bech32)**: `cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw`
-* **Address ([EIP55](https://eips.ethereum.org/EIPS/eip-55) Hex)**: `0x91defC7fE5603DFA8CC9B655cF5772459BF10c6f`
-* **Compressed Public Key**: `{"@type":"/ethermint.crypto.v1.ethsecp256k1.PubKey","key":"AsV5oddeB+hkByIJo/4lZiVUgXTzNfBPKC73cZ4K1YD2"}`
+<CodeGroup>
 
-### Address conversion[​](#address-conversion "Direct link to Address conversion")
-
-The `appd debug addr <address>` can be used to convert an address between hex and bech32 formats. For example:
-
-Bech32
-
-```
- $ appd debug addr cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw  Address: [20 87 74 109 255 45 223 158 7 130 139 67 69 211 4 9 25 175 86 82]  Address (hex): 14574A6DFF2DDF9E07828B4345D3040919AF5652  Bech32 Acc: cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw  Bech32 Val: cosmosvaloper1z3t55m0l9h0eupuz3dp5t5cypyv674jjn4d6nn
+```text Bech32 Address
+cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw
 ```
 
-Hex
-
-```
- $ cosmosd debug addr 14574A6DFF2DDF9E07828B4345D3040919AF5652  Address: [20 87 74 109 255 45 223 158 7 130 139 67 69 211 4 9 25 175 86 82]  Address (hex): 14574A6DFF2DDF9E07828B4345D3040919AF5652  Bech32 Acc: cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw  Bech32 Val: cosmosvaloper1z3t55m0l9h0eupuz3dp5t5cypyv674jjn4d6nn
+```text EIP-55 Hex Address
+0x91defC7fE5603DFA8CC9B655cF5772459BF10c6f
 ```
 
-### Key output[​](#key-output "Direct link to Key output")
+```json Public Key
+{
+  "@type": "/ethermint.crypto.v1.ethsecp256k1.PubKey",
+  "key": "AsV5oddeB+hkByIJo/4lZiVUgXTzNfBPKC73cZ4K1YD2"
+}
+```
+
+</CodeGroup>
+
+### Address conversion
+
+The `appd debug addr <address>` can be used to convert an address between hex and bech32 formats:
+
+<CodeGroup>
+
+```bash Bech32 to Hex
+$ appd debug addr cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw
+
+Address: [20 87 74 109 255 45 223 158 7 130 139 67 69 211 4 9 25 175 86 82]
+Address (hex): 14574A6DFF2DDF9E07828B4345D3040919AF5652
+Bech32 Acc: cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw
+Bech32 Val: cosmosvaloper1z3t55m0l9h0eupuz3dp5t5cypyv674jjn4d6nn
+```
+
+```bash Hex to Bech32
+$ appd debug addr 14574A6DFF2DDF9E07828B4345D3040919AF5652
+
+Address: [20 87 74 109 255 45 223 158 7 130 139 67 69 211 4 9 25 175 86 82]
+Address (hex): 14574A6DFF2DDF9E07828B4345D3040919AF5652
+Bech32 Acc: cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw
+Bech32 Val: cosmosvaloper1z3t55m0l9h0eupuz3dp5t5cypyv674jjn4d6nn
+```
+
+</CodeGroup>
+
+### Key output
 
 <Check>
   The Cosmos SDK Keyring output (i.e `appd keys`) only supports addresses and public keys in Bech32 format.
 </Check>
 
-We can use the `keys show` command of `appd` with the flag `--bech <type> (acc|val|cons)` to obtain the addresses and keys as mentioned above,
+We can use the `keys show` command with the flag `--bech <type>` to obtain different address formats:
 
-Accounts
+<Tabs>
+  <Tab title="Account (acc)">
+    ```bash
+    $ appd keys show dev0 --bech acc
+    
+    - name: dev0
+      type: local
+      address: cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw
+      pubkey: '{"@type":"/ethermint.crypto.v1.ethsecp256k1.PubKey","key":"AsV5oddeB+hkByIJo/4lZiVUgXTzNfBPKC73cZ4K1YD2"}'
+      mnemonic: ""
+    ```
+  </Tab>
+  
+  <Tab title="Validator (val)">
+    ```bash
+    $ appd keys show dev0 --bech val
+    
+    - name: dev0
+      type: local
+      address: cosmosvaloper1z3t55m0l9h0eupuz3dp5t5cypyv674jjn4d6nn
+      pubkey: '{"@type":"/ethermint.crypto.v1.ethsecp256k1.PubKey","key":"AsV5oddeB+hkByIJo/4lZiVUgXTzNfBPKC73cZ4K1YD2"}'
+      mnemonic: ""
+    ```
+  </Tab>
+  
+  <Tab title="Consensus (cons)">
+    ```bash
+    $ appd keys show dev0 --bech cons
+    
+    - name: dev0
+      type: local
+      address: cosmosvalcons1rllqa5d97n6zyjhy6cnscc7zu30zjn3f7wyj2n
+      pubkey: '{"@type":"/ethermint.crypto.v1.ethsecp256k1.PubKey","key":"A/fVLgIqiLykFQxum96JkSOoTemrXD0tFaFQ1B0cpB2c"}'
+      mnemonic: ""
+    ```
+  </Tab>
+</Tabs>
 
-```
- $ appd keys show dev0 --bech acc- name: dev0  type: local  address: cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw  pubkey: '{"@type":"/ethermint.crypto.v1.ethsecp256k1.PubKey","key":"AsV5oddeB+hkByIJo/4lZiVUgXTzNfBPKC73cZ4K1YD2"}'  mnemonic: ""
-```
+## Querying an Account
 
-Validator
+You can query an account address using CLI, gRPC, REST, or JSON-RPC:
 
-```
- $ appd keys show dev0 --bech val- name: dev0  type: local  address: cosmosvaloper1z3t55m0l9h0eupuz3dp5t5cypyv674jjn4d6nn  pubkey: '{"@type":"/ethermint.crypto.v1.ethsecp256k1.PubKey","key":"AsV5oddeB+hkByIJo/4lZiVUgXTzNfBPKC73cZ4K1YD2"}'  mnemonic: ""
-```
+<Tabs>
+  <Tab title="CLI">
+    ```bash
+    # NOTE: the --output (-o) flag defines the output format
+    appd q auth account $(appd keys show dev0 -a) -o text
+    
+    '@type': /ethermint.types.v1.EthAccount
+    base_account:
+      account_number: "0"
+      address: cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw
+      pub_key:
+        '@type': /ethermint.crypto.v1.ethsecp256k1.PubKey
+        key: AsV5oddeB+hkByIJo/4lZiVUgXTzNfBPKC73cZ4K1YD2
+      sequence: "1"
+    code_hash: 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470
+    ```
+  </Tab>
+  
+  <Tab title="REST API">
+    ```bash
+    # GET /cosmos/auth/v1beta1/accounts/{address}
+    curl -X GET "http://localhost:10337/cosmos/auth/v1beta1/accounts/cosmos14au322k9munkmx5wrchz9q30juf5wjgz2cfqku" \
+      -H "accept: application/json"
+    ```
+  </Tab>
+  
+  <Tab title="JSON-RPC">
+    ```bash
+    # List accounts using eth_accounts
+    curl -X POST --data '{
+      "jsonrpc":"2.0",
+      "method":"eth_accounts",
+      "params":[],
+      "id":1
+    }' -H "Content-Type: application/json" http://localhost:8545
+    
+    # Or using personal_listAccounts
+    curl -X POST --data '{
+      "jsonrpc":"2.0",
+      "method":"personal_listAccounts",
+      "params":[],
+      "id":1
+    }' -H "Content-Type: application/json" http://localhost:8545
+    ```
+  </Tab>
+</Tabs>
 
-Consensus
-
-```
- $ appd keys show dev0 --bech cons- name: dev0  type: local  address: cosmosvalcons1rllqa5d97n6zyjhy6cnscc7zu30zjn3f7wyj2n  pubkey: '{"@type":"/ethermint.crypto.v1.ethsecp256k1.PubKey","key":"A/fVLgIqiLykFQxum96JkSOoTemrXD0tFaFQ1B0cpB2c"}'  mnemonic: ""
-```
-
-## Querying an Account[​](#querying-an-account "Direct link to Querying an Account")
-
-You can query an account address using the CLI, gRPC or
-
-### Command Line Interface[​](#command-line-interface "Direct link to Command Line Interface")
-
-```
-# NOTE: the --output (-o) flag will define the output format in JSON or YAML (text)appd q auth account $(appd keys show dev0 -a) -o text'@type': /ethermint.types.v1.EthAccountbase_account:account_number: "0"address: cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jwpub_key:  '@type': /ethermint.crypto.v1.ethsecp256k1.PubKey  key: AsV5oddeB+hkByIJo/4lZiVUgXTzNfBPKC73cZ4K1YD2sequence: "1"code_hash: 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470
-```
-
-### Cosmos gRPC and REST[​](#cosmos-grpc-and-rest "Direct link to Cosmos gRPC and REST")
-
-```
-# GET /cosmos/auth/v1beta1/accounts/{address}curl -X GET "http://localhost:10337/cosmos/auth/v1beta1/accounts/cosmos14au322k9munkmx5wrchz9q30juf5wjgz2cfqku" -H "accept: application/json"
-```
-
-### JSON-RPC[​](#json-rpc "Direct link to JSON-RPC")
-
-To retrieve the Ethereum hex address using Web3, use the JSON-RPC [`eth_accounts`](/docs/api-reference/ethereum-json-rpc/methods#eth-accounts) or [`personal_listAccounts`](/docs/api-reference/ethereum-json-rpc/methods#personal-listAccounts) endpoints:
-
-```
-# query against a local nodecurl -X POST --data '{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545curl -X POST --data '{"jsonrpc":"2.0","method":"personal_listAccounts","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
-```
+<Note>
+For JSON-RPC methods, see [`eth_accounts`](/api-reference/ethereum-json-rpc/methods#eth-accounts) and [`personal_listAccounts`](/api-reference/ethereum-json-rpc/methods#personal-listAccounts) documentation.
+</Note>
 
