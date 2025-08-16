@@ -91,7 +91,8 @@
                 "group": "Integration",
                 "pages": [
                   "docs/documentation/integration/evm-module-integration",
-                  "docs/documentation/integration/mempool-integration"
+                  "docs/documentation/integration/mempool-integration",
+                  "docs/documentation/integration/migration-v0.3-to-v0.4"
                 ]
               },
               {
