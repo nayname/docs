@@ -25,7 +25,7 @@ Cosmos EVM provides Ethereum compatibility on Cosmos chains with significant arc
 1. **Instant finality** - No block reorganizations, transactions are final after one block
 2. **1-2 second blocks** - Much faster than Ethereum's 12-15 seconds
 3. **Dual Chain IDs** - ⚠️ **Two completely independent IDs** (Cosmos string + EVM integer), unlike Ethermint's single combined format
-4. **Experimental pending state** - [Two-tiered mempool](/docs/documentation/concepts/mempool) (local queue + public pool) handles nonce gaps
+4. **Experimental pending state** - [Two-tiered mempool](/docs/documentation/concepts/mempool) (local queue + public pool) handles nonce gaps - **WARNING: This is experimental and not recommended for production**
 5. **Configurable base fee** - Can be dynamic (EIP-1559) or disabled, distributed to validators instead of burned
 6. **Native IBC** - Built-in cross-chain communication without bridges
 7. **Cosmos precompiles** - Direct access to staking, governance, and other Cosmos SDK modules
@@ -38,7 +38,7 @@ Cosmos EVM provides Ethereum compatibility on Cosmos chains with significant arc
 |--------|------------|--------------|---------|
 | **Transaction Ordering** | Fee priority and nonce with mempool | Gas price and nonce | Similar ordering with two-tier system |
 | **Transactions per Block** | Multiple per account | Multiple per account | Full Ethereum compatibility |
-| **Mempool** | Two-tiered (local queue + public pool) | Traditional mempool | Nonce gaps queued locally, valid txs broadcast |
+| **Mempool** | Two-tiered (local queue + public pool) **[EXPERIMENTAL]** | Traditional mempool | Nonce gaps queued locally, valid txs broadcast |
 | **Block Rewards** | Native token inflation to validators | Block rewards + tips | Different economic model |
 | **Consensus** | Tendermint/CometBFT | Proof of Work/Stake | Byzantine Fault Tolerant with 2/3+ validator agreement |
 | **Finality** | Immediate (single block, irreversible) | Probabilistic (12+ confirmations) | No waiting period vs 12-15 minute finality |
@@ -98,6 +98,19 @@ Cosmos EVM supports EIP-1559 with dynamic base fees, but with key differences:
   </Card>
 </CardGroup>
 
+### Verified Precompile Addresses
+
+| Precompile | Address | Status |
+|------------|---------|--------|
+| **P256 Verify** | `0x0000000000000000000000000000000000000100` | Implemented |
+| **Bech32** | `0x0000000000000000000000000000000000000400` | Implemented |
+| **Staking** | `0x0000000000000000000000000000000000000800` | Implemented |
+| **Distribution** | `0x0000000000000000000000000000000000000801` | Implemented |
+| **ICS20** | `0x0000000000000000000000000000000000000802` | Implemented |
+| **Bank** | `0x0000000000000000000000000000000000000804` | Implemented |
+| **Governance** | `0x0000000000000000000000000000000000000805` | Implemented |
+| **Slashing** | `0x0000000000000000000000000000000000000806` | Implemented |
+
 <Note>
 Precompile addresses may vary between implementations. Verify addresses with your specific chain.
 </Note>
@@ -111,11 +124,13 @@ Cosmos EVM implements most standard Ethereum JSON-RPC methods with modifications
 </Card>
 
 ### Key RPC Differences
-- **Mining methods**: Return stub values (e.g., `eth_mining` always false, `eth_hashrate` always 0)
-- **Uncle methods**: Always return 0/null since no uncle blocks exist
+- **Mining methods**: Not implemented in eth namespace (Tendermint consensus replaces mining)
+- **Miner namespace**: Limited implementation - only `setEtherbase` and `setGasPrice` available
+- **Uncle methods**: Always return 0/null since no uncle blocks exist in Tendermint
 - **Pending state**: Full support via experimental mempool with `txpool_*` methods
 - **Trace methods**: Not implemented (use `debug_*` methods instead)
 - **Light client protocols**: Not supported (`les_*` namespace unavailable)
+- **eth_getWork**: Not implemented (mining not applicable)
 
 ## Address Formats
 
@@ -148,13 +163,49 @@ Cosmos:   cosmos1wskntvnryr5qxpe4tv5k64rhc6kx6ma4dxjmav
   <Accordion title="Consensus EIPs: Not Applicable">
     Difficulty adjustments, PoW→PoS transition, and beacon chain operations don't apply to Tendermint BFT consensus.
   </Accordion>
+
+  <Accordion title="Custom Cosmos EIPs (CIPs)">
+    Cosmos EVM supports custom improvement proposals:
+    - **CIP-0000**: Modified CREATE/CREATE2 gas costs (10x multiplier)
+    - **CIP-0001**: Modified CALL opcode gas costs (10x multiplier)
+    - **CIP-0002**: Custom SSTORE gas cost (500 gas)
+    - These are configurable and can be activated per chain requirements
+  </Accordion>
 </AccordionGroup>
+
+## Implementation Details (Verified from Codebase)
+
+### Chain Configuration
+- **Default test chain ID**: 262144 (used for testing)
+- **Chain config storage**: Singleton pattern - can only be set once during initialization
+- **EIP activation**: All major EIPs activated from block 0 by default (Homestead through Cancun)
+- **Blob configuration**: Includes default blob configs for Cancun, Prague, and Osaka
+
+### Fee Distribution Architecture
+- **No burning mechanism**: Base fees collected via `DeductTxCostsFromUserBalance` in x/vm/keeper/fees.go
+- **Validator distribution**: Fees go to fee collector module account, then distributed to validators
+- **Bank wrapper**: Used to handle 18-decimal conversion before deducting fees
+- **Minimum gas price**: Enforced via `min-gas-price` parameter, lower-bounds all transactions
+
+### Mempool Implementation Details
+- **TxPool fork**: Based on go-ethereum v1.15.11 with significant modifications
+- **Cosmos pool**: Uses `PriorityNonceMempool` for SDK transactions
+- **Block gas limit**: Configurable per chain (default examples use 100M gas)
+- **CheckTx handler**: Custom handler for nonce gap detection and queuing
+- **Promotion mechanism**: `BroadcastTxFn` callback triggers when gaps are filled
+- **Height requirement**: Mempool requires block height >= 1 to accept transactions
 
 ## Additional Key Differences
 
 ### Transaction Execution
-- **Two-tiered mempool**: Local queue for nonce-gapped transactions (not broadcast), public pool for executable transactions (broadcast to network)
+- **Two-tiered mempool** (EXPERIMENTAL): Local queue for nonce-gapped transactions (not broadcast), public pool for executable transactions (broadcast to network)
+  - Local TxPool forked from go-ethereum v1.15.11 with Cosmos adaptations
+  - Background promotion when nonce gaps are filled via BroadcastTxFn callback
+  - Requires block height 1+ before accepting transactions
 - **Fee-priority ordering**: Fair competition between EVM and Cosmos txs based on effective tips
+  - EVM priority: `min(gas_tip_cap, gas_fee_cap - base_fee)`
+  - Cosmos priority: `(fee_amount / gas_limit) - base_fee`
+  - EVM transactions preferred on ties
 - **Nonce gap handling**: Transactions with future nonces queued locally until gaps fill (unique to Cosmos EVM)
 - **Multiple transactions per block per EOA**: Full support for batched transactions
 - **Transaction replacement**: Same-nonce transactions with higher fees replace lower-fee ones (configurable threshold)
@@ -176,14 +227,26 @@ Cosmos:   cosmos1wskntvnryr5qxpe4tv5k64rhc6kx6ma4dxjmav
 ### Developer Considerations
 - **Pending state**: Full pending state support via experimental mempool with nonce gap handling
 - **Transaction batching**: Send multiple transactions at once, out-of-order delivery handled automatically
-- **Gas refunds**: 50% of unused gas is refunded by default (configurable via params)
+- **Gas refunds**: Standard Ethereum refund rules apply
+- **Intrinsic gas**: Calculated using go-ethereum's `core.IntrinsicGas` function
+- **Gas validation**: Enforces gas limit >= intrinsic gas during CheckTx
 - **Revert reasons**: Full revert reason strings always available
 - **Event reliability**: Events are immediately final, no need to wait for confirmations
 - **Block timestamps**: More reliable due to BFT consensus requirements
 - **Account abstraction**: EIP-7702 support coming in v0.5.0 for EOA code delegation
-- **Opcode differences**: DIFFICULTY/PREVRANDAO returns 0, COINBASE returns validator operator address
-- **Chain ID**: **Two completely separate independent values** (unlike Ethermint's single ID) - Cosmos string ID for consensus/IBC and EVM integer ID for transactions/wallets
+- **Opcode differences**:
+  - DIFFICULTY/PREVRANDAO: Returns 0 (no PoW difficulty)
+  - COINBASE: Returns validator operator address (block proposer)
+  - BLOCKHASH: Limited history due to Tendermint consensus
+- **Chain ID**: **Two completely separate independent values** (unlike Ethermint's single ID)
+  - Cosmos string ID: Used for consensus/IBC/native SDK transactions
+  - EVM integer ID: Stored as uint64 in ChainConfig, used for EIP-155/wallets/contracts
+  - No derivation relationship between the two IDs (fully independent)
 - **Token precision**: x/precisebank module provides 18 decimal precision for native tokens
+  - Wraps x/bank to extend precision from 6 to 18 decimals
+  - 1 uatom = 10^12 aatom (aatom is the EVM-native sub-atomic unit)
+  - Every aatom is fully backed by uatom in x/bank
+  - Fractional balances (< 10^12 aatom) stored separately in x/precisebank
 - **Storage costs**: No state rent mechanisms, pruning configurable per node
 
 ## Migration from Evmos/Ethermint
@@ -231,6 +294,11 @@ Cosmos:   cosmos1wskntvnryr5qxpe4tv5k64rhc6kx6ma4dxjmav
 - **Organization change**: `evmos/os` → `cosmos/evm`
 - **Protobuf changes**: Package names updated from `evmos` to `cosmos`
 - **x/precisebank**: New module for 18-decimal precision
+  - Extends bank module precision from 6 to 18 decimals
+  - Maintains full backing of aatom by uatom
+  - Required for EVM compatibility
+- **x/erc20**: Handles automatic wrapping/unwrapping of Cosmos coins to ERC20
+- **x/feemarket**: EIP-1559 dynamic base fee implementation
 
 #### Feemarket Updates
 <AccordionGroup>
@@ -333,12 +401,17 @@ These issues frequently cause migration failures:
 - **Light client protocol**: Only full nodes supported
 - **MEV infrastructure**: No native flashbots or MEV-boost equivalents
 - **Archive node pruning**: Different pruning strategies than Ethereum
+- **Mining/PoW operations**: All mining-related RPC methods return stub values or are not implemented
+- **Trace namespace**: Not implemented, use debug namespace instead
+- **Admin namespace**: Limited implementation compared to go-ethereum
 
 ### Areas Under Development
 - **EIP-155 enforcement**: Moving from chain-level to per-transaction validation
-- **EIP-7702 (Account Abstraction)**: Planned for v0.5.0
+- **EIP-7702 (Account Abstraction)**: Support for EOA code delegation
 - **EIP-2681 (Nonce Limit)**: Stricter overflow checking needed
 - **Parameter migrations**: Ongoing work to simplify upgrades from Evmos/Ethermint ([Issue #424](https://github.com/cosmos/evm/issues/424))
+- **Experimental Mempool**: Two-tiered mempool is experimental and actively developed - not recommended for production
+- **Prague/Osaka Hard Forks**: Support for upcoming Ethereum upgrades
 
 ## Related Documentation
 
@@ -368,9 +441,23 @@ These issues frequently cause migration failures:
   </Card>
 </CardGroup>
 
+## Security Considerations
+
+### Audits
+- **Sherlock Audit (July 2025)**: Security audit completed (see `sherlock_2025_07_28_final.pdf` in repository)
+- **Experimental Features**: Two-tiered mempool is experimental - thoroughly test before production use
+- **Production Readiness**: Core EVM functionality is production-ready, experimental features should be evaluated carefully
+
+### Key Security Differences from Ethereum
+- **No reorganizations**: Instant finality eliminates reorg-based attack vectors
+- **Validator set security**: 2/3+ stake required for consensus provides strong security guarantees
+- **Precompile permissions**: Direct module access requires careful permission management
+- **Cross-chain risks**: IBC integration introduces additional attack surface to consider
+
 ## Additional Resources
 
 - [Cosmos EVM GitHub Repository](https://github.com/cosmos/evm)
 - [EVM Module Documentation](https://github.com/cosmos/evm/tree/main/docs)
 - [Migration Guides](https://github.com/cosmos/evm/tree/main/docs/migrations)
+- [Security Audits](https://github.com/cosmos/evm/tree/main/docs/audits)
 - [Issue Tracker](https://github.com/cosmos/evm/issues)
