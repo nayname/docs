@@ -30,8 +30,8 @@ export default function RPCMethodsViewerVersionB() {
   // Simple code display component
   const CodeHighlighter = ({ code, language, className = '' }) => {
     return (
-      <pre className={`bg-black p-4 rounded-lg text-xs overflow-x-auto border border-zinc-800 ${className}`}>
-        <code className="text-zinc-300 font-mono leading-relaxed">
+      <pre className={`bg-gray-100 dark:bg-black p-4 rounded-lg text-xs overflow-x-auto border border-gray-300 dark:border-zinc-800 ${className}`}>
+        <code className="text-gray-800 dark:text-zinc-300 font-mono leading-relaxed">
           {code}
         </code>
       </pre>
@@ -1734,12 +1734,12 @@ class Program
 
   // Mobile navigation
   const MobileNav = () => (
-    <div className="lg:hidden bg-black border-t border-zinc-800 dark:border-white/10 z-30 flex-shrink-0">
+    <div className="lg:hidden bg-gray-100 dark:bg-black border-t border-gray-200 dark:border-zinc-800 z-30 flex-shrink-0">
       <div className="flex">
         <button
           onClick={() => setShowMobilePanel('list')}
           className={`flex-1 py-3 text-sm font-medium ${
-            showMobilePanel === 'list' ? 'text-blue-400 bg-zinc-800/50' : 'text-zinc-400'
+            showMobilePanel === 'list' ? 'text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-zinc-800/50' : 'text-gray-600 dark:text-zinc-400'
           }`}
         >
           Methods
@@ -1747,7 +1747,7 @@ class Program
         <button
           onClick={() => setShowMobilePanel('details')}
           className={`flex-1 py-3 text-sm font-medium ${
-            showMobilePanel === 'details' ? 'text-blue-400 bg-zinc-800/50' : 'text-zinc-400'
+            showMobilePanel === 'details' ? 'text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-zinc-800/50' : 'text-gray-600 dark:text-zinc-400'
           }`}
           disabled={!selectedMethod}
         >
@@ -1756,7 +1756,7 @@ class Program
         <button
           onClick={() => setShowMobilePanel('execute')}
           className={`flex-1 py-3 text-sm font-medium ${
-            showMobilePanel === 'execute' ? 'text-blue-400 bg-zinc-800/50' : 'text-zinc-400'
+            showMobilePanel === 'execute' ? 'text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-zinc-800/50' : 'text-gray-600 dark:text-zinc-400'
           }`}
           disabled={!selectedMethod}
         >
@@ -1769,10 +1769,10 @@ class Program
   // Left Panel - Methods List
   const MethodsList = () => (
     <div className={`${isMobile && showMobilePanel !== 'list' ? 'hidden' : ''}
-      ${isMobile ? 'w-full' : 'w-80'} border-r border-zinc-800 dark:border-white/10 flex flex-col h-full bg-black overflow-hidden`}>
+      ${isMobile ? 'w-full' : 'w-80'} border-r border-gray-200 dark:border-zinc-800 flex flex-col h-full bg-gray-50 dark:bg-black overflow-hidden`}>
 
       {/* Search & Filters */}
-      <div className="p-4 border-b border-zinc-800 dark:border-white/10">
+      <div className="p-4 border-b border-gray-200 dark:border-zinc-800">
         <div className="relative mb-3">
           <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -1780,7 +1780,7 @@ class Program
           <input
             type="text"
             placeholder="Search methods..."
-            className="w-full pl-9 pr-3 py-2 bg-zinc-800 dark:bg-zinc-800/50 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-700 dark:border-white/20"
+            className="w-full pl-9 pr-3 py-2 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-300 dark:border-zinc-700"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -1791,8 +1791,8 @@ class Program
             onClick={() => setSelectedNamespace('all')}
             className={`px-3 py-1 text-xs rounded-full transition-colors ${
               selectedNamespace === 'all'
-                ? 'bg-zinc-600 text-white'
-                : 'bg-zinc-800 dark:bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700'
+                ? 'bg-gray-700 dark:bg-zinc-600 text-white'
+                : 'bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-zinc-400 hover:bg-gray-300 dark:hover:bg-zinc-700'
             }`}
           >
             All
@@ -1820,9 +1820,12 @@ class Program
               type="checkbox"
               checked={hideUnsupported}
               onChange={(e) => setHideUnsupported(e.target.checked)}
-              className="mr-2 w-3.5 h-3.5 rounded bg-zinc-800 border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-2"
+              className="mr-2 w-3.5 h-3.5 rounded bg-white dark:bg-zinc-800 border-gray-400 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-2"
             />
-            <span className="text-zinc-400">Show only Cosmos EVM supported methods</span>
+            <span className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
+              <CosmosIcon size={14} className="text-purple-400" />
+              Show only Cosmos EVM supported methods
+            </span>
           </label>
         </div>
       </div>
@@ -1838,8 +1841,8 @@ class Program
               setRequestResult(null);
               if (isMobile) setShowMobilePanel('details');
             }}
-            className={`w-full px-4 py-3 text-left hover:bg-zinc-800/50 transition-colors ${
-              selectedMethod?.name === method.name ? 'bg-zinc-800/50' : ''
+            className={`w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-zinc-800/50 transition-colors ${
+              selectedMethod?.name === method.name ? 'bg-gray-100 dark:bg-zinc-800/50' : ''
             }`}
             style={{
               border: `2px solid ${namespaceColors[method.namespace]}`,
@@ -1850,7 +1853,7 @@ class Program
             <div className="flex items-start gap-2">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <code className="text-sm font-mono text-blue-400 truncate">
+                  <code className="text-sm font-mono text-blue-600 dark:text-blue-400 truncate">
                     {method.name}
                   </code>
                   {method.implemented === false && (
@@ -1869,7 +1872,7 @@ class Program
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-zinc-500 mt-1 line-clamp-2">
+                <p className="text-xs text-gray-600 dark:text-zinc-500 mt-1 line-clamp-2">
                   {method.description}
                 </p>
               </div>
@@ -1883,18 +1886,18 @@ class Program
   // Center Panel - Method Details
   const MethodDetails = () => (
     <div className={`${isMobile && showMobilePanel !== 'details' ? 'hidden' : ''}
-      ${isMobile ? 'w-full' : 'flex-1'} flex flex-col h-full overflow-y-auto bg-black`}>
+      ${isMobile ? 'w-full' : 'flex-1'} flex flex-col h-full overflow-y-auto bg-white dark:bg-black`}>
 
       {selectedMethod ? (
         <>
           {/* Method Header */}
-          <div className="p-6 border-b border-zinc-800 dark:border-white/10">
+          <div className="p-6 border-b border-gray-200 dark:border-zinc-800">
             <div className="flex items-start gap-3">
               <div className="flex-1">
-                <h2 className="text-2xl font-mono font-bold text-white">
+                <h2 className="text-2xl font-mono font-bold text-gray-900 dark:text-white">
                   {selectedMethod.name}
                 </h2>
-                <p className="text-zinc-400 mt-1">
+                <p className="text-gray-600 dark:text-zinc-400 mt-1">
                   {selectedMethod.description}
                 </p>
                 <div className="flex items-center gap-3 mt-3">
@@ -1920,8 +1923,8 @@ class Program
 
           {/* Parameters */}
           {selectedMethod.params && selectedMethod.params.length > 0 && (
-            <div className="p-6 border-b border-zinc-800 dark:border-white/10">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <div className="p-6 border-b border-gray-200 dark:border-zinc-800">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
@@ -1929,24 +1932,24 @@ class Program
               </h3>
               <div className="space-y-3">
                 {selectedMethod.params.map((param, i) => (
-                  <div key={i} className="bg-zinc-800 dark:bg-zinc-800/50 rounded-lg p-4">
+                  <div key={i} className="bg-gray-100 dark:bg-zinc-800 rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div>
-                        <code className="text-sm font-mono text-blue-400">
+                        <code className="text-sm font-mono text-blue-600 dark:text-blue-400">
                           {param.name}
                         </code>
-                        <span className="ml-2 text-xs bg-zinc-700 text-zinc-300 px-2 py-1 rounded">
+                        <span className="ml-2 text-xs bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300 px-2 py-1 rounded">
                           {param.type}
                         </span>
                       </div>
                     </div>
-                    <p className="mt-2 text-sm text-zinc-400">
+                    <p className="mt-2 text-sm text-gray-600 dark:text-zinc-400">
                       {param.description}
                     </p>
                     {param.example && (
                       <div className="mt-2">
-                        <span className="text-xs text-zinc-500">Example: </span>
-                        <code className="text-xs text-zinc-300 bg-zinc-900 px-2 py-1 rounded">
+                        <span className="text-xs text-gray-500 dark:text-zinc-500">Example: </span>
+                        <code className="text-xs text-gray-700 dark:text-zinc-300 bg-gray-200 dark:bg-zinc-900 px-2 py-1 rounded">
                           {param.example}
                         </code>
                       </div>
@@ -1955,9 +1958,9 @@ class Program
                       <div className="mt-3 space-y-1 pl-4 border-l-2 border-zinc-700">
                         {param.fields.map((field, j) => (
                           <div key={j} className="text-xs">
-                            <code className="text-zinc-300">{field.name}</code>
-                            <span className="text-zinc-500"> ({field.type})</span>
-                            <span className="text-zinc-400"> - {field.description}</span>
+                            <code className="text-gray-700 dark:text-zinc-300">{field.name}</code>
+                            <span className="text-gray-500 dark:text-zinc-500"> ({field.type})</span>
+                            <span className="text-gray-600 dark:text-zinc-400"> - {field.description}</span>
                           </div>
                         ))}
                       </div>
@@ -1971,7 +1974,7 @@ class Program
           {/* Examples */}
           {selectedMethod.examples && selectedMethod.examples.length > 0 && (
             <div className="p-6">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                 </svg>
@@ -1979,11 +1982,11 @@ class Program
               </h3>
               {selectedMethod.examples.map((example, i) => (
                 <div key={i} className="mb-6">
-                  <h4 className="text-sm font-medium text-zinc-300 mb-2">
+                  <h4 className="text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">
                     {example.name}
                   </h4>
-                  <div className="bg-zinc-800 dark:bg-zinc-800/50 rounded-lg p-4">
-                    <div className="text-xs text-zinc-500 mb-2">Request:</div>
+                  <div className="bg-gray-100 dark:bg-zinc-800 rounded-lg p-4">
+                    <div className="text-xs text-gray-500 dark:text-zinc-500 mb-2">Request:</div>
                     <CodeHighlighter
                       code={JSON.stringify({
                         jsonrpc: '2.0',
@@ -1994,8 +1997,8 @@ class Program
                       language="json"
                     />
                   </div>
-                  <div className="bg-zinc-800 dark:bg-zinc-800/50 rounded-lg p-4 mt-2">
-                    <div className="text-xs text-zinc-500 mb-2">Expected Response:</div>
+                  <div className="bg-gray-100 dark:bg-zinc-800 rounded-lg p-4 mt-2">
+                    <div className="text-xs text-gray-500 dark:text-zinc-500 mb-2">Expected Response:</div>
                     <CodeHighlighter
                       code={JSON.stringify({
                         jsonrpc: '2.0',
@@ -2011,7 +2014,7 @@ class Program
           )}
         </>
       ) : (
-        <div className="flex-1 flex items-center justify-center text-zinc-500">
+        <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-zinc-500">
           <div className="text-center">
             <svg className="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -2026,24 +2029,24 @@ class Program
   // Right Panel - Interactive Execute
   const ExecutePanel = () => (
     <div className={`${isMobile && showMobilePanel !== 'execute' ? 'hidden' : ''}
-      ${isMobile ? 'w-full' : 'w-96'} border-l border-zinc-800 dark:border-white/10 flex flex-col h-full bg-black overflow-hidden`}>
+      ${isMobile ? 'w-full' : 'w-96'} border-l border-gray-200 dark:border-zinc-800 flex flex-col h-full bg-gray-50 dark:bg-black overflow-hidden`}>
 
       {selectedMethod ? (
         <div className="flex-1 overflow-y-auto">
           {/* Parameters Form */}
           {selectedMethod.params && selectedMethod.params.length > 0 && (
-            <div className="p-4 border-b border-zinc-800 dark:border-white/10">
-              <h3 className="text-sm font-semibold text-white mb-3">Parameters</h3>
+            <div className="p-4 border-b border-gray-200 dark:border-zinc-800">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Parameters</h3>
               <div className="space-y-3">
                 {selectedMethod.params.map((param) => (
                   <div key={param.name}>
-                    <label className="text-xs text-zinc-400 block mb-1">
+                    <label className="text-xs text-gray-600 dark:text-zinc-400 block mb-1">
                       {param.name} ({param.type})
                     </label>
                     <input
                       type="text"
                       placeholder={param.example || `Enter ${param.name}`}
-                      className="w-full px-3 py-2 bg-zinc-800 dark:bg-zinc-800/50 text-white rounded text-sm border border-zinc-700 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded text-sm border border-gray-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       value={paramValues[param.name] || ''}
                       onChange={(e) => setParamValues(prev => ({
                         ...prev,
@@ -2057,11 +2060,11 @@ class Program
           )}
 
           {/* Execute Button */}
-          <div className="p-4 border-b border-zinc-800 dark:border-white/10">
+          <div className="p-4 border-b border-gray-200 dark:border-zinc-800">
             <button
               onClick={executeRpcRequest}
               disabled={isLoading || !isValidEndpoint}
-              className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-2 bg-blue-600 dark:bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 dark:hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -2103,7 +2106,7 @@ class Program
                   className={`px-2 py-1 text-xs rounded transition-colors ${
                     selectedLanguage === lang.id
                       ? 'bg-blue-600 text-white'
-                      : 'bg-zinc-800 dark:bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700'
+                      : 'bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-zinc-400 hover:bg-gray-300 dark:hover:bg-zinc-700'
                   }`}
                 >
                   {lang.name}
@@ -2123,7 +2126,7 @@ class Program
           {/* Response */}
           {requestResult && (
             <div className="p-4">
-              <h3 className="text-sm font-semibold text-white mb-3">Response</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Response</h3>
               <CodeHighlighter
                 code={JSON.stringify(requestResult, null, 2)}
                 language="json"
@@ -2132,7 +2135,7 @@ class Program
           )}
         </div>
       ) : (
-        <div className="flex-1 flex items-center justify-center text-zinc-500">
+        <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-zinc-500">
           <div className="text-center">
             <svg className="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -2145,13 +2148,13 @@ class Program
   );
 
   return (
-    <div className="min-h-[600px] h-[80vh] bg-black text-white not-prose flex flex-col relative">
+    <div className="min-h-[600px] h-[80vh] bg-white dark:bg-black text-gray-900 dark:text-white not-prose flex flex-col relative">
       {/* Header - Fixed/Pinned at top */}
-      <div className="bg-black border-b border-zinc-800 dark:border-white/10 px-6 py-4 flex-shrink-0">
+      <div className="bg-white dark:bg-black border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex-shrink-0">
         <div className="flex items-center justify-between gap-6">
           <div className="flex-1">
             <h1 className="text-2xl font-bold">Ethereum JSON-RPC Explorer</h1>
-            <p className="text-sm text-zinc-400 mt-1">
+            <p className="text-sm text-gray-600 dark:text-zinc-400 mt-1">
               Interactive method testing for Cosmos EVM
             </p>
           </div>
@@ -2159,18 +2162,18 @@ class Program
           {/* RPC Endpoint Config */}
           <div className="w-[40%] max-w-md">
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-zinc-500">RPC URL - Enter a valid EVM endpoint to test methods</label>
+              <label className="text-xs text-gray-600 dark:text-zinc-500">RPC URL - Enter a valid EVM endpoint to test methods</label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
                   <input
                     type="text"
                     placeholder="http://localhost:8545"
-                    className={`w-full px-3 py-2 bg-zinc-800 dark:bg-zinc-800/50 text-white rounded-lg text-sm border ${
+                    className={`w-full px-3 py-2 bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg text-sm border ${
                       isValidEndpoint
                         ? 'border-green-500'
                         : isInvalidEndpoint
                         ? 'border-red-500'
-                        : 'border-zinc-700 dark:border-white/20'
+                        : 'border-gray-300 dark:border-zinc-700'
                     } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                     value={rpcEndpoint}
                     onChange={(e) => {
@@ -2191,7 +2194,7 @@ class Program
                   {isInvalidEndpoint && (
                     <span className="text-sm text-red-400 whitespace-nowrap">✗ Failed</span>
                   )}
-                  <span className="text-xs text-zinc-500 whitespace-nowrap">
+                  <span className="text-xs text-gray-600 dark:text-zinc-500 whitespace-nowrap">
                     {filteredMethods.length} methods
                   </span>
                 </div>
@@ -2203,7 +2206,7 @@ class Program
 
       {/* Main Content Container with padding */}
       <div className="flex-1 p-2 overflow-hidden">
-        <div className="h-full bg-black rounded-lg overflow-hidden flex flex-col">
+        <div className="h-full bg-white dark:bg-black rounded-lg overflow-hidden flex flex-col">
           {/* Panels Container - Scrollable */}
           <div className="flex-1 flex overflow-hidden">
             <MethodsList />
