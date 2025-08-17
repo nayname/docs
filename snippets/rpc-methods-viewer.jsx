@@ -1,4 +1,15 @@
 export default function RPCMethodsViewerVersionB() {
+  // Namespace color scheme - works in both light and dark modes
+  const namespaceColors = {
+    web3: '#9333ea', // Purple
+    net: '#0891b2', // Cyan
+    eth: '#2563eb', // Blue
+    personal: '#dc2626', // Red
+    debug: '#ea580c', // Orange
+    txpool: '#16a34a', // Green
+    miner: '#a21caf' // Fuchsia
+  };
+
   // Cosmos Icon for Cosmos-specific methods
   const CosmosIcon = ({ size = 12, className = "" }) => (
     <svg 
@@ -505,17 +516,19 @@ export default function RPCMethodsViewerVersionB() {
         {
           name: 'eth_createAccessList',
           description: 'Creates EIP-2930 access list',
-          implemented: true,
+          implemented: false,
           params: [
             { name: 'transaction', type: 'object', description: 'Transaction object' },
             { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
           ]
         },
         {
-          name: 'eth_pendingTransactions',
-          description: 'Returns pending transactions',
+          name: 'eth_fillTransaction',
+          description: 'Fills transaction defaults (nonce, gas, gasPrice)',
           implemented: true,
-          params: []
+          params: [
+            { name: 'transaction', type: 'object', description: 'Unsigned transaction object' }
+          ]
         },
         {
           name: 'eth_getTransactionLogs',
@@ -525,13 +538,6 @@ export default function RPCMethodsViewerVersionB() {
           params: [
             { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b' }
           ]
-        },
-        {
-          name: 'eth_getPendingTransactions',
-          description: 'Returns all pending transactions details (Cosmos-specific)',
-          implemented: true,
-          cosmosSpecific: true,
-          params: []
         },
         {
           name: 'eth_resend',
@@ -812,6 +818,171 @@ export default function RPCMethodsViewerVersionB() {
           ]
         },
         {
+          name: 'debug_traceBlockByNumber',
+          description: 'Trace all transactions in block by number',
+          implemented: true,
+          private: true,
+          params: [
+            {
+              name: 'blockNumber',
+              type: 'string',
+              description: 'Block number',
+              example: '0x1b4'
+            },
+            {
+              name: 'config',
+              type: 'object',
+              description: 'Trace config (optional)',
+              fields: [
+                { name: 'tracer', type: 'string', description: 'Tracer type' },
+                { name: 'timeout', type: 'string', description: 'Execution timeout' }
+              ]
+            }
+          ]
+        },
+        {
+          name: 'debug_traceBlockByHash',
+          description: 'Trace all transactions in block by hash',
+          implemented: true,
+          private: true,
+          params: [
+            {
+              name: 'blockHash',
+              type: 'hash',
+              description: 'Block hash',
+              example: '0xdc0818cf78f21a8e70579cb46a43643f78291264dda342ae31049421c82d21ae'
+            },
+            {
+              name: 'config',
+              type: 'object',
+              description: 'Trace config (optional)',
+              fields: [
+                { name: 'tracer', type: 'string', description: 'Tracer type' },
+                { name: 'timeout', type: 'string', description: 'Execution timeout' }
+              ]
+            }
+          ]
+        },
+        {
+          name: 'debug_blockProfile',
+          description: 'Turns on block profiling for duration',
+          implemented: true,
+          private: true,
+          params: [
+            { name: 'file', type: 'string', description: 'Profile output file', example: 'block.prof' },
+            { name: 'nsec', type: 'number', description: 'Duration in seconds', example: 30 }
+          ]
+        },
+        {
+          name: 'debug_cpuProfile',
+          description: 'Turns on CPU profiling for duration',
+          implemented: true,
+          private: true,
+          params: [
+            { name: 'file', type: 'string', description: 'Profile output file', example: 'cpu.prof' },
+            { name: 'nsec', type: 'number', description: 'Duration in seconds', example: 30 }
+          ]
+        },
+        {
+          name: 'debug_gcStats',
+          description: 'Returns GC statistics (Cosmos-specific)',
+          implemented: true,
+          cosmosSpecific: true,
+          private: true,
+          params: []
+        },
+        {
+          name: 'debug_goTrace',
+          description: 'Turns on Go runtime tracing',
+          implemented: true,
+          private: true,
+          params: [
+            { name: 'file', type: 'string', description: 'Trace output file', example: 'trace.out' },
+            { name: 'nsec', type: 'number', description: 'Duration in seconds', example: 5 }
+          ]
+        },
+        {
+          name: 'debug_memStats',
+          description: 'Returns detailed runtime memory statistics (Cosmos-specific)',
+          implemented: true,
+          cosmosSpecific: true,
+          private: true,
+          params: []
+        },
+        {
+          name: 'debug_setBlockProfileRate',
+          description: 'Sets the rate of goroutine block profile data collection (Cosmos-specific)',
+          implemented: true,
+          cosmosSpecific: true,
+          private: true,
+          params: [
+            { name: 'rate', type: 'number', description: 'Profile rate', example: 1 }
+          ]
+        },
+        {
+          name: 'debug_stacks',
+          description: 'Returns a printed representation of the stacks',
+          implemented: true,
+          private: true,
+          params: []
+        },
+        {
+          name: 'debug_startCPUProfile',
+          description: 'Starts CPU profiling',
+          implemented: true,
+          private: true,
+          params: [
+            { name: 'file', type: 'string', description: 'Profile output file', example: 'cpu.prof' }
+          ]
+        },
+        {
+          name: 'debug_stopCPUProfile',
+          description: 'Stops an ongoing CPU profile',
+          implemented: true,
+          private: true,
+          params: []
+        },
+        {
+          name: 'debug_writeBlockProfile',
+          description: 'Writes block profile to file (Cosmos-specific)',
+          implemented: true,
+          cosmosSpecific: true,
+          private: true,
+          params: [
+            { name: 'file', type: 'string', description: 'Output file path', example: 'block.prof' }
+          ]
+        },
+        {
+          name: 'debug_writeMemProfile',
+          description: 'Writes memory profile to file (Cosmos-specific)',
+          implemented: true,
+          cosmosSpecific: true,
+          private: true,
+          params: [
+            { name: 'file', type: 'string', description: 'Output file path', example: 'mem.prof' }
+          ]
+        },
+        {
+          name: 'debug_mutexProfile',
+          description: 'Turns on mutex profiling for duration',
+          implemented: true,
+          private: true,
+          params: [
+            { name: 'file', type: 'string', description: 'Profile output file', example: 'mutex.prof' },
+            { name: 'nsec', type: 'number', description: 'Duration in seconds', example: 10 }
+          ]
+        },
+        {
+          name: 'debug_setMutexProfileFraction',
+          description: 'Sets mutex profile fraction (Cosmos-specific)',
+          implemented: true,
+          cosmosSpecific: true,
+          private: true,
+          params: [
+            { name: 'rate', type: 'number', description: 'Profile fraction (0 to disable)', example: 1 }
+          ]
+        },
+        {
           name: 'debug_freeOSMemory',
           description: 'Forces garbage collection and frees OS memory (Cosmos-specific)',
           implemented: true,
@@ -837,6 +1008,43 @@ export default function RPCMethodsViewerVersionB() {
           private: true,
           params: [
             { name: 'file', type: 'string', description: 'Output file path', example: '/tmp/mutex.prof' }
+          ]
+        },
+        {
+          name: 'debug_getHeaderRlp',
+          description: 'Returns RLP encoded header',
+          implemented: true,
+          private: true,
+          params: [
+            { name: 'number', type: 'number', description: 'Block number', example: 100 }
+          ]
+        },
+        {
+          name: 'debug_getBlockRlp',
+          description: 'Returns RLP encoded block',
+          implemented: true,
+          private: true,
+          params: [
+            { name: 'number', type: 'number', description: 'Block number', example: 100 }
+          ]
+        },
+        {
+          name: 'debug_printBlock',
+          description: 'Returns formatted block information',
+          implemented: true,
+          private: true,
+          params: [
+            { name: 'number', type: 'number', description: 'Block number', example: 100 }
+          ]
+        },
+        {
+          name: 'debug_intermediateRoots',
+          description: 'Returns intermediate state roots for transaction',
+          implemented: true,
+          private: true,
+          params: [
+            { name: 'hash', type: 'hash', description: 'Transaction hash', example: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b' },
+            { name: 'config', type: 'object', description: 'Trace config (optional)' }
           ]
         }
       ]
@@ -1583,7 +1791,7 @@ class Program
             onClick={() => setSelectedNamespace('all')}
             className={`px-3 py-1 text-xs rounded-full transition-colors ${
               selectedNamespace === 'all'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-zinc-600 text-white'
                 : 'bg-zinc-800 dark:bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700'
             }`}
           >
@@ -1593,11 +1801,12 @@ class Program
             <button
               key={key}
               onClick={() => setSelectedNamespace(key)}
-              className={`px-3 py-1 text-xs rounded-full transition-colors ${
+              className={`px-3 py-1 text-xs rounded-full transition-colors text-white ${
                 selectedNamespace === key
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-zinc-800 dark:bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700'
+                  ? 'brightness-100'
+                  : 'brightness-75 hover:brightness-90'
               }`}
+              style={{ backgroundColor: namespaceColors[key] }}
             >
               {namespace.name}
             </button>
@@ -1613,7 +1822,7 @@ class Program
               onChange={(e) => setHideUnsupported(e.target.checked)}
               className="mr-2 w-3.5 h-3.5 rounded bg-zinc-800 border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-2"
             />
-            <span className="text-zinc-400">Hide unsupported methods</span>
+            <span className="text-zinc-400">Show only Cosmos EVM supported methods</span>
           </label>
         </div>
       </div>
@@ -1629,9 +1838,14 @@ class Program
               setRequestResult(null);
               if (isMobile) setShowMobilePanel('details');
             }}
-            className={`w-full px-4 py-3 text-left hover:bg-zinc-800/50 transition-colors border-b border-zinc-900 dark:border-zinc-900/50 ${
-              selectedMethod?.name === method.name ? 'bg-zinc-800/50 border-l-2 border-blue-500' : ''
+            className={`w-full px-4 py-3 text-left hover:bg-zinc-800/50 transition-colors ${
+              selectedMethod?.name === method.name ? 'bg-zinc-800/50' : ''
             }`}
+            style={{
+              border: `2px solid ${namespaceColors[method.namespace]}`,
+              borderLeft: selectedMethod?.name === method.name ? `4px solid ${namespaceColors[method.namespace]}` : `2px solid ${namespaceColors[method.namespace]}`,
+              marginBottom: '2px'
+            }}
           >
             <div className="flex items-start gap-2">
               <div className="flex-1 min-w-0">
@@ -1639,14 +1853,9 @@ class Program
                   <code className="text-sm font-mono text-blue-400 truncate">
                     {method.name}
                   </code>
-                  {method.implemented === true && (
-                    <span className="text-xs bg-green-900/30 text-green-500 px-1.5 py-0.5 rounded" title="Supported on Cosmos EVM">
-                      ✓
-                    </span>
-                  )}
                   {method.implemented === false && (
                     <span className="text-xs bg-zinc-700 text-zinc-400 px-1.5 py-0.5 rounded">
-                      Not impl
+                      Stub
                     </span>
                   )}
                   {method.cosmosSpecific && (
@@ -1664,9 +1873,6 @@ class Program
                   {method.description}
                 </p>
               </div>
-              <span className="text-[10px] text-zinc-600 bg-zinc-800 dark:bg-zinc-800/50 px-1.5 py-0.5 rounded">
-                {method.namespaceName}
-              </span>
             </div>
           </button>
         ))}
@@ -1692,16 +1898,9 @@ class Program
                   {selectedMethod.description}
                 </p>
                 <div className="flex items-center gap-3 mt-3">
-                  <span className="px-2 py-1 bg-zinc-800 dark:bg-zinc-800/50 text-zinc-300 rounded text-xs">
-                    {selectedMethod.namespaceName}
-                  </span>
-                  {selectedMethod.implemented ? (
-                    <span className="px-2 py-1 bg-green-900/50 text-green-400 rounded text-xs">
-                      ✓ Implemented
-                    </span>
-                  ) : (
-                    <span className="px-2 py-1 bg-red-900/50 text-red-400 rounded text-xs">
-                      Not Implemented
+                  {selectedMethod.implemented === false && (
+                    <span className="px-2 py-1 bg-zinc-700 text-zinc-400 rounded text-xs">
+                      Stub Implementation
                     </span>
                   )}
                   {selectedMethod.cosmosSpecific && (
@@ -1712,6 +1911,10 @@ class Program
                   )}
                 </div>
               </div>
+              <div 
+                className="h-1 w-full mt-3" 
+                style={{ backgroundColor: namespaceColors[selectedMethod.namespace] }}
+              />
             </div>
           </div>
 

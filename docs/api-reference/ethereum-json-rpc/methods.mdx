@@ -71,7 +71,6 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | `eth_chainId`                                                                         | Eth       | Y          | Y      |                    |
 | `eth_getBlockReceipts`                                                                | Eth       | Y          | Y      |                    |
 | `eth_resend`                                                                          | Eth       | Y          | Y      |                    |
-| `eth_pendingTransactions`                                                             | Eth       | Y          | Y      |                    |
 | `eth_createAccessList`                                                                | Eth       | Y          | Y      | EIP-2930           |
 | [`eth_subscribe`](#eth_subscribe)                                                     | Websocket | W         | Y      | syncing not impl.  |
 | [`eth_unsubscribe`](#eth_unsubscribe)                                                 | Websocket | Y          | Y      |                    |
@@ -117,24 +116,24 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | `clique_discard`                                                                      | Clique    |             |        |                    |
 | `clique_status`                                                                       | Clique    |             |        |                    |
 | `debug_backtraceAt`                                                                   | Debug     |             |        |                    |
-| `debug_blockProfile`                                                                  | Debug     |             |        |                    |
-| `debug_cpuProfile`                                                                    | Debug     |             |        |                    |
+| `debug_blockProfile`                                                                  | Debug     | Y          | N      | **Cosmos-specific**|
+| `debug_cpuProfile`                                                                    | Debug     | Y          | N      | **Cosmos-specific**|
 | `debug_dumpBlock`                                                                     | Debug     |             |        |                    |
-| `debug_gcStats`                                                                       | Debug     |             |        |                    |
-| `debug_getBlockRlp`                                                                   | Debug     |             |        |                    |
-| `debug_goTrace`                                                                       | Debug     |             |        |                    |
+| `debug_gcStats`                                                                       | Debug     | Y          | N      | **Cosmos-specific**|
+| `debug_getBlockRlp`                                                                   | Debug     | Y          | N      |                    |
+| `debug_goTrace`                                                                       | Debug     | Y          | N      |                    |
 | `debug_freeOSMemory`                                                                  | Debug     | Y          | N      | **Cosmos-specific**|
 | `debug_memStats`                                                                      | Debug     | Y          | N      |                    |
-| `debug_mutexProfile`                                                                  | Debug     | N          | N      | Not implemented    |
+| `debug_mutexProfile`                                                                  | Debug     | Y          | N      |                    |
 | `debug_seedHash`                                                                      | Debug     | N          | N      | Not implemented    |
 | `debug_setHead`                                                                       | Debug     | N          | N      | Not implemented    |
 | `debug_setBlockProfileRate`                                                           | Debug     | Y          | N      |                    |
 | `debug_setGCPercent`                                                                  | Debug     | Y          | N      | **Cosmos-specific**|
-| `debug_setMutexProfileFraction`                                                       | Debug     | N          | N      | Not implemented    |
-| `debug_stacks`                                                                        | Debug     |             |        |                    |
-| `debug_startCPUProfile`                                                               | Debug     |             |        |                    |
+| `debug_setMutexProfileFraction`                                                       | Debug     | Y          | N      | **Cosmos-specific**|
+| `debug_stacks`                                                                        | Debug     | Y          | N      |                    |
+| `debug_startCPUProfile`                                                               | Debug     | Y          | N      |                    |
 | `debug_startGoTrace`                                                                  | Debug     |             |        |                    |
-| `debug_stopCPUProfile`                                                                | Debug     |             |        |                    |
+| `debug_stopCPUProfile`                                                                | Debug     | Y          | N      |                    |
 | `debug_stopGoTrace`                                                                   | Debug     |             |        |                    |
 | `debug_traceBlock`                                                                    | Debug     |             |        |                    |
 | [`debug_traceBlockByNumber`](#debug_traceblockbynumber)                               | Debug     | Y          | N      |                    |
@@ -153,7 +152,9 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | `debug_getRawHeader`                                                                  | Debug     | N          | N      | Not implemented    |
 | `debug_getRawReceipts`                                                                | Debug     | N          | N      | Not implemented    |
 | `debug_getRawTransaction`                                                             | Debug     | N          | N      | Not implemented    |
-| `debug_printBlock`                                                                    | Debug     | N          | N      | Not implemented    |
+| `debug_printBlock`                                                                    | Debug     | Y          | N      |                    |
+| `debug_getHeaderRlp`                                                                  | Debug     | Y          | N      |                    |
+| `debug_intermediateRoots`                                                             | Debug     | Y          | N      |                    |
 | `debug_getBadBlocks`                                                                  | Debug     | Y          | N      |                    |
 | `debug_storageRangeAt`                                                                | Debug     | Y          | N      |                    |
 | `debug_getModifiedAccountsByNumber`                                                   | Debug     | Y          | N      |                    |
@@ -173,9 +174,8 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | [`txpool_status`](#txpool_status)                                                     | TxPool    | Y          | Y      | Requires config    |
 | `trace_callMany`                                                                      | Trace     | N          | N      | Not implemented    |
 | `eth_signTypedData`                                                                   | Eth       | W         | N      | EIP-712 partial    |
-| `eth_fillTransaction`                                                                 | Eth       | N          | N      | Not implemented    |
+| `eth_fillTransaction`                                                                 | Eth       | Y          | Y      |                    |
 | `eth_getTransactionLogs`                                                              | Eth       | Y          | Y      | **Cosmos-specific**|
-| `eth_getPendingTransactions`                                                          | Eth       | Y          | Y      | **Cosmos-specific**|
 | `miner_start`                                                                         | Miner     | Y          | N      | Stub returns true  |
 | `miner_stop`                                                                          | Miner     | Y          | N      | Stub returns true  |
 | `miner_setEtherbase`                                                                  | Miner     | Y          | N      | Stub returns true  |
@@ -223,7 +223,7 @@ Block Number can be entered as a Hex string, `"earliest"`, `"latest"` or `"pendi
 * `eth_feeHistory` - Fee history for EIP-1559
 * `eth_getFilterChanges` / `eth_getFilterLogs` - Filter management issues
 * `eth_fillTransaction` - Transaction filling utility
-* `eth_resend` / `eth_pendingTransactions` - Transaction pool management
+* `eth_resend` - Transaction resending utility
 * `personal_sendTransaction` / `personal_ecRecover` - Personal namespace methods
 * `personal_lockAccount` - Always returns false (not supported)
 * `debug_getRaw*` methods - Raw data access methods
@@ -1010,17 +1010,6 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockReceipts","params":[
 {"jsonrpc":"2.0","id":1,"result":[{"blockHash":"0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4","blockNumber":"0xc","contractAddress":"0x0000000000000000000000000000000000000000","cumulativeGasUsed":null,"from":"0xddd64b4712f7c8f1ace3c145c950339eddaf221d","gasUsed":"0x5289","logs":[],"logsBloom":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","status":"0x1","to":"0x439c697e0742a0ddb124a376efd62a72a94ac35a","transactionHash":"0xae64961cb206a9773a6e5efeb337773a6fd0a2085ce480a174135a029afea615","transactionIndex":"0x0"}]}
 ```
 
-### `eth_getPendingTransactions`
-
-Returns a list of pending transactions.
-
-```shell
-// Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getPendingTransactions","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
-// Result
-{"jsonrpc":"2.0","id":1,"result":[]}
-```
-
 ### `eth_getTransactionLogs`
 
 Returns the logs for a specific transaction.
@@ -1034,6 +1023,38 @@ Returns the logs for a specific transaction.
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionLogs","params":["0xae64961cb206a9773a6e5efeb337773a6fd0a2085ce480a174135a029afea615"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
 // Result
 {"jsonrpc":"2.0","id":1,"result":[{"address":"0x439c697e0742a0ddb124a376efd62a72a94ac35a","topics":["0x64a55044d1f2eddebe1b90e8e2853e8e96931cefadbfa0b2ceb34bee36061941"],"data":"0x0000000000000000000000000000000000000000000000000000000000000002","blockNumber":"0xc","transactionHash":"0xae64961cb206a9773a6e5efeb337773a6fd0a2085ce480a174135a029afea615","transactionIndex":"0x0","blockHash":"0x0000000000000000000000000000000000000000000000000000000000000000","logIndex":"0x0","removed":false}]}
+```
+
+### `eth_fillTransaction`
+
+Fills the defaults (nonce, gas, gasPrice or 1559 fields) on a given unsigned transaction, and returns it to the caller for further processing (signing + broadcast).
+
+#### Parameters
+
+- Transaction object with optional fields
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_fillTransaction","params":[{"from":"0x0123456789012345678901234567890123456789","to":"0x0123456789012345678901234567890123456789","value":"0x1"}],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":{"raw":"0x...","tx":{"nonce":"0x0","gasPrice":"0x3b9aca00","gas":"0x5208","to":"0x0123456789012345678901234567890123456789","value":"0x1","input":"0x","v":"0x0","r":"0x0","s":"0x0","hash":"0x..."}}}
+```
+
+### `eth_resend`
+
+Resends a transaction with updated gas parameters. Removes the given transaction from the pool and reinserts it with the new gas price and limit.
+
+#### Parameters
+
+- Original transaction object
+- New gas price (hex)
+- New gas limit (hex)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_resend","params":[{"from":"0x0123456789012345678901234567890123456789","to":"0x0123456789012345678901234567890123456789","value":"0x1","gas":"0x5208","gasPrice":"0x3b9aca00","nonce":"0x0"},"0x3b9aca01","0x5209"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0x..."}  // Returns transaction hash
 ```
 
 ### `eth_getProof`
@@ -1545,6 +1566,248 @@ Writes a mutex contention profile to the specified file.
 curl -X POST --data '{"jsonrpc":"2.0","method":"debug_writeMutexProfile","params":["mutex.prof"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
 // Result
 {"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_blockProfile`
+
+Turns on block profiling for the given duration and writes the profile data to disk.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- File path (string) - Output file for the profile
+- Duration in seconds (number)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_blockProfile","params":["block.prof", 30],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_cpuProfile`
+
+Turns on CPU profiling for the given duration and writes the profile data to disk.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- File path (string) - Output file for the profile
+- Duration in seconds (number)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_cpuProfile","params":["cpu.prof", 30],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_gcStats`
+
+Returns garbage collection statistics.
+
+<Check>
+**Private**: Requires authentication.
+**Cosmos-specific**: This method is unique to Cosmos EVM.
+</Check>
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_gcStats","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":{"NumGC":10,"PauseTotal":1000000,"Pause":[100000,200000],"PauseEnd":[1234567890,1234567891],"...":"..."}}
+```
+
+### `debug_goTrace`
+
+Turns on Go runtime tracing for the given duration and writes the trace data to disk.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- File path (string) - Output file for the trace
+- Duration in seconds (number)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_goTrace","params":["trace.out", 5],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_stacks`
+
+Returns a printed representation of the stacks of all goroutines.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_stacks","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"goroutine 1 [running]:\n..."}
+```
+
+### `debug_startCPUProfile`
+
+Starts indefinite CPU profiling, writing to the given file.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- File path (string) - Output file for the profile
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_startCPUProfile","params":["cpu.prof"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_stopCPUProfile`
+
+Stops an ongoing CPU profile.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_stopCPUProfile","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_mutexProfile`
+
+Turns on mutex profiling for the given duration and writes the profile data to disk.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- File path (string) - Output file for the profile
+- Duration in seconds (number)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_mutexProfile","params":["mutex.prof", 10],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_setMutexProfileFraction`
+
+Sets the rate of mutex profiling.
+
+<Check>
+**Private**: Requires authentication.
+**Cosmos-specific**: This method is unique to Cosmos EVM.
+</Check>
+
+#### Parameters
+
+- Rate (number) - 0 to disable, 1 for full profiling
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_setMutexProfileFraction","params":[1],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":0}
+```
+
+### `debug_getHeaderRlp`
+
+Returns the RLP encoding of the header of the block.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- Block number (number)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_getHeaderRlp","params":[100],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0xf90..."}
+```
+
+### `debug_getBlockRlp`
+
+Returns the RLP encoding of the block.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- Block number (number)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_getBlockRlp","params":[100],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0xf90..."}
+```
+
+### `debug_printBlock`
+
+Returns a formatted string of the block.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- Block number (number)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_printBlock","params":[100],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"Block #100\nParent: 0x...\nStateRoot: 0x...\n..."}
+```
+
+### `debug_intermediateRoots`
+
+Returns the intermediate state roots for a transaction.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- Transaction hash (hash)
+- Trace config (object, optional)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_intermediateRoots","params":["0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b", {}],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":["0x...","0x..."]}
 ```
 
 ## TxPool Methods
