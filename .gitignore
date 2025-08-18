@@ -54,8 +54,9 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Mintlify build files
+# Mintlify files
 .mintlify/
+schema.json
 
 # Misc
 docs/logs/
