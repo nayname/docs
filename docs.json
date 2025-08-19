@@ -123,7 +123,12 @@
                   {
                     "group": "Predeployed Contracts",
                     "pages": [
-                      "docs/documentation/smart-contracts/predeployed-contracts/index"
+                      "docs/documentation/smart-contracts/predeployed-contracts/index",
+                      "docs/documentation/smart-contracts/predeployed-contracts/overview",
+                      "docs/documentation/smart-contracts/predeployed-contracts/create2",
+                      "docs/documentation/smart-contracts/predeployed-contracts/multicall3",
+                      "docs/documentation/smart-contracts/predeployed-contracts/permit2",
+                      "docs/documentation/smart-contracts/predeployed-contracts/safe-factory"
                     ]
                   }
                 ]
