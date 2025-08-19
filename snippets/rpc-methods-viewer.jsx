@@ -1137,12 +1137,6 @@ class Program
                 <div className={`mt-4 flex flex-wrap gap-3 text-xs ${
                   theme === 'dark' ? 'text-zinc-500' : 'text-gray-500'
                 }`}>
-                  {selectedMethod.status === 'Y' && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="px-1.5 py-0.5 rounded bg-green-500/30 text-green-400 text-[10px]">functional</span>
-                      <span>Fully compatible</span>
-                    </div>
-                  )}
                   {selectedMethod.status === 'Stub' && (
                     <div className="flex items-center gap-1.5">
                       <span className="px-1.5 py-0.5 rounded bg-yellow-500/30 text-yellow-400 text-[10px]">stub</span>
