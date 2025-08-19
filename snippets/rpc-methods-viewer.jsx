@@ -1,31 +1,84 @@
+import { CosmosIcon } from '/snippets/icons.mdx';
+
 export default function RPCMethodsViewerVersionB() {
-  // Cosmos Icon for Cosmos-specific methods
-  const CosmosIcon = ({ size = 12, className = "" }) => (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-    >
-      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-      <ellipse cx="12" cy="12" rx="6" ry="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 3"/>
-      <ellipse cx="12" cy="12" rx="10" ry="6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 3"/>
-      <ellipse cx="12" cy="12" rx="8" ry="8" transform="rotate(45 12 12)" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 3"/>
-    </svg>
-  );
+  const [theme, setTheme] = useState('dark');
+
+  // Detect theme changes
+  useEffect(() => {
+    const detectTheme = () => {
+      // Mintlify uses 'dark' class on html element for dark mode
+      // When in light mode, the 'dark' class is absent
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
+    };
+
+    detectTheme();
+
+    // Listen for theme changes
+    const observer = new MutationObserver(detectTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', detectTheme);
+
+    return () => {
+      observer.disconnect();
+      window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', detectTheme);
+    };
+  }, []);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Theme-aware namespace colors - carefully chosen to be distinct
+  const namespaceColors = theme === 'dark' ? {
+    eth: '#3b82f6',     // Blue (primary namespace)
+    web3: '#a855f7',    // Purple
+    net: '#10b981',     // Emerald
+    txpool: '#22c55e',  // Green
+    personal: '#ef4444', // Red
+    debug: '#f59e0b',   // Amber/Gold
+    admin: '#ec4899',   // Pink
+    miner: '#84cc16',   // Lime (high visibility)
+    engine: '#f97316',  // Orange
+    clique: '#14b8a6',  // Teal
+    les: '#06b6d4'      // Cyan
+  } : {
+    eth: '#3b82f6',     // Blue
+    web3: '#9333ea',    // Purple
+    net: '#0891b2',     // Cyan
+    txpool: '#22c55e',  // Green
+    personal: '#ef4444', // Red
+    debug: '#f59e0b',   // Amber
+    admin: '#ec4899',   // Pink
+    miner: '#84cc16',   // Lime
+    engine: '#f97316',  // Orange
+    clique: '#14b8a6',  // Teal
+    les: '#22d3ee'      // Light Cyan
+  };
 
   // Simple code display component
-  const CodeHighlighter = ({ code, language, className = '' }) => {
+  const CodeHighlighter = ({ code, language, className = '', theme }) => {
     return (
-      <pre className={`bg-black p-4 rounded-lg text-xs overflow-x-auto border border-zinc-800 ${className}`}>
+      <pre className={`p-4 rounded-lg text-xs overflow-x-auto border ${className} ${
+        theme === 'dark'
+          ? 'bg-black border-zinc-800'
+          : 'bg-gray-900 border-gray-700'
+      }`}>
         <code className="text-zinc-300 font-mono leading-relaxed">
           {code}
         </code>
       </pre>
     );
   };
+
   const [selectedNamespace, setSelectedNamespace] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMethod, setSelectedMethod] = useState(null);
@@ -39,7 +92,8 @@ export default function RPCMethodsViewerVersionB() {
   const [isMobile, setIsMobile] = useState(false);
   const [showMobilePanel, setShowMobilePanel] = useState('list');
   const [paramValues, setParamValues] = useState({});
-  const [hideUnsupported, setHideUnsupported] = useState(false);
+  const [debouncedParamValues, setDebouncedParamValues] = useState({});
+  const [showAllMethods, setShowAllMethods] = useState(false); // Default to showing only functional methods
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -47,6 +101,14 @@ export default function RPCMethodsViewerVersionB() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Debounce param values to prevent code regeneration on every keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedParamValues(paramValues);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [paramValues]);
 
   const languages = [
     { id: 'curl', name: 'cURL' },
@@ -57,990 +119,389 @@ export default function RPCMethodsViewerVersionB() {
     { id: 'csharp', name: 'C#' }
   ];
 
-  const namespaces = {
-    web3: {
-      name: 'Web3',
+  // RPC Methods Data - Generated from unified test results (202 methods total)
+  const rpcMethodsData = {
+    eth: {
+      name: "eth",
       methods: [
-        {
-          name: 'web3_clientVersion',
-          description: 'Get the web3 client version',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Standard Request',
-              params: [],
-              response: {
-                result: 'Cosmos/0.1.3+/linux/go1.18'
-              }
-            }
-          ]
-        },
-        {
-          name: 'web3_sha3',
-          description: 'Returns Keccak-256 hash of the given data',
-          implemented: true,
-          params: [{
-            name: 'data',
-            type: 'string',
-            description: 'The data to hash (hex encoded)',
-            example: '0x68656c6c6f20776f726c64'
-          }],
-          examples: [
-            {
-              name: 'Hash "hello world"',
-              params: ['0x68656c6c6f20776f726c64'],
-              response: {
-                result: '0x1b84adea42d5b7d192fd8a61a85b25abe0757e9a65cab1da470258914053823f'
-              }
-            }
-          ]
-        }
+        { name: "eth_accounts", status: "Y", description: "Returns list of addresses owned by client" },
+        { name: "eth_getBalance", status: "Y", description: "Returns the balance of an account" },
+        { name: "eth_getTransactionCount", status: "Y", description: "Returns the number of transactions sent from an address" },
+        { name: "eth_blockNumber", status: "Y", description: "Returns the current block number" },
+        { name: "eth_chainId", status: "Y", description: "Returns the chain ID" },
+        { name: "eth_protocolVersion", status: "Y", description: "Returns the current Ethereum protocol version" },
+        { name: "eth_gasPrice", status: "Stub", description: "Returns the current gas price (always 0x0)" },
+        { name: "eth_coinbase", status: "N", description: "Returns the client coinbase address (not implemented)" },
+        { name: "eth_maxPriorityFeePerGas", status: "Stub", description: "Returns the max priority fee per gas (always 0x0)" },
+        { name: "eth_getBlockByNumber", status: "Y", description: "Returns block information by number" },
+        { name: "eth_getBlockByHash", status: "Y", description: "Returns block information by hash" },
+        { name: "eth_call", status: "Stub", description: "Executes a message call immediately (returns 0x)" },
+        { name: "eth_estimateGas", status: "Y", description: "Estimates gas needed for a transaction" },
+        { name: "eth_sign", status: "Y", description: "Signs data with a given address" },
+        { name: "eth_feeHistory", status: "Y", description: "Returns fee history" },
+        { name: "eth_newFilter", status: "Y", description: "Creates a filter object" },
+        { name: "eth_newBlockFilter", status: "Y", description: "Creates a filter for new blocks" },
+        { name: "eth_newPendingTransactionFilter", status: "Y", description: "Creates a filter for pending transactions" },
+        { name: "eth_uninstallFilter", status: "Y", description: "Uninstalls a filter" },
+        // Additional functional transaction methods
+        { name: "eth_sendTransaction", status: "N", description: "Sends transaction (not implemented)" },
+        { name: "eth_sendRawTransaction", status: "Y", description: "Sends signed raw transaction" },
+        { name: "eth_signTransaction", status: "N", description: "Signs transaction (not implemented)" },
+        { name: "eth_getTransactionByHash", status: "Stub", description: "Returns transaction by hash (returns null)" },
+        { name: "eth_getTransactionReceipt", status: "Stub", description: "Returns transaction receipt (returns null)" },
+        { name: "eth_getTransactionByBlockNumberAndIndex", status: "Stub", description: "Returns transaction by block and index (returns null)" },
+        { name: "eth_getTransactionByBlockHashAndIndex", status: "Stub", description: "Returns transaction by block hash and index (returns null)" },
+        { name: "eth_getLogs", status: "Stub", description: "Returns logs matching filter (returns empty array)" },
+        { name: "eth_getStorageAt", status: "Y", description: "Returns storage value at position" },
+        { name: "eth_getCode", status: "Stub", description: "Returns code at address (returns 0x)" },
+        // Partial/Limited implementations
+        { name: "eth_getFilterChanges", status: "Stub", description: "Returns filter changes (limited)" },
+        { name: "eth_getFilterLogs", status: "Stub", description: "Returns filter logs (limited)" },
+        { name: "eth_getProof", status: "N", description: "Returns merkle proof (requires valid height)" },
+        { name: "eth_pendingTransactions", status: "Stub", description: "Returns pending transactions (returns undefined)" },
+        { name: "eth_getPendingTransactions", status: "Stub", description: "Returns pending transactions (returns undefined)" },
+        { name: "eth_getBlockTransactionCountByNumber", status: "Stub", description: "Returns transaction count in block (returns 0x0)" },
+        { name: "eth_getBlockTransactionCountByHash", status: "Stub", description: "Returns transaction count in block by hash (returns 0x0)" },
+        { name: "eth_getBlockReceipts", status: "Stub", description: "Returns all receipts for a block (returns empty array)" },
+        { name: "eth_getUncleByBlockNumberAndIndex", status: "Stub", description: "Returns uncle by block number (always null)" },
+        { name: "eth_getUncleByBlockHashAndIndex", status: "Stub", description: "Returns uncle by block hash (always null)" },
+        { name: "eth_getUncleCountByBlockNumber", status: "Stub", description: "Returns uncle count by number (always 0)" },
+        { name: "eth_getUncleCountByBlockHash", status: "Stub", description: "Returns uncle count by hash (always 0)" },
+        { name: "eth_syncing", status: "Stub", description: "Returns sync status (always false)" },
+        // Mining methods - not applicable
+        { name: "eth_mining", status: "Stub", description: "Returns mining status (always false - no PoW)" },
+        { name: "eth_hashrate", status: "Stub", description: "Returns hashrate (always 0 - no PoW)" },
+        { name: "eth_getWork", status: "Stub", description: "Returns work array (not applicable)" },
+        { name: "eth_submitWork", status: "Stub", description: "Submits work (not applicable)" },
+        { name: "eth_submitHashrate", status: "Stub", description: "Submits hashrate (not applicable)" },
+        { name: "eth_getTransactionLogs", status: "Stub", description: "Returns transaction logs (Cosmos-specific)" },
+        // Additional methods not previously listed
+        { name: "eth_getRawTransactionByHash", status: "Stub", description: "Returns raw transaction by hash" },
+        { name: "eth_getRawTransactionByBlockNumberAndIndex", status: "Stub", description: "Returns raw transaction by block and index" },
+        { name: "eth_getRawTransactionByBlockHashAndIndex", status: "Stub", description: "Returns raw transaction by block hash and index" },
+        { name: "eth_resend", status: "N", description: "Resends transaction with new gas price (requires nonce param)" },
+        { name: "eth_fillTransaction", status: "N", description: "Fills missing transaction fields (not implemented)" },
+        { name: "eth_createAccessList", status: "Stub", description: "Creates EIP-2930 access list" },
+        { name: "eth_blobBaseFee", status: "Stub", description: "Returns blob base fee (EIP-4844)" },
+        { name: "eth_signTypedData", status: "N", description: "Signs typed structured data (requires domain param)" },
+        { name: "eth_signTypedData_v3", status: "N", description: "Signs typed structured data v3 (not implemented)" },
+        { name: "eth_signTypedData_v4", status: "N", description: "Signs typed structured data v4 (not implemented)" },
+        { name: "eth_subscribe", status: "Y", description: "Creates subscription for events (WebSocket only)" },
+        { name: "eth_unsubscribe", status: "Y", description: "Cancels subscription (WebSocket only)" },
+        { name: "eth_getCompilers", status: "Stub", description: "Returns available compilers" },
+        { name: "eth_compileSolidity", status: "Stub", description: "Compiles Solidity code" },
+        { name: "eth_compileLLL", status: "Stub", description: "Compiles LLL code" },
+        { name: "eth_compileSerpent", status: "Stub", description: "Compiles Serpent code" }
+      ]
+    },
+    web3: {
+      name: "web3",
+      color: "purple",
+      methods: [
+        { name: "web3_clientVersion", status: "Y", description: "Returns the current client version" },
+        { name: "web3_sha3", status: "Y", description: "Returns Keccak-256 hash of the given data" }
       ]
     },
     net: {
-      name: 'Net',
+      name: "net",
+      color: "green",
       methods: [
-        {
-          name: 'net_version',
-          description: 'Returns the current network id',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get Network ID',
-              params: [],
-              response: { result: '1' }
-            }
-          ]
-        },
-        {
-          name: 'net_peerCount',
-          description: 'Returns the number of connected peers',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Standard Request',
-              params: [],
-              response: { result: '0x17' }
-            }
-          ]
-        },
-        {
-          name: 'net_listening',
-          description: 'Check if client is listening for connections',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Check listening status',
-              params: [],
-              response: { result: true }
-            }
-          ]
-        }
-      ]
-    },
-    eth: {
-      name: 'Eth',
-      methods: [
-        {
-          name: 'eth_protocolVersion',
-          description: 'Returns the current Ethereum protocol version',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_syncing',
-          description: 'Returns sync status or false',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_gasPrice',
-          description: 'Returns current gas price',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_accounts',
-          description: 'Returns list of addresses owned by client',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_blockNumber',
-          description: 'Returns the current block number',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_getBalance',
-          description: 'Returns account balance',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Address to check', example: '0x407d73d8a49eeb85d32cf465507dd71d507100c1' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ]
-        },
-        {
-          name: 'eth_getStorageAt',
-          description: 'Returns storage value at position',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Storage address', example: '0x295a70b2de5e3953354a6a8344e616ed314d7251' },
-            { name: 'position', type: 'hex', description: 'Storage position', example: '0x0' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ]
-        },
-        {
-          name: 'eth_getTransactionCount',
-          description: 'Returns transaction count (nonce)',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Address', example: '0x407d73d8a49eeb85d32cf465507dd71d507100c1' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ]
-        },
-        {
-          name: 'eth_getBlockTransactionCountByNumber',
-          description: 'Returns transaction count in block by number',
-          implemented: true,
-          params: [
-            { name: 'block', type: 'string', description: 'Block number or tag', example: '0xe8' }
-          ]
-        },
-        {
-          name: 'eth_getBlockTransactionCountByHash',
-          description: 'Returns transaction count in block by hash',
-          implemented: true,
-          params: [
-            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238' }
-          ]
-        },
-        {
-          name: 'eth_getCode',
-          description: 'Returns code at address',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Contract address', example: '0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ]
-        },
-        {
-          name: 'eth_sign',
-          description: 'Sign data with account',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Signing address', example: '0x9b2055d370f73ec7d8a03e965129118dc8f5bf83' },
-            { name: 'data', type: 'hex', description: 'Data to sign', example: '0xdeadbeef' }
-          ]
-        },
-        {
-          name: 'eth_signTransaction',
-          description: 'Sign transaction without sending',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'transaction', type: 'object', description: 'Transaction object' }
-          ]
-        },
-        {
-          name: 'eth_sendTransaction',
-          description: 'Create and send transaction',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'transaction', type: 'object', description: 'Transaction object' }
-          ]
-        },
-        {
-          name: 'eth_sendRawTransaction',
-          description: 'Send signed transaction',
-          implemented: true,
-          params: [
-            { name: 'data', type: 'hex', description: 'Signed transaction data', example: '0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675' }
-          ]
-        },
-        {
-          name: 'eth_call',
-          description: 'Execute call without creating transaction',
-          implemented: true,
-          params: [
-            { name: 'callObject', type: 'object', description: 'Call data' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ]
-        },
-        {
-          name: 'eth_estimateGas',
-          description: 'Estimate gas for transaction',
-          implemented: true,
-          params: [
-            { name: 'callObject', type: 'object', description: 'Transaction data' }
-          ]
-        },
-        {
-          name: 'eth_getBlockByNumber',
-          description: 'Returns block by number',
-          implemented: true,
-          params: [
-            { name: 'block', type: 'string', description: 'Block number or tag', example: '0x1b4' },
-            { name: 'fullTx', type: 'boolean', description: 'Return full transactions', example: true }
-          ]
-        },
-        {
-          name: 'eth_getBlockByHash',
-          description: 'Returns block by hash',
-          implemented: true,
-          params: [
-            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0xdc0818cf78f21a8e70579cb46a43643f78291264dda342ae31049421c82d21ae' },
-            { name: 'fullTx', type: 'boolean', description: 'Return full transactions', example: false }
-          ]
-        },
-        {
-          name: 'eth_getTransactionByHash',
-          description: 'Returns transaction by hash',
-          implemented: true,
-          params: [
-            { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b' }
-          ]
-        },
-        {
-          name: 'eth_getTransactionByBlockHashAndIndex',
-          description: 'Returns transaction by block hash and index',
-          implemented: true,
-          params: [
-            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0xc6ef2fc5426d6ad6fd9e2a26abeab0aa2411b7ab17f30a99d3cb96aed1d1055b' },
-            { name: 'index', type: 'hex', description: 'Transaction index', example: '0x0' }
-          ]
-        },
-        {
-          name: 'eth_getTransactionByBlockNumberAndIndex',
-          description: 'Returns transaction by block number and index',
-          implemented: true,
-          params: [
-            { name: 'block', type: 'string', description: 'Block number or tag', example: '0x29c' },
-            { name: 'index', type: 'hex', description: 'Transaction index', example: '0x0' }
-          ]
-        },
-        {
-          name: 'eth_getTransactionReceipt',
-          description: 'Returns transaction receipt',
-          implemented: true,
-          params: [
-            { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238' }
-          ]
-        },
-        {
-          name: 'eth_getUncleByBlockHashAndIndex',
-          description: 'Returns uncle by block hash and index (always null in Cosmos)',
-          implemented: true,
-          params: [
-            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0xc6ef2fc5426d6ad6fd9e2a26abeab0aa2411b7ab17f30a99d3cb96aed1d1055b' },
-            { name: 'index', type: 'hex', description: 'Uncle index', example: '0x0' }
-          ]
-        },
-        {
-          name: 'eth_getUncleByBlockNumberAndIndex',
-          description: 'Returns uncle by block number and index (always null in Cosmos)',
-          implemented: true,
-          params: [
-            { name: 'block', type: 'string', description: 'Block number or tag', example: '0x29c' },
-            { name: 'index', type: 'hex', description: 'Uncle index', example: '0x0' }
-          ]
-        },
-        {
-          name: 'eth_getUncleCountByBlockHash',
-          description: 'Returns uncle count by block hash (always 0 in Cosmos)',
-          implemented: true,
-          params: [
-            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238' }
-          ]
-        },
-        {
-          name: 'eth_getUncleCountByBlockNumber',
-          description: 'Returns uncle count by block number (always 0 in Cosmos)',
-          implemented: true,
-          params: [
-            { name: 'block', type: 'string', description: 'Block number or tag', example: '0xe8' }
-          ]
-        },
-        {
-          name: 'eth_newFilter',
-          description: 'Creates new filter',
-          implemented: true,
-          params: [
-            { name: 'filterOptions', type: 'object', description: 'Filter parameters' }
-          ]
-        },
-        {
-          name: 'eth_newBlockFilter',
-          description: 'Creates new block filter',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_newPendingTransactionFilter',
-          description: 'Creates pending transaction filter',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_uninstallFilter',
-          description: 'Removes filter',
-          implemented: true,
-          params: [
-            { name: 'filterId', type: 'hex', description: 'Filter ID', example: '0xb' }
-          ]
-        },
-        {
-          name: 'eth_getFilterChanges',
-          description: 'Polls filter for changes',
-          implemented: true,
-          params: [
-            { name: 'filterId', type: 'hex', description: 'Filter ID', example: '0x16' }
-          ]
-        },
-        {
-          name: 'eth_getFilterLogs',
-          description: 'Returns filter logs',
-          implemented: true,
-          params: [
-            { name: 'filterId', type: 'hex', description: 'Filter ID', example: '0x16' }
-          ]
-        },
-        {
-          name: 'eth_getLogs',
-          description: 'Returns logs matching filter',
-          implemented: true,
-          params: [
-            { name: 'filterOptions', type: 'object', description: 'Filter parameters' }
-          ]
-        },
-        {
-          name: 'eth_getWork',
-          description: 'Returns mining work (stub - returns empty)',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_submitWork',
-          description: 'Submit mining work (stub - always false)',
-          implemented: true,
-          params: [
-            { name: 'nonce', type: 'hex', description: 'Nonce', example: '0x0000000000000001' },
-            { name: 'powHash', type: 'hash', description: 'PoW hash', example: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' },
-            { name: 'mixDigest', type: 'hash', description: 'Mix digest', example: '0xD1FE5700000000000000000000000000D1FE5700000000000000000000000000' }
-          ]
-        },
-        {
-          name: 'eth_submitHashrate',
-          description: 'Submit mining hashrate (stub)',
-          implemented: true,
-          params: [
-            { name: 'hashrate', type: 'hex', description: 'Hashrate', example: '0x500000' },
-            { name: 'id', type: 'hex', description: 'Client ID', example: '0x59daa26581d0acd1fce254fb7e85952f4c09d0915afd33d3886cd914bc7d283c' }
-          ]
-        },
-        {
-          name: 'eth_mining',
-          description: 'Returns if client is mining (always false)',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_hashrate',
-          description: 'Returns hashrate (always 0)',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_coinbase',
-          description: 'Returns coinbase address',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_getProof',
-          description: 'Returns Merkle proof for account',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Account address', example: '0x7F0d15C7FAae65896648C8273B6d7E43f58Fa842' },
-            { name: 'storageKeys', type: 'array', description: 'Storage keys', example: ['0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'] },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ]
-        },
-        {
-          name: 'eth_feeHistory',
-          description: 'Returns fee history (EIP-1559)',
-          implemented: true,
-          params: [
-            { name: 'blockCount', type: 'hex', description: 'Number of blocks', example: '0x5' },
-            { name: 'newestBlock', type: 'string', description: 'Newest block', example: 'latest' },
-            { name: 'rewardPercentiles', type: 'array', description: 'Percentiles', example: [25, 50, 75] }
-          ]
-        },
-        {
-          name: 'eth_maxPriorityFeePerGas',
-          description: 'Returns max priority fee per gas (EIP-1559)',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_chainId',
-          description: 'Returns chain ID',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_getBlockReceipts',
-          description: 'Returns all receipts for block',
-          implemented: true,
-          params: [
-            { name: 'block', type: 'string', description: 'Block number, hash or tag', example: '0x1' }
-          ]
-        },
-        {
-          name: 'eth_createAccessList',
-          description: 'Creates EIP-2930 access list',
-          implemented: true,
-          params: [
-            { name: 'transaction', type: 'object', description: 'Transaction object' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ]
-        },
-        {
-          name: 'eth_pendingTransactions',
-          description: 'Returns pending transactions',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_getTransactionLogs',
-          description: 'Returns logs for a transaction (Cosmos-specific)',
-          implemented: true,
-          cosmosSpecific: true,
-          params: [
-            { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b' }
-          ]
-        },
-        {
-          name: 'eth_getPendingTransactions',
-          description: 'Returns all pending transactions details (Cosmos-specific)',
-          implemented: true,
-          cosmosSpecific: true,
-          params: []
-        },
-        {
-          name: 'eth_resend',
-          description: 'Resend transaction with new gas price',
-          implemented: true,
-          params: [
-            { name: 'transaction', type: 'object', description: 'Original transaction' },
-            { name: 'gasPrice', type: 'hex', description: 'New gas price', example: '0x3b9aca00' },
-            { name: 'gasLimit', type: 'hex', description: 'New gas limit', example: '0x5208' }
-          ]
-        }
-      ]
-    },
-    personal: {
-      name: 'Personal',
-      methods: [
-        {
-          name: 'personal_newAccount',
-          description: 'Generate new private key and store in key store',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'passphrase',
-              type: 'string',
-              description: 'Passphrase for encryption',
-              example: 'This is the passphrase'
-            }
-          ],
-          examples: [
-            {
-              name: 'Create account',
-              params: ['This is the passphrase'],
-              response: {
-                result: '0xf0e4086ad1c6aab5d42161d5baaae2f9ad0571c0'
-              }
-            }
-          ]
-        },
-        {
-          name: 'personal_importRawKey',
-          description: 'Import a private key into the keystore',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'privateKey',
-              type: 'string',
-              description: 'Private key to import (hex)',
-              example: '0x...'
-            },
-            {
-              name: 'passphrase',
-              type: 'string',
-              description: 'Passphrase for encryption',
-              example: 'mypassword'
-            }
-          ]
-        },
-        {
-          name: 'personal_listAccounts',
-          description: 'List all accounts in the keystore',
-          implemented: true,
-          private: true,
-          params: [],
-          examples: [
-            {
-              name: 'List accounts',
-              params: [],
-              response: {
-                result: ['0x...', '0x...']
-              }
-            }
-          ]
-        },
-        {
-          name: 'personal_lockAccount',
-          description: 'Lock an account',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'address',
-              type: 'address',
-              description: 'Account address to lock',
-              example: '0x...'
-            }
-          ]
-        },
-        {
-          name: 'personal_unlockAccount',
-          description: 'Unlock an account for signing',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'address',
-              type: 'address',
-              description: 'Account address to unlock',
-              example: '0x...'
-            },
-            {
-              name: 'passphrase',
-              type: 'string',
-              description: 'Account passphrase',
-              example: 'mypassword'
-            },
-            {
-              name: 'duration',
-              type: 'number',
-              description: 'Unlock duration in seconds (0 = indefinite)',
-              example: 300
-            }
-          ]
-        },
-        {
-          name: 'personal_sendTransaction',
-          description: 'Sign and send transaction',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'transaction',
-              type: 'object',
-              description: 'Transaction object',
-              fields: [
-                { name: 'from', type: 'address', description: 'Sender address' },
-                { name: 'to', type: 'address', description: 'Recipient address' },
-                { name: 'value', type: 'hex', description: 'Value in wei' },
-                { name: 'gas', type: 'hex', description: 'Gas limit' },
-                { name: 'gasPrice', type: 'hex', description: 'Gas price' }
-              ]
-            },
-            {
-              name: 'passphrase',
-              type: 'string',
-              description: 'Account passphrase',
-              example: 'mypassword'
-            }
-          ]
-        },
-        {
-          name: 'personal_sign',
-          description: 'Sign data with account',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'data',
-              type: 'string',
-              description: 'Data to sign',
-              example: '0xdeadbeef'
-            },
-            {
-              name: 'address',
-              type: 'address',
-              description: 'Signing account',
-              example: '0x...'
-            },
-            {
-              name: 'passphrase',
-              type: 'string',
-              description: 'Account passphrase',
-              example: 'mypassword'
-            }
-          ]
-        },
-        {
-          name: 'personal_ecRecover',
-          description: 'Recover address from signed message',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'data',
-              type: 'string',
-              description: 'Signed data',
-              example: '0xdeadbeef'
-            },
-            {
-              name: 'signature',
-              type: 'string',
-              description: 'Signature',
-              example: '0x...'
-            }
-          ]
-        },
-        {
-          name: 'personal_initializeWallet',
-          description: 'Initialize hardware wallet',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'url',
-              type: 'string',
-              description: 'Wallet URL',
-              example: 'ledger://...'
-            }
-          ]
-        },
-        {
-          name: 'personal_unpair',
-          description: 'Unpair hardware wallet',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'url',
-              type: 'string',
-              description: 'Wallet URL',
-              example: 'ledger://...'
-            },
-            {
-              name: 'pin',
-              type: 'string',
-              description: 'Wallet PIN',
-              example: '1234'
-            }
-          ]
-        },
-        {
-          name: 'personal_listWallets',
-          description: 'List all wallets',
-          implemented: true,
-          private: true,
-          params: [],
-          examples: [
-            {
-              name: 'List wallets',
-              params: [],
-              response: {
-                result: []
-              }
-            }
-          ]
-        }
-      ]
-    },
-    debug: {
-      name: 'Debug',
-      methods: [
-        {
-          name: 'debug_traceTransaction',
-          description: 'Trace transaction execution',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'txHash',
-              type: 'hash',
-              description: 'Transaction hash',
-              example: '0x4ed38df88f88...'
-            },
-            {
-              name: 'config',
-              type: 'object',
-              description: 'Trace config (optional)',
-              fields: [
-                { name: 'tracer', type: 'string', description: 'Tracer type (callTracer, prestateTracer)' },
-                { name: 'timeout', type: 'string', description: 'Execution timeout' }
-              ]
-            }
-          ],
-          examples: [
-            {
-              name: 'Basic trace',
-              params: ['0x4ed38df88f88...', {}],
-              response: {
-                result: {
-                  gas: 21000,
-                  failed: false,
-                  returnValue: '0x',
-                  structLogs: []
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'debug_freeOSMemory',
-          description: 'Forces garbage collection and frees OS memory (Cosmos-specific)',
-          implemented: true,
-          cosmosSpecific: true,
-          private: true,
-          params: []
-        },
-        {
-          name: 'debug_setGCPercent',
-          description: 'Sets garbage collector percentage (Cosmos-specific)',
-          implemented: true,
-          cosmosSpecific: true,
-          private: true,
-          params: [
-            { name: 'percent', type: 'number', description: 'GC percentage', example: 100 }
-          ]
-        },
-        {
-          name: 'debug_writeMutexProfile',
-          description: 'Writes mutex profile to file (Cosmos-specific)',
-          implemented: true,
-          cosmosSpecific: true,
-          private: true,
-          params: [
-            { name: 'file', type: 'string', description: 'Output file path', example: '/tmp/mutex.prof' }
-          ]
-        }
+        { name: "net_version", status: "Y", description: "Returns the current network ID" },
+        { name: "net_listening", status: "Stub", description: "Returns true if client is actively listening (always true)" },
+        { name: "net_peerCount", status: "Stub", description: "Returns number of peers (returns 0)" }
       ]
     },
     txpool: {
-      name: 'TxPool',
+      name: "txpool",
+      color: "orange",
       methods: [
-        {
-          name: 'txpool_status',
-          description: 'Get number of pending and queued transactions',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get pool status',
-              params: [],
-              response: {
-                result: {
-                  pending: '0x0',
-                  queued: '0x0'
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'txpool_content',
-          description: 'Get all pending and queued transactions',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Get pool content',
-              params: [],
-              response: {
-                result: {
-                  pending: {},
-                  queued: {}
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'txpool_contentFrom',
-          description: 'Get pending and queued transactions from a specific address',
-          implemented: true,
-          params: [
-            {
-              name: 'address',
-              type: 'address',
-              description: 'Address to get transactions from',
-              example: '0x1234567890abcdef1234567890abcdef12345678'
-            }
-          ],
-          examples: [
-            {
-              name: 'Get transactions from address',
-              params: ['0x1234567890abcdef1234567890abcdef12345678'],
-              response: {
-                result: {
-                  pending: {},
-                  queued: {}
-                }
-              }
-            }
-          ]
-        },
-        {
-          name: 'txpool_inspect',
-          description: 'Get summary of all pending and queued transactions',
-          implemented: true,
-          params: [],
-          examples: [
-            {
-              name: 'Inspect pool',
-              params: [],
-              response: {
-                result: {
-                  pending: {},
-                  queued: {}
-                }
-              }
-            }
-          ]
-        }
+        { name: "txpool_content", status: "Y", description: "Returns the content of the transaction pool" },
+        { name: "txpool_contentFrom", status: "Y", description: "Returns transactions from specific address" },
+        { name: "txpool_inspect", status: "Y", description: "Returns a summary of the transaction pool" },
+        { name: "txpool_status", status: "Stub", description: "Returns the number of pending and queued transactions (returns empty object)" }
+      ]
+    },
+    personal: {
+      name: "personal",
+      color: "red",
+      methods: [
+        { name: "personal_listAccounts", status: "Y", description: "Returns list of accounts" },
+        { name: "personal_newAccount", status: "Y", description: "Creates new account" },
+        { name: "personal_sign", status: "Y", description: "Signs data with account" },
+        { name: "personal_unlockAccount", status: "Stub", description: "Unlocks account (always false)" },
+        { name: "personal_lockAccount", status: "Stub", description: "Locks account (always false)" },
+        { name: "personal_sendTransaction", status: "N", description: "Sends transaction (not implemented)" },
+        { name: "personal_signTransaction", status: "N", description: "Signs transaction (not implemented)" },
+        { name: "personal_signAndSendTransaction", status: "N", description: "Signs and sends transaction (not implemented)" },
+        { name: "personal_ecRecover", status: "N", description: "Recovers address (requires 65-byte signature)" },
+        { name: "personal_importRawKey", status: "N", description: "Imports raw key (requires valid hex key)" },
+        { name: "personal_listWallets", status: "Stub", description: "Lists wallets (returns null)" },
+        { name: "personal_openWallet", status: "N", description: "Opens wallet (not implemented)" },
+        { name: "personal_deriveAccount", status: "N", description: "Derives account (not implemented)" },
+        { name: "personal_unpair", status: "N", description: "Unpairs device (not implemented)" },
+        { name: "personal_initializeWallet", status: "N", description: "Initializes wallet (not implemented)" }
+      ]
+    },
+    debug: {
+      name: "debug",
+      color: "yellow",
+      methods: [
+        // Tracing methods
+        { name: "debug_traceTransaction", status: "N", description: "Traces transaction execution (not implemented)" },
+        { name: "debug_traceBlockByNumber", status: "Stub", description: "Traces all transactions in block by number (returns empty array)" },
+        { name: "debug_traceBlockByHash", status: "Stub", description: "Traces all transactions in block by hash (returns empty array)" },
+        { name: "debug_traceCall", status: "N", description: "Traces eth_call execution (not implemented)" },
+        { name: "debug_traceChain", status: "N", description: "Traces chain between blocks (not implemented)" },
+        { name: "debug_standardTraceBlockToFile", status: "N", description: "Standard trace to file (not implemented)" },
+        { name: "debug_standardTraceBadBlockToFile", status: "N", description: "Trace bad block to file (not implemented)" },
+        { name: "debug_traceBadBlock", status: "N", description: "Traces bad block (not implemented)" },
+        { name: "debug_intermediateRoots", status: "N", description: "Returns intermediate state roots (profiling disabled)" },
+        // Block and state methods
+        { name: "debug_getBadBlocks", status: "N", description: "Returns bad blocks (not implemented)" },
+        { name: "debug_storageRangeAt", status: "N", description: "Returns storage range at block (not implemented)" },
+        { name: "debug_getModifiedAccountsByNumber", status: "N", description: "Modified accounts by block number (not implemented)" },
+        { name: "debug_getModifiedAccountsByHash", status: "N", description: "Modified accounts by block hash (not implemented)" },
+        { name: "debug_accountRange", status: "N", description: "Returns range of accounts (not implemented)" },
+        { name: "debug_getAccessibleState", status: "N", description: "Returns accessible state range (not implemented)" },
+        // Raw data methods
+        { name: "debug_getRawBlock", status: "N", description: "Returns raw block data (not implemented)" },
+        { name: "debug_getRawHeader", status: "N", description: "Returns raw header data (not implemented)" },
+        { name: "debug_getRawReceipts", status: "N", description: "Returns raw receipts (not implemented)" },
+        { name: "debug_getRawTransaction", status: "N", description: "Returns raw transaction (not implemented)" },
+        { name: "debug_getHeaderRlp", status: "N", description: "Returns header RLP (requires uint64 param)" },
+        { name: "debug_getBlockRlp", status: "N", description: "Returns block RLP (requires uint64 param)" },
+        // Chain management
+        { name: "debug_printBlock", status: "N", description: "Pretty prints block (requires uint64 param)" },
+        { name: "debug_setHead", status: "N", description: "Sets current head of chain (not implemented)" },
+        { name: "debug_seedHash", status: "N", description: "Returns seed hash (not implemented)" },
+        { name: "debug_freezeClient", status: "N", description: "Freezes client (not implemented)" },
+        // Database methods
+        { name: "debug_chaindbProperty", status: "N", description: "Returns chain database property (not implemented)" },
+        { name: "debug_chaindbCompact", status: "N", description: "Compacts chain database (not implemented)" },
+        { name: "debug_dbGet", status: "N", description: "Gets value from database (not implemented)" },
+        { name: "debug_dbAncient", status: "N", description: "Gets ancient data from database (not implemented)" },
+        { name: "debug_dbAncients", status: "N", description: "Gets number of ancient items (not implemented)" },
+        // Profiling methods
+        { name: "debug_startCPUProfile", status: "N", description: "Starts CPU profiling (profiling disabled)" },
+        { name: "debug_stopCPUProfile", status: "N", description: "Stops CPU profiling (profiling disabled)" },
+        { name: "debug_startGoTrace", status: "N", description: "Starts Go execution trace (profiling disabled)" },
+        { name: "debug_stopGoTrace", status: "N", description: "Stops Go execution trace (profiling disabled)" },
+        { name: "debug_blockProfile", status: "N", description: "Writes goroutine blocking profile (profiling disabled)" },
+        { name: "debug_cpuProfile", status: "N", description: "Writes CPU profile (profiling disabled)" },
+        { name: "debug_goTrace", status: "N", description: "Writes Go execution trace (profiling disabled)" },
+        { name: "debug_memStats", status: "N", description: "Returns memory statistics (profiling disabled)" },
+        { name: "debug_gcStats", status: "N", description: "Returns GC statistics (profiling disabled)" },
+        { name: "debug_freeOSMemory", status: "N", description: "Forces garbage collection (profiling disabled)" },
+        { name: "debug_setGCPercent", status: "N", description: "Sets garbage collection percentage (profiling disabled)" },
+        { name: "debug_writeBlockProfile", status: "N", description: "Writes block profile to file (profiling disabled)" },
+        { name: "debug_writeMemProfile", status: "N", description: "Writes memory profile to file (profiling disabled)" },
+        { name: "debug_writeMutexProfile", status: "N", description: "Writes mutex profile to file (profiling disabled)" },
+        { name: "debug_setMutexProfileFraction", status: "N", description: "Sets mutex profile fraction (profiling disabled)" },
+        { name: "debug_getMutexProfileFraction", status: "N", description: "Gets mutex profile fraction (not implemented)" },
+        { name: "debug_setBlockProfileRate", status: "N", description: "Sets block profile rate (profiling disabled)" },
+        // Runtime methods
+        { name: "debug_stacks", status: "N", description: "Returns stack traces (profiling disabled)" },
+        { name: "debug_stacksLimit", status: "N", description: "Returns limited stack traces (not implemented)" },
+        { name: "debug_nodeInfo", status: "N", description: "Returns node information (not implemented)" },
+        { name: "debug_peers", status: "N", description: "Returns connected peers (not implemented)" },
+        { name: "debug_verbosity", status: "N", description: "Sets logging verbosity (not implemented)" },
+        { name: "debug_vmodule", status: "N", description: "Sets logging vmodule (not implemented)" },
+        { name: "debug_backtraceAt", status: "N", description: "Sets backtrace location (not implemented)" },
+        { name: "debug_preimage", status: "N", description: "Returns preimage for hash (not implemented)" }
+      ]
+    },
+    admin: {
+      name: "admin",
+      color: "indigo",
+      methods: [
+        { name: "admin_addPeer", status: "N", description: "Adds peer (not implemented)" },
+        { name: "admin_removePeer", status: "N", description: "Removes peer (not implemented)" },
+        { name: "admin_addTrustedPeer", status: "N", description: "Adds trusted peer (not implemented)" },
+        { name: "admin_removeTrustedPeer", status: "N", description: "Removes trusted peer (not implemented)" },
+        { name: "admin_nodeInfo", status: "N", description: "Returns node info (not implemented)" },
+        { name: "admin_peers", status: "N", description: "Returns peers (not implemented)" },
+        { name: "admin_datadir", status: "N", description: "Returns data directory (not implemented)" },
+        { name: "admin_startRPC", status: "N", description: "Starts RPC (not implemented)" },
+        { name: "admin_stopRPC", status: "N", description: "Stops RPC (not implemented)" },
+        { name: "admin_startWS", status: "N", description: "Starts WebSocket (not implemented)" },
+        { name: "admin_stopWS", status: "N", description: "Stops WebSocket (not implemented)" },
+        { name: "admin_startHTTP", status: "N", description: "Starts HTTP (not implemented)" },
+        { name: "admin_stopHTTP", status: "N", description: "Stops HTTP (not implemented)" },
+        { name: "admin_exportChain", status: "N", description: "Exports chain (not implemented)" },
+        { name: "admin_importChain", status: "N", description: "Imports chain (not implemented)" },
+        { name: "admin_sleepBlocks", status: "N", description: "Sleeps blocks (not implemented)" },
+        { name: "admin_clearPeerBanList", status: "N", description: "Clears peer ban list (not implemented)" },
+        { name: "admin_listPeerBanList", status: "N", description: "Lists peer ban list (not implemented)" }
       ]
     },
     miner: {
-      name: 'Miner',
+      name: "miner",
+      color: "gray",
       methods: [
-        {
-          name: 'miner_start',
-          description: 'Start mining (stub implementation)',
-          implemented: false,
-          private: true,
-          params: [
-            {
-              name: 'threads',
-              type: 'number',
-              description: 'Number of threads (optional)',
-              example: 1
-            }
-          ],
-          examples: [
-            {
-              name: 'Start mining',
-              params: [1],
-              response: {
-                result: true
-              }
-            }
-          ]
-        },
-        {
-          name: 'miner_stop',
-          description: 'Stop mining (stub implementation)',
-          implemented: false,
-          private: true,
-          params: [],
-          examples: [
-            {
-              name: 'Stop mining',
-              params: [],
-              response: {
-                result: true
-              }
-            }
-          ]
-        },
-        {
-          name: 'miner_setEtherbase',
-          description: 'Set coinbase address (stub implementation)',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'address',
-              type: 'address',
-              description: 'Coinbase address',
-              example: '0x...'
-            }
-          ],
-          examples: [
-            {
-              name: 'Set etherbase',
-              params: ['0x1234567890abcdef1234567890abcdef12345678'],
-              response: {
-                result: true
-              }
-            }
-          ]
-        },
-        {
-          name: 'miner_setGasPrice',
-          description: 'Set minimum gas price (stub implementation)',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'gasPrice',
-              type: 'hex',
-              description: 'Minimum gas price in wei',
-              example: '0x3b9aca00'
-            }
-          ],
-          examples: [
-            {
-              name: 'Set gas price',
-              params: ['0x3b9aca00'],
-              response: {
-                result: true
-              }
-            }
-          ]
-        },
-        {
-          name: 'miner_setGasLimit',
-          description: 'Set gas limit (stub implementation)',
-          implemented: false,
-          private: true,
-          params: [
-            {
-              name: 'gasLimit',
-              type: 'hex',
-              description: 'Gas limit',
-              example: '0x1c9c380'
-            }
-          ],
-          examples: [
-            {
-              name: 'Set gas limit',
-              params: ['0x1c9c380'],
-              response: {
-                result: true
-              }
-            }
-          ]
-        }
+        { name: "miner_start", status: "N", description: "Starts mining (not applicable - uses Tendermint)" },
+        { name: "miner_stop", status: "N", description: "Stops mining (not applicable - uses Tendermint)" },
+        { name: "miner_setEtherbase", status: "N", description: "Sets etherbase (not applicable - uses Tendermint)" },
+        { name: "miner_setExtra", status: "N", description: "Sets extra data (not applicable - uses Tendermint)" },
+        { name: "miner_setGasPrice", status: "N", description: "Sets gas price (not applicable - uses Tendermint)" },
+        { name: "miner_setGasLimit", status: "N", description: "Sets gas limit (not applicable - uses Tendermint)" },
+        { name: "miner_setRecommitInterval", status: "N", description: "Sets recommit interval (not applicable - uses Tendermint)" },
+        { name: "miner_getHashrate", status: "N", description: "Returns hashrate (not applicable - uses Tendermint)" }
+      ]
+    },
+    engine: {
+      name: "engine",
+      color: "pink",
+      methods: [
+        { name: "engine_newPayloadV1", status: "N", description: "New payload V1 (not applicable - uses Tendermint)" },
+        { name: "engine_newPayloadV2", status: "N", description: "New payload V2 (not applicable - uses Tendermint)" },
+        { name: "engine_newPayloadV3", status: "N", description: "New payload V3 (not applicable - uses Tendermint)" },
+        { name: "engine_forkchoiceUpdatedV1", status: "N", description: "Fork choice updated V1 (not applicable - uses Tendermint)" },
+        { name: "engine_forkchoiceUpdatedV2", status: "N", description: "Fork choice updated V2 (not applicable - uses Tendermint)" },
+        { name: "engine_forkchoiceUpdatedV3", status: "N", description: "Fork choice updated V3 (not applicable - uses Tendermint)" },
+        { name: "engine_getPayloadV1", status: "N", description: "Get payload V1 (not applicable - uses Tendermint)" },
+        { name: "engine_getPayloadV2", status: "N", description: "Get payload V2 (not applicable - uses Tendermint)" },
+        { name: "engine_getPayloadV3", status: "N", description: "Get payload V3 (not applicable - uses Tendermint)" },
+        { name: "engine_getPayloadBodiesByHashV1", status: "N", description: "Get payload bodies by hash (not applicable - uses Tendermint)" },
+        { name: "engine_getPayloadBodiesByRangeV1", status: "N", description: "Get payload bodies by range (not applicable - uses Tendermint)" },
+        { name: "engine_exchangeTransitionConfigurationV1", status: "N", description: "Exchange transition configuration (not applicable - uses Tendermint)" },
+        { name: "engine_exchangeCapabilities", status: "N", description: "Exchange capabilities (not applicable - uses Tendermint)" },
+        { name: "engine_getBlobsV1", status: "N", description: "Get blobs V1 (not applicable - uses Tendermint)" }
+      ]
+    },
+    clique: {
+      name: "clique",
+      color: "teal",
+      methods: [
+        { name: "clique_getSnapshot", status: "N", description: "Get snapshot at block (not applicable - uses Tendermint)" },
+        { name: "clique_getSnapshotAtHash", status: "N", description: "Get snapshot at hash (not applicable - uses Tendermint)" },
+        { name: "clique_getSigners", status: "N", description: "Get authorized signers (not applicable - uses Tendermint)" },
+        { name: "clique_getSignersAtHash", status: "N", description: "Get signers at hash (not applicable - uses Tendermint)" },
+        { name: "clique_propose", status: "N", description: "Propose new signer (not applicable - uses Tendermint)" },
+        { name: "clique_discard", status: "N", description: "Discard signer proposal (not applicable - uses Tendermint)" },
+        { name: "clique_status", status: "N", description: "Get clique status (not applicable - uses Tendermint)" },
+        { name: "clique_getSigner", status: "N", description: "Get current signer (not applicable - uses Tendermint)" }
+      ]
+    },
+    les: {
+      name: "les",
+      color: "cyan",
+      methods: [
+        { name: "les_serverInfo", status: "N", description: "Server information (not implemented)" },
+        { name: "les_clientInfo", status: "N", description: "Client information (not implemented)" },
+        { name: "les_priorityClientInfo", status: "N", description: "Priority client info (not implemented)" },
+        { name: "les_addBalance", status: "N", description: "Add balance to client (not implemented)" },
+        { name: "les_setClientParams", status: "N", description: "Set client parameters (not implemented)" },
+        { name: "les_setDefaultParams", status: "N", description: "Set default parameters (not implemented)" },
+        { name: "les_latestCheckpoint", status: "N", description: "Latest checkpoint (not implemented)" },
+        { name: "les_getCheckpoint", status: "N", description: "Get checkpoint by index (not implemented)" },
+        { name: "les_getCheckpointContractAddress", status: "N", description: "Get checkpoint contract (not implemented)" }
       ]
     }
   };
 
-  const generateCodeExamples = (method, params = []) => {
+  // Transform imported data into the expected format
+  const namespaces = Object.entries(rpcMethodsData).reduce((acc, [key, value]) => {
+    acc[key] = {
+      name: value.name,
+      methods: value.methods.map(method => ({
+        name: method.name,
+        description: method.description,
+        implemented: method.status === 'Y',
+        partial: method.status === 'Stub',
+        notImplemented: method.status === 'N',
+        status: method.status,
+        params: [],
+        cosmosSpecific: method.description.includes('Cosmos-specific'),
+        private: method.description.includes('Private') || method.description.includes('private')
+      }))
+    };
+    return acc;
+  }, {});
+
+  // Add parameter examples for common methods (preserving existing functionality)
+  const methodParams = {
+    web3_sha3: [{
+      name: 'data',
+      type: 'string',
+      description: 'The data to hash (hex encoded)',
+      example: '0x68656c6c6f20776f726c64'
+    }],
+    eth_getBalance: [
+      { name: 'address', type: 'address', description: 'Address to check', example: '0x407d73d8a49eeb85d32cf465507dd71d507100c1' },
+      { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
+    ],
+    eth_getTransactionCount: [
+      { name: 'address', type: 'address', description: 'Address', example: '0x407d73d8a49eeb85d32cf465507dd71d507100c1' },
+      { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
+    ],
+    eth_sendRawTransaction: [
+      { name: 'data', type: 'hex', description: 'Signed transaction data', example: '0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675' }
+    ],
+    eth_call: [
+      { name: 'callObject', type: 'object', description: 'Call data' },
+      { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
+    ],
+    eth_estimateGas: [
+      { name: 'callObject', type: 'object', description: 'Transaction data' }
+    ],
+    eth_getStorageAt: [
+      { name: 'address', type: 'address', description: 'Storage address', example: '0x295a70b2de5e3953354a6a8344e616ed314d7251' },
+      { name: 'position', type: 'hex', description: 'Storage position', example: '0x0' },
+      { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
+    ],
+    eth_getCode: [
+      { name: 'address', type: 'address', description: 'Contract address', example: '0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b' },
+      { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
+    ],
+    eth_getBlockByNumber: [
+      { name: 'block', type: 'string', description: 'Block number or tag', example: '0x1b4' },
+      { name: 'fullTx', type: 'boolean', description: 'Return full transactions', example: true }
+    ],
+    eth_getBlockByHash: [
+      { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0xdc0818cf78f21a8e70579cb46a43643f78291264dda342ae31049421c82d21ae' },
+      { name: 'fullTx', type: 'boolean', description: 'Return full transactions', example: false }
+    ],
+    eth_getTransactionByHash: [
+      { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b' }
+    ],
+    eth_getTransactionReceipt: [
+      { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238' }
+    ],
+    eth_getLogs: [
+      { name: 'filterOptions', type: 'object', description: 'Filter parameters' }
+    ],
+    eth_getTransactionLogs: [
+      { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b' }
+    ],
+    personal_newAccount: [
+      { name: 'passphrase', type: 'string', description: 'Passphrase for encryption', example: 'This is the passphrase' }
+    ],
+    personal_unlockAccount: [
+      { name: 'address', type: 'address', description: 'Account address to unlock', example: '0x...' },
+      { name: 'passphrase', type: 'string', description: 'Account passphrase', example: 'mypassword' },
+      { name: 'duration', type: 'number', description: 'Unlock duration in seconds (0 = indefinite)', example: 300 }
+    ],
+    personal_sign: [
+      { name: 'data', type: 'string', description: 'Data to sign', example: '0xdeadbeef' },
+      { name: 'address', type: 'address', description: 'Signing account', example: '0x...' },
+      { name: 'passphrase', type: 'string', description: 'Account passphrase', example: 'mypassword' }
+    ],
+    txpool_contentFrom: [
+      { name: 'address', type: 'address', description: 'Address to get transactions from', example: '0x1234567890abcdef1234567890abcdef12345678' }
+    ]
+  };
+
+  // Merge params into methods
+  Object.keys(namespaces).forEach(ns => {
+    namespaces[ns].methods.forEach(method => {
+      if (methodParams[method.name]) {
+        method.params = methodParams[method.name];
+      }
+    });
+  });
+
+  // Optimized to only generate code for the selected language
+  const generateCodeExample = useCallback((method, params = [], language = 'curl') => {
     const endpoint = rpcEndpoint;
     const jsonRpcBody = {
       jsonrpc: '2.0',
@@ -1048,174 +509,107 @@ export default function RPCMethodsViewerVersionB() {
       method: method,
       params: params
     };
-    
-    // Build JavaScript example as array to avoid template literal issues
-    const jsLines = [
-      '// Using Fetch API (modern browsers, Node 18+)',
-      'const response = await fetch(\'' + endpoint + '\', {',
-      '  method: \'POST\',',
-      '  headers: { \'Content-Type\': \'application/json\' },',
-      '  body: JSON.stringify({',
-      '    jsonrpc: \'2.0\',',
-      '    id: 1,',
-      '    method: \'' + method + '\',',
-      '    params: ' + JSON.stringify(params),
-      '  })',
-      '});',
-      'const data = await response.json();',
-      'console.log(data.result);',
-      '',
-      '// Using ethers.js v6 (recommended)',
-      'import { JsonRpcProvider } from \'ethers\';',
-      'const provider = new JsonRpcProvider(\'' + endpoint + '\');',
-      'const result = await provider.send(\'' + method + '\', ' + JSON.stringify(params) + ');',
-      'console.log(result);',
-      '',
-      '// Using web3.js v4',
-      'import { Web3 } from \'web3\';',
-      'const web3 = new Web3(\'' + endpoint + '\');',
-      'const result = await web3.currentProvider.request({',
-      '  method: \'' + method + '\',',
-      '  params: ' + JSON.stringify(params),
-      '});',
-      'console.log(result);',
-      '',
-      '// Using viem',
-      'import { createPublicClient, http } from \'viem\';',
-      'const client = createPublicClient({',
-      '  transport: http(\'' + endpoint + '\')',
-      '});',
-      'const result = await client.request({',
-      '  method: \'' + method + '\',',
-      '  params: ' + JSON.stringify(params),
-      '});',
-      'console.log(result);'
-    ];
 
-    const examples = {
-      curl: 'curl -X POST ' + endpoint + ' \\\n' +
-        '  -H "Content-Type: application/json" \\\n' +
-        '  -d \'' + JSON.stringify(jsonRpcBody, null, 2) + '\'',
-
-      javascript: jsLines.join('\n'),
-
-      python: [
-        'import json',
-        'import requests',
+    // Only generate code for the requested language to avoid unnecessary computation
+    if (language === 'javascript') {
+      return [
+        '// Using Fetch API',
+        `const response = await fetch('${endpoint}', {`,
+        `  method: 'POST',`,
+        `  headers: { 'Content-Type': 'application/json' },`,
+        `  body: JSON.stringify({`,
+        `    jsonrpc: '2.0',`,
+        `    id: 1,`,
+        `    method: '${method}',`,
+        `    params: ${JSON.stringify(params)}`,
+        `  })`,
+        `});`,
+        `const data = await response.json();`,
+        `console.log(data.result);`,
         '',
+        '// Using ethers.js v6',
+        `import { JsonRpcProvider } from 'ethers';`,
+        `const provider = new JsonRpcProvider('${endpoint}');`,
+        `const result = await provider.send('${method}', ${JSON.stringify(params)});`,
+        `console.log(result);`,
+        '',
+        '// Using web3.js v4',
+        `import { Web3 } from 'web3';`,
+        `const web3 = new Web3('${endpoint}');`,
+        `const result = await web3.currentProvider.request({`,
+        `  method: '${method}',`,
+        `  params: ${JSON.stringify(params)}`,
+        `});`,
+        `console.log(result);`
+      ].join('\n');
+    }
+
+    if (language === 'python') {
+      return [
         '# Using requests library',
-        'url = "' + endpoint + '"',
-        'headers = {"Content-Type": "application/json"}',
-        'payload = {',
-        '    "jsonrpc": "2.0",',
-        '    "id": 1,',
-        '    "method": "' + method + '",',
-        '    "params": ' + JSON.stringify(params),
-        '}',
+        'import requests',
+        'import json',
         '',
-        'response = requests.post(url, json=payload, headers=headers)',
-        'data = response.json()',
-        "print(data.get('result'))",
+        `url = "${endpoint}"`,
+        `headers = {"Content-Type": "application/json"}`,
+        `payload = {`,
+        `    "jsonrpc": "2.0",`,
+        `    "id": 1,`,
+        `    "method": "${method}",`,
+        `    "params": ${JSON.stringify(params)}`,
+        `}`,
         '',
-        '# Using web3.py v6 (recommended)',
+        `response = requests.post(url, json=payload, headers=headers)`,
+        `data = response.json()`,
+        `print(data.get('result'))`,
+        '',
+        '# Using web3.py',
         'from web3 import Web3',
         '',
-        'w3 = Web3(Web3.HTTPProvider("' + endpoint + '"))',
-        'result = w3.provider.make_request("' + method + '", ' + JSON.stringify(params) + ')',
-        "print(result['result'])",
-        '',
-        '# Using asyncio with aiohttp',
-        'import asyncio',
-        'import aiohttp',
-        '',
-        'async def make_request():',
-        '    async with aiohttp.ClientSession() as session:',
-        '        async with session.post(url, json=payload) as response:',
-        '            data = await response.json()',
-        "            return data.get('result')",
-        '',
-        'result = asyncio.run(make_request())',
-        'print(result)'
-      ].join('\n'),
+        `w3 = Web3(Web3.HTTPProvider("${endpoint}"))`,
+        `result = w3.provider.make_request("${method}", ${JSON.stringify(params)})`,
+        `print(result['result'])`
+      ].join('\n');
+    }
 
-      go: [
+    if (language === 'go') {
+      return [
         'package main',
         '',
         'import (',
         '    "bytes"',
         '    "encoding/json"',
         '    "fmt"',
-        '    "log"',
         '    "net/http"',
         ')',
         '',
-        'type JSONRPCRequest struct {',
-        '    JSONRPC string        `json:"jsonrpc"`',
-        '    ID      int           `json:"id"`',
-        '    Method  string        `json:"method"`',
-        '    Params  []interface{} `json:"params"`',
-        '}',
-        '',
-        'type JSONRPCResponse struct {',
-        '    JSONRPC string          `json:"jsonrpc"`',
-        '    ID      int             `json:"id"`',
-        '    Result  json.RawMessage `json:"result"`',
-        '    Error   *JSONRPCError   `json:"error,omitempty"`',
-        '}',
-        '',
-        'type JSONRPCError struct {',
-        '    Code    int    `json:"code"`',
-        '    Message string `json:"message"`',
-        '}',
-        '',
         'func main() {',
-        '    request := JSONRPCRequest{',
-        '        JSONRPC: "2.0",',
-        '        ID:      1,',
-        '        Method:  "' + method + '",',
-        '        Params:  []interface{}{' + params.map(p => {
+        '    payload := map[string]interface{}{',
+        '        "jsonrpc": "2.0",',
+        '        "id":      1,',
+        '        "method":  "' + method + '",',
+        '        "params":  []interface{}{' + params.map(p => {
           if (typeof p === 'string') return '"' + p + '"';
-          if (typeof p === 'object') return JSON.stringify(p);
-          return p;
+          return JSON.stringify(p);
         }).join(', ') + '},',
         '    }',
         '',
-        '    jsonData, err := json.Marshal(request)',
-        '    if err != nil {',
-        '        log.Fatal("Failed to marshal request:", err)',
-        '    }',
-        '',
-        '    resp, err := http.Post("' + endpoint + '", "application/json", bytes.NewBuffer(jsonData))',
-        '    if err != nil {',
-        '        log.Fatal("Failed to send request:", err)',
-        '    }',
+        '    jsonData, _ := json.Marshal(payload)',
+        '    resp, _ := http.Post("' + endpoint + '", "application/json", bytes.NewBuffer(jsonData))',
         '    defer resp.Body.Close()',
         '',
-        '    var response JSONRPCResponse',
-        '    if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {',
-        '        log.Fatal("Failed to decode response:", err)',
-        '    }',
-        '',
-        '    if response.Error != nil {',
-        '        log.Fatalf("RPC Error %d: %s", response.Error.Code, response.Error.Message)',
-        '    }',
-        '',
-        '    // Pretty print the result',
-        '    var result interface{}',
-        '    if err := json.Unmarshal(response.Result, &result); err != nil {',
-        '        fmt.Printf("Result: %s\\n", response.Result)',
-        '    } else {',
-        '        output, _ := json.MarshalIndent(result, "", "  ")',
-        '        fmt.Printf("Result:\\n%s\\n", output)',
-        '    }',
+        '    var result map[string]interface{}',
+        '    json.NewDecoder(resp.Body).Decode(&result)',
+        '    fmt.Printf("Result: %+v\\n", result["result"])',
         '}'
-      ].join('\n'),
+      ].join('\n');
+    }
 
-      rust: `use serde::{Deserialize, Serialize};
+    if (language === 'rust') {
+      return `use serde::{Deserialize, Serialize};
 use serde_json::json;
-use anyhow::Result;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 struct JsonRpcRequest {
     jsonrpc: String,
     id: u64,
@@ -1227,9 +621,7 @@ struct JsonRpcRequest {
 struct JsonRpcResponse {
     jsonrpc: String,
     id: u64,
-    #[serde(skip_serializing_if = "Option::is_none")]
     result: Option<serde_json::Value>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     error: Option<JsonRpcError>,
 }
 
@@ -1237,26 +629,23 @@ struct JsonRpcResponse {
 struct JsonRpcError {
     code: i32,
     message: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    data: Option<serde_json::Value>,
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = reqwest::Client::new();
 
     let request = JsonRpcRequest {
         jsonrpc: "2.0".to_string(),
         id: 1,
-        method: "' + method + '".to_string(),
-        params: vec![' + params.map(p => {
-          if (typeof p === 'string') return 'json!("' + p + '")';
-          return 'json!(' + JSON.stringify(p) + ')';
-        }).join(', ') + '],
+        method: "${method}".to_string(),
+        params: vec![${params.map(p =>
+          typeof p === 'string' ? `json!("${p}")` : `json!(${JSON.stringify(p)})`
+        ).join(', ')}],
     };
 
     let response = client
-        .post("' + endpoint + '")
+        .post("${endpoint}")
         .json(&request)
         .send()
         .await?
@@ -1264,20 +653,8 @@ async fn main() -> Result<()> {
         .await?;
 
     match response.error {
-        Some(error) => {
-            eprintln!("RPC Error {}: {}", error.code, error.message);
-            if let Some(data) = error.data {
-                eprintln!("Error data: {}", serde_json::to_string_pretty(&data)?);
-            }
-            std::process::exit(1);
-        }
-        None => {
-            if let Some(result) = response.result {
-                println!("Result:\\n{}", serde_json::to_string_pretty(&result)?);
-            } else {
-                println!("Empty result");
-            }
-        }
+        Some(error) => eprintln!("Error {}: {}", error.code, error.message),
+        None => println!("Result: {:#?}", response.result),
     }
 
     Ok(())
@@ -1288,10 +665,11 @@ async fn main() -> Result<()> {
 // reqwest = { version = "0.11", features = ["json"] }
 // serde = { version = "1.0", features = ["derive"] }
 // serde_json = "1.0"
-// tokio = { version = "1", features = ["full"] }
-// anyhow = "1.0"`,
+// tokio = { version = "1", features = ["full"] }`;
+    }
 
-      csharp: `using System;
+    if (language === 'csharp') {
+      return `using System;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -1335,9 +713,6 @@ public class JsonRpcError
 
     [JsonPropertyName("message")]
     public string Message { get; set; }
-
-    [JsonPropertyName("data")]
-    public object Data { get; set; }
 }
 
 class Program
@@ -1345,82 +720,48 @@ class Program
     static async Task Main(string[] args)
     {
         using var httpClient = new HttpClient();
-        httpClient.Timeout = TimeSpan.FromSeconds(30);
 
         var request = new JsonRpcRequest
         {
-            Method = "' + method + '",
-            Params = new object[] { ' + params.map(p => {
-              if (typeof p === 'string') return '"' + p + '"';
-              if (typeof p === 'object') return JSON.stringify(p);
-              return p;
-            }).join(', ') + ' }
+            Method = "${method}",
+            Params = new object[] { ${params.map(p =>
+              typeof p === 'string' ? `"${p}"` : JSON.stringify(p)
+            ).join(', ')} }
         };
 
-        var options = new JsonSerializerOptions
-        {
-            WriteIndented = false,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
-        var json = JsonSerializer.Serialize(request, options);
+        var json = JsonSerializer.Serialize(request);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         try
         {
-            var response = await httpClient.PostAsync("' + endpoint + '", content);
+            var response = await httpClient.PostAsync("${endpoint}", content);
             response.EnsureSuccessStatusCode();
 
             var responseBody = await response.Content.ReadAsStringAsync();
-            var jsonResponse = JsonSerializer.Deserialize<JsonRpcResponse<JsonElement>>(
-                responseBody,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            );
+            var jsonResponse = JsonSerializer.Deserialize<JsonRpcResponse<JsonElement>>(responseBody);
 
             if (jsonResponse?.Error != null)
             {
-                Console.Error.WriteLine($"RPC Error {jsonResponse.Error.Code}: {jsonResponse.Error.Message}");
-                if (jsonResponse.Error.Data != null)
-                {
-                    Console.Error.WriteLine($"Error data: {jsonResponse.Error.Data}");
-                }
-                Environment.Exit(1);
-            }
-            else if (jsonResponse?.Result != null)
-            {
-                var prettyJson = JsonSerializer.Serialize(jsonResponse.Result, new JsonSerializerOptions { WriteIndented = true });
-                Console.WriteLine($"Result:\\n{prettyJson}");
+                Console.Error.WriteLine($"Error {jsonResponse.Error.Code}: {jsonResponse.Error.Message}");
             }
             else
             {
-                Console.WriteLine("Empty result");
+                Console.WriteLine($"Result: {jsonResponse?.Result}");
             }
-        }
-        catch (HttpRequestException ex)
-        {
-            Console.Error.WriteLine($"HTTP request failed: {ex.Message}");
-            Environment.Exit(1);
-        }
-        catch (TaskCanceledException)
-        {
-            Console.Error.WriteLine("Request timed out");
-            Environment.Exit(1);
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
-            Environment.Exit(1);
+            Console.Error.WriteLine($"Request failed: {ex.Message}");
         }
     }
-}
+}`;
+    }
 
-// NuGet packages required:
-// dotnet add package System.Text.Json
-// dotnet add package System.Net.Http`
-    };
-
-    return examples[selectedLanguage] || examples.curl;
-  };
+    // Default to curl
+    return `curl -X POST ${endpoint} \\\n` +
+      `  -H "Content-Type: application/json" \\\n` +
+      `  -d '${JSON.stringify(jsonRpcBody, null, 2)}'`;
+  }, [rpcEndpoint]);
 
   const executeRpcRequest = async () => {
     if (!selectedMethod) return;
@@ -1501,7 +842,7 @@ class Program
       });
     });
     return methods;
-  }, []);
+  }, [namespaces]);
 
   const filteredMethods = useMemo(() => {
     let methods = allMethods;
@@ -1517,506 +858,550 @@ class Program
       methods = methods.filter(method => method.namespace === selectedNamespace);
     }
 
-    if (hideUnsupported) {
-      methods = methods.filter(method => method.implemented !== false);
+    if (!showAllMethods) {
+      methods = methods.filter(method => method.status === 'Y');
     }
 
     return methods;
-  }, [selectedNamespace, searchTerm, allMethods, hideUnsupported]);
+  }, [selectedNamespace, searchTerm, allMethods, showAllMethods]);
 
-  // Mobile navigation
-  const MobileNav = () => (
-    <div className="lg:hidden bg-black border-t border-zinc-800 dark:border-white/10 z-30 flex-shrink-0">
-      <div className="flex">
-        <button
-          onClick={() => setShowMobilePanel('list')}
-          className={`flex-1 py-3 text-sm font-medium ${
-            showMobilePanel === 'list' ? 'text-blue-400 bg-zinc-800/50' : 'text-zinc-400'
-          }`}
-        >
-          Methods
-        </button>
-        <button
-          onClick={() => setShowMobilePanel('details')}
-          className={`flex-1 py-3 text-sm font-medium ${
-            showMobilePanel === 'details' ? 'text-blue-400 bg-zinc-800/50' : 'text-zinc-400'
-          }`}
-          disabled={!selectedMethod}
-        >
-          Details
-        </button>
-        <button
-          onClick={() => setShowMobilePanel('execute')}
-          className={`flex-1 py-3 text-sm font-medium ${
-            showMobilePanel === 'execute' ? 'text-blue-400 bg-zinc-800/50' : 'text-zinc-400'
-          }`}
-          disabled={!selectedMethod}
-        >
-          Execute
-        </button>
-      </div>
-    </div>
-  );
+  // Compute which namespaces have visible methods
+  const visibleNamespaces = useMemo(() => {
+    const visible = new Set();
+    allMethods.forEach(method => {
+      if (showAllMethods || method.status === 'Y') {
+        visible.add(method.namespace);
+      }
+    });
+    return visible;
+  }, [allMethods, showAllMethods]);
 
-  // Left Panel - Methods List
-  const MethodsList = () => (
-    <div className={`${isMobile && showMobilePanel !== 'list' ? 'hidden' : ''}
-      ${isMobile ? 'w-full' : 'w-80'} border-r border-zinc-800 dark:border-white/10 flex flex-col h-full bg-black overflow-hidden`}>
-
-      {/* Search & Filters */}
-      <div className="p-4 border-b border-zinc-800 dark:border-white/10">
-        <div className="relative mb-3">
-          <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search methods..."
-            className="w-full pl-9 pr-3 py-2 bg-zinc-800 dark:bg-zinc-800/50 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border border-zinc-700 dark:border-white/20"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <div className="flex flex-wrap gap-1 mb-3">
-          <button
-            onClick={() => setSelectedNamespace('all')}
-            className={`px-3 py-1 text-xs rounded-full transition-colors ${
-              selectedNamespace === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'bg-zinc-800 dark:bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700'
-            }`}
-          >
-            All
-          </button>
-          {Object.entries(namespaces).map(([key, namespace]) => (
-            <button
-              key={key}
-              onClick={() => setSelectedNamespace(key)}
-              className={`px-3 py-1 text-xs rounded-full transition-colors ${
-                selectedNamespace === key
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-zinc-800 dark:bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700'
-              }`}
-            >
-              {namespace.name}
-            </button>
-          ))}
-        </div>
-
-        {/* Cosmos EVM Filter */}
-        <div className="flex items-center gap-2">
-          <label className="flex items-center cursor-pointer text-xs">
-            <input
-              type="checkbox"
-              checked={hideUnsupported}
-              onChange={(e) => setHideUnsupported(e.target.checked)}
-              className="mr-2 w-3.5 h-3.5 rounded bg-zinc-800 border-zinc-600 text-blue-600 focus:ring-blue-500 focus:ring-2"
-            />
-            <span className="text-zinc-400">Hide unsupported methods</span>
-          </label>
-        </div>
-      </div>
-
-      {/* Methods */}
-      <div className="flex-1 overflow-y-auto">
-        {filteredMethods.map((method) => (
-          <button
-            key={method.name}
-            onClick={() => {
-              setSelectedMethod(method);
-              setParamValues({});
-              setRequestResult(null);
-              if (isMobile) setShowMobilePanel('details');
-            }}
-            className={`w-full px-4 py-3 text-left hover:bg-zinc-800/50 transition-colors border-b border-zinc-900 dark:border-zinc-900/50 ${
-              selectedMethod?.name === method.name ? 'bg-zinc-800/50 border-l-2 border-blue-500' : ''
-            }`}
-          >
-            <div className="flex items-start gap-2">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <code className="text-sm font-mono text-blue-400 truncate">
-                    {method.name}
-                  </code>
-                  {method.implemented === true && (
-                    <span className="text-xs bg-green-900/30 text-green-500 px-1.5 py-0.5 rounded" title="Supported on Cosmos EVM">
-                      ✓
-                    </span>
-                  )}
-                  {method.implemented === false && (
-                    <span className="text-xs bg-zinc-700 text-zinc-400 px-1.5 py-0.5 rounded">
-                      Not impl
-                    </span>
-                  )}
-                  {method.cosmosSpecific && (
-                    <span className="inline-flex items-center gap-1 text-xs bg-purple-900/30 text-purple-400 px-1.5 py-0.5 rounded" title="Cosmos-specific">
-                      <CosmosIcon size={10} />
-                    </span>
-                  )}
-                  {method.private && (
-                    <span className="text-xs bg-yellow-900/50 text-yellow-400 px-1.5 py-0.5 rounded">
-                      Private
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs text-zinc-500 mt-1 line-clamp-2">
-                  {method.description}
-                </p>
-              </div>
-              <span className="text-[10px] text-zinc-600 bg-zinc-800 dark:bg-zinc-800/50 px-1.5 py-0.5 rounded">
-                {method.namespaceName}
-              </span>
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-
-  // Center Panel - Method Details
-  const MethodDetails = () => (
-    <div className={`${isMobile && showMobilePanel !== 'details' ? 'hidden' : ''}
-      ${isMobile ? 'w-full' : 'flex-1'} flex flex-col h-full overflow-y-auto bg-black`}>
-
-      {selectedMethod ? (
-        <>
-          {/* Method Header */}
-          <div className="p-6 border-b border-zinc-800 dark:border-white/10">
-            <div className="flex items-start gap-3">
-              <div className="flex-1">
-                <h2 className="text-2xl font-mono font-bold text-white">
-                  {selectedMethod.name}
-                </h2>
-                <p className="text-zinc-400 mt-1">
-                  {selectedMethod.description}
-                </p>
-                <div className="flex items-center gap-3 mt-3">
-                  <span className="px-2 py-1 bg-zinc-800 dark:bg-zinc-800/50 text-zinc-300 rounded text-xs">
-                    {selectedMethod.namespaceName}
-                  </span>
-                  {selectedMethod.implemented ? (
-                    <span className="px-2 py-1 bg-green-900/50 text-green-400 rounded text-xs">
-                      ✓ Implemented
-                    </span>
-                  ) : (
-                    <span className="px-2 py-1 bg-red-900/50 text-red-400 rounded text-xs">
-                      Not Implemented
-                    </span>
-                  )}
-                  {selectedMethod.cosmosSpecific && (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-900/50 text-purple-400 rounded text-xs">
-                      <CosmosIcon size={12} />
-                      <span>Cosmos-specific</span>
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Parameters */}
-          {selectedMethod.params && selectedMethod.params.length > 0 && (
-            <div className="p-6 border-b border-zinc-800 dark:border-white/10">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-                Parameters
-              </h3>
-              <div className="space-y-3">
-                {selectedMethod.params.map((param, i) => (
-                  <div key={i} className="bg-zinc-800 dark:bg-zinc-800/50 rounded-lg p-4">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <code className="text-sm font-mono text-blue-400">
-                          {param.name}
-                        </code>
-                        <span className="ml-2 text-xs bg-zinc-700 text-zinc-300 px-2 py-1 rounded">
-                          {param.type}
-                        </span>
-                      </div>
-                    </div>
-                    <p className="mt-2 text-sm text-zinc-400">
-                      {param.description}
-                    </p>
-                    {param.example && (
-                      <div className="mt-2">
-                        <span className="text-xs text-zinc-500">Example: </span>
-                        <code className="text-xs text-zinc-300 bg-zinc-900 px-2 py-1 rounded">
-                          {param.example}
-                        </code>
-                      </div>
-                    )}
-                    {param.fields && (
-                      <div className="mt-3 space-y-1 pl-4 border-l-2 border-zinc-700">
-                        {param.fields.map((field, j) => (
-                          <div key={j} className="text-xs">
-                            <code className="text-zinc-300">{field.name}</code>
-                            <span className="text-zinc-500"> ({field.type})</span>
-                            <span className="text-zinc-400"> - {field.description}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Examples */}
-          {selectedMethod.examples && selectedMethod.examples.length > 0 && (
-            <div className="p-6">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-                Examples
-              </h3>
-              {selectedMethod.examples.map((example, i) => (
-                <div key={i} className="mb-6">
-                  <h4 className="text-sm font-medium text-zinc-300 mb-2">
-                    {example.name}
-                  </h4>
-                  <div className="bg-zinc-800 dark:bg-zinc-800/50 rounded-lg p-4">
-                    <div className="text-xs text-zinc-500 mb-2">Request:</div>
-                    <CodeHighlighter
-                      code={JSON.stringify({
-                        jsonrpc: '2.0',
-                        id: 1,
-                        method: selectedMethod.name,
-                        params: example.params
-                      }, null, 2)}
-                      language="json"
-                    />
-                  </div>
-                  <div className="bg-zinc-800 dark:bg-zinc-800/50 rounded-lg p-4 mt-2">
-                    <div className="text-xs text-zinc-500 mb-2">Expected Response:</div>
-                    <CodeHighlighter
-                      code={JSON.stringify({
-                        jsonrpc: '2.0',
-                        id: 1,
-                        ...example.response
-                      }, null, 2)}
-                      language="json"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </>
-      ) : (
-        <div className="flex-1 flex items-center justify-center text-zinc-500">
-          <div className="text-center">
-            <svg className="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-            <p>Select a method to view details</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  // Right Panel - Interactive Execute
-  const ExecutePanel = () => (
-    <div className={`${isMobile && showMobilePanel !== 'execute' ? 'hidden' : ''}
-      ${isMobile ? 'w-full' : 'w-96'} border-l border-zinc-800 dark:border-white/10 flex flex-col h-full bg-black overflow-hidden`}>
-
-      {selectedMethod ? (
-        <div className="flex-1 overflow-y-auto">
-          {/* Parameters Form */}
-          {selectedMethod.params && selectedMethod.params.length > 0 && (
-            <div className="p-4 border-b border-zinc-800 dark:border-white/10">
-              <h3 className="text-sm font-semibold text-white mb-3">Parameters</h3>
-              <div className="space-y-3">
-                {selectedMethod.params.map((param) => (
-                  <div key={param.name}>
-                    <label className="text-xs text-zinc-400 block mb-1">
-                      {param.name} ({param.type})
-                    </label>
-                    <input
-                      type="text"
-                      placeholder={param.example || `Enter ${param.name}`}
-                      className="w-full px-3 py-2 bg-zinc-800 dark:bg-zinc-800/50 text-white rounded text-sm border border-zinc-700 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      value={paramValues[param.name] || ''}
-                      onChange={(e) => setParamValues(prev => ({
-                        ...prev,
-                        [param.name]: e.target.value
-                      }))}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Execute Button */}
-          <div className="p-4 border-b border-zinc-800 dark:border-white/10">
-            <button
-              onClick={executeRpcRequest}
-              disabled={isLoading || !isValidEndpoint}
-              className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {isLoading ? 'Executing...' : 'Execute Request'}
-            </button>
-          </div>
-
-          {/* Code Examples */}
-          <div className="p-4 border-b border-zinc-800 dark:border-white/10">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-white">Code Example</h3>
-              <button
-                onClick={() => handleCopy(generateCodeExamples(
-                  selectedMethod.name,
-                  selectedMethod.params.map(p => paramValues[p.name] || p.example || '')
-                ))}
-                className="text-zinc-400 hover:text-white p-1"
-              >
-                {copied ? (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                )}
-              </button>
-            </div>
-
-            {/* Language Tabs */}
-            <div className="flex flex-wrap gap-1 mb-3">
-              {languages.map(lang => (
-                <button
-                  key={lang.id}
-                  onClick={() => setSelectedLanguage(lang.id)}
-                  className={`px-2 py-1 text-xs rounded transition-colors ${
-                    selectedLanguage === lang.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-zinc-800 dark:bg-zinc-800/50 text-zinc-400 hover:bg-zinc-700'
-                  }`}
-                >
-                  {lang.name}
-                </button>
-              ))}
-            </div>
-
-            <CodeHighlighter
-              code={generateCodeExamples(
-                selectedMethod.name,
-                selectedMethod.params.map(p => paramValues[p.name] || p.example || '')
-              )}
-              language={selectedLanguage}
-            />
-          </div>
-
-          {/* Response */}
-          {requestResult && (
-            <div className="p-4">
-              <h3 className="text-sm font-semibold text-white mb-3">Response</h3>
-              <CodeHighlighter
-                code={JSON.stringify(requestResult, null, 2)}
-                language="json"
-              />
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex-1 flex items-center justify-center text-zinc-500">
-          <div className="text-center">
-            <svg className="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            <p>Select a method to execute</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  // Generate code example using debounced values
+  const codeExample = useMemo(() => {
+    if (!selectedMethod) return '';
+    const params = selectedMethod.params.map(p => debouncedParamValues[p.name] || p.example || '');
+    return generateCodeExample(selectedMethod.name, params, selectedLanguage);
+  }, [selectedMethod, debouncedParamValues, selectedLanguage, generateCodeExample]);
 
   return (
-    <div className="min-h-[600px] h-[80vh] bg-black text-white not-prose flex flex-col relative">
-      {/* Header - Fixed/Pinned at top */}
-      <div className="bg-black border-b border-zinc-800 dark:border-white/10 px-6 py-4 flex-shrink-0">
+    <div className={`min-h-[600px] h-[80vh] not-prose flex flex-col relative ${
+      theme === 'dark' ? 'bg-black text-white' : 'bg-gray-50 text-gray-900'
+    }`}>
+      <div className="max-w-7xl mx-auto w-full flex flex-col h-full p-4">
+      {/* Header */}
+      <div className={`rounded-t-lg px-6 py-4 flex-shrink-0 ${
+        theme === 'dark'
+          ? 'bg-black border-b border-zinc-800'
+          : 'bg-white border-b border-gray-200'
+      }`}>
         <div className="flex items-center justify-between gap-6">
           <div className="flex-1">
             <h1 className="text-2xl font-bold">Ethereum JSON-RPC Explorer</h1>
-            <p className="text-sm text-zinc-400 mt-1">
+            <p className={`text-sm mt-1 ${
+              theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'
+            }`}>
               Interactive method testing for Cosmos EVM
             </p>
           </div>
 
           {/* RPC Endpoint Config */}
-          <div className="w-[40%] max-w-md">
+          <div className={`${isMobile ? 'w-full' : 'w-[40%] max-w-md'}`}>
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-zinc-500">RPC URL - Enter a valid EVM endpoint to test methods</label>
-              <div className="flex items-center gap-3">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    placeholder="http://localhost:8545"
-                    className={`w-full px-3 py-2 bg-zinc-800 dark:bg-zinc-800/50 text-white rounded-lg text-sm border ${
-                      isValidEndpoint
-                        ? 'border-green-500'
-                        : isInvalidEndpoint
-                        ? 'border-red-500'
-                        : 'border-zinc-700 dark:border-white/20'
-                    } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    value={rpcEndpoint}
-                    onChange={(e) => {
-                      setRpcEndpoint(e.target.value);
-                      setIsValidEndpoint(false);
-                      setIsInvalidEndpoint(false);
-                    }}
-                    onBlur={validateEndpoint}
-                  />
-                </div>
-                <div className="flex items-center gap-3">
-                  {isValidEndpoint && (
-                    <span className="text-sm text-green-400 flex items-center gap-1 whitespace-nowrap">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                      Connected
-                    </span>
-                  )}
-                  {isInvalidEndpoint && (
-                    <span className="text-sm text-red-400 whitespace-nowrap">✗ Failed</span>
-                  )}
-                  <span className="text-xs text-zinc-500 whitespace-nowrap">
-                    {filteredMethods.length} methods
+              <label className={`text-xs ${
+                theme === 'dark' ? 'text-zinc-500' : 'text-gray-500'
+              }`}>RPC URL</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="http://localhost:8545"
+                  className={`flex-1 px-3 py-2 rounded-lg text-sm border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  theme === 'dark'
+                    ? 'bg-zinc-800 text-white border-zinc-700'
+                    : 'bg-white text-gray-900 border-gray-300'
+                }`}
+                  value={rpcEndpoint}
+                  onChange={(e) => {
+                    setRpcEndpoint(e.target.value);
+                    setIsValidEndpoint(false);
+                    setIsInvalidEndpoint(false);
+                  }}
+                  onBlur={validateEndpoint}
+                />
+                {isValidEndpoint && (
+                  <span className="text-xs text-green-500 flex items-center gap-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    Connected
                   </span>
-                </div>
+                )}
+                {isInvalidEndpoint && (
+                  <span className="text-xs text-red-500">Failed</span>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content Container with padding */}
-      <div className="flex-1 p-2 overflow-hidden">
-        <div className="h-full bg-black rounded-lg overflow-hidden flex flex-col">
-          {/* Panels Container - Scrollable */}
-          <div className="flex-1 flex overflow-hidden">
-            <MethodsList />
-            <MethodDetails />
-            {!isMobile && <ExecutePanel />}
+      {/* Main Content */}
+      <div className="flex-1 flex overflow-hidden rounded-b-lg">
+        {/* Left Panel - Methods List */}
+        <div className={`${isMobile ? 'w-full' : 'w-80'} ${
+          isMobile && showMobilePanel !== 'list' ? 'hidden' : ''
+        } flex flex-col h-full overflow-hidden ${
+          theme === 'dark'
+            ? 'border-r border-zinc-800 bg-black'
+            : 'border-r border-gray-200 bg-white'
+        }`}>
+          {/* Search & Filters */}
+          <div className={`p-4 ${
+            theme === 'dark' ? 'border-b border-zinc-800' : 'border-b border-gray-200'
+          }`}>
+            <div className="relative">
+              <svg className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                theme === 'dark' ? 'text-zinc-400' : 'text-gray-400'
+              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search methods..."
+                className={`w-full pl-9 pr-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                theme === 'dark'
+                  ? 'bg-zinc-800 text-white'
+                  : 'bg-gray-100 text-gray-900'
+              }`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-1 mt-3">
+              <button
+                onClick={() => setSelectedNamespace('all')}
+                style={{
+                  boxShadow: selectedNamespace === 'all'
+                    ? `0 0 0 2px ${theme === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)'}`
+                    : 'none'
+                }}
+                className={`px-3 py-1 text-xs rounded-full transition-all font-medium ${
+                  selectedNamespace === 'all'
+                    ? theme === 'dark'
+                      ? 'bg-zinc-500 text-white'
+                      : 'bg-gray-500 text-white'
+                    : theme === 'dark'
+                      ? 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                      : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                }`}
+              >
+                All
+              </button>
+              {Object.entries(namespaces)
+                .filter(([key]) => visibleNamespaces.has(key))
+                .map(([key, namespace]) => (
+                  <button
+                    key={key}
+                    onClick={() => setSelectedNamespace(key)}
+                    style={{
+                      backgroundColor: theme === 'dark'
+                        ? (selectedNamespace === key ? namespaceColors[key] : 'transparent')
+                        : namespaceColors[key],
+                      borderColor: namespaceColors[key],
+                      borderWidth: '2px',
+                      color: 'white', // Always white text for better visibility
+                      opacity: theme === 'light' ? (selectedNamespace === key ? 1 : 0.7) : 1,
+                      boxShadow: selectedNamespace === key
+                        ? `0 0 0 2px ${theme === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)'}`
+                        : 'none'
+                    }}
+                    className="px-3 py-1 text-xs rounded-full transition-all font-medium hover:opacity-100"
+                  >
+                    {namespace.name}
+                  </button>
+                ))}
+            </div>
+
+            <div className="flex items-center gap-2 mt-3">
+              <label className="flex items-center cursor-pointer text-xs">
+                <input
+                  type="checkbox"
+                  checked={showAllMethods}
+                  onChange={(e) => setShowAllMethods(e.target.checked)}
+                  className="mr-2"
+                />
+                <span className={theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'}>Show all methods</span>
+              </label>
+            </div>
           </div>
-          {/* Mobile Navigation */}
-          {isMobile && (
+
+          {/* Methods */}
+          <div className="flex-1 overflow-y-auto">
+            {filteredMethods.map((method) => (
+              <button
+                key={method.name}
+                onClick={() => {
+                  setSelectedMethod(method);
+                  setParamValues({});
+                  setRequestResult(null);
+                  if (isMobile) setShowMobilePanel('details');
+                }}
+                className={`w-full px-4 py-3 text-left transition-colors ${
+                  selectedMethod?.name === method.name
+                    ? theme === 'dark' ? 'bg-zinc-800/50' : 'bg-gray-100'
+                    : ''
+                } ${
+                  theme === 'dark' ? 'hover:bg-zinc-800/50' : 'hover:bg-gray-50'
+                }`}
+                style={{
+                  borderLeft: `3px solid ${namespaceColors[method.namespace]}`,
+                  borderTop: `1px solid ${namespaceColors[method.namespace]}33`,
+                  borderRight: `1px solid ${namespaceColors[method.namespace]}33`,
+                  borderBottom: `1px solid ${namespaceColors[method.namespace]}33`,
+                  borderRadius: '0 4px 4px 0',
+                  marginBottom: '2px'
+                }}
+              >
+                <div className="flex items-start gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <code className="text-sm font-mono text-blue-400 truncate">
+                        {method.name}
+                      </code>
+                      {method.status === 'Stub' && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/30 text-yellow-400">
+                          stub
+                        </span>
+                      )}
+                      {method.status === 'N' && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/30 text-red-400">
+                          not impl
+                        </span>
+                      )}
+                      {method.cosmosSpecific && (
+                        <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded bg-purple-500/30">
+                          <CosmosIcon size={10} color={theme === 'dark' ? '#c084fc' : '#9333ea'} />
+                          <span className={theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}>Cosmos</span>
+                        </span>
+                      )}
+                      {method.private && (
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                          theme === 'dark'
+                            ? 'bg-amber-500/30 text-amber-400'
+                            : 'bg-amber-100 text-amber-700'
+                        }`}>
+                          Private
+                        </span>
+                      )}
+                    </div>
+                    <p className={`text-xs mt-1 line-clamp-2 ${
+                      theme === 'dark' ? 'text-zinc-500' : 'text-gray-600'
+                    }`}>
+                      {method.description}
+                    </p>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Center Panel - Method Details */}
+        <div className={`${
+          isMobile && showMobilePanel !== 'details' ? 'hidden' : ''
+        } flex-1 flex flex-col overflow-y-auto ${
+          theme === 'dark' ? 'bg-black' : 'bg-white'
+        }`}>
+          {selectedMethod ? (
             <>
-              <div className={`${showMobilePanel === 'execute' ? 'block' : 'hidden'} flex-1 overflow-hidden`}>
-                <ExecutePanel />
+              <div className={`p-6 ${
+                theme === 'dark' ? 'border-b border-zinc-800' : 'border-b border-gray-200'
+              }`}>
+                <div className="flex items-center">
+                  <h2 className={`text-2xl font-mono font-bold ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {selectedMethod.name}
+                  </h2>
+                  <div
+                    className="flex-1 ml-4 h-0.5"
+                    style={{ backgroundColor: namespaceColors[selectedMethod.namespace] }}
+                  />
+                </div>
+                <p className={`mt-1 ${
+                  theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'
+                }`}>
+                  {selectedMethod.description}
+                </p>
+
+                {/* Status Legend */}
+                <div className={`mt-4 flex flex-wrap gap-3 text-xs ${
+                  theme === 'dark' ? 'text-zinc-500' : 'text-gray-500'
+                }`}>
+                  {selectedMethod.status === 'Y' && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1.5 py-0.5 rounded bg-green-500/30 text-green-400 text-[10px]">functional</span>
+                      <span>Fully compatible</span>
+                    </div>
+                  )}
+                  {selectedMethod.status === 'Stub' && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1.5 py-0.5 rounded bg-yellow-500/30 text-yellow-400 text-[10px]">stub</span>
+                      <span>Returns empty/null for compatibility</span>
+                    </div>
+                  )}
+                  {selectedMethod.status === 'N' && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1.5 py-0.5 rounded bg-red-500/30 text-red-400 text-[10px]">not impl</span>
+                      <span>Not implemented in Cosmos EVM</span>
+                    </div>
+                  )}
+                  {selectedMethod.cosmosSpecific && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-purple-500/30 text-[10px]">
+                        <CosmosIcon size={10} color={theme === 'dark' ? '#c084fc' : '#9333ea'} />
+                        <span className={theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}>Cosmos</span>
+                      </span>
+                      <span>Cosmos-specific extension</span>
+                    </div>
+                  )}
+                  {selectedMethod.private && (
+                    <div className="flex items-center gap-1.5">
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] ${
+                        theme === 'dark'
+                          ? 'bg-amber-500/30 text-amber-400'
+                          : 'bg-amber-100 text-amber-700'
+                      }`}>Private</span>
+                      <span>Requires authentication</span>
+                    </div>
+                  )}
+                </div>
               </div>
-              <MobileNav />
+
+              {/* Parameters */}
+              {selectedMethod.params && selectedMethod.params.length > 0 && (
+                <div className={`p-6 ${
+                  theme === 'dark' ? 'border-b border-zinc-800' : 'border-b border-gray-200'
+                }`}>
+                  <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Parameters
+                  </h3>
+                  <div className="space-y-3">
+                    {selectedMethod.params.map((param, i) => (
+                      <div key={i} className={`rounded-lg p-4 ${
+                    theme === 'dark' ? 'bg-zinc-800' : 'bg-gray-100'
+                  }`}>
+                        <code className="text-sm font-mono text-blue-400">
+                          {param.name}
+                        </code>
+                        <span className={`ml-2 text-xs px-2 py-1 rounded ${
+                          theme === 'dark'
+                            ? 'bg-zinc-700 text-zinc-300'
+                            : 'bg-gray-200 text-gray-700'
+                        }`}>
+                          {param.type}
+                        </span>
+                        <p className={`mt-2 text-sm ${
+                          theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'
+                        }`}>
+                          {param.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
+          ) : (
+            <div className={`flex-1 flex items-center justify-center ${
+              theme === 'dark' ? 'text-zinc-500' : 'text-gray-500'
+            }`}>
+              <p>Select a method to view details</p>
+            </div>
           )}
         </div>
+
+        {/* Right Panel - Interactive Execute */}
+        <div className={`${
+          isMobile ? 'w-full' : 'w-96'
+        } ${
+          isMobile && showMobilePanel !== 'execute' ? 'hidden' : ''
+        } flex flex-col h-full overflow-hidden ${
+          theme === 'dark'
+            ? 'border-l border-zinc-800 bg-black'
+            : 'border-l border-gray-200 bg-white'
+        }`}>
+          {selectedMethod ? (
+            <div className="flex-1 overflow-y-auto">
+              {/* Parameters Form */}
+              {selectedMethod.params && selectedMethod.params.length > 0 && (
+                <div className={`p-4 ${
+                  theme === 'dark' ? 'border-b border-zinc-800' : 'border-b border-gray-200'
+                }`}>
+                  <h3 className={`text-sm font-semibold mb-3 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>Parameters</h3>
+                  <div className="space-y-3">
+                    {selectedMethod.params.map((param) => (
+                      <div key={param.name}>
+                        <label className={`text-xs block mb-1 ${
+                          theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'
+                        }`}>
+                          {param.name} ({param.type})
+                        </label>
+                        <input
+                          type="text"
+                          placeholder={param.example || `Enter ${param.name}`}
+                          className={`w-full px-3 py-2 rounded text-sm border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            theme === 'dark'
+                              ? 'bg-zinc-800 text-white border-zinc-700'
+                              : 'bg-gray-100 text-gray-900 border-gray-300'
+                          }`}
+                          value={paramValues[param.name] || ''}
+                          onChange={(e) => setParamValues(prev => ({
+                            ...prev,
+                            [param.name]: e.target.value
+                          }))}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Execute Button */}
+              <div className={`p-4 ${
+                theme === 'dark' ? 'border-b border-zinc-800' : 'border-b border-gray-200'
+              }`}>
+                <button
+                  onClick={executeRpcRequest}
+                  disabled={isLoading || !isValidEndpoint}
+                  className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {isLoading ? 'Executing...' : 'Execute Request'}
+                </button>
+              </div>
+
+              {/* Code Examples */}
+              <div className={`p-4 ${
+                theme === 'dark' ? 'border-b border-zinc-800' : 'border-b border-gray-200'
+              }`}>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className={`text-sm font-semibold ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>Code Example</h3>
+                  <button
+                    onClick={() => handleCopy(codeExample)}
+                    className={`p-1 ${
+                      theme === 'dark'
+                        ? 'text-zinc-400 hover:text-white'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Language Tabs */}
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {languages.map(lang => (
+                    <button
+                      key={lang.id}
+                      onClick={() => setSelectedLanguage(lang.id)}
+                      className={`px-2 py-1 text-xs rounded transition-colors ${
+                        selectedLanguage === lang.id
+                          ? 'bg-blue-600 text-white'
+                          : theme === 'dark'
+                            ? 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                            : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                      }`}
+                    >
+                      {lang.name}
+                    </button>
+                  ))}
+                </div>
+
+                <CodeHighlighter
+                  code={codeExample}
+                  language={selectedLanguage}
+                  theme={theme}
+                />
+              </div>
+
+              {/* Response */}
+              {requestResult && (
+                <div className="p-4">
+                  <h3 className={`text-sm font-semibold mb-3 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>Response</h3>
+                  <CodeHighlighter
+                    code={JSON.stringify(requestResult, null, 2)}
+                    language="json"
+                    theme={theme}
+                  />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className={`flex-1 flex items-center justify-center ${
+              theme === 'dark' ? 'text-zinc-500' : 'text-gray-500'
+            }`}>
+              <p>Select a method to execute</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      {isMobile && (
+        <div className={`border-t flex-shrink-0 ${
+          theme === 'dark' ? 'border-zinc-800 bg-black' : 'border-gray-200 bg-white'
+        }`}>
+          <div className="flex">
+            <button
+              onClick={() => setShowMobilePanel('list')}
+              className={`flex-1 py-3 text-sm font-medium transition-colors ${
+                showMobilePanel === 'list'
+                  ? theme === 'dark' ? 'text-blue-400 bg-zinc-800/50' : 'text-blue-600 bg-gray-100'
+                  : theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'
+              }`}
+            >
+              Methods
+            </button>
+            <button
+              onClick={() => setShowMobilePanel('details')}
+              className={`flex-1 py-3 text-sm font-medium transition-colors ${
+                showMobilePanel === 'details'
+                  ? theme === 'dark' ? 'text-blue-400 bg-zinc-800/50' : 'text-blue-600 bg-gray-100'
+                  : theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'
+              }`}
+              disabled={!selectedMethod}
+            >
+              Details
+            </button>
+            <button
+              onClick={() => setShowMobilePanel('execute')}
+              className={`flex-1 py-3 text-sm font-medium transition-colors ${
+                showMobilePanel === 'execute'
+                  ? theme === 'dark' ? 'text-blue-400 bg-zinc-800/50' : 'text-blue-600 bg-gray-100'
+                  : theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'
+              }`}
+              disabled={!selectedMethod}
+            >
+              Execute
+            </button>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );

@@ -4,6 +4,15 @@ description: "Find below a list of JSON-RPC methods supported on Cosmos EVM, sor
 keywords: ['json-rpc', 'ethereum', 'methods', 'api', 'web3', 'eth', 'debug', 'admin', 'personal', 'txpool', 'filter', 'websocket', 'trace', 'engine', 'clique', 'les', 'rpc methods', 'ethereum api', 'cosmos evm']
 ---
 
+<Warning>
+**Implementation Status**: While Cosmos EVM responds to all standard Ethereum RPC methods for compatibility, many are stub implementations that return empty or null responses. This page indicates the actual implementation status of each method.
+
+**Legend**:
+- **Y** - Fully compatible
+- **Stub** - Returns success but with null/empty/zero values for compatibility
+- **N** - Not Implemented - Returns error or not available
+</Warning>
+
 <Info>
 This documentation lists all Ethereum JSON-RPC methods and their implementation status in Cosmos EVM. For the official Ethereum JSON-RPC specification, see the [Ethereum Execution APIs](https://github.com/ethereum/execution-apis) repository.
 </Info>
@@ -12,80 +21,123 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 **Namespace Configuration**: By default, only the `eth`, `net`, and `web3` namespaces are enabled. To enable additional namespaces like `personal`, `txpool`, `debug`, or `miner`, you must configure them in your node's JSON-RPC API settings. Methods marked as "Requires config" are implemented but need their namespace to be explicitly enabled.
 </Note>
 
+## Non-Implemented Namespaces
+
+The following namespaces are not implemented in Cosmos EVM but may be present in the interactive explorer for testing against other networks:
+
+<AccordionGroup>
+  <Accordion title="debug - Debugging and Tracing (Not Implemented)">
+    The `debug` namespace provides debugging and tracing tools for development. These methods are not implemented in Cosmos EVM. For debugging needs, use standard logging and monitoring tools.
+  </Accordion>
+
+  <Accordion title="admin - Node Administration (Not Applicable)">
+    The `admin` namespace handles node administration and peer management. Cosmos nodes use different administration mechanisms through the Cosmos SDK CLI and configuration files.
+  </Accordion>
+
+  <Accordion title="miner - Mining Operations (Not Applicable)">
+    The `miner` namespace controls Proof of Work mining operations. Cosmos EVM uses Tendermint Byzantine Fault Tolerant consensus instead of mining.
+  </Accordion>
+
+  <Accordion title="engine - Post-Merge Engine API (Not Applicable)">
+    The `engine` namespace implements Ethereum's post-merge Engine API for communication with the consensus layer. Cosmos EVM uses Tendermint consensus instead of the beacon chain.
+  </Accordion>
+
+  <Accordion title="clique - Proof of Authority (Not Applicable)">
+    The `clique` namespace implements Proof of Authority consensus for private networks. Cosmos EVM uses Tendermint consensus.
+  </Accordion>
+
+  <Accordion title="les - Light Client Protocol (Not Supported)">
+    The `les` namespace implements the Light Ethereum Subprotocol. Cosmos has a different light client architecture through IBC.
+  </Accordion>
+</AccordionGroup>
+
 ## Endpoints
 
-| Method                                                                                | Namespace | Implemented | Public | Notes              |
+| Method                                                                                | Namespace | Status | Public | Notes              |
 | ------------------------------------------------------------------------------------- | --------- | ----------- | ------ | ------------------ |
 | [`web3_clientVersion`](#web3_clientversion)                                           | Web3      | Y          | Y      |                    |
 | [`web3_sha3`](#web3_sha3)                                                             | Web3      | Y          | Y      |                    |
 | [`net_version`](#net_version)                                                         | Net       | Y          | Y      |                    |
-| [`net_peerCount`](#net_peercount)                                                     | Net       | Y          | Y      |                    |
-| [`net_listening`](#net_listening)                                                     | Net       | Y          | Y      |                    |
+| [`net_peerCount`](#net_peercount)                                                     | Net       | Stub          | Y      | Returns "0x0"      |
+| [`net_listening`](#net_listening)                                                     | Net       | Stub       | Y      | Returns true       |
 | [`eth_protocolVersion`](#eth_protocolversion)                                         | Eth       | Y          | Y      |                    |
-| [`eth_syncing`](#eth_syncing)                                                         | Eth       | Y          | Y      |                    |
-| [`eth_gasPrice`](#eth_gasprice)                                                       | Eth       | Y          | Y      |                    |
+| [`eth_syncing`](#eth_syncing)                                                         | Eth       | Stub       | Y      | Returns false      |
+| [`eth_gasPrice`](#eth_gasprice)                                                       | Eth       | Stub       | Y      | Returns "0x0"      |
 | [`eth_accounts`](#eth_accounts)                                                       | Eth       | Y          | Y      |                    |
 | [`eth_blockNumber`](#eth_blocknumber)                                                 | Eth       | Y          | Y      |                    |
 | [`eth_getBalance`](#eth_getbalance)                                                   | Eth       | Y          | Y      |                    |
 | [`eth_getStorageAt`](#eth_getstorageat)                                               | Eth       | Y          | Y      |                    |
 | [`eth_getTransactionCount`](#eth_gettransactioncount)                                 | Eth       | Y          | Y      |                    |
-| [`eth_getBlockTransactionCountByNumber`](#eth_getblocktransactioncountbynumber)       | Eth       | Y          | Y      |                    |
-| [`eth_getBlockTransactionCountByHash`](#eth_getblocktransactioncountbyhash)           | Eth       | Y          | Y      |                    |
-| [`eth_getCode`](#eth_getcode)                                                         | Eth       | Y          | Y      |                    |
+| [`eth_getBlockTransactionCountByNumber`](#eth_getblocktransactioncountbynumber)       | Eth       | Stub       | Y      | Returns "0x0"      |
+| [`eth_getBlockTransactionCountByHash`](#eth_getblocktransactioncountbyhash)           | Eth       | Stub       | Y      | Returns "0x0"      |
+| [`eth_getCode`](#eth_getcode)                                                         | Eth       | Stub       | Y      | Returns "0x"       |
 | [`eth_sign`](#eth_sign)                                                               | Eth       | Y          | N      |                    |
-| [`eth_sendTransaction`](#eth_sendtransaction)                                         | Eth       | Y          | N      |                    |
+| [`eth_sendTransaction`](#eth_sendtransaction)                                         | Eth       | N          | N      | Not implemented    |
 | [`eth_sendRawTransaction`](#eth_sendrawtransaction)                                   | Eth       | Y          | Y      |                    |
-| [`eth_call`](#eth_call)                                                               | Eth       | Y          | Y      |                    |
+| [`eth_call`](#eth_call)                                                               | Eth       | Stub       | Y      | Returns "0x"       |
 | [`eth_estimateGas`](#eth_estimategas)                                                 | Eth       | Y          | Y      |                    |
 | [`eth_getBlockByNumber`](#eth_getblockbynumber)                                       | Eth       | Y          | Y      |                    |
 | [`eth_getBlockByHash`](#eth_getblockbyhash)                                           | Eth       | Y          | Y      |                    |
-| [`eth_getTransactionByHash`](#eth_gettransactionbyhash)                               | Eth       | Y          | Y      |                    |
-| [`eth_getTransactionByBlockHashAndIndex`](#eth_gettransactionbyblockhashandindex)     | Eth       | Y          | Y      |                    |
-| [`eth_getTransactionReceipt`](#eth_gettransactionreceipt)                             | Eth       | Y          | Y      |                    |
+| [`eth_getTransactionByHash`](#eth_gettransactionbyhash)                               | Eth       | Stub       | Y      | Returns null       |
+| [`eth_getTransactionByBlockHashAndIndex`](#eth_gettransactionbyblockhashandindex)     | Eth       | Stub       | Y      | Returns null       |
+| [`eth_getTransactionReceipt`](#eth_gettransactionreceipt)                             | Eth       | Stub       | Y      | Returns null       |
 | [`eth_newFilter`](#eth_newfilter)                                                     | Eth       | Y          | Y      |                    |
 | [`eth_newBlockFilter`](#eth_newblockfilter)                                           | Eth       | Y          | Y      |                    |
 | [`eth_newPendingTransactionFilter`](#eth_newpendingtransactionfilter)                 | Eth       | Y          | Y      |                    |
-| [`eth_uninstallFilter`](#eth_uninstallfilter)                                         | Eth       | Y          | Y      |                    |
-| [`eth_getFilterChanges`](#eth_getfilterchanges)                                       | Eth       | Y          | Y      |                    |
-| [`eth_getFilterLogs`](#eth_getfilterlogs)                                             | Eth       | Y          | Y      |                    |
-| [`eth_getLogs`](#eth_getlogs)                                                         | Eth       | Y          | Y      |                    |
-| [`eth_getTransactionByBlockNumberAndIndex`](#eth_gettransactionbyblocknumberandindex) | Eth       | Y          | Y      |                    |
-| `eth_getWork`                                                                         | Eth       | Y          | Y      | Returns empty work |
-| `eth_submitWork`                                                                      | Eth       | Y          | Y      | Always returns false|
-| `eth_submitHashrate`                                                                  | Eth       | Y          | Y      | Stub implementation|
-| `eth_getCompilers`                                                                    | Eth       | N          | N      | Deprecated         |
-| `eth_compileLLL`                                                                      | Eth       | N          | N      | Deprecated         |
-| `eth_compileSolidity`                                                                 | Eth       | N          | N      | Deprecated         |
-| `eth_compileSerpent`                                                                  | Eth       | N          | N      | Deprecated         |
-| `eth_signTransaction`                                                                 | Eth       | Y          | N      |                    |
-| `eth_mining`                                                                          | Eth       | Y          | Y      | Always false       |
-| [`eth_coinbase`](#eth_coinbase)                                                       | Eth       | Y          | Y      |                    |
-| `eth_hashrate`                                                                        | Eth       | Y          | Y      | Always 0           |
-| `eth_getUncleCountByBlockHash`                                                        | Eth       | Y          | Y      | Always 0           |
-| `eth_getUncleCountByBlockNumber`                                                      | Eth       | Y          | Y      | Always 0           |
-| `eth_getUncleByBlockHashAndIndex`                                                     | Eth       | Y          | Y      | Always null        |
-| `eth_getUncleByBlockNumberAndIndex`                                                   | Eth       | Y          | Y      | Always null        |
-| [`eth_getProof`](#eth_getproof)                                                       | Eth       | Y          | Y      |                    |
+| [`eth_uninstallFilter`](#eth_uninstallfilter)                                         | Eth       | Stub       | Y      | Returns true       |
+| [`eth_getFilterChanges`](#eth_getfilterchanges)                                       | Eth       | Stub       | Y      | Returns empty array|
+| [`eth_getFilterLogs`](#eth_getfilterlogs)                                             | Eth       | Stub       | Y      | Returns empty array|
+| [`eth_getLogs`](#eth_getlogs)                                                         | Eth       | Stub       | Y      | Returns []         |
+| [`eth_getTransactionByBlockNumberAndIndex`](#eth_gettransactionbyblocknumberandindex) | Eth       | Stub       | Y      | Returns null       |
+| `eth_getWork`                                                                         | Eth       | N          | Y      | Not implemented    |
+| `eth_submitWork`                                                                      | Eth       | N          | Y      | Not implemented    |
+| `eth_submitHashrate`                                                                  | Eth       | N          | Y      | Not implemented    |
+| `eth_getCompilers`                                                                    | Eth       | N          | N      | Not implemented    |
+| `eth_compileLLL`                                                                      | Eth       | N          | N      | Not implemented    |
+| `eth_compileSolidity`                                                                 | Eth       | N          | N      | Not implemented    |
+| `eth_compileSerpent`                                                                  | Eth       | N          | N      | Not implemented    |
+| `eth_signTransaction`                                                                 | Eth       | N          | N      | Not implemented    |
+| `eth_mining`                                                                          | Eth       | N          | Y      | Not implemented    |
+| [`eth_coinbase`](#eth_coinbase)                                                       | Eth       | N          | Y      | Not implemented    |
+| `eth_hashrate`                                                                        | Eth       | N          | Y      | Not implemented    |
+| `eth_getUncleCountByBlockHash`                                                        | Eth       | Stub       | Y      | Always "0x0"       |
+| `eth_getUncleCountByBlockNumber`                                                      | Eth       | Stub       | Y      | Always "0x0"       |
+| `eth_getUncleByBlockHashAndIndex`                                                     | Eth       | Stub       | Y      | Always null        |
+| `eth_getUncleByBlockNumberAndIndex`                                                   | Eth       | Stub       | Y      | Always null        |
+| [`eth_getProof`](#eth_getproof)                                                       | Eth       | N          | Y      | Requires valid height |
 | `eth_feeHistory`                                                                      | Eth       | Y          | Y      | EIP-1559           |
-| `eth_maxPriorityFeePerGas`                                                            | Eth       | Y          | Y      | EIP-1559           |
+| `eth_maxPriorityFeePerGas`                                                            | Eth       | Stub       | Y      | Returns "0x0"      |
 | `eth_chainId`                                                                         | Eth       | Y          | Y      |                    |
-| `eth_getBlockReceipts`                                                                | Eth       | Y          | Y      |                    |
-| `eth_resend`                                                                          | Eth       | Y          | Y      |                    |
-| `eth_pendingTransactions`                                                             | Eth       | Y          | Y      |                    |
-| `eth_createAccessList`                                                                | Eth       | Y          | Y      | EIP-2930           |
-| [`eth_subscribe`](#eth_subscribe)                                                     | Websocket | W         | Y      | syncing not impl.  |
-| [`eth_unsubscribe`](#eth_unsubscribe)                                                 | Websocket | Y          | Y      |                    |
-| [`personal_importRawKey`](#personal_importrawkey)                                     | Personal  | Y          | N      |                    |
-| [`personal_listAccounts`](#personal_listaccounts)                                     | Personal  | Y          | N      |                    |
-| [`personal_lockAccount`](#personal_lockaccount)                                       | Personal  | Y          | N      |                    |
-| [`personal_newAccount`](#personal_newaccount)                                         | Personal  | Y          | N      |                    |
-| [`personal_unlockAccount`](#personal_unlockaccount)                                   | Personal  | Y          | N      |                    |
-| [`personal_sendTransaction`](#personal_sendtransaction)                               | Personal  | Y          | N      | Requires config    |
-| [`personal_sign`](#personal_sign)                                                     | Personal  | Y          | N      |                    |
-| [`personal_ecRecover`](#personal_ecrecover)                                           | Personal  | Y          | N      | Requires config    |
-| [`personal_initializeWallet`](#personal_initializewallet)                             | Personal  | Y          | N      |                    |
-| [`personal_unpair`](#personal_unpair)                                                 | Personal  | Y          | N      |                    |
-| `personal_listWallets`                                                                | Personal  | Y          | N      |                    |
+| `eth_getBlockReceipts`                                                                | Eth       | Stub       | Y      | Returns empty array|
+| [`eth_resend`](#eth_resend)                                                          | Eth       | N          | Y      | Requires nonce param |
+| `eth_createAccessList`                                                                | Eth       | N          | Y      | Not implemented    |
+| `eth_blobBaseFee`                                                                     | Eth       | N          | Y      | Not implemented    |
+| `eth_fillTransaction`                                                                 | Eth       | N          | Y      | Not implemented    |
+| [`eth_signTypedData`](#eth_signtypeddata)                                            | Eth       | N          | N      | Requires domain param |
+| `eth_signTypedData_v3`                                                                | Eth       | N          | N      | Not implemented    |
+| `eth_signTypedData_v4`                                                                | Eth       | N          | N      | Not implemented    |
+| `eth_pendingTransactions`                                                             | Eth       | N          | Y      | Not implemented    |
+| `eth_getPendingTransactions`                                                          | Eth       | N          | Y      | Not implemented    |
+| `eth_getRawTransactionByHash`                                                         | Eth       | N          | Y      | Not implemented    |
+| `eth_getRawTransactionByBlockNumberAndIndex`                                          | Eth       | N          | Y      | Not implemented    |
+| `eth_getRawTransactionByBlockHashAndIndex`                                            | Eth       | N          | Y      | Not implemented    |
+| [`eth_subscribe`](#eth_subscribe)                                                     | Websocket | Y          | Y      | WebSocket only     |
+| [`eth_unsubscribe`](#eth_unsubscribe)                                                 | Websocket | Y          | Y      | WebSocket only     |
+| [`personal_importRawKey`](#personal_importrawkey)                                     | Personal  | N          | N      | Requires valid hex key |
+| [`personal_listAccounts`](#personal_listaccounts)                                     | Personal  | Y          | N      | Requires config    |
+| [`personal_lockAccount`](#personal_lockaccount)                                       | Personal  | Stub       | N      | Always false       |
+| [`personal_newAccount`](#personal_newaccount)                                         | Personal  | Y          | N      | Requires config    |
+| [`personal_unlockAccount`](#personal_unlockaccount)                                   | Personal  | Stub       | N      | Always false       |
+| [`personal_sendTransaction`](#personal_sendtransaction)                               | Personal  | N          | N      | Not implemented    |
+| [`personal_sign`](#personal_sign)                                                     | Personal  | Y          | N      | Requires config    |
+| [`personal_ecRecover`](#personal_ecrecover)                                           | Personal  | N          | N      | Requires 65-byte sig |
+| [`personal_initializeWallet`](#personal_initializewallet)                             | Personal  | N          | N      | Not implemented    |
+| [`personal_unpair`](#personal_unpair)                                                 | Personal  | N          | N      | Not implemented    |
+| `personal_listWallets`                                                                | Personal  | Stub       | N      | Returns null       |
+| `personal_signTransaction`                                                            | Personal  | N          | N      | Not implemented    |
+| `personal_signAndSendTransaction`                                                     | Personal  | N          | N      | Not implemented    |
+| `personal_openWallet`                                                                 | Personal  | N          | N      | Not implemented    |
+| `personal_deriveAccount`                                                              | Personal  | N          | N      | Not implemented    |
 | `db_putString`                                                                        | DB        | N          | N      | Deprecated         |
 | `db_getString`                                                                        | DB        | N          | N      | Deprecated         |
 | `db_putHex`                                                                           | DB        | N          | N      | Deprecated         |
@@ -100,103 +152,117 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 | `shh_uninstallFilter`                                                                 | SSH       | N          | N      | Deprecated         |
 | `shh_getFilterChanges`                                                                | SSH       | N          | N      | Deprecated         |
 | `shh_getMessages`                                                                     | SSH       | N          | N      | Deprecated         |
-| `admin_addPeer`                                                                       | Admin     | Y          | N      |                    |
-| `admin_removePeer`                                                                    | Admin     | Y          | N      |                    |
-| `admin_datadir`                                                                       | Admin     | Y          | N      |                    |
-| `admin_nodeInfo`                                                                      | Admin     | Y          | N      |                    |
-| `admin_peers`                                                                         | Admin     | Y          | N      |                    |
-| `admin_startHTTP`                                                                     | Admin     | Y          | N      |                    |
-| `admin_startWS`                                                                       | Admin     | Y          | N      |                    |
-| `admin_stopHTTP`                                                                      | Admin     | Y          | N      |                    |
-| `admin_stopWS`                                                                        | Admin     | Y          | N      |                    |
-| `clique_getSnapshot`                                                                  | Clique    |             |        |                    |
-| `clique_getSnapshotAtHash`                                                            | Clique    |             |        |                    |
-| `clique_getSigners`                                                                   | Clique    |             |        |                    |
-| `clique_proposals`                                                                    | Clique    |             |        |                    |
-| `clique_propose`                                                                      | Clique    |             |        |                    |
-| `clique_discard`                                                                      | Clique    |             |        |                    |
-| `clique_status`                                                                       | Clique    |             |        |                    |
-| `debug_backtraceAt`                                                                   | Debug     |             |        |                    |
-| `debug_blockProfile`                                                                  | Debug     |             |        |                    |
-| `debug_cpuProfile`                                                                    | Debug     |             |        |                    |
-| `debug_dumpBlock`                                                                     | Debug     |             |        |                    |
-| `debug_gcStats`                                                                       | Debug     |             |        |                    |
-| `debug_getBlockRlp`                                                                   | Debug     |             |        |                    |
-| `debug_goTrace`                                                                       | Debug     |             |        |                    |
-| `debug_freeOSMemory`                                                                  | Debug     | Y          | N      | **Cosmos-specific**|
-| `debug_memStats`                                                                      | Debug     | Y          | N      |                    |
-| `debug_mutexProfile`                                                                  | Debug     | N          | N      | Not implemented    |
+| `admin_addPeer`                                                                       | Admin     | N          | N      | Returns undefined  |
+| `admin_removePeer`                                                                    | Admin     | N          | N      | Returns undefined  |
+| `admin_datadir`                                                                       | Admin     | N          | N      | Returns undefined  |
+| `admin_nodeInfo`                                                                      | Admin     | N          | N      | Returns undefined  |
+| `admin_peers`                                                                         | Admin     | N          | N      | Returns undefined  |
+| `admin_startHTTP`                                                                     | Admin     | N          | N      | Returns undefined  |
+| `admin_startWS`                                                                       | Admin     | N          | N      | Returns undefined  |
+| `admin_stopHTTP`                                                                      | Admin     | N          | N      | Returns undefined  |
+| `admin_stopWS`                                                                        | Admin     | N          | N      | Returns undefined  |
+| `admin_addTrustedPeer`                                                                | Admin     | N          | N      | Returns undefined  |
+| `admin_removeTrustedPeer`                                                             | Admin     | N          | N      | Returns undefined  |
+| `admin_startRPC`                                                                      | Admin     | N          | N      | Returns undefined  |
+| `admin_stopRPC`                                                                        | Admin     | N          | N      | Returns undefined  |
+| `admin_exportChain`                                                                   | Admin     | N          | N      | Returns undefined  |
+| `admin_importChain`                                                                   | Admin     | N          | N      | Returns undefined  |
+| `admin_sleepBlocks`                                                                   | Admin     | N          | N      | Returns undefined  |
+| `admin_clearPeerBanList`                                                              | Admin     | N          | N      | Returns undefined  |
+| `admin_listPeerBanList`                                                               | Admin     | N          | N      | Returns undefined  |
+| `clique_getSnapshot`                                                                  | Clique    | N          | N      | Returns undefined  |
+| `clique_getSnapshotAtHash`                                                            | Clique    | N          | N      | Returns undefined  |
+| `clique_getSigners`                                                                   | Clique    | N          | N      | Returns undefined  |
+| `clique_getSignersAtHash`                                                             | Clique    | N          | N      | Returns undefined  |
+| `clique_propose`                                                                      | Clique    | N          | N      | Returns undefined  |
+| `clique_discard`                                                                      | Clique    | N          | N      | Returns undefined  |
+| `clique_status`                                                                       | Clique    | N          | N      | Returns undefined  |
+| `clique_getSigner`                                                                    | Clique    | N          | N      | Returns undefined  |
+| `debug_backtraceAt`                                                                   | Debug     | N          | N      | Returns undefined  |
+| `debug_blockProfile`                                                                  | Debug     | N          | N      | Profiling disabled |
+| `debug_cpuProfile`                                                                    | Debug     | N          | N      | Profiling disabled |
+| `debug_dumpBlock`                                                                     | Debug     | N          | N      | Returns undefined  |
+| `debug_gcStats`                                                                       | Debug     | N          | N      | Profiling disabled |
+| [`debug_getBlockRlp`](#debug_getblockrlp)                                            | Debug     | N          | N      | Requires uint64 param |
+| `debug_goTrace`                                                                       | Debug     | N          | N      | Profiling disabled |
+| `debug_freeOSMemory`                                                                  | Debug     | N          | N      | Profiling disabled |
+| `debug_memStats`                                                                      | Debug     | N          | N      | Profiling disabled |
+| `debug_mutexProfile`                                                                  | Debug     | N          | N      | Profiling disabled |
 | `debug_seedHash`                                                                      | Debug     | N          | N      | Not implemented    |
 | `debug_setHead`                                                                       | Debug     | N          | N      | Not implemented    |
-| `debug_setBlockProfileRate`                                                           | Debug     | Y          | N      |                    |
-| `debug_setGCPercent`                                                                  | Debug     | Y          | N      | **Cosmos-specific**|
-| `debug_setMutexProfileFraction`                                                       | Debug     | N          | N      | Not implemented    |
-| `debug_stacks`                                                                        | Debug     |             |        |                    |
-| `debug_startCPUProfile`                                                               | Debug     |             |        |                    |
-| `debug_startGoTrace`                                                                  | Debug     |             |        |                    |
-| `debug_stopCPUProfile`                                                                | Debug     |             |        |                    |
-| `debug_stopGoTrace`                                                                   | Debug     |             |        |                    |
-| `debug_traceBlock`                                                                    | Debug     |             |        |                    |
-| [`debug_traceBlockByNumber`](#debug_traceblockbynumber)                               | Debug     | Y          | N      |                    |
-| `debug_traceBlockByHash`                                                              | Debug     | Y          | N      |                    |
-| `debug_traceBlockFromFile`                                                            | Debug     |             |        |                    |
-| `debug_standardTraceBlockToFile`                                                      | Debug     |             |        |                    |
-| `debug_standardTraceBadBlockToFile`                                                   | Debug     |             |        |                    |
-| [`debug_traceTransaction`](#debug_tracetransaction)                                   | Debug     | Y          | N      |                    |
-| `debug_traceCall`                                                                     | Debug     | Y          | N      |                    |
+| `debug_setBlockProfileRate`                                                           | Debug     | N          | N      | Profiling disabled |
+| `debug_setGCPercent`                                                                  | Debug     | N          | N      | Profiling disabled |
+| `debug_setMutexProfileFraction`                                                       | Debug     | N          | N      | Profiling disabled |
+| `debug_stacks`                                                                        | Debug     | N          | N      | Profiling disabled |
+| `debug_startCPUProfile`                                                               | Debug     | N          | N      | Profiling disabled |
+| `debug_startGoTrace`                                                                  | Debug     | N          | N      | Profiling disabled |
+| `debug_stopCPUProfile`                                                                | Debug     | N          | N      | Profiling disabled |
+| `debug_stopGoTrace`                                                                   | Debug     | N          | N      | Profiling disabled |
+| `debug_traceBlock`                                                                    | Debug     | N          | N      | Returns undefined  |
+| [`debug_traceBlockByNumber`](#debug_traceblockbynumber)                               | Debug     | Stub       | N      | Returns empty array |
+| [`debug_traceBlockByHash`](#debug_traceblockhash)                                    | Debug     | Stub       | N      | Returns empty array |
+| `debug_traceBlockFromFile`                                                            | Debug     | N          | N      | Returns undefined  |
+| `debug_standardTraceBlockToFile`                                                      | Debug     | N          | N      | Returns undefined  |
+| `debug_standardTraceBadBlockToFile`                                                   | Debug     | N          | N      | Returns undefined  |
+| [`debug_traceTransaction`](#debug_tracetransaction)                                   | Debug     | N          | N      | Returns undefined  |
+| `debug_traceCall`                                                                     | Debug     | N          | N      | Returns undefined  |
+| `debug_traceChain`                                                                    | Debug     | N          | N      | Returns undefined  |
+| `debug_traceBadBlock`                                                                 | Debug     | N          | N      | Returns undefined  |
 | `debug_verbosity`                                                                     | Debug     | N          | N      | Not implemented    |
 | `debug_vmodule`                                                                       | Debug     | N          | N      | Not implemented    |
-| `debug_writeBlockProfile`                                                             | Debug     | Y          | N      |                    |
-| `debug_writeMemProfile`                                                               | Debug     | Y          | N      |                    |
-| `debug_writeMutexProfile`                                                             | Debug     | Y          | N      | **Cosmos-specific**|
+| `debug_writeBlockProfile`                                                             | Debug     | N          | N      | Profiling disabled |
+| `debug_writeMemProfile`                                                               | Debug     | N          | N      | Profiling disabled |
+| `debug_writeMutexProfile`                                                             | Debug     | N          | N      | Profiling disabled |
 | `debug_getRawBlock`                                                                   | Debug     | N          | N      | Not implemented    |
 | `debug_getRawHeader`                                                                  | Debug     | N          | N      | Not implemented    |
 | `debug_getRawReceipts`                                                                | Debug     | N          | N      | Not implemented    |
 | `debug_getRawTransaction`                                                             | Debug     | N          | N      | Not implemented    |
-| `debug_printBlock`                                                                    | Debug     | N          | N      | Not implemented    |
+| [`debug_printBlock`](#debug_printblock)                                              | Debug     | N          | N      | Requires uint64 param |
+| [`debug_getHeaderRlp`](#debug_getheaderrlp)                                          | Debug     | N          | N      | Requires uint64 param |
+| `debug_intermediateRoots`                                                             | Debug     | N          | N      | Profiling disabled |
 | `debug_getBadBlocks`                                                                  | Debug     | Y          | N      |                    |
 | `debug_storageRangeAt`                                                                | Debug     | Y          | N      |                    |
 | `debug_getModifiedAccountsByNumber`                                                   | Debug     | Y          | N      |                    |
 | `debug_getModifiedAccountsByHash`                                                     | Debug     | Y          | N      |                    |
-| `les_serverInfo`                                                                      | Les       | N/A         | N/A    | LES protocol       |
-| `les_clientInfo`                                                                      | Les       | N/A         | N/A    | LES protocol       |
-| `les_priorityClientInfo`                                                              | Les       | N/A         | N/A    | LES protocol       |
-| `les_addBalance`                                                                      | Les       | N/A         | N/A    | LES protocol       |
-| `les_setClientParams`                                                                 | Les       | N/A         | N/A    | LES protocol       |
-| `les_setDefaultParams`                                                                | Les       | N/A         | N/A    | LES protocol       |
-| `les_latestCheckpoint`                                                                | Les       | N/A         | N/A    | LES protocol       |
-| `les_getCheckpoint`                                                                   | Les       | N/A         | N/A    | LES protocol       |
-| `les_getCheckpointContractAddress`                                                    | Les       | N/A         | N/A    | LES protocol       |
+| `les_serverInfo`                                                                      | Les       | N          | N      | Returns undefined  |
+| `les_clientInfo`                                                                      | Les       | N          | N      | Returns undefined  |
+| `les_priorityClientInfo`                                                              | Les       | N          | N      | Returns undefined  |
+| `les_addBalance`                                                                      | Les       | N          | N      | Returns undefined  |
+| `les_setClientParams`                                                                 | Les       | N          | N      | Returns undefined  |
+| `les_setDefaultParams`                                                                | Les       | N          | N      | Returns undefined  |
+| `les_latestCheckpoint`                                                                | Les       | N          | N      | Returns undefined  |
+| `les_getCheckpoint`                                                                   | Les       | N          | N      | Returns undefined  |
+| `les_getCheckpointContractAddress`                                                    | Les       | N          | N      | Returns undefined  |
 | [`txpool_content`](#txpool_content)                                                   | TxPool    | Y          | Y      | Requires config    |
 | [`txpool_contentFrom`](#txpool_contentfrom)                                           | TxPool    | Y          | Y      | Requires config    |
 | [`txpool_inspect`](#txpool_inspect)                                                   | TxPool    | Y          | Y      | Requires config    |
-| [`txpool_status`](#txpool_status)                                                     | TxPool    | Y          | Y      | Requires config    |
+| [`txpool_status`](#txpool_status)                                                     | TxPool    | Stub       | Y      | Returns empty obj  |
 | `trace_callMany`                                                                      | Trace     | N          | N      | Not implemented    |
 | `eth_signTypedData`                                                                   | Eth       | W         | N      | EIP-712 partial    |
-| `eth_fillTransaction`                                                                 | Eth       | N          | N      | Not implemented    |
+| `eth_fillTransaction`                                                                 | Eth       | Y          | Y      |                    |
 | `eth_getTransactionLogs`                                                              | Eth       | Y          | Y      | **Cosmos-specific**|
-| `eth_getPendingTransactions`                                                          | Eth       | Y          | Y      | **Cosmos-specific**|
-| `miner_start`                                                                         | Miner     | Y          | N      | Stub returns true  |
-| `miner_stop`                                                                          | Miner     | Y          | N      | Stub returns true  |
-| `miner_setEtherbase`                                                                  | Miner     | Y          | N      | Stub returns true  |
-| `miner_setGasPrice`                                                                   | Miner     | Y          | N      | Stub returns true  |
-| `miner_setGasLimit`                                                                   | Miner     | Y          | N      | Stub returns true  |
-| `engine_newPayloadV1`                                                                 | Engine    | N          | N      | Post-merge API     |
-| `engine_newPayloadV2`                                                                 | Engine    | N          | N      | Post-merge API     |
-| `engine_newPayloadV3`                                                                 | Engine    | N          | N      | Post-merge API     |
-| `engine_forkchoiceUpdatedV1`                                                          | Engine    | N          | N      | Post-merge API     |
-| `engine_forkchoiceUpdatedV2`                                                          | Engine    | N          | N      | Post-merge API     |
-| `engine_forkchoiceUpdatedV3`                                                          | Engine    | N          | N      | Post-merge API     |
-| `engine_getPayloadV1`                                                                 | Engine    | N          | N      | Post-merge API     |
-| `engine_getPayloadV2`                                                                 | Engine    | N          | N      | Post-merge API     |
-| `engine_getPayloadV3`                                                                 | Engine    | N          | N      | Post-merge API     |
-| `engine_exchangeCapabilities`                                                         | Engine    | N          | N      | Post-merge API     |
-| `engine_exchangeTransitionConfigurationV1`                                            | Engine    | N          | N      | Post-merge API     |
-| `engine_getPayloadBodiesByHashV1`                                                     | Engine    | N          | N      | Post-merge API     |
-| `engine_getPayloadBodiesByHashV2`                                                     | Engine    | N          | N      | Post-merge API     |
-| `engine_getPayloadBodiesByRangeV1`                                                    | Engine    | N          | N      | Post-merge API     |
-| `engine_getPayloadBodiesByRangeV2`                                                    | Engine    | N          | N      | Post-merge API     |
-| `engine_getBlobsV1`                                                                   | Engine    | N          | N      | EIP-4844           |
+| `miner_start`                                                                         | Miner     | N          | N      | Returns undefined  |
+| `miner_stop`                                                                          | Miner     | N          | N      | Returns undefined  |
+| `miner_setEtherbase`                                                                  | Miner     | N          | N      | Returns undefined  |
+| `miner_setGasPrice`                                                                   | Miner     | N          | N      | Returns undefined  |
+| `miner_setGasLimit`                                                                   | Miner     | N          | N      | Returns undefined  |
+| `miner_setExtra`                                                                      | Miner     | N          | N      | Returns undefined  |
+| `miner_setRecommitInterval`                                                           | Miner     | N          | N      | Returns undefined  |
+| `miner_getHashrate`                                                                   | Miner     | N          | N      | Returns undefined  |
+| `engine_newPayloadV1`                                                                 | Engine    | N          | N      | Returns undefined  |
+| `engine_newPayloadV2`                                                                 | Engine    | N          | N      | Returns undefined  |
+| `engine_newPayloadV3`                                                                 | Engine    | N          | N      | Returns undefined  |
+| `engine_forkchoiceUpdatedV1`                                                          | Engine    | N          | N      | Returns undefined  |
+| `engine_forkchoiceUpdatedV2`                                                          | Engine    | N          | N      | Returns undefined  |
+| `engine_forkchoiceUpdatedV3`                                                          | Engine    | N          | N      | Returns undefined  |
+| `engine_getPayloadV1`                                                                 | Engine    | N          | N      | Returns undefined  |
+| `engine_getPayloadV2`                                                                 | Engine    | N          | N      | Returns undefined  |
+| `engine_getPayloadV3`                                                                 | Engine    | N          | N      | Returns undefined  |
+| `engine_exchangeCapabilities`                                                         | Engine    | N          | N      | Returns undefined  |
+| `engine_exchangeTransitionConfigurationV1`                                            | Engine    | N          | N      | Returns undefined  |
+| `engine_getPayloadBodiesByHashV1`                                                     | Engine    | N          | N      | Returns undefined  |
+| `engine_getPayloadBodiesByRangeV1`                                                    | Engine    | N          | N      | Returns undefined  |
+| `engine_getBlobsV1`                                                                   | Engine    | N          | N      | Returns undefined  |
 | `trace_call`                                                                          | Trace     | N          | N      | Not implemented    |
 | `trace_rawTransaction`                                                                | Trace     | N          | N      | Not implemented    |
 | `trace_replayBlockTransactions`                                                       | Trace     | N          | N      | Not implemented    |
@@ -223,12 +289,12 @@ Block Number can be entered as a Hex string, `"earliest"`, `"latest"` or `"pendi
 * `eth_feeHistory` - Fee history for EIP-1559
 * `eth_getFilterChanges` / `eth_getFilterLogs` - Filter management issues
 * `eth_fillTransaction` - Transaction filling utility
-* `eth_resend` / `eth_pendingTransactions` - Transaction pool management
+* `eth_resend` - Transaction resending utility
 * `personal_sendTransaction` / `personal_ecRecover` - Personal namespace methods
 * `personal_lockAccount` - Always returns false (not supported)
 * `debug_getRaw*` methods - Raw data access methods
 * `debug_printBlock` - Block printing utility
-* `trace_*` methods - Advanced tracing functionality
+* `trace_*` methods - Advanced tracing features
 * `engine_*` methods - Post-merge Engine API (uses Tendermint instead)
 * `admin_*` methods - Node administration
 * `les_*` methods - Light Ethereum Subprotocol
@@ -539,6 +605,30 @@ The address to sign with must be unlocked.
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_sign","params":["0x3b7252d007059ffc82d16d022da3cbf9992d2f70", "0xdeadbeaf"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
 // Result
 {"jsonrpc":"2.0","id":1,"result":"0x909809c76ed2a5d38733de39207d0f411222b9b49c64a192bf649cb13f63f37b45acb4f6939facb4f1c277bc70fb00407564140c0f18600ac44388f2c1dfd1dc1b"}
+```
+
+### `eth_signTypedData`
+
+Signs typed structured data according to [EIP-712](https://eips.ethereum.org/EIPS/eip-712). This method provides a more secure way to sign structured data compared to `eth_sign`.
+
+<Warning>
+**Implementation Note**: This method requires a properly formatted domain parameter in the typed data structure. Without the domain, it will return an error: "domain is undefined".
+</Warning>
+
+#### Parameters
+
+- Account Address (20 bytes)
+- Typed data object containing:
+  - `domain`: EIP-712 domain separator
+  - `types`: Type definitions
+  - `primaryType`: Primary type name
+  - `message`: Message to sign
+
+```shell
+// Request - Note: proper domain structure is required
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_signTypedData","params":["0x3b7252d007059ffc82d16d022da3cbf9992d2f70", {"domain":{"name":"Example","version":"1","chainId":1,"verifyingContract":"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"},"types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"Person":[{"name":"name","type":"string"},{"name":"wallet","type":"address"}]},"primaryType":"Person","message":{"name":"Bob","wallet":"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB"}}],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0x..."}  // Returns signature
 ```
 
 ### `eth_sendTransaction`
@@ -1010,17 +1100,6 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBlockReceipts","params":[
 {"jsonrpc":"2.0","id":1,"result":[{"blockHash":"0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4","blockNumber":"0xc","contractAddress":"0x0000000000000000000000000000000000000000","cumulativeGasUsed":null,"from":"0xddd64b4712f7c8f1ace3c145c950339eddaf221d","gasUsed":"0x5289","logs":[],"logsBloom":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","status":"0x1","to":"0x439c697e0742a0ddb124a376efd62a72a94ac35a","transactionHash":"0xae64961cb206a9773a6e5efeb337773a6fd0a2085ce480a174135a029afea615","transactionIndex":"0x0"}]}
 ```
 
-### `eth_getPendingTransactions`
-
-Returns a list of pending transactions.
-
-```shell
-// Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getPendingTransactions","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
-// Result
-{"jsonrpc":"2.0","id":1,"result":[]}
-```
-
 ### `eth_getTransactionLogs`
 
 Returns the logs for a specific transaction.
@@ -1036,21 +1115,59 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getTransactionLogs","params"
 {"jsonrpc":"2.0","id":1,"result":[{"address":"0x439c697e0742a0ddb124a376efd62a72a94ac35a","topics":["0x64a55044d1f2eddebe1b90e8e2853e8e96931cefadbfa0b2ceb34bee36061941"],"data":"0x0000000000000000000000000000000000000000000000000000000000000002","blockNumber":"0xc","transactionHash":"0xae64961cb206a9773a6e5efeb337773a6fd0a2085ce480a174135a029afea615","transactionIndex":"0x0","blockHash":"0x0000000000000000000000000000000000000000000000000000000000000000","logIndex":"0x0","removed":false}]}
 ```
 
+### `eth_fillTransaction`
+
+Fills the defaults (nonce, gas, gasPrice or 1559 fields) on a given unsigned transaction, and returns it to the caller for further processing (signing + broadcast).
+
+#### Parameters
+
+- Transaction object with optional fields
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_fillTransaction","params":[{"from":"0x0123456789012345678901234567890123456789","to":"0x0123456789012345678901234567890123456789","value":"0x1"}],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":{"raw":"0x...","tx":{"nonce":"0x0","gasPrice":"0x3b9aca00","gas":"0x5208","to":"0x0123456789012345678901234567890123456789","value":"0x1","input":"0x","v":"0x0","r":"0x0","s":"0x0","hash":"0x..."}}}
+```
+
+### `eth_resend`
+
+Resends a transaction with updated gas parameters. Removes the given transaction from the pool and reinserts it with the new gas price and limit.
+
+<Warning>
+**Implementation Note**: This method requires a transaction `nonce` parameter in the transaction object. Without the nonce, it will return an error: "missing transaction nonce in transaction spec".
+</Warning>
+
+#### Parameters
+
+- Original transaction object (must include `nonce`)
+- New gas price (hex)
+- New gas limit (hex)
+
+```shell
+// Request - Note the required 'nonce' field in the transaction object
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_resend","params":[{"from":"0x0123456789012345678901234567890123456789","to":"0x0123456789012345678901234567890123456789","value":"0x1","gas":"0x5208","gasPrice":"0x3b9aca00","nonce":"0x0"},"0x3b9aca01","0x5209"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0x..."}  // Returns transaction hash
+```
+
 ### `eth_getProof`
 
 Returns the account- and storage-values of the specified account including the Merkle-proof.
 
+<Warning>
+**Implementation Note**: This method requires a valid block height. Using "latest" or block heights less than 1 will return an error: "cannot query with height < 0; please provide a valid height". You must specify an actual block number.
+</Warning>
+
 #### Parameters
 
   - Address of account or contract
-  - Integer of the position in the storage
-  - Block Number or Block Hash ([EIP-1898](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1898.md))
-
-
+  - Array of storage positions (32-byte storage slot)
+  - Block Number (must be a specific number, not "latest")
 
 ```shell
-// Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getProof","params":["0x1234567890123456789012345678901234567890",["0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000001"],"latest"],"id":1}' -H "Content-type:application/json" http://localhost:8545
+// Request - Note: using a specific block number instead of "latest"
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getProof","params":["0x1234567890123456789012345678901234567890",["0x0000000000000000000000000000000000000000000000000000000000000000","0x0000000000000000000000000000000000000000000000000000000000000001"],"0x1"],"id":1}' -H "Content-type:application/json" http://localhost:8545
 // Result
 {"jsonrpc": "2.0", "id": 1, "result": {"address": "0x1234567890123456789012345678901234567890", "accountProof": ["0xf90211a090dcaf88c40c7bbc95a912cbdde67c175767b31173df9ee4b0d733bfdd511c43a0babe369f6b12092f49181ae04ca173fb68d1a5456f18d20fa32cba73954052bda0473ecf8a7e36a829e75039a3b055e51b8332cbf03324ab4af2066bbd6fbf0021a0bbda34753d7aa6c38e603f360244e8f59611921d9e1f128372fec0d586d4f9e0a04e44caecff45c9891f74f6a2156735886eedf6f1a733628ebc802ec79d844648a0a5f3f2f7542148c973977c8a1e154c4300fec92f755f7846f1b734d3ab1d90e7a0e823850f50bf72baae9d1733a36a444ab65d0a6faaba404f0583ce0ca4dad92da0f7a00cbe7d4b30b11faea3ae61b7f1f2b315b61d9f6bd68bfe587ad0eeceb721a07117ef9fc932f1a88e908eaead8565c19b5645dc9e5b1b6e841c5edbdfd71681a069eb2de283f32c11f859d7bcf93da23990d3e662935ed4d6b39ce3673ec84472a0203d26456312bbc4da5cd293b75b840fc5045e493d6f904d180823ec22bfed8ea09287b5c21f2254af4e64fca76acc5cd87399c7f1ede818db4326c98ce2dc2208a06fc2d754e304c48ce6a517753c62b1a9c1d5925b89707486d7fc08919e0a94eca07b1c54f15e299bd58bdfef9741538c7828b5d7d11a489f9c20d052b3471df475a051f9dd3739a927c89e357580a4c97b40234aa01ed3d5e0390dc982a7975880a0a089d613f26159af43616fd9455bb461f4869bfede26f2130835ed067a8b967bfb80", "0xf90211a0395d87a95873cd98c21cf1df9421af03f7247880a2554e20738eec2c7507a494a0bcf6546339a1e7e14eb8fb572a968d217d2a0d1f3bc4257b22ef5333e9e4433ca012ae12498af8b2752c99efce07f3feef8ec910493be749acd63822c3558e6671a0dbf51303afdc36fc0c2d68a9bb05dab4f4917e7531e4a37ab0a153472d1b86e2a0ae90b50f067d9a2244e3d975233c0a0558c39ee152969f6678790abf773a9621a01d65cd682cc1be7c5e38d8da5c942e0a73eeaef10f387340a40a106699d494c3a06163b53d956c55544390c13634ea9aa75309f4fd866f312586942daf0f60fb37a058a52c1e858b1382a8893eb9c1f111f266eb9e21e6137aff0dddea243a567000a037b4b100761e02de63ea5f1fcfcf43e81a372dafb4419d126342136d329b7a7ba032472415864b08f808ba4374092003c8d7c40a9f7f9fe9cc8291f62538e1cc14a074e238ff5ec96b810364515551344100138916594d6af966170ff326a092fab0a0d31ac4eef14a79845200a496662e92186ca8b55e29ed0f9f59dbc6b521b116fea090607784fe738458b63c1942bba7c0321ae77e18df4961b2bc66727ea996464ea078f757653c1b63f72aff3dcc3f2a2e4c8cb4a9d36d1117c742833c84e20de994a0f78407de07f4b4cb4f899dfb95eedeb4049aeb5fc1635d65cf2f2f4dfd25d1d7a0862037513ba9d45354dd3e36264aceb2b862ac79d2050f14c95657e43a51b85c80", "0xf90171a04ad705ea7bf04339fa36b124fa221379bd5a38ffe9a6112cb2d94be3a437b879a08e45b5f72e8149c01efcb71429841d6a8879d4bbe27335604a5bff8dfdf85dcea00313d9b2f7c03733d6549ea3b810e5262ed844ea12f70993d87d3e0f04e3979ea0b59e3cdd6750fa8b15164612a5cb6567cdfb386d4e0137fccee5f35ab55d0efda0fe6db56e42f2057a071c980a778d9a0b61038f269dd74a0e90155b3f40f14364a08538587f2378a0849f9608942cf481da4120c360f8391bbcc225d811823c6432a026eac94e755534e16f9552e73025d6d9c30d1d7682a4cb5bd7741ddabfd48c50a041557da9a74ca68da793e743e81e2029b2835e1cc16e9e25bd0c1e89d4ccad6980a041dda0a40a21ade3a20fcd1a4abb2a42b74e9a32b02424ff8db4ea708a5e0fb9a09aaf8326a51f613607a8685f57458329b41e938bb761131a5747e066b81a0a16808080a022e6cef138e16d2272ef58434ddf49260dc1de1f8ad6dfca3da5d2a92aaaadc58080", "0xf851808080a009833150c367df138f1538689984b8a84fc55692d3d41fe4d1e5720ff5483a6980808080808080808080a0a319c1c415b271afc0adcb664e67738d103ac168e0bc0b7bd2da7966165cb9518080"], "balance": "0x0", "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470", "nonce": "0x0", "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421", "storageProof": [{"key": "0x0000000000000000000000000000000000000000000000000000000000000000", "value": "0x0", "proof": []}, {"key": "0x0000000000000000000000000000000000000000000000000000000000000001", "value": "0x0", "proof": []}]}}
 ```
@@ -1104,21 +1221,26 @@ Unsubscribe from an event using the subscription id
 
 Imports the given unencrypted private key (hex encoded string) into the key store, encrypting it with the passphrase. Returns the address of the new account.
 
+<Warning>
+**Implementation Note**: The private key must be a valid 64-character hex string (32 bytes) without the "0x" prefix. Invalid hex characters will return an error: "invalid hex character 'x' in private key".
+</Warning>
+
 #### Parameters (2)
 
 **1:** privkey `string`
 
   - Required: [Y] Yes
+  - Format: 64 hex characters (32 bytes) without "0x" prefix
 
 **2:** password `string`
 
   - Required: [Y] Yes
 
-
-
 ```shell
-// Request
-curl -X POST --data '{"jsonrpc":"2.0","method":"personal_importRawKey","params":["c5bd76cd0cd948de17a31261567d219576e992d9066fe1a6bca97496dec634e2c8e06f8949773b300b9f73fabbbc7710d5d6691e96bcf3c9145e15daf6fe07b9", "the key is this"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Request - Note: private key without "0x" prefix
+curl -X POST --data '{"jsonrpc":"2.0","method":"personal_importRawKey","params":["c5bd76cd0cd948de17a31261567d219576e992d9066fe1a6bca97496dec634e2", "the key is this"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0x..."} // Returns the address
 ```
 
 ### `personal_listAccounts`
@@ -1267,17 +1389,19 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"personal_sign","params":["0xdead
 **Private**: Requires authentication.
 </Check>
 
-`ecRecover` returns the address associated with the private key that was used to calculate the signature in [`personal_sign`](https://www.google.com/search?q=%23personal-sign).
+`ecRecover` returns the address associated with the private key that was used to calculate the signature in [`personal_sign`](#personal_sign).
+
+<Warning>
+**Implementation Note**: The signature must be exactly 65 bytes (130 hex characters). Signatures of other lengths will return an error: "signature must be 65 bytes long".
+</Warning>
 
 #### Parameters
 
-  - Message
-  - Signature returned from [`personal_sign`](https://www.google.com/search?q=%23personal-sign)
-
-
+  - Message (hex encoded)
+  - Signature returned from [`personal_sign`](#personal_sign) (65 bytes)
 
 ```shell
-// Request
+// Request - Note: signature must be exactly 130 hex characters (65 bytes)
 curl -X POST --data '{"jsonrpc":"2.0","method":"personal_ecRecover","params":["0xdeadbeaf", "0xf9ff74c86aefeb5f6019d77280bbb44fb695b4d45cfe97e6eed7acd62905f4a85034d5c68ed25a2e7a8eeb9baf1b8401e4f865d92ec48c1763bf649e354d900b1c"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
 // Result
 {"jsonrpc":"2.0","id":1,"result":"0x3b7252d007059ffc82d16d022da3cbf9992d2f70"}
@@ -1394,32 +1518,40 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"debug_traceTransaction","params"
 
 The `traceBlockByNumber` endpoint accepts a block number and will replay the block that is already present in the database.
 
+<Info>
+**Stub Implementation**: This method is implemented but currently returns an empty array for all requests. The tracing functionality is not fully operational in Cosmos EVM.
+</Info>
+
 #### Parameters
 
-  - Block number
+  - Block number (hex string)
   - Trace Config (optional)
 
 ```shell
 // Request
 curl -X POST --data '{"jsonrpc":"2.0","method":"debug_traceBlockByNumber","params":["0xe", {"tracer": "{data: [], fault: function(log) {}, step: function(log) { if(log.op.toString() == \"CALL\") this.data.push(log.stack.peek(0)); }, result: function() { return this.data; }}"}],"id":1}' -H "Content-Type: application/json" http://localhost:8545
-//Result
-{"jsonrpc":"2.0","id":1,"result":[{"result":["68410", "51470"]}]}
+// Result - Currently returns empty array
+{"jsonrpc":"2.0","id":1,"result":[]}
 ```
 
 ### `debug_traceBlockByHash`
 
 Similar to `debug_traceBlockByNumber`, this method accepts a block hash and will replay the block that is already present in the database.
 
+<Info>
+**Stub Implementation**: This method is implemented but currently returns an empty array for all requests. The tracing functionality is not fully operational in Cosmos EVM.
+</Info>
+
 #### Parameters
 
-  - Block hash
+  - Block hash (32-byte hash)
   - Trace Config (optional)
 
 ```shell
 // Request
 curl -X POST --data '{"jsonrpc":"2.0","method":"debug_traceBlockByHash","params":["0x1b9911f57c13e5160d567ea6cf5b545413f96b95e43ec6e02787043351fb2cc4", {}],"id":1}' -H "Content-Type: application/json" http://localhost:8545
-// Result
-{"jsonrpc":"2.0","id":1,"result":[{"result":{"failed":false,"gas":21000,"returnValue":"0x","structLogs":[]}}]}
+// Result - Currently returns empty array
+{"jsonrpc":"2.0","id":1,"result":[]}
 ```
 
 ### `debug_freeOSMemory`
@@ -1545,6 +1677,260 @@ Writes a mutex contention profile to the specified file.
 curl -X POST --data '{"jsonrpc":"2.0","method":"debug_writeMutexProfile","params":["mutex.prof"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
 // Result
 {"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_blockProfile`
+
+Turns on block profiling for the given duration and writes the profile data to disk.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- File path (string) - Output file for the profile
+- Duration in seconds (number)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_blockProfile","params":["block.prof", 30],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_cpuProfile`
+
+Turns on CPU profiling for the given duration and writes the profile data to disk.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- File path (string) - Output file for the profile
+- Duration in seconds (number)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_cpuProfile","params":["cpu.prof", 30],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_gcStats`
+
+Returns garbage collection statistics.
+
+<Check>
+**Private**: Requires authentication.
+**Cosmos-specific**: This method is unique to Cosmos EVM.
+</Check>
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_gcStats","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":{"NumGC":10,"PauseTotal":1000000,"Pause":[100000,200000],"PauseEnd":[1234567890,1234567891],"...":"..."}}
+```
+
+### `debug_goTrace`
+
+Turns on Go runtime tracing for the given duration and writes the trace data to disk.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- File path (string) - Output file for the trace
+- Duration in seconds (number)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_goTrace","params":["trace.out", 5],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_stacks`
+
+Returns a printed representation of the stacks of all goroutines.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_stacks","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"goroutine 1 [running]:\n..."}
+```
+
+### `debug_startCPUProfile`
+
+Starts indefinite CPU profiling, writing to the given file.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- File path (string) - Output file for the profile
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_startCPUProfile","params":["cpu.prof"],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_stopCPUProfile`
+
+Stops an ongoing CPU profile.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_stopCPUProfile","params":[],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_mutexProfile`
+
+Turns on mutex profiling for the given duration and writes the profile data to disk.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- File path (string) - Output file for the profile
+- Duration in seconds (number)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_mutexProfile","params":["mutex.prof", 10],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":null}
+```
+
+### `debug_setMutexProfileFraction`
+
+Sets the rate of mutex profiling.
+
+<Check>
+**Private**: Requires authentication.
+**Cosmos-specific**: This method is unique to Cosmos EVM.
+</Check>
+
+#### Parameters
+
+- Rate (number) - 0 to disable, 1 for full profiling
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_setMutexProfileFraction","params":[1],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":0}
+```
+
+### `debug_getHeaderRlp`
+
+Returns the RLP encoding of the header of the block.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+<Warning>
+**Parameter Type**: This method requires the block number as a `uint64` (number type), not a hex string. Passing a string will return an error: "invalid argument 0: json: cannot unmarshal string into Go value of type uint64".
+</Warning>
+
+#### Parameters
+
+- Block number (uint64 number, not hex string)
+
+```shell
+// Request - Note: block number as integer, not hex string
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_getHeaderRlp","params":[100],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0xf90..."}
+```
+
+### `debug_getBlockRlp`
+
+Returns the RLP encoding of the block.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+<Warning>
+**Parameter Type**: This method requires the block number as a `uint64` (number type), not a hex string. Passing a string will return an error: "invalid argument 0: json: cannot unmarshal string into Go value of type uint64".
+</Warning>
+
+#### Parameters
+
+- Block number (uint64 number, not hex string)
+
+```shell
+// Request - Note: block number as integer, not hex string
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_getBlockRlp","params":[100],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"0xf90..."}
+```
+
+### `debug_printBlock`
+
+Returns a formatted string of the block.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+<Warning>
+**Parameter Type**: This method requires the block number as a `uint64` (number type), not a hex string. Passing a string will return an error: "invalid argument 0: json: cannot unmarshal string into Go value of type uint64".
+</Warning>
+
+#### Parameters
+
+- Block number (uint64 number, not hex string)
+
+```shell
+// Request - Note: block number as integer, not hex string
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_printBlock","params":[100],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":"Block #100\nParent: 0x...\nStateRoot: 0x...\n..."}
+```
+
+### `debug_intermediateRoots`
+
+Returns the intermediate state roots for a transaction.
+
+<Check>
+**Private**: Requires authentication.
+</Check>
+
+#### Parameters
+
+- Transaction hash (hash)
+- Trace config (object, optional)
+
+```shell
+// Request
+curl -X POST --data '{"jsonrpc":"2.0","method":"debug_intermediateRoots","params":["0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b", {}],"id":1}' -H "Content-Type: application/json" http://localhost:8545
+// Result
+{"jsonrpc":"2.0","id":1,"result":["0x...","0x..."]}
 ```
 
 ## TxPool Methods
