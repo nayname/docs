@@ -1021,14 +1021,15 @@ class Program
             </div>
 
             <div className="flex items-center gap-2 mt-3">
-              <label className="flex items-center cursor-pointer text-xs">
+              <label className="flex items-center cursor-pointer text-xs gap-2">
                 <input
                   type="checkbox"
                   checked={showAllMethods}
                   onChange={(e) => setShowAllMethods(e.target.checked)}
-                  className="mr-2"
-                />
-                <span className={theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'}>Show all methods</span>
+                  className="mr-2"                />
+                <span className={theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'}>
+                  Show all methods (including unsupported)
+                </span>
               </label>
             </div>
           </div>
