@@ -37,23 +37,31 @@ export default function RPCMethodsViewerVersionB() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Theme-aware namespace colors
+  // Theme-aware namespace colors - carefully chosen to be distinct
   const namespaceColors = theme === 'dark' ? {
-    web3: '#CF00A6', // Magenta
-    net: '#0891b2', // Cyan
-    eth: '#2563eb', // Blue
-    personal: '#dc2626', // Red
-    debug: '#CFB800', // Gold
-    txpool: '#16a34a', // Green
-    miner: '#4B0080' // Purple
-  } : {
-    web3: '#9333ea', // Purple
-    net: '#0891b2', // Cyan
-    eth: '#3b82f6', // Blue
+    eth: '#3b82f6',     // Blue (primary namespace)
+    web3: '#a855f7',    // Purple
+    net: '#10b981',     // Emerald
+    txpool: '#22c55e',  // Green
     personal: '#ef4444', // Red
-    debug: '#f59e0b', // Amber
-    txpool: '#22c55e', // Green
-    miner: '#a855f7' // Purple
+    debug: '#f59e0b',   // Amber/Gold
+    admin: '#ec4899',   // Pink
+    miner: '#84cc16',   // Lime (high visibility)
+    engine: '#f97316',  // Orange
+    clique: '#14b8a6',  // Teal
+    les: '#06b6d4'      // Cyan
+  } : {
+    eth: '#3b82f6',     // Blue
+    web3: '#9333ea',    // Purple
+    net: '#0891b2',     // Cyan
+    txpool: '#22c55e',  // Green
+    personal: '#ef4444', // Red
+    debug: '#f59e0b',   // Amber
+    admin: '#ec4899',   // Pink
+    miner: '#84cc16',   // Lime
+    engine: '#f97316',  // Orange
+    clique: '#14b8a6',  // Teal
+    les: '#22d3ee'      // Light Cyan
   };
 
   // Simple code display component
@@ -85,7 +93,7 @@ export default function RPCMethodsViewerVersionB() {
   const [showMobilePanel, setShowMobilePanel] = useState('list');
   const [paramValues, setParamValues] = useState({});
   const [debouncedParamValues, setDebouncedParamValues] = useState({});
-  const [hideUnsupported, setHideUnsupported] = useState(true);
+  const [showAllMethods, setShowAllMethods] = useState(false); // Default to showing only functional methods
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -111,394 +119,386 @@ export default function RPCMethodsViewerVersionB() {
     { id: 'csharp', name: 'C#' }
   ];
 
-  const namespaces = {
-    web3: {
-      name: 'Web3',
+  // RPC Methods Data - Generated from unified test results (202 methods total)
+  const rpcMethodsData = {
+    eth: {
+      name: "eth",
       methods: [
-        {
-          name: 'web3_clientVersion',
-          description: 'Get the web3 client version',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'web3_sha3',
-          description: 'Returns Keccak-256 hash of the given data',
-          implemented: true,
-          params: [{
-            name: 'data',
-            type: 'string',
-            description: 'The data to hash (hex encoded)',
-            example: '0x68656c6c6f20776f726c64'
-          }]
-        }
+        { name: "eth_accounts", status: "Y", description: "Returns list of addresses owned by client" },
+        { name: "eth_getBalance", status: "Y", description: "Returns the balance of an account" },
+        { name: "eth_getTransactionCount", status: "Y", description: "Returns the number of transactions sent from an address" },
+        { name: "eth_blockNumber", status: "Y", description: "Returns the current block number" },
+        { name: "eth_chainId", status: "Y", description: "Returns the chain ID" },
+        { name: "eth_protocolVersion", status: "Y", description: "Returns the current Ethereum protocol version" },
+        { name: "eth_gasPrice", status: "Stub", description: "Returns the current gas price (always 0x0)" },
+        { name: "eth_coinbase", status: "N", description: "Returns the client coinbase address (not implemented)" },
+        { name: "eth_maxPriorityFeePerGas", status: "Stub", description: "Returns the max priority fee per gas (always 0x0)" },
+        { name: "eth_getBlockByNumber", status: "Y", description: "Returns block information by number" },
+        { name: "eth_getBlockByHash", status: "Y", description: "Returns block information by hash" },
+        { name: "eth_call", status: "Stub", description: "Executes a message call immediately (returns 0x)" },
+        { name: "eth_estimateGas", status: "Y", description: "Estimates gas needed for a transaction" },
+        { name: "eth_sign", status: "Y", description: "Signs data with a given address" },
+        { name: "eth_feeHistory", status: "Y", description: "Returns fee history" },
+        { name: "eth_newFilter", status: "Y", description: "Creates a filter object" },
+        { name: "eth_newBlockFilter", status: "Y", description: "Creates a filter for new blocks" },
+        { name: "eth_newPendingTransactionFilter", status: "Y", description: "Creates a filter for pending transactions" },
+        { name: "eth_uninstallFilter", status: "Y", description: "Uninstalls a filter" },
+        // Additional functional transaction methods
+        { name: "eth_sendTransaction", status: "N", description: "Sends transaction (not implemented)" },
+        { name: "eth_sendRawTransaction", status: "Y", description: "Sends signed raw transaction" },
+        { name: "eth_signTransaction", status: "N", description: "Signs transaction (not implemented)" },
+        { name: "eth_getTransactionByHash", status: "Stub", description: "Returns transaction by hash (returns null)" },
+        { name: "eth_getTransactionReceipt", status: "Stub", description: "Returns transaction receipt (returns null)" },
+        { name: "eth_getTransactionByBlockNumberAndIndex", status: "Stub", description: "Returns transaction by block and index (returns null)" },
+        { name: "eth_getTransactionByBlockHashAndIndex", status: "Stub", description: "Returns transaction by block hash and index (returns null)" },
+        { name: "eth_getLogs", status: "Stub", description: "Returns logs matching filter (returns empty array)" },
+        { name: "eth_getStorageAt", status: "Y", description: "Returns storage value at position" },
+        { name: "eth_getCode", status: "Stub", description: "Returns code at address (returns 0x)" },
+        // Partial/Limited implementations
+        { name: "eth_getFilterChanges", status: "Stub", description: "Returns filter changes (limited)" },
+        { name: "eth_getFilterLogs", status: "Stub", description: "Returns filter logs (limited)" },
+        { name: "eth_getProof", status: "N", description: "Returns merkle proof (requires valid height)" },
+        { name: "eth_pendingTransactions", status: "Stub", description: "Returns pending transactions (returns undefined)" },
+        { name: "eth_getPendingTransactions", status: "Stub", description: "Returns pending transactions (returns undefined)" },
+        { name: "eth_getBlockTransactionCountByNumber", status: "Stub", description: "Returns transaction count in block (returns 0x0)" },
+        { name: "eth_getBlockTransactionCountByHash", status: "Stub", description: "Returns transaction count in block by hash (returns 0x0)" },
+        { name: "eth_getBlockReceipts", status: "Stub", description: "Returns all receipts for a block (returns empty array)" },
+        { name: "eth_getUncleByBlockNumberAndIndex", status: "Stub", description: "Returns uncle by block number (always null)" },
+        { name: "eth_getUncleByBlockHashAndIndex", status: "Stub", description: "Returns uncle by block hash (always null)" },
+        { name: "eth_getUncleCountByBlockNumber", status: "Stub", description: "Returns uncle count by number (always 0)" },
+        { name: "eth_getUncleCountByBlockHash", status: "Stub", description: "Returns uncle count by hash (always 0)" },
+        { name: "eth_syncing", status: "Stub", description: "Returns sync status (always false)" },
+        // Mining methods - not applicable
+        { name: "eth_mining", status: "Stub", description: "Returns mining status (always false - no PoW)" },
+        { name: "eth_hashrate", status: "Stub", description: "Returns hashrate (always 0 - no PoW)" },
+        { name: "eth_getWork", status: "Stub", description: "Returns work array (not applicable)" },
+        { name: "eth_submitWork", status: "Stub", description: "Submits work (not applicable)" },
+        { name: "eth_submitHashrate", status: "Stub", description: "Submits hashrate (not applicable)" },
+        { name: "eth_getTransactionLogs", status: "Stub", description: "Returns transaction logs (Cosmos-specific)" },
+        // Additional methods not previously listed
+        { name: "eth_getRawTransactionByHash", status: "Stub", description: "Returns raw transaction by hash" },
+        { name: "eth_getRawTransactionByBlockNumberAndIndex", status: "Stub", description: "Returns raw transaction by block and index" },
+        { name: "eth_getRawTransactionByBlockHashAndIndex", status: "Stub", description: "Returns raw transaction by block hash and index" },
+        { name: "eth_resend", status: "N", description: "Resends transaction with new gas price (requires nonce param)" },
+        { name: "eth_fillTransaction", status: "N", description: "Fills missing transaction fields (not implemented)" },
+        { name: "eth_createAccessList", status: "Stub", description: "Creates EIP-2930 access list" },
+        { name: "eth_blobBaseFee", status: "Stub", description: "Returns blob base fee (EIP-4844)" },
+        { name: "eth_signTypedData", status: "N", description: "Signs typed structured data (requires domain param)" },
+        { name: "eth_signTypedData_v3", status: "N", description: "Signs typed structured data v3 (not implemented)" },
+        { name: "eth_signTypedData_v4", status: "N", description: "Signs typed structured data v4 (not implemented)" },
+        { name: "eth_subscribe", status: "Y", description: "Creates subscription for events (WebSocket only)" },
+        { name: "eth_unsubscribe", status: "Y", description: "Cancels subscription (WebSocket only)" },
+        { name: "eth_getCompilers", status: "Stub", description: "Returns available compilers" },
+        { name: "eth_compileSolidity", status: "Stub", description: "Compiles Solidity code" },
+        { name: "eth_compileLLL", status: "Stub", description: "Compiles LLL code" },
+        { name: "eth_compileSerpent", status: "Stub", description: "Compiles Serpent code" }
+      ]
+    },
+    web3: {
+      name: "web3",
+      color: "purple",
+      methods: [
+        { name: "web3_clientVersion", status: "Y", description: "Returns the current client version" },
+        { name: "web3_sha3", status: "Y", description: "Returns Keccak-256 hash of the given data" }
       ]
     },
     net: {
-      name: 'Net',
+      name: "net",
+      color: "green",
       methods: [
-        {
-          name: 'net_version',
-          description: 'Returns the current network id',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'net_peerCount',
-          description: 'Returns the number of connected peers',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'net_listening',
-          description: 'Check if client is listening for connections',
-          implemented: true,
-          params: []
-        }
-      ]
-    },
-    eth: {
-      name: 'Eth',
-      methods: [
-        {
-          name: 'eth_protocolVersion',
-          description: 'Returns the current Ethereum protocol version',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_syncing',
-          description: 'Returns sync status or false',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_gasPrice',
-          description: 'Returns current gas price',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_accounts',
-          description: 'Returns list of addresses owned by client',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_blockNumber',
-          description: 'Returns the current block number',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_getBalance',
-          description: 'Returns account balance',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Address to check', example: '0x407d73d8a49eeb85d32cf465507dd71d507100c1' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ]
-        },
-        {
-          name: 'eth_getTransactionCount',
-          description: 'Returns transaction count (nonce)',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Address', example: '0x407d73d8a49eeb85d32cf465507dd71d507100c1' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ]
-        },
-        {
-          name: 'eth_sendRawTransaction',
-          description: 'Send signed transaction',
-          implemented: true,
-          params: [
-            { name: 'data', type: 'hex', description: 'Signed transaction data', example: '0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675' }
-          ]
-        },
-        {
-          name: 'eth_call',
-          description: 'Execute call without creating transaction',
-          implemented: true,
-          params: [
-            { name: 'callObject', type: 'object', description: 'Call data' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ]
-        },
-        {
-          name: 'eth_estimateGas',
-          description: 'Estimate gas for transaction',
-          implemented: true,
-          params: [
-            { name: 'callObject', type: 'object', description: 'Transaction data' }
-          ]
-        },
-        {
-          name: 'eth_getStorageAt',
-          description: 'Returns storage value at position',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Storage address', example: '0x295a70b2de5e3953354a6a8344e616ed314d7251' },
-            { name: 'position', type: 'hex', description: 'Storage position', example: '0x0' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ]
-        },
-        {
-          name: 'eth_getCode',
-          description: 'Returns code at address',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Contract address', example: '0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b' },
-            { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
-          ]
-        },
-        {
-          name: 'eth_getBlockByNumber',
-          description: 'Returns block by number',
-          implemented: true,
-          params: [
-            { name: 'block', type: 'string', description: 'Block number or tag', example: '0x1b4' },
-            { name: 'fullTx', type: 'boolean', description: 'Return full transactions', example: true }
-          ]
-        },
-        {
-          name: 'eth_getBlockByHash',
-          description: 'Returns block by hash',
-          implemented: true,
-          params: [
-            { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0xdc0818cf78f21a8e70579cb46a43643f78291264dda342ae31049421c82d21ae' },
-            { name: 'fullTx', type: 'boolean', description: 'Return full transactions', example: false }
-          ]
-        },
-        {
-          name: 'eth_getTransactionByHash',
-          description: 'Returns transaction by hash',
-          implemented: true,
-          params: [
-            { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b' }
-          ]
-        },
-        {
-          name: 'eth_getTransactionReceipt',
-          description: 'Returns transaction receipt',
-          implemented: true,
-          params: [
-            { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238' }
-          ]
-        },
-        {
-          name: 'eth_getLogs',
-          description: 'Returns logs matching filter',
-          implemented: true,
-          params: [
-            { name: 'filterOptions', type: 'object', description: 'Filter parameters' }
-          ]
-        },
-        {
-          name: 'eth_chainId',
-          description: 'Returns chain ID',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'eth_getTransactionLogs',
-          description: 'Returns logs for a transaction (Cosmos-specific)',
-          implemented: true,
-          cosmosSpecific: true,
-          params: [
-            { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b' }
-          ]
-        }
-      ]
-    },
-    personal: {
-      name: 'Personal',
-      methods: [
-        {
-          name: 'personal_newAccount',
-          description: 'Generate new private key and store in key store',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'passphrase',
-              type: 'string',
-              description: 'Passphrase for encryption',
-              example: 'This is the passphrase'
-            }
-          ]
-        },
-        {
-          name: 'personal_listAccounts',
-          description: 'List all accounts in the keystore',
-          implemented: true,
-          private: true,
-          params: []
-        },
-        {
-          name: 'personal_unlockAccount',
-          description: 'Unlock an account for signing',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Account address to unlock', example: '0x...' },
-            { name: 'passphrase', type: 'string', description: 'Account passphrase', example: 'mypassword' },
-            { name: 'duration', type: 'number', description: 'Unlock duration in seconds (0 = indefinite)', example: 300 }
-          ]
-        },
-        {
-          name: 'personal_sign',
-          description: 'Sign data with account',
-          implemented: true,
-          private: true,
-          params: [
-            { name: 'data', type: 'string', description: 'Data to sign', example: '0xdeadbeef' },
-            { name: 'address', type: 'address', description: 'Signing account', example: '0x...' },
-            { name: 'passphrase', type: 'string', description: 'Account passphrase', example: 'mypassword' }
-          ]
-        }
-      ]
-    },
-    debug: {
-      name: 'Debug',
-      methods: [
-        {
-          name: 'debug_traceTransaction',
-          description: 'Trace transaction execution',
-          implemented: true,
-          private: true,
-          params: [
-            {
-              name: 'txHash',
-              type: 'hash',
-              description: 'Transaction hash',
-              example: '0x4ed38df88f88...'
-            }
-          ]
-        },
-        {
-          name: 'debug_freeOSMemory',
-          description: 'Forces garbage collection and frees OS memory (Cosmos-specific)',
-          implemented: true,
-          cosmosSpecific: true,
-          private: true,
-          params: []
-        },
-        {
-          name: 'debug_setGCPercent',
-          description: 'Sets garbage collector percentage (Cosmos-specific)',
-          implemented: true,
-          cosmosSpecific: true,
-          private: true,
-          params: [
-            { name: 'percent', type: 'number', description: 'GC percentage', example: 100 }
-          ]
-        },
-        {
-          name: 'debug_writeMutexProfile',
-          description: 'Writes mutex profile to file (Cosmos-specific)',
-          implemented: true,
-          cosmosSpecific: true,
-          private: true,
-          params: [
-            { name: 'file', type: 'string', description: 'Output file path', example: '/tmp/mutex.prof' }
-          ]
-        }
+        { name: "net_version", status: "Y", description: "Returns the current network ID" },
+        { name: "net_listening", status: "Stub", description: "Returns true if client is actively listening (always true)" },
+        { name: "net_peerCount", status: "Stub", description: "Returns number of peers (returns 0)" }
       ]
     },
     txpool: {
-      name: 'TxPool',
+      name: "txpool",
+      color: "orange",
       methods: [
-        {
-          name: 'txpool_status',
-          description: 'Get number of pending and queued transactions',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'txpool_content',
-          description: 'Get all pending and queued transactions',
-          implemented: true,
-          params: []
-        },
-        {
-          name: 'txpool_contentFrom',
-          description: 'Get pending and queued transactions from a specific address',
-          implemented: true,
-          params: [
-            { name: 'address', type: 'address', description: 'Address to get transactions from', example: '0x1234567890abcdef1234567890abcdef12345678' }
-          ]
-        },
-        {
-          name: 'txpool_inspect',
-          description: 'Get summary of all pending and queued transactions',
-          implemented: true,
-          params: []
-        }
+        { name: "txpool_content", status: "Y", description: "Returns the content of the transaction pool" },
+        { name: "txpool_contentFrom", status: "Y", description: "Returns transactions from specific address" },
+        { name: "txpool_inspect", status: "Y", description: "Returns a summary of the transaction pool" },
+        { name: "txpool_status", status: "Stub", description: "Returns the number of pending and queued transactions (returns empty object)" }
+      ]
+    },
+    personal: {
+      name: "personal",
+      color: "red",
+      methods: [
+        { name: "personal_listAccounts", status: "Y", description: "Returns list of accounts" },
+        { name: "personal_newAccount", status: "Y", description: "Creates new account" },
+        { name: "personal_sign", status: "Y", description: "Signs data with account" },
+        { name: "personal_unlockAccount", status: "Stub", description: "Unlocks account (always false)" },
+        { name: "personal_lockAccount", status: "Stub", description: "Locks account (always false)" },
+        { name: "personal_sendTransaction", status: "N", description: "Sends transaction (not implemented)" },
+        { name: "personal_signTransaction", status: "N", description: "Signs transaction (not implemented)" },
+        { name: "personal_signAndSendTransaction", status: "N", description: "Signs and sends transaction (not implemented)" },
+        { name: "personal_ecRecover", status: "N", description: "Recovers address (requires 65-byte signature)" },
+        { name: "personal_importRawKey", status: "N", description: "Imports raw key (requires valid hex key)" },
+        { name: "personal_listWallets", status: "Stub", description: "Lists wallets (returns null)" },
+        { name: "personal_openWallet", status: "N", description: "Opens wallet (not implemented)" },
+        { name: "personal_deriveAccount", status: "N", description: "Derives account (not implemented)" },
+        { name: "personal_unpair", status: "N", description: "Unpairs device (not implemented)" },
+        { name: "personal_initializeWallet", status: "N", description: "Initializes wallet (not implemented)" }
+      ]
+    },
+    debug: {
+      name: "debug",
+      color: "yellow",
+      methods: [
+        // Tracing methods
+        { name: "debug_traceTransaction", status: "N", description: "Traces transaction execution (not implemented)" },
+        { name: "debug_traceBlockByNumber", status: "Stub", description: "Traces all transactions in block by number (returns empty array)" },
+        { name: "debug_traceBlockByHash", status: "Stub", description: "Traces all transactions in block by hash (returns empty array)" },
+        { name: "debug_traceCall", status: "N", description: "Traces eth_call execution (not implemented)" },
+        { name: "debug_traceChain", status: "N", description: "Traces chain between blocks (not implemented)" },
+        { name: "debug_standardTraceBlockToFile", status: "N", description: "Standard trace to file (not implemented)" },
+        { name: "debug_standardTraceBadBlockToFile", status: "N", description: "Trace bad block to file (not implemented)" },
+        { name: "debug_traceBadBlock", status: "N", description: "Traces bad block (not implemented)" },
+        { name: "debug_intermediateRoots", status: "N", description: "Returns intermediate state roots (profiling disabled)" },
+        // Block and state methods
+        { name: "debug_getBadBlocks", status: "N", description: "Returns bad blocks (not implemented)" },
+        { name: "debug_storageRangeAt", status: "N", description: "Returns storage range at block (not implemented)" },
+        { name: "debug_getModifiedAccountsByNumber", status: "N", description: "Modified accounts by block number (not implemented)" },
+        { name: "debug_getModifiedAccountsByHash", status: "N", description: "Modified accounts by block hash (not implemented)" },
+        { name: "debug_accountRange", status: "N", description: "Returns range of accounts (not implemented)" },
+        { name: "debug_getAccessibleState", status: "N", description: "Returns accessible state range (not implemented)" },
+        // Raw data methods
+        { name: "debug_getRawBlock", status: "N", description: "Returns raw block data (not implemented)" },
+        { name: "debug_getRawHeader", status: "N", description: "Returns raw header data (not implemented)" },
+        { name: "debug_getRawReceipts", status: "N", description: "Returns raw receipts (not implemented)" },
+        { name: "debug_getRawTransaction", status: "N", description: "Returns raw transaction (not implemented)" },
+        { name: "debug_getHeaderRlp", status: "N", description: "Returns header RLP (requires uint64 param)" },
+        { name: "debug_getBlockRlp", status: "N", description: "Returns block RLP (requires uint64 param)" },
+        // Chain management
+        { name: "debug_printBlock", status: "N", description: "Pretty prints block (requires uint64 param)" },
+        { name: "debug_setHead", status: "N", description: "Sets current head of chain (not implemented)" },
+        { name: "debug_seedHash", status: "N", description: "Returns seed hash (not implemented)" },
+        { name: "debug_freezeClient", status: "N", description: "Freezes client (not implemented)" },
+        // Database methods
+        { name: "debug_chaindbProperty", status: "N", description: "Returns chain database property (not implemented)" },
+        { name: "debug_chaindbCompact", status: "N", description: "Compacts chain database (not implemented)" },
+        { name: "debug_dbGet", status: "N", description: "Gets value from database (not implemented)" },
+        { name: "debug_dbAncient", status: "N", description: "Gets ancient data from database (not implemented)" },
+        { name: "debug_dbAncients", status: "N", description: "Gets number of ancient items (not implemented)" },
+        // Profiling methods
+        { name: "debug_startCPUProfile", status: "N", description: "Starts CPU profiling (profiling disabled)" },
+        { name: "debug_stopCPUProfile", status: "N", description: "Stops CPU profiling (profiling disabled)" },
+        { name: "debug_startGoTrace", status: "N", description: "Starts Go execution trace (profiling disabled)" },
+        { name: "debug_stopGoTrace", status: "N", description: "Stops Go execution trace (profiling disabled)" },
+        { name: "debug_blockProfile", status: "N", description: "Writes goroutine blocking profile (profiling disabled)" },
+        { name: "debug_cpuProfile", status: "N", description: "Writes CPU profile (profiling disabled)" },
+        { name: "debug_goTrace", status: "N", description: "Writes Go execution trace (profiling disabled)" },
+        { name: "debug_memStats", status: "N", description: "Returns memory statistics (profiling disabled)" },
+        { name: "debug_gcStats", status: "N", description: "Returns GC statistics (profiling disabled)" },
+        { name: "debug_freeOSMemory", status: "N", description: "Forces garbage collection (profiling disabled)" },
+        { name: "debug_setGCPercent", status: "N", description: "Sets garbage collection percentage (profiling disabled)" },
+        { name: "debug_writeBlockProfile", status: "N", description: "Writes block profile to file (profiling disabled)" },
+        { name: "debug_writeMemProfile", status: "N", description: "Writes memory profile to file (profiling disabled)" },
+        { name: "debug_writeMutexProfile", status: "N", description: "Writes mutex profile to file (profiling disabled)" },
+        { name: "debug_setMutexProfileFraction", status: "N", description: "Sets mutex profile fraction (profiling disabled)" },
+        { name: "debug_getMutexProfileFraction", status: "N", description: "Gets mutex profile fraction (not implemented)" },
+        { name: "debug_setBlockProfileRate", status: "N", description: "Sets block profile rate (profiling disabled)" },
+        // Runtime methods
+        { name: "debug_stacks", status: "N", description: "Returns stack traces (profiling disabled)" },
+        { name: "debug_stacksLimit", status: "N", description: "Returns limited stack traces (not implemented)" },
+        { name: "debug_nodeInfo", status: "N", description: "Returns node information (not implemented)" },
+        { name: "debug_peers", status: "N", description: "Returns connected peers (not implemented)" },
+        { name: "debug_verbosity", status: "N", description: "Sets logging verbosity (not implemented)" },
+        { name: "debug_vmodule", status: "N", description: "Sets logging vmodule (not implemented)" },
+        { name: "debug_backtraceAt", status: "N", description: "Sets backtrace location (not implemented)" },
+        { name: "debug_preimage", status: "N", description: "Returns preimage for hash (not implemented)" }
+      ]
+    },
+    admin: {
+      name: "admin",
+      color: "indigo",
+      methods: [
+        { name: "admin_addPeer", status: "N", description: "Adds peer (not implemented)" },
+        { name: "admin_removePeer", status: "N", description: "Removes peer (not implemented)" },
+        { name: "admin_addTrustedPeer", status: "N", description: "Adds trusted peer (not implemented)" },
+        { name: "admin_removeTrustedPeer", status: "N", description: "Removes trusted peer (not implemented)" },
+        { name: "admin_nodeInfo", status: "N", description: "Returns node info (not implemented)" },
+        { name: "admin_peers", status: "N", description: "Returns peers (not implemented)" },
+        { name: "admin_datadir", status: "N", description: "Returns data directory (not implemented)" },
+        { name: "admin_startRPC", status: "N", description: "Starts RPC (not implemented)" },
+        { name: "admin_stopRPC", status: "N", description: "Stops RPC (not implemented)" },
+        { name: "admin_startWS", status: "N", description: "Starts WebSocket (not implemented)" },
+        { name: "admin_stopWS", status: "N", description: "Stops WebSocket (not implemented)" },
+        { name: "admin_startHTTP", status: "N", description: "Starts HTTP (not implemented)" },
+        { name: "admin_stopHTTP", status: "N", description: "Stops HTTP (not implemented)" },
+        { name: "admin_exportChain", status: "N", description: "Exports chain (not implemented)" },
+        { name: "admin_importChain", status: "N", description: "Imports chain (not implemented)" },
+        { name: "admin_sleepBlocks", status: "N", description: "Sleeps blocks (not implemented)" },
+        { name: "admin_clearPeerBanList", status: "N", description: "Clears peer ban list (not implemented)" },
+        { name: "admin_listPeerBanList", status: "N", description: "Lists peer ban list (not implemented)" }
       ]
     },
     miner: {
-      name: 'Miner',
+      name: "miner",
+      color: "gray",
       methods: [
-        {
-          name: 'miner_start',
-          description: 'Start mining (stub implementation)',
-          implemented: false,
-          private: true,
-          params: []
-        },
-        {
-          name: 'miner_stop',
-          description: 'Stop mining (stub implementation)',
-          implemented: false,
-          private: true,
-          params: []
-        },
-        {
-          name: 'miner_setEtherbase',
-          description: 'Set coinbase address (stub implementation)',
-          implemented: false,
-          private: true,
-          params: [
-            {
-              name: 'address',
-              type: 'address',
-              description: 'Coinbase address',
-              example: '0x...'
-            }
-          ]
-        },
-        {
-          name: 'miner_setGasPrice',
-          description: 'Set minimum gas price (stub implementation)',
-          implemented: false,
-          private: true,
-          params: [
-            {
-              name: 'gasPrice',
-              type: 'hex',
-              description: 'Minimum gas price in wei',
-              example: '0x3b9aca00'
-            }
-          ]
-        },
-        {
-          name: 'miner_setGasLimit',
-          description: 'Set gas limit (stub implementation)',
-          implemented: false,
-          private: true,
-          params: [
-            {
-              name: 'gasLimit',
-              type: 'hex',
-              description: 'Gas limit',
-              example: '0x1c9c380'
-            }
-          ]
-        }
+        { name: "miner_start", status: "N", description: "Starts mining (not applicable - uses Tendermint)" },
+        { name: "miner_stop", status: "N", description: "Stops mining (not applicable - uses Tendermint)" },
+        { name: "miner_setEtherbase", status: "N", description: "Sets etherbase (not applicable - uses Tendermint)" },
+        { name: "miner_setExtra", status: "N", description: "Sets extra data (not applicable - uses Tendermint)" },
+        { name: "miner_setGasPrice", status: "N", description: "Sets gas price (not applicable - uses Tendermint)" },
+        { name: "miner_setGasLimit", status: "N", description: "Sets gas limit (not applicable - uses Tendermint)" },
+        { name: "miner_setRecommitInterval", status: "N", description: "Sets recommit interval (not applicable - uses Tendermint)" },
+        { name: "miner_getHashrate", status: "N", description: "Returns hashrate (not applicable - uses Tendermint)" }
+      ]
+    },
+    engine: {
+      name: "engine",
+      color: "pink",
+      methods: [
+        { name: "engine_newPayloadV1", status: "N", description: "New payload V1 (not applicable - uses Tendermint)" },
+        { name: "engine_newPayloadV2", status: "N", description: "New payload V2 (not applicable - uses Tendermint)" },
+        { name: "engine_newPayloadV3", status: "N", description: "New payload V3 (not applicable - uses Tendermint)" },
+        { name: "engine_forkchoiceUpdatedV1", status: "N", description: "Fork choice updated V1 (not applicable - uses Tendermint)" },
+        { name: "engine_forkchoiceUpdatedV2", status: "N", description: "Fork choice updated V2 (not applicable - uses Tendermint)" },
+        { name: "engine_forkchoiceUpdatedV3", status: "N", description: "Fork choice updated V3 (not applicable - uses Tendermint)" },
+        { name: "engine_getPayloadV1", status: "N", description: "Get payload V1 (not applicable - uses Tendermint)" },
+        { name: "engine_getPayloadV2", status: "N", description: "Get payload V2 (not applicable - uses Tendermint)" },
+        { name: "engine_getPayloadV3", status: "N", description: "Get payload V3 (not applicable - uses Tendermint)" },
+        { name: "engine_getPayloadBodiesByHashV1", status: "N", description: "Get payload bodies by hash (not applicable - uses Tendermint)" },
+        { name: "engine_getPayloadBodiesByRangeV1", status: "N", description: "Get payload bodies by range (not applicable - uses Tendermint)" },
+        { name: "engine_exchangeTransitionConfigurationV1", status: "N", description: "Exchange transition configuration (not applicable - uses Tendermint)" },
+        { name: "engine_exchangeCapabilities", status: "N", description: "Exchange capabilities (not applicable - uses Tendermint)" },
+        { name: "engine_getBlobsV1", status: "N", description: "Get blobs V1 (not applicable - uses Tendermint)" }
+      ]
+    },
+    clique: {
+      name: "clique",
+      color: "teal",
+      methods: [
+        { name: "clique_getSnapshot", status: "N", description: "Get snapshot at block (not applicable - uses Tendermint)" },
+        { name: "clique_getSnapshotAtHash", status: "N", description: "Get snapshot at hash (not applicable - uses Tendermint)" },
+        { name: "clique_getSigners", status: "N", description: "Get authorized signers (not applicable - uses Tendermint)" },
+        { name: "clique_getSignersAtHash", status: "N", description: "Get signers at hash (not applicable - uses Tendermint)" },
+        { name: "clique_propose", status: "N", description: "Propose new signer (not applicable - uses Tendermint)" },
+        { name: "clique_discard", status: "N", description: "Discard signer proposal (not applicable - uses Tendermint)" },
+        { name: "clique_status", status: "N", description: "Get clique status (not applicable - uses Tendermint)" },
+        { name: "clique_getSigner", status: "N", description: "Get current signer (not applicable - uses Tendermint)" }
+      ]
+    },
+    les: {
+      name: "les",
+      color: "cyan",
+      methods: [
+        { name: "les_serverInfo", status: "N", description: "Server information (not implemented)" },
+        { name: "les_clientInfo", status: "N", description: "Client information (not implemented)" },
+        { name: "les_priorityClientInfo", status: "N", description: "Priority client info (not implemented)" },
+        { name: "les_addBalance", status: "N", description: "Add balance to client (not implemented)" },
+        { name: "les_setClientParams", status: "N", description: "Set client parameters (not implemented)" },
+        { name: "les_setDefaultParams", status: "N", description: "Set default parameters (not implemented)" },
+        { name: "les_latestCheckpoint", status: "N", description: "Latest checkpoint (not implemented)" },
+        { name: "les_getCheckpoint", status: "N", description: "Get checkpoint by index (not implemented)" },
+        { name: "les_getCheckpointContractAddress", status: "N", description: "Get checkpoint contract (not implemented)" }
       ]
     }
   };
+
+  // Transform imported data into the expected format
+  const namespaces = Object.entries(rpcMethodsData).reduce((acc, [key, value]) => {
+    acc[key] = {
+      name: value.name,
+      methods: value.methods.map(method => ({
+        name: method.name,
+        description: method.description,
+        implemented: method.status === 'Y',
+        partial: method.status === 'Stub',
+        notImplemented: method.status === 'N',
+        status: method.status,
+        params: [],
+        cosmosSpecific: method.description.includes('Cosmos-specific'),
+        private: method.description.includes('Private') || method.description.includes('private')
+      }))
+    };
+    return acc;
+  }, {});
+
+  // Add parameter examples for common methods (preserving existing functionality)
+  const methodParams = {
+    web3_sha3: [{
+      name: 'data',
+      type: 'string',
+      description: 'The data to hash (hex encoded)',
+      example: '0x68656c6c6f20776f726c64'
+    }],
+    eth_getBalance: [
+      { name: 'address', type: 'address', description: 'Address to check', example: '0x407d73d8a49eeb85d32cf465507dd71d507100c1' },
+      { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
+    ],
+    eth_getTransactionCount: [
+      { name: 'address', type: 'address', description: 'Address', example: '0x407d73d8a49eeb85d32cf465507dd71d507100c1' },
+      { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
+    ],
+    eth_sendRawTransaction: [
+      { name: 'data', type: 'hex', description: 'Signed transaction data', example: '0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675' }
+    ],
+    eth_call: [
+      { name: 'callObject', type: 'object', description: 'Call data' },
+      { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
+    ],
+    eth_estimateGas: [
+      { name: 'callObject', type: 'object', description: 'Transaction data' }
+    ],
+    eth_getStorageAt: [
+      { name: 'address', type: 'address', description: 'Storage address', example: '0x295a70b2de5e3953354a6a8344e616ed314d7251' },
+      { name: 'position', type: 'hex', description: 'Storage position', example: '0x0' },
+      { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
+    ],
+    eth_getCode: [
+      { name: 'address', type: 'address', description: 'Contract address', example: '0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b' },
+      { name: 'block', type: 'string', description: 'Block number or tag', example: 'latest' }
+    ],
+    eth_getBlockByNumber: [
+      { name: 'block', type: 'string', description: 'Block number or tag', example: '0x1b4' },
+      { name: 'fullTx', type: 'boolean', description: 'Return full transactions', example: true }
+    ],
+    eth_getBlockByHash: [
+      { name: 'blockHash', type: 'hash', description: 'Block hash', example: '0xdc0818cf78f21a8e70579cb46a43643f78291264dda342ae31049421c82d21ae' },
+      { name: 'fullTx', type: 'boolean', description: 'Return full transactions', example: false }
+    ],
+    eth_getTransactionByHash: [
+      { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b' }
+    ],
+    eth_getTransactionReceipt: [
+      { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238' }
+    ],
+    eth_getLogs: [
+      { name: 'filterOptions', type: 'object', description: 'Filter parameters' }
+    ],
+    eth_getTransactionLogs: [
+      { name: 'txHash', type: 'hash', description: 'Transaction hash', example: '0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b' }
+    ],
+    personal_newAccount: [
+      { name: 'passphrase', type: 'string', description: 'Passphrase for encryption', example: 'This is the passphrase' }
+    ],
+    personal_unlockAccount: [
+      { name: 'address', type: 'address', description: 'Account address to unlock', example: '0x...' },
+      { name: 'passphrase', type: 'string', description: 'Account passphrase', example: 'mypassword' },
+      { name: 'duration', type: 'number', description: 'Unlock duration in seconds (0 = indefinite)', example: 300 }
+    ],
+    personal_sign: [
+      { name: 'data', type: 'string', description: 'Data to sign', example: '0xdeadbeef' },
+      { name: 'address', type: 'address', description: 'Signing account', example: '0x...' },
+      { name: 'passphrase', type: 'string', description: 'Account passphrase', example: 'mypassword' }
+    ],
+    txpool_contentFrom: [
+      { name: 'address', type: 'address', description: 'Address to get transactions from', example: '0x1234567890abcdef1234567890abcdef12345678' }
+    ]
+  };
+
+  // Merge params into methods
+  Object.keys(namespaces).forEach(ns => {
+    namespaces[ns].methods.forEach(method => {
+      if (methodParams[method.name]) {
+        method.params = methodParams[method.name];
+      }
+    });
+  });
 
   // Optimized to only generate code for the selected language
   const generateCodeExample = useCallback((method, params = [], language = 'curl') => {
@@ -842,7 +842,7 @@ class Program
       });
     });
     return methods;
-  }, []);
+  }, [namespaces]);
 
   const filteredMethods = useMemo(() => {
     let methods = allMethods;
@@ -858,12 +858,23 @@ class Program
       methods = methods.filter(method => method.namespace === selectedNamespace);
     }
 
-    if (hideUnsupported) {
-      methods = methods.filter(method => method.implemented !== false);
+    if (!showAllMethods) {
+      methods = methods.filter(method => method.status === 'Y');
     }
 
     return methods;
-  }, [selectedNamespace, searchTerm, allMethods, hideUnsupported]);
+  }, [selectedNamespace, searchTerm, allMethods, showAllMethods]);
+
+  // Compute which namespaces have visible methods
+  const visibleNamespaces = useMemo(() => {
+    const visible = new Set();
+    allMethods.forEach(method => {
+      if (showAllMethods || method.status === 'Y') {
+        visible.add(method.namespace);
+      }
+    });
+    return visible;
+  }, [allMethods, showAllMethods]);
 
   // Generate code example using debounced values
   const codeExample = useMemo(() => {
@@ -984,40 +995,40 @@ class Program
               >
                 All
               </button>
-              {Object.entries(namespaces).map(([key, namespace]) => (
-                <button
-                  key={key}
-                  onClick={() => setSelectedNamespace(key)}
-                  style={{
-                    backgroundColor: theme === 'dark'
-                      ? (selectedNamespace === key ? namespaceColors[key] : 'transparent')
-                      : namespaceColors[key],
-                    borderColor: namespaceColors[key],
-                    borderWidth: '2px',
-                    color: theme === 'dark'
-                      ? (selectedNamespace === key ? 'white' : namespaceColors[key])
-                      : 'white',
-                    opacity: theme === 'light' ? (selectedNamespace === key ? 1 : 0.7) : 1,
-                    boxShadow: selectedNamespace === key
-                      ? `0 0 0 2px ${theme === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)'}`
-                      : 'none'
-                  }}
-                  className="px-3 py-1 text-xs rounded-full transition-all font-medium hover:opacity-100"
-                >
-                  {namespace.name}
-                </button>
-              ))}
+              {Object.entries(namespaces)
+                .filter(([key]) => visibleNamespaces.has(key))
+                .map(([key, namespace]) => (
+                  <button
+                    key={key}
+                    onClick={() => setSelectedNamespace(key)}
+                    style={{
+                      backgroundColor: theme === 'dark'
+                        ? (selectedNamespace === key ? namespaceColors[key] : 'transparent')
+                        : namespaceColors[key],
+                      borderColor: namespaceColors[key],
+                      borderWidth: '2px',
+                      color: 'white', // Always white text for better visibility
+                      opacity: theme === 'light' ? (selectedNamespace === key ? 1 : 0.7) : 1,
+                      boxShadow: selectedNamespace === key
+                        ? `0 0 0 2px ${theme === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)'}`
+                        : 'none'
+                    }}
+                    className="px-3 py-1 text-xs rounded-full transition-all font-medium hover:opacity-100"
+                  >
+                    {namespace.name}
+                  </button>
+                ))}
             </div>
 
             <div className="flex items-center gap-2 mt-3">
               <label className="flex items-center cursor-pointer text-xs">
                 <input
                   type="checkbox"
-                  checked={!hideUnsupported}
-                  onChange={(e) => setHideUnsupported(!e.target.checked)}
+                  checked={showAllMethods}
+                  onChange={(e) => setShowAllMethods(e.target.checked)}
                   className="mr-2"
                 />
-                <span className={theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'}>Show all methods (Including unsupported)</span>
+                <span className={theme === 'dark' ? 'text-zinc-400' : 'text-gray-600'}>Show all methods</span>
               </label>
             </div>
           </div>
@@ -1055,9 +1066,14 @@ class Program
                       <code className="text-sm font-mono text-blue-400 truncate">
                         {method.name}
                       </code>
-                      {method.implemented === false && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-500/30 text-gray-400">
+                      {method.status === 'Stub' && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/30 text-yellow-400">
                           stub
+                        </span>
+                      )}
+                      {method.status === 'N' && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/30 text-red-400">
+                          not impl
                         </span>
                       )}
                       {method.cosmosSpecific && (
@@ -1115,6 +1131,49 @@ class Program
                 }`}>
                   {selectedMethod.description}
                 </p>
+
+                {/* Status Legend */}
+                <div className={`mt-4 flex flex-wrap gap-3 text-xs ${
+                  theme === 'dark' ? 'text-zinc-500' : 'text-gray-500'
+                }`}>
+                  {selectedMethod.status === 'Y' && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1.5 py-0.5 rounded bg-green-500/30 text-green-400 text-[10px]">functional</span>
+                      <span>Fully compatible</span>
+                    </div>
+                  )}
+                  {selectedMethod.status === 'Stub' && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1.5 py-0.5 rounded bg-yellow-500/30 text-yellow-400 text-[10px]">stub</span>
+                      <span>Returns empty/null for compatibility</span>
+                    </div>
+                  )}
+                  {selectedMethod.status === 'N' && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1.5 py-0.5 rounded bg-red-500/30 text-red-400 text-[10px]">not impl</span>
+                      <span>Not implemented in Cosmos EVM</span>
+                    </div>
+                  )}
+                  {selectedMethod.cosmosSpecific && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-purple-500/30 text-[10px]">
+                        <CosmosIcon size={10} color={theme === 'dark' ? '#c084fc' : '#9333ea'} />
+                        <span className={theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}>Cosmos</span>
+                      </span>
+                      <span>Cosmos-specific extension</span>
+                    </div>
+                  )}
+                  {selectedMethod.private && (
+                    <div className="flex items-center gap-1.5">
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] ${
+                        theme === 'dark'
+                          ? 'bg-amber-500/30 text-amber-400'
+                          : 'bg-amber-100 text-amber-700'
+                      }`}>Private</span>
+                      <span>Requires authentication</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Parameters */}

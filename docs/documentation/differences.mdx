@@ -7,30 +7,13 @@ keywords: ['differences', 'ethereum', 'evm', 'cosmos', 'tendermint', 'consensus'
 
 import { footnote } from '/snippets/footnote.mdx'
 
+Cosmos EVM provides Ethereum compatibility on Cosmos chains with significant architectural differences from both standard Ethereum and Ethermint-based implementations.
+
 <Warning>
-  **The EVM module is still in active development:** Some of what is detailed here may change or be removed entirely as development continues. This document represents the current state of the implementation.
+  **The EVM module is in active development:** Details within this documentation may change or be removed entirely as development continues. A versioned form of this documentation is in development for future releases.
 
-  **Implementation Variations:** This document is specific to the current version of [Cosmos-EVM](https://github.com/cosmos/evm) and may not be applicable in part or in full to older versions or Ethermint variants.
+  **Implementation Variations:** This documentation is specific to [Cosmos-EVM](https://github.com/cosmos/evm) and may not be applicable in part or in full to older versions or Ethermint variants.
 </Warning>
-
-<Info>
-  **Critical for Ethermint/Evmos Migrations:** Cosmos EVM has significant architectural differences from Ethermint/Evmos. See [Migration from Evmos/Ethermint](#migration-from-evmosethermint) for breaking changes.
-</Info>
-
-## Quick Summary
-
-Cosmos EVM provides Ethereum compatibility on Cosmos chains with significant architectural improvements and differences from both standard Ethereum and Ethermint-based implementations
-
-**Most Important Differences for Developers:**
-1. **Instant finality** - No block reorganizations, transactions are final after one block
-2. **1-2 second blocks** - Much faster than Ethereum's 12-15 seconds
-3. **Dual Chain IDs** - ⚠️ **Two completely independent IDs** (Cosmos string + EVM integer), unlike Ethermint's single combined format
-4. **Experimental pending state** - [Two-tiered mempool](/docs/documentation/concepts/mempool) (local queue + public pool) handles nonce gaps - **WARNING: This is experimental and not recommended for production**
-5. **Configurable base fee** - Can be dynamic (EIP-1559) or disabled, distributed to validators instead of burned
-6. **Native IBC** - Built-in cross-chain communication without bridges
-7. **Cosmos precompiles** - Direct access to staking, governance, and other Cosmos SDK modules
-8. **Token precision** - Native tokens use 18 decimals via [x/precisebank module](/docs/documentation/concepts/single-token-representation)
-9. **EIP compatibility** - Most Core EIPs supported with some consensus-related exceptions ([see full matrix](/docs/documentation/eip-support))
 
 ## Core Differences
 
@@ -98,39 +81,44 @@ Cosmos EVM supports EIP-1559 with dynamic base fees, but with key differences:
   </Card>
 </CardGroup>
 
-### Verified Precompile Addresses
+### Active Precompiles
 
-| Precompile | Address | Status |
-|------------|---------|--------|
-| **P256 Verify** | `0x0000000000000000000000000000000000000100` | Implemented |
-| **Bech32** | `0x0000000000000000000000000000000000000400` | Implemented |
-| **Staking** | `0x0000000000000000000000000000000000000800` | Implemented |
-| **Distribution** | `0x0000000000000000000000000000000000000801` | Implemented |
-| **ICS20** | `0x0000000000000000000000000000000000000802` | Implemented |
-| **Bank** | `0x0000000000000000000000000000000000000804` | Implemented |
-| **Governance** | `0x0000000000000000000000000000000000000805` | Implemented |
-| **Slashing** | `0x0000000000000000000000000000000000000806` | Implemented |
-
-<Note>
-Precompile addresses may vary between implementations. Verify addresses with your specific chain.
-</Note>
+| Precompile | Address |
+|------------|---------|
+| **P256 Verify** | `0x0000000000000000000000000000000000000100` |
+| **Bech32** | `0x0000000000000000000000000000000000000400` |
+| **Staking** | `0x0000000000000000000000000000000000000800` |
+| **Distribution** | `0x0000000000000000000000000000000000000801` |
+| **ICS20** | `0x0000000000000000000000000000000000000802` |
+| **Bank** | `0x0000000000000000000000000000000000000804` |
+| **Governance** | `0x0000000000000000000000000000000000000805` |
+| **Slashing** | `0x0000000000000000000000000000000000000806` |
 
 ## JSON-RPC Method Support
 
-Cosmos EVM implements most standard Ethereum JSON-RPC methods with modifications for Tendermint consensus:
+Cosmos EVM implements the Ethereum JSON-RPC API with varying levels of support across different method categories:
 
 <Card title="JSON-RPC Implementation" icon="code" href="/docs/api-reference/ethereum-json-rpc/methods">
-  View the complete JSON-RPC methods reference with detailed implementation status for all `eth_*`, `web3_*`, `net_*`, `txpool_*`, `personal_*`, `debug_*`, and `admin_*` namespaces.
+  View the complete JSON-RPC methods reference with detailed implementation status for all 200+ methods across `eth_*`, `web3_*`, `net_*`, `txpool_*`, `personal_*`, `debug_*`, and `admin_*` namespaces.
 </Card>
 
-### Key RPC Differences
-- **Mining methods**: Not implemented in eth namespace (Tendermint consensus replaces mining)
-- **Miner namespace**: Limited implementation - only `setEtherbase` and `setGasPrice` available
-- **Uncle methods**: Always return 0/null since no uncle blocks exist in Tendermint
-- **Pending state**: Full support via experimental mempool with `txpool_*` methods
-- **Trace methods**: Not implemented (use `debug_*` methods instead)
-- **Light client protocols**: Not supported (`les_*` namespace unavailable)
-- **eth_getWork**: Not implemented (mining not applicable)
+### Implementation Categories
+
+**✅ Fully Functional:** Core Ethereum methods work as expected
+- Transaction methods (`eth_sendTransaction`, `eth_getTransactionByHash`, `eth_getTransactionReceipt`)
+- Block methods (`eth_getBlockByNumber`, `eth_getBlockByHash`)
+- Account methods (`eth_getBalance`, `eth_getTransactionCount`)
+- Call/estimate methods (`eth_call`, `eth_estimateGas`)
+- Web3 utilities, network info, transaction pool queries
+
+**⚠️ Compatibility Stubs:** Return empty/default values for compatibility
+- Mining methods (no PoW mining in Tendermint)
+- Uncle block methods (always return 0/null)
+- Debug namespace (tracing not implemented)
+- Admin/engine namespaces (node management differs)
+
+**Important:** Methods returning `null` for non-existent data is correct Ethereum behavior, not a stub implementation
+
 
 ## Address Formats
 
