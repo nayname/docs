@@ -1,87 +1,60 @@
 ---
 title: "Migration: v0.3.0 to v0.4.0"
-description: "Step-by-step guide for upgrading Cosmos EVM from v0.3.x to v0.4.0"
+description: "Upgrading Cosmos EVM from v0.3.x to v0.4.0, step by step"
 ---
 
-<Warning>
-This migration requires careful planning and testing. Create a backup of your state and configuration before proceeding.
-</Warning>
+import { Callout } from '@/components'
 
-## Executive Checklist
+## Process Overview
 
-Quick overview of required changes:
+- Create an upgrade branch and freeze schema-affecting changes
+- Export a pre-upgrade state and archive node configs
+- Bump `cosmos/evm` to v0.4.0 and align Cosmos SDK/IBC/CometBFT constraints
+- Rewire keepers and AppModule (imports, constructors, `RegisterServices`)
+- Add client context field and `SetClientCtx` method
+- Add pending transaction listener support
+- **CRITICAL**: Migrate ERC20 precompiles if you have existing token pairs (see [Section 5](#5-erc20-precompiles-migration-critical))
+- Audit and migrate EVM & FeeMarket params (EIP-1559 knobs, denom/decimals)
+- Implement store/params migrations in your UpgradeHandler
 
-<Steps>
-  <Step title="Preparation">
-    - Create an upgrade branch and freeze schema-affecting changes
-    - Export pre-upgrade state and archive node configs
-  </Step>
-  
-  <Step title="Dependencies">
-    - Bump `cosmos/evm` to v0.4.0
-    - Align Cosmos SDK/IBC/CometBFT constraints
-  </Step>
-  
-  <Step title="Code Changes">
-    - Rewire keepers and AppModule (imports, constructors, `RegisterServices`)
-    - Update app constructor return type
-    - Add pending transaction listener support
-  </Step>
-  
-  <Step title="Configuration">
-    - Audit and migrate EVM & FeeMarket params
-    - Implement store/params migrations in UpgradeHandler
-  </Step>
-</Steps>
+## Prep
 
-## Preparation
-
-### Create Upgrade Branch
+- Create a branch: `git switch -c upgrade/evm-v0.4`
+- Ensure a clean build + tests green pre-upgrade
+- Snapshot your current params/genesis for comparison later
 
 ```bash
-# Create a dedicated branch for the upgrade
 git switch -c upgrade/evm-v0.4
-
-# Ensure clean build and tests pass pre-upgrade
 go test ./...
-
-# Snapshot current params/genesis for comparison
 evmd export > pre-upgrade-genesis.json
 ```
 
-## Dependency Updates
+## Dependency bumps
 
-### Update go.mod
+### 1.1 Pin EVM and tidy
 
-<CodeGroup>
+Bump the `cosmos/evm` dependency in `go.mod`:
 
-```diff go.mod
+```diff
 - github.com/cosmos/evm v0.3.1
 + github.com/cosmos/evm v0.4.0
 ```
 
-```bash Terminal
-# Update dependencies
-go mod tidy
+### 1.2 Transitive bumps
 
-# Verify no conflicts
-go mod verify
+Check for minor dependency bumps (e.g., `google.golang.org/protobuf`, `github.com/gofrs/flock`, `github.com/consensys/gnark-crypto`):
+
+```bash
+go mod tidy
 ```
 
-</CodeGroup>
+Resolve any version conflicts here before moving on.
 
-<Note>
-Check for transitive dependency bumps in `go.sum`, particularly:
-- `google.golang.org/protobuf`
-- `github.com/gofrs/flock`
-- `github.com/consensys/gnark-crypto`
-</Note>
+## App constructor return type & CLI command wiring
 
-## App Constructor Changes
+Update your app's `newApp` to return an `evmserver.Application` rather than `servertypes.Application`, and CLI commands that still expect an SDK app creator require a wrapper.
 
-### Update Return Type
-
-The app's `newApp` function must now return `evmserver.Application` instead of `servertypes.Application`.
+### 2.1 Change the return type
 
 ```go cmd/myapp/cmd/root.go
 import (
@@ -89,40 +62,54 @@ import (
 )
 
 func (a appCreator) newApp(
-    l log.Logger, 
-    db dbm.DB, 
-    traceStore io.Writer, 
+    l log.Logger,
+    db dbm.DB,
+    traceStore io.Writer,
     appOpts servertypes.AppOptions,
 ) evmserver.Application { // Changed from servertypes.Application
-    // ... app construction
+    // ...
 }
 ```
 
-### Add SDK Wrapper for CLI Commands
+### 2.2 Provide a wrapper for commands that expect the SDK type
 
-Some commands still expect the SDK type, so create a wrapper:
+Create a thin wrapper and use it for `pruning.Cmd` and `snapshot.Cmd`:
 
 ```go cmd/myapp/cmd/root.go
-// Create wrapper for SDK-expecting commands
-sdkAppCreatorWrapper := func(
-    l log.Logger, 
-    d dbm.DB, 
-    w io.Writer, 
-    ao servertypes.AppOptions,
-) servertypes.Application {
+sdkAppCreatorWrapper := func(l log.Logger, d dbm.DB, w io.Writer, ao servertypes.AppOptions) servertypes.Application {
     return ac.newApp(l, d, w, ao)
 }
 
-// Use wrapper for pruning and snapshot commands
 rootCmd.AddCommand(
     pruning.Cmd(sdkAppCreatorWrapper, myapp.DefaultNodeHome),
     snapshot.Cmd(sdkAppCreatorWrapper),
 )
 ```
 
-## Pending Transaction Listener Support
+### 2.3 Add clientCtx and SetClientCtx
 
-### Add Required Imports
+Add the clientCtx to your app object:
+
+```go app/app.go
+import (
+    "github.com/cosmos/cosmos-sdk/client"
+)
+
+type MyApp struct {
+    // ... existing fields
+    clientCtx client.Context
+}
+
+func (app *MyApp) SetClientCtx(clientCtx client.Context) {
+    app.clientCtx = clientCtx
+}
+```
+
+## Pending-tx listener support
+
+### 3.1 Imports
+
+Import the EVM ante package and geth common:
 
 ```go app/app.go
 import (
@@ -131,77 +118,80 @@ import (
 )
 ```
 
-### Update App Structure
+### 3.2 App state: listeners slice
+
+Add a new field for listeners:
 
 ```go app/app.go
 type MyApp struct {
     // ... existing fields
-    
-    // Add pending transaction listeners
     pendingTxListeners []ante.PendingTxListener
 }
+```
 
-// Add registration method
+### 3.3 Registration method
+
+Add a public method to register a listener by txHash:
+
+```go app/app.go
 func (app *MyApp) RegisterPendingTxListener(listener func(common.Hash)) {
     app.pendingTxListeners = append(app.pendingTxListeners, listener)
 }
 ```
 
-## Precompile Updates
+## Precompiles: optionals + codec injection
 
-### Add Address Codec Support
+### 4.1 New imports
 
-<Tabs>
-  <Tab title="Options Structure">
-    ```go app/keepers/precompiles.go
-    import (
-        "cosmossdk.io/core/address"
-        addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
-        sdk "github.com/cosmos/cosmos-sdk/types"
-    )
+```go app/keepers/precompiles.go
+import (
+    "cosmossdk.io/core/address"
+    addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
+    sdk "github.com/cosmos/cosmos-sdk/types"
+)
+```
 
-    type Optionals struct {
-        AddressCodec       address.Codec // for gov/staking
-        ValidatorAddrCodec address.Codec // for slashing
-        ConsensusAddrCodec address.Codec // for slashing
+### 4.2 Define Optionals + defaults + functional options
+
+Create a small options container with sane defaults pulled from the app's bech32 config:
+
+```go app/keepers/precompiles.go
+type Optionals struct {
+    AddressCodec       address.Codec // used by gov/staking
+    ValidatorAddrCodec address.Codec // used by slashing
+    ConsensusAddrCodec address.Codec // used by slashing
+}
+
+func defaultOptionals() Optionals {
+    return Optionals{
+        AddressCodec:       addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
+        ValidatorAddrCodec: addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
+        ConsensusAddrCodec: addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
     }
+}
 
-    func defaultOptionals() Optionals {
-        return Optionals{
-            AddressCodec:       addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
-            ValidatorAddrCodec: addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
-            ConsensusAddrCodec: addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
-        }
-    }
-    ```
-  </Tab>
-  
-  <Tab title="Functional Options">
-    ```go app/keepers/precompiles.go
-    type Option func(*Optionals)
+type Option func(*Optionals)
 
-    func WithAddressCodec(c address.Codec) Option {
-        return func(o *Optionals) { o.AddressCodec = c }
-    }
+func WithAddressCodec(c address.Codec) Option {
+    return func(o *Optionals) { o.AddressCodec = c }
+}
 
-    func WithValidatorAddrCodec(c address.Codec) Option {
-        return func(o *Optionals) { o.ValidatorAddrCodec = c }
-    }
+func WithValidatorAddrCodec(c address.Codec) Option {
+    return func(o *Optionals) { o.ValidatorAddrCodec = c }
+}
 
-    func WithConsensusAddrCodec(c address.Codec) Option {
-        return func(o *Optionals) { o.ConsensusAddrCodec = c }
-    }
-    ```
-  </Tab>
-</Tabs>
+func WithConsensusAddrCodec(c address.Codec) Option {
+    return func(o *Optionals) { o.ConsensusAddrCodec = c }
+}
+```
 
-### Update Precompile Factory
+### 4.3 Update the precompile factory to accept options
 
 ```go app/keepers/precompiles.go
 func NewAvailableStaticPrecompiles(
     ctx context.Context,
     // ... other params
-    opts ...Option, // Add options parameter
+    opts ...Option,
 ) map[common.Address]vm.PrecompiledContract {
     options := defaultOptionals()
     for _, opt := range opts {
@@ -211,128 +201,168 @@ func NewAvailableStaticPrecompiles(
 }
 ```
 
-### Update Individual Precompiles
+### 4.4 Modify individual precompile constructors
 
-<AccordionGroup>
-  <Accordion title="ICS-20 Precompile">
-    The ICS-20 precompile now requires `bankKeeper` as the first parameter:
-    
-    ```diff
-    - ibcTransferPrecompile, err := ics20precompile.NewPrecompile(
-    -     stakingKeeper,
-    + ibcTransferPrecompile, err := ics20precompile.NewPrecompile(
-    +     bankKeeper,  // New first parameter
-    +     stakingKeeper,
-          transferKeeper,
-          &channelKeeper,
-          // ...
-    ```
-  </Accordion>
-  
-  <Accordion title="Governance Precompile">
-    The governance precompile now requires an `AddressCodec`:
-    
-    ```diff
-    - govPrecompile, err := govprecompile.NewPrecompile(govKeeper, cdc)
-    + govPrecompile, err := govprecompile.NewPrecompile(govKeeper, cdc, options.AddressCodec)
-    ```
-  </Accordion>
-</AccordionGroup>
+**ICS-20 precompile** now needs `bankKeeper` first:
 
-## Testing the Migration
-
-### Build Verification
-
-```bash
-# Compile all packages
-go build ./...
-
-# Run tests
-go test ./...
+```diff
+- ibcTransferPrecompile, err := ics20precompile.NewPrecompile(
+-     stakingKeeper,
++ ibcTransferPrecompile, err := ics20precompile.NewPrecompile(
++     bankKeeper,
++     stakingKeeper,
+      transferKeeper,
+      &channelKeeper,
+      // ...
 ```
 
-### Smoke Tests
+**Gov precompile** now requires an `AddressCodec`:
 
-<Steps>
-  <Step title="Start Node">
-    Ensure RPC starts cleanly without errors
-  </Step>
-  
-  <Step title="Deploy Contract">
-    Deploy a simple contract and verify events/logs
-  </Step>
-  
-  <Step title="Test EIP-1559">
-    Send EIP-1559 transactions and confirm base fee behavior
-  </Step>
-  
-  <Step title="Test Listeners">
-    Register a pending transaction listener and verify it receives hashes
-  </Step>
-</Steps>
+```diff
+- govPrecompile, err := govprecompile.NewPrecompile(govKeeper, cdc)
++ govPrecompile, err := govprecompile.NewPrecompile(govKeeper, cdc, options.AddressCodec)
+```
 
-## Deployment Checklist
+## 5) ERC20 Precompiles Migration (CRITICAL)
 
-<Tabs>
-  <Tab title="Pre-Deployment">
-    - [ ] Package new binary
-    - [ ] Prepare Cosmovisor upgrade folder (if applicable)
-    - [ ] Confirm all validators build the same commit
-    - [ ] Verify no `replace` directives in `go.mod`
-    - [ ] Share `app.toml` diff if defaults changed
-  </Tab>
-  
-  <Tab title="Post-Deployment">
-    - [ ] Monitor mempool and pending transaction logs
-    - [ ] Verify base fee progression
-    - [ ] Check contract events for first 20-50 blocks
-    - [ ] Confirm precompiles execute correctly
-    - [ ] Validate ICS-20 transfers (if applicable)
-  </Tab>
-</Tabs>
+<Callout type="error">
+**⚠️ MANDATORY for chains with existing ERC20 token pairs**
 
-## Common Issues and Solutions
+The storage mechanism for ERC20 precompiles has fundamentally changed in v0.4.0. Without proper migration, your ERC20 tokens will become inaccessible via EVM.
+</Callout>
 
-### CLI Command Panics
+### Quick Check
 
-**Problem**: `pruning` or `snapshot` commands panic with wrong type error.
+Your chain needs this migration if you have:
+- IBC tokens converted to ERC20
+- Token factory tokens with ERC20 representations
+- Any existing `DynamicPrecompiles` or `NativePrecompiles` in storage
 
-**Solution**: Ensure you're passing `sdkAppCreatorWrapper` (not `ac.newApp`) to these commands.
+### Implementation
 
-### ICS-20 Precompile Build Error
+For complete migration instructions, see: **[ERC20 Precompiles Migration Guide](./erc20-precompiles-migration)**
 
-**Problem**: ICS-20 precompile fails to build.
+Add this to your upgrade handler:
 
-**Solution**: Ensure `bankKeeper` is passed as the first parameter to `NewPrecompile`.
+```go
+// In your upgrade handler
+store := ctx.KVStore(storeKeys[erc20types.StoreKey])
+const addressLength = 42
 
-### Governance Precompile Address Parsing
+// Migrate dynamic precompiles
+if oldData := store.Get([]byte("DynamicPrecompiles")); len(oldData) > 0 {
+    for i := 0; i < len(oldData); i += addressLength {
+        address := common.HexToAddress(string(oldData[i : i+addressLength]))
+        erc20Keeper.SetDynamicPrecompile(ctx, address)
+    }
+    store.Delete([]byte("DynamicPrecompiles"))
+}
 
-**Problem**: Governance precompile fails to parse addresses.
+// Migrate native precompiles
+if oldData := store.Get([]byte("NativePrecompiles")); len(oldData) > 0 {
+    for i := 0; i < len(oldData); i += addressLength {
+        address := common.HexToAddress(string(oldData[i : i+addressLength]))
+        erc20Keeper.SetNativePrecompile(ctx, address)
+    }
+    store.Delete([]byte("NativePrecompiles"))
+}
+```
 
-**Solution**: Provide the correct `AddressCodec` via defaults or `WithAddressCodec(...)`.
+### Verification
 
-### Pending Transaction Listeners Not Firing
+Post-upgrade, verify your migration succeeded:
 
-**Problem**: Registered listeners never receive transaction hashes.
+```bash
+# Check ERC20 balance (should NOT be 0 if tokens existed before)
+cast call $TOKEN_ADDRESS "balanceOf(address)" $USER_ADDRESS --rpc-url http://localhost:8545
 
-**Solution**: Ensure `RegisterPendingTxListener` is called during app construction or module initialization.
+# Verify precompiles in state
+mantrachaind export | jq '.app_state.erc20.dynamic_precompiles'
+```
 
-## Verification Steps
+## 6) Build & quick tests
 
-Before finalizing the upgrade:
+1. **Compile**:
+   ```bash
+   go build ./...
+   ```
 
-<Checklist>
-  - [ ] `go.mod` has no `replace` lines for `github.com/cosmos/evm`
-  - [ ] Node boots with expected RPC namespaces
-  - [ ] Contracts deploy and call successfully
-  - [ ] Events stream correctly
-  - [ ] Fee market behaves as expected
-  - [ ] ICS-20 transfers work (if applicable)
-  - [ ] All precompiles execute without errors
-</Checklist>
+2. **Smoke tests** (local single-node):
+   - Start your node; ensure RPC starts cleanly
+   - Deploy a trivial contract; verify events and logs
+   - Send a couple 1559 txs and confirm base-fee behavior looks sane
+   - (Optional) register a pending-tx listener and log hashes as they enter the mempool
 
-## Additional Resources
+## 6) Rollout checklist (operational)
 
-- [Cosmos EVM v0.4.0 Release Notes](https://github.com/cosmos/evm/releases/tag/v0.4.0)
-- [Migration Support](https://github.com/cosmos/evm/issues)
-- [Upgrade Handler Examples](https://github.com/cosmos/evm/tree/main/docs/migrations)
+- Package the new binary (and Cosmovisor upgrade folder if you use it)
+- Confirm all validators build the same commit (no `replace` lines)
+- Share an `app.toml` diff only if you changed defaults; otherwise regenerate the file from the new binary and re-apply customizations
+- Post-upgrade: monitor mempool/pending tx logs, base-fee progression, and contract events for the first 20-50 blocks
+
+## Pitfalls & remedies
+
+- **Forgot wrapper for CLI commands** → `pruning`/`snapshot` panic or wrong type:
+  - Ensure you pass `sdkAppCreatorWrapper` (not `ac.newApp`) into those commands
+
+- **ICS-20 precompile build error**:
+  - You likely didn't pass `bankKeeper` first; update the call site
+
+- **Governance precompile address parsing fails**:
+  - Provide the correct `AddressCodec` via defaults or `WithAddressCodec(...)`
+
+- **Listeners never fire**:
+  - Register with `RegisterPendingTxListener` during app construction or module init
+
+## Minimal code snippets
+
+**App listeners**
+
+```go app/app.go
+import (
+    "github.com/cosmos/evm/ante"
+    "github.com/ethereum/go-ethereum/common"
+)
+
+type MyApp struct {
+    // ...
+    pendingTxListeners []ante.PendingTxListener
+}
+
+func (app *MyApp) RegisterPendingTxListener(l func(common.Hash)) {
+    app.pendingTxListeners = append(app.pendingTxListeners, l)
+}
+```
+
+**CLI wrapper**
+
+```go cmd/myapp/cmd/root.go
+sdkAppCreatorWrapper := func(l log.Logger, d dbm.DB, w io.Writer, ao servertypes.AppOptions) servertypes.Application {
+    return ac.newApp(l, d, w, ao)
+}
+
+rootCmd.AddCommand(
+    pruning.Cmd(sdkAppCreatorWrapper, myapp.DefaultNodeHome),
+    snapshot.Cmd(sdkAppCreatorWrapper),
+)
+```
+
+**Precompile options & usage**
+
+```go app/keepers/precompiles.go
+opts := []Option{
+    // override defaults only if you use non-standard prefixes/codecs
+    WithAddressCodec(myAcctCodec),
+    WithValidatorAddrCodec(myValCodec),
+    WithConsensusAddrCodec(myConsCodec),
+}
+
+pcs := NewAvailableStaticPrecompiles(ctx, /* ... keepers ... */, opts...)
+```
+
+## Verify before tagging
+
+- `go.mod` has no `replace` lines for `github.com/cosmos/evm`
+- Node boots with expected RPC namespaces
+- Contracts deploy/call; events stream; fee market behaves
+- (If applicable) ICS-20 transfers work and precompiles execute
