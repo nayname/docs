@@ -1,11 +1,10 @@
 ---
-title: "EVM Compatibility"
-description: "Full Ethereum compatibility with enhanced Cosmos features"
+title: "Overview"
 mode: "wide"
 keywords: ['differences', 'ethereum', 'evm', 'cosmos', 'tendermint', 'consensus', 'finality', 'json-rpc', 'compatibility', 'precompiles', 'ibc', 'mev', 'gas', 'basefee', 'reorganization', 'bft', 'validator', 'staking']
 ---
 
-Cosmos EVM provides **full Ethereum compatibility** on Cosmos chains. Your existing Ethereum dApps, tools, and workflows work seamlessly while gaining the benefits of Cosmos consensus and interoperability.
+Cosmos EVM provides **full Ethereum compatibility** for Cosmos-SDK based chains. All standard / common Ethereum dApps, tools, and workflows work seamlessly while gaining the benefits of Cosmos consensus and interoperability.
 
 <Info>
   **100% EVM Compatible:** All critical Ethereum behaviors are preserved. Deploy your contracts, use MetaMask, connect with Web3.js/Ethers - everything works as expected.
@@ -106,7 +105,7 @@ These are completely independent values, not derived from each other.
 
 **Everything your dApp needs works:**
 -  All transaction methods (`eth_sendTransaction`, `eth_call`, `eth_estimateGas`)
--  Block and receipt queries  
+-  Block and receipt queries
 -  Account balances and nonces
 -  Event logs and filters
 -  Web3 utilities and net info
@@ -129,7 +128,7 @@ The only methods that return empty/null are those related to Proof-of-Work minin
 
 ## Developer Experience
 
-### Everything You Know Still Works 
+### Everything You Know Still Works
 
 **Your Ethereum skills and tools work unchanged:**
 - Deploy contracts with Hardhat, Foundry, or Remix
@@ -139,7 +138,7 @@ The only methods that return empty/null are those related to Proof-of-Work minin
 - Solidity and Vyper compile and run identically
 - Standard tooling like OpenZeppelin contracts work perfectly
 
-### Additional Benefits You Get 
+### Additional Benefits You Get
 
 **Enhanced capabilities without breaking compatibility:**
 - **Instant Finality:** No waiting for confirmations - transactions are final in ~2 seconds
