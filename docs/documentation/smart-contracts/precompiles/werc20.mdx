@@ -22,9 +22,9 @@ Native Cosmos tokens (including ATOM and all IBC tokens) exist in both wrapped a
 
 ## Gas Costs
 
-<Callout type="info">
-  Gas costs are approximated and may vary based on token complexity and chain settings.
-</Callout>
+<Info>
+Gas costs are approximated and may vary based on token complexity and chain settings.
+</Info>
 
 | Method | Gas Cost |
 |---|---|
@@ -87,14 +87,16 @@ function withdraw(uint256 amount) external {
 }
 ```
 
-<Callout type="info" title="Understanding the Deposit/Withdraw Pattern">
+<Info>
+**Understanding the Deposit/Withdraw Pattern**
+
 Unlike traditional WETH implementations where the contract holds wrapped tokens:
 - **Traditional WETH**: Contract receives ETH and mints WETH tokens that it holds
 - **WERC20**: Contract never holds tokens - all balances remain in the bank module
 - **Result**: The precompile contract address has no balance; tokens stay with users
 
 This is why `deposit()` and `withdraw()` are no-ops - there's no separate wrapped token state to manage.
-</Callout>
+</Info>
 
 ### Real-World Example
 

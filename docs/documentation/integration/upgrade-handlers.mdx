@@ -7,9 +7,9 @@ description: "Understanding and implementing on-chain upgrade handlers for coord
 
 Upgrade handlers enable coordinated on-chain upgrades across all validators at specific block heights via governance proposals. They provide a mechanism for chains to perform data migrations, parameter updates, and module upgrades in a deterministic way.
 
-<Callout type="info">
+<Info>
 Upgrade handlers are critical for maintaining consensus during chain upgrades. All validators must run the same upgrade logic at the same height.
-</Callout>
+</Info>
 
 ## When to Use Upgrade Handlers
 
@@ -241,9 +241,9 @@ func CreateUpgradeHandler(...) upgradetypes.UpgradeHandler {
 
 ## Best Practices
 
-<Callout type="warning">
+<Warning>
 Always test upgrade handlers thoroughly on testnets before mainnet deployment.
-</Callout>
+</Warning>
 
 ### 1. Idempotency
 

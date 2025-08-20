@@ -223,11 +223,11 @@ func NewAvailableStaticPrecompiles(
 
 ## 5) ERC20 Precompiles Migration (CRITICAL)
 
-<Callout type="error">
+<Warning>
 **⚠️ MANDATORY for chains with existing ERC20 token pairs**
 
 The storage mechanism for ERC20 precompiles has fundamentally changed in v0.4.0. Without proper migration, your ERC20 tokens will become inaccessible via EVM.
-</Callout>
+</Warning>
 
 ### Quick Check
 
