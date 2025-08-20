@@ -5,7 +5,9 @@ description: "The CLI tool ('appd') provides a full-feature interface for intera
 
 import { footnote } from '/snippets/footnote.mdx'
 
-:::info Node Requirements
+<Info>
+**Node Requirements**
+
 To use the `query` and `tx` commands, your `appd` node must either:
 
 - Be fully synced with the network you're interacting with, OR
@@ -27,7 +29,7 @@ broadcast-mode = "sync"
 ```
 
 To use an external RPC, update the `node` field to point to a public or private RPC endpoint.
-:::
+</Info>
 
 ## Global Flags
 
@@ -77,9 +79,9 @@ Key flags:
 - `--json-rpc.logs-cap`: Sets the max number of results from eth_getLogs query (default: `10000`)
 - `--json-rpc.block-range-cap`: Sets the max block range allowed for eth_getLogs query (default: `10000`)
 
-:::warning
+<Warning>
 You should only expose the debug endpoint in non production settings as it could impact network performance and uptime under certain conditions.
-:::
+</Warning>
 
 
 

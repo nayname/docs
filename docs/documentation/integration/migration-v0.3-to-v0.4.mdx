@@ -11,7 +11,7 @@ description: "Upgrading Cosmos EVM from v0.3.x to v0.4.0, step by step"
 - Rewire keepers and AppModule (imports, constructors, `RegisterServices`)
 - Add client context field and `SetClientCtx` method
 - Add pending transaction listener support
-- **Migrate ERC20 precompiles if you have existing token pairs** (see [Section 5](#5-erc20-precompiles-migration))
+- **Migrate ERC20 precompiles if you have existing token pairs** (see [this section]./(erc20-precompiles-migration))
 - Audit and migrate EVM & FeeMarket params (EIP-1559 knobs, denom/decimals)
 - Implement store/params migrations in your UpgradeHandler
 
@@ -232,11 +232,11 @@ func NewAvailableStaticPrecompiles(
 
 ## ERC20 Precompiles Migration
 
-<Callout type="error">
-**This nigration is required for `v0.3.x` chains with existing ERC20 token pairs**
+<Warning>
+**This migration is required for chains with existing ERC20 token pairs**
 
 The storage mechanism for ERC20 precompiles has fundamentally changed in v0.4.0. Without proper migration, your ERC20 tokens will become inaccessible via EVM.
-</Callout>
+</Warning>
 
 Include this migration with your upgrade if your chain has:
 

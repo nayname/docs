@@ -1,0 +1,18 @@
+# --- Treat documentation files as mergeable text
+*.md    text eol=lf
+*.mdx   text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+
+# (Optional) Use the builtin "union" driver for CHANGELOG-like lines
+# CHANGELOG* merge=union
+
+# --- Treat images as binary and auto-resolve by keeping ours during merges
+*.png   binary merge=ours
+*.jpg   binary merge=ours
+*.jpeg  binary merge=ours
+*.gif   binary merge=ours
+*.webp  binary merge=ours
+# SVG is XML text; keep as text so Meld can diff/merge
+*.svg   text

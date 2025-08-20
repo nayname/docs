@@ -21,6 +21,18 @@
   "logo": {
     "light": "/assets/brand/cosmos-wordmark-dark.svg",
     "dark": "/assets/brand/cosmos-wordmark.svg"
+},
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "navigation": {
     "tabs": [
@@ -52,6 +64,23 @@
                 ]
               },
               {
+                "group": "Integration",
+                "pages": [
+                  "docs/documentation/integration/evm-module-integration",
+                  "docs/documentation/integration/mempool-integration",
+                  "docs/documentation/integration/upgrade-handlers",
+                  "docs/documentation/integration/migration-v0.3-to-v0.4",
+                  "docs/documentation/integration/erc20-precompiles-migration"
+                ]
+              },
+              {
+                "group": "EVM Compatibility",
+                "pages": [
+                  "docs/documentation/evm-compatibility/overview",
+                  "docs/documentation/evm-compatibility/eip-reference"
+                ]
+              },
+              {
                 "group": "Concepts",
                 "pages": [
                   "docs/documentation/concepts/index",
@@ -67,41 +96,14 @@
                   "docs/documentation/concepts/signing",
                   "docs/documentation/concepts/single-token-representation",
                   "docs/documentation/concepts/tokens",
-                  "docs/documentation/concepts/transactions"
-                ]
-              },
-              {
-                "group": "Cosmos SDK",
-                "pages": [
-                  "docs/documentation/cosmos-sdk/overview",
-                  "docs/documentation/cosmos-sdk/cli",
-                  "docs/documentation/cosmos-sdk/protocol",
-                  {
-                    "group": "Modules",
-                    "pages": [
-                      "docs/documentation/cosmos-sdk/modules/epochs",
-                      "docs/documentation/cosmos-sdk/modules/erc20",
-                      "docs/documentation/cosmos-sdk/modules/feemarket",
-                      "docs/documentation/cosmos-sdk/modules/vm"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Integration",
-                "pages": [
-                  "docs/documentation/integration/evm-module-integration",
-                  "docs/documentation/integration/mempool-integration",
-                  "docs/documentation/integration/upgrade-handlers",
-                  "docs/documentation/integration/migration-v0.3-to-v0.4",
-                  "docs/documentation/integration/erc20-precompiles-migration"
+                  "docs/documentation/concepts/transactions",
+                  "docs/documentation/concepts/predeployed-contracts"
                 ]
               },
               {
                 "group": "Smart Contracts",
                 "pages": [
                   "docs/documentation/smart-contracts/introduction",
-                  "docs/documentation/smart-contracts/custom-improvement-proposals",
                   {
                     "group": "Precompiles",
                     "pages": [
@@ -123,13 +125,34 @@
                   {
                     "group": "Predeployed Contracts",
                     "pages": [
-                      "docs/documentation/smart-contracts/predeployed-contracts/index"
+                      "docs/documentation/smart-contracts/predeployed-contracts/overview",
+                      "docs/documentation/smart-contracts/predeployed-contracts/implementation-guide",
+                      "docs/documentation/smart-contracts/predeployed-contracts/create2",
+                      "docs/documentation/smart-contracts/predeployed-contracts/multicall3",
+                      "docs/documentation/smart-contracts/predeployed-contracts/permit2",
+                      "docs/documentation/smart-contracts/predeployed-contracts/safe-factory"
                     ]
                   }
                 ]
               },
-              "docs/documentation/differences",
-              "docs/documentation/eip-support"
+              "docs/documentation/custom-improvement-proposals",
+              {
+                "group": "Cosmos SDK",
+                "pages": [
+                  "docs/documentation/cosmos-sdk/overview",
+                  "docs/documentation/cosmos-sdk/cli",
+                  "docs/documentation/cosmos-sdk/protocol",
+                  {
+                    "group": "Modules",
+                    "pages": [
+                      "docs/documentation/cosmos-sdk/modules/epochs",
+                      "docs/documentation/cosmos-sdk/modules/erc20",
+                      "docs/documentation/cosmos-sdk/modules/feemarket",
+                      "docs/documentation/cosmos-sdk/modules/vm"
+                    ]
+                  }
+                ]
+              }
             ]
           }
         ]
