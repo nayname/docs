@@ -126,14 +126,14 @@ const tx = {
 
 ### With Replay Protection Enabled (Default)
 
- **Protected from:**
+✅ **Protected from:**
 - Cross-chain replay attacks
 - Accidental transaction execution on wrong networks
 - Fork-related replay vulnerabilities
 
 ### With Replay Protection Disabled
 
- **Vulnerable to:**
+⚠️ **Vulnerable to:**
 - Transactions being replayed on any EVM chain
 - Loss of funds through replay attacks
 - Unintended contract interactions on multiple chains

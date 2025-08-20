@@ -206,7 +206,7 @@ This ensures: `Total_aatom = Total_uatom * 10^12 - remainder` where `0 ≤ remai
 ### ERC20 Token Pairs
 
 The x/erc20 module manages the registration and tracking of token pairs:
-- Native Cosmos denoms  ERC20 contract addresses
+- Native Cosmos denoms ↔ ERC20 contract addresses
 - Automatic registration for IBC tokens when enabled
 - Governance-controlled token pair registration
 

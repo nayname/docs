@@ -76,8 +76,8 @@
               {
                 "group": "EVM Compatibility",
                 "pages": [
-                  "docs/documentation/differences",
-                  "docs/documentation/eip-support"
+                  "docs/documentation/evm-compatibility/differences",
+                  "docs/documentation/evm-compatibility/eip-reference"
                 ]
               },
               {
