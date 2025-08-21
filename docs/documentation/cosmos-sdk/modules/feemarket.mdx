@@ -9,28 +9,6 @@ The feemarket module from [cosmos/evm](https://github.com/cosmos/evm) implements
   This is part of cosmos/evm, not standard Cosmos SDK. Designed specifically for EVM-compatible Cosmos chains.
 </Note>
 
-## Module Distinctions
-
-### cosmos/evm vs Standard Cosmos SDK
-
-This fee market module from [cosmos/evm](https://github.com/cosmos/evm/tree/v0.4.1/x/feemarket) differs from standard Cosmos SDK fee handling:
-
-| **Aspect** | **Standard Cosmos SDK** | **cosmos/evm Feemarket** |
-|------------|-------------------------|---------------------------|
-| **Fee Model** | Static, validator-configured min gas prices | Dynamic EIP-1559 base fee |
-| **Price Discovery** | Manual adjustment by validators | Automatic based on utilization |
-| **Transaction Types** | Cosmos SDK Tx only | Both Cosmos & Ethereum txs |
-| **Decimal Handling** | Chain-specific precision | 18-decimal EVM compatibility |
-| **State Storage** | Not tracked | Base fee in state, gas in transient store |
-| **Consensus Impact** | No consensus on fees | Base fee part of consensus |
-
-### Key Integration Points
-
-The module integrates with EVM through:
-- **AnteHandlers**: Custom decorators for EVM transaction validation ([source](https://github.com/cosmos/evm/blob/v0.4.1/ante/evm/))
-- **Hooks**: PostTxProcessing for EVM state updates ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/hooks.go))
-- **RPC**: Ethereum JSON-RPC methods for fee queries ([source](https://github.com/cosmos/evm/blob/v0.4.1/rpc/backend/chain_info.go))
-
 ## Concepts
 
 ### EIP-1559: Fee Market
@@ -873,6 +851,28 @@ async function isHighFee() {
 
 </CodeGroup>
 
+
+## Module Distinctions
+
+### cosmos/evm vs Standard Cosmos SDK
+
+This fee market module from [cosmos/evm](https://github.com/cosmos/evm/tree/v0.4.1/x/feemarket) differs from standard Cosmos SDK fee handling:
+
+| **Aspect** | **Standard Cosmos SDK** | **cosmos/evm Feemarket** |
+|------------|-------------------------|---------------------------|
+| **Fee Model** | Static, validator-configured min gas prices | Dynamic EIP-1559 base fee |
+| **Price Discovery** | Manual adjustment by validators | Automatic based on utilization |
+| **Transaction Types** | Cosmos SDK Tx only | Both Cosmos & Ethereum txs |
+| **Decimal Handling** | Chain-specific precision | 18-decimal EVM compatibility |
+| **State Storage** | Not tracked | Base fee in state, gas in transient store |
+| **Consensus Impact** | No consensus on fees | Base fee part of consensus |
+
+### Key Integration Points
+
+The module integrates with EVM through:
+- **AnteHandlers**: Custom decorators for EVM transaction validation ([source](https://github.com/cosmos/evm/blob/v0.4.1/ante/evm/))
+- **Hooks**: PostTxProcessing for EVM state updates ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/hooks.go))
+- **RPC**: Ethereum JSON-RPC methods for fee queries ([source](https://github.com/cosmos/evm/blob/v0.4.1/rpc/backend/chain_info.go))
 
 ## References
 
