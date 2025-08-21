@@ -3,87 +3,11 @@ title: "Feemarket"
 description: "EIP-1559 modualarized"
 ---
 
-The feemarket module from [cosmos/evm](https://github.com/cosmos/evm) implements [EIP-1559](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md) dynamic fee pricing for Cosmos SDK chains with EVM compatibility. It replaces static gas prices with a base fee that automatically adjusts based on network congestion.
+The feemarket module from [cosmos/evm](https://github.com/cosmos/evm) implements [EIP-1559](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md) dynamic fee pricing for Cosmos SDK chains with EVM compatibility. 
 
 <Note>
-  This is part of cosmos/evm, not standard Cosmos SDK. Designed specifically for EVM-compatible Cosmos chains.
+  This is part of cosmos/evm, not standard Cosmos SDK. For conceptual understanding of EIP-1559, see [EIP-1559 Fee Market](/documentation/concepts/eip-1559-feemarket).
 </Note>
-
-## Concepts
-
-### EIP-1559: Fee Market
-
-[EIP-1559](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md) implements a dual-fee structure replacing the single gas price auction model. It includes a fixed-per-block network fee that dynamically adjusts based on network congestion and an optional priority fee (tip) for faster inclusion.
-
-Before EIP-1559:
-```
-fee = gasPrice * gasLimit
-```
-
-With EIP-1559:
-```
-fee = (baseFee + priorityTip) * gasLimit
-```
-
-where `baseFee` is the protocol-determined price per gas and `priorityTip` is an optional fee for transaction prioritization.
-
-<Info>
-  The Cosmos SDK uses different terminology than Ethereum. What Ethereum calls `gasLimit` is `gasWanted` in Cosmos. You'll encounter both terms in the Cosmos EVM as it bridges Ethereum and Cosmos SDK concepts.
-</Info>
-
-### Base Fee Mechanism
-
-The base fee is the minimum price per unit of gas required for transaction inclusion. It adjusts each block using this formula:
-
-```
-NewBaseFee = BaseFee × (1 + (|GasUsed - GasTarget| / GasTarget / Denominator))
-```
-
-The adjustment direction depends on block utilization:
-- **Increases** when `gasUsed > gasTarget`
-- **Decreases** when `gasUsed < gasTarget` (but not below `minGasPrice`)
-- **Remains stable** when `gasUsed == gasTarget`
-
-### Target Utilization
-
-The target utilization determines when fees should increase or decrease:
-
-```
-Target Gas = MaxBlockGas / ElasticityMultiplier
-Target Utilization % = 100 / ElasticityMultiplier
-```
-
-For example, with `ElasticityMultiplier = 2` (Ethereum default), the target is 50% block utilization.
-
-### Priority Tip
-
-The `max_priority_fee_per_gas` (tip) incentivizes validators to prioritize transactions. In the current Cosmos SDK implementation, transaction prioritization is limited, so tips may have minimal effect on inclusion order.
-
-### Effective Gas Price
-
-For EIP-1559 transactions, the effective gas price is:
-
-```
-effectiveGasPrice = min(baseFee + gasTipCap, gasFeeCap)
-```
-
-This ensures users never pay more than their specified maximum (`gasFeeCap`) while allowing for priority fees when network conditions permit.
-
-### Local vs. Global Minimum Gas Prices
-
-The module enforces two types of minimum gas prices:
-
-1. **Local minimum**: Set by individual validators in their node configuration
-2. **Global minimum**: Set as the `MinGasPrice` parameter via governance
-
-The effective minimum is the higher of:
-- Global `MinGasPrice`
-- Local validator minimum
-- Current base fee
-
-<Alert>
-  If the base fee falls below the global `MinGasPrice`, it's automatically set to `MinGasPrice`. This prevents the base fee from dropping below the spam prevention threshold.
-</Alert>
 
 ## State
 
