@@ -1,6 +1,7 @@
 ---
 title: "Feemarket"
 description: "EIP-1559 modualarized"
+icon: "trending-up"
 ---
 
 The feemarket module from [cosmos/evm](https://github.com/cosmos/evm) implements [EIP-1559](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md) dynamic fee pricing for Cosmos SDK chains with EVM compatibility.
@@ -8,27 +9,6 @@ The feemarket module from [cosmos/evm](https://github.com/cosmos/evm) implements
 <Note>
   This is part of cosmos/evm, not standard Cosmos SDK. For conceptual understanding of EIP-1559, see [EIP-1559 Fee Market](/docs/documentation/concepts/eip-1559-feemarket).
 </Note>
-
-## State
-
-The module maintains the following state ([genesis proto](https://github.com/cosmos/evm/blob/v0.4.1/proto/cosmos/evm/feemarket/v1/genesis.proto)):
-
-### State Objects
-
-| State Object | Description | Key | Value | Store |
-|--------------|-------------|-----|-------|-------|
-| BlockGasWanted | Gas wanted in the current block | `[]byte{1}` | `[]byte{uint64}` | Transient |
-| BaseFee | Current base fee | `Params.BaseFee` | `sdk.Dec` | KV |
-| Params | Module parameters | `[]byte{0x00}` | `Params` | KV |
-
-### Genesis State
-
-```go
-type GenesisState struct {
-    Params Params
-    BaseFee sdk.Dec
-}
-```
 
 ## Parameters
 
@@ -87,132 +67,6 @@ This prevents fees from dropping too low during periods of low activity, maintai
 | 1 unit | "1000000000000000000" | 1 × 10^18 |
 | 0.5 (50%) | "500000000000000000" | 0.5 × 10^18 |
 | 1 billion | "1000000000000000000000000000" | 10^9 × 10^18 |
-
-## Begin Block
-
-At the beginning of each block, the module calculates and sets the new base fee ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/abci.go#L16-L45)):
-
-```go
-func (k Keeper) BeginBlock(ctx sdk.Context) error {
-    baseFee := k.CalculateBaseFee(ctx)
-
-    // Skip if base fee is nil (not enabled)
-    if baseFee.IsNil() {
-        return nil
-    }
-
-    // Update the base fee in state
-    k.SetBaseFee(ctx, baseFee)
-
-    // Emit event with new base fee
-    ctx.EventManager().EmitEvent(
-        sdk.NewEvent(
-            "fee_market",
-            sdk.NewAttribute("base_fee", baseFee.String()),
-        ),
-    )
-    return nil
-}
-```
-
-## End Block
-
-At the end of each block, the module updates the gas wanted for base fee calculation ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/abci.go#L47-L92)):
-
-```go
-func (k Keeper) EndBlock(ctx sdk.Context) error {
-    gasWanted := k.GetTransientGasWanted(ctx)
-    gasUsed := ctx.BlockGasMeter().GasConsumedToLimit()
-
-    // Apply MinGasMultiplier to prevent manipulation
-    // gasWanted = max(gasWanted * MinGasMultiplier, gasUsed)
-    minGasMultiplier := k.GetParams(ctx).MinGasMultiplier
-    limitedGasWanted := NewDec(gasWanted).Mul(minGasMultiplier)
-    updatedGasWanted := MaxDec(limitedGasWanted, NewDec(gasUsed)).TruncateInt()
-
-    // Store for next block's base fee calculation
-    k.SetBlockGasWanted(ctx, updatedGasWanted)
-
-    ctx.EventManager().EmitEvent(
-        sdk.NewEvent(
-            "block_gas",
-            sdk.NewAttribute("height", fmt.Sprintf("%d", ctx.BlockHeight())),
-            sdk.NewAttribute("amount", fmt.Sprintf("%d", updatedGasWanted)),
-        ),
-    )
-    return nil
-}
-```
-
-### Base Fee Calculation Algorithm
-
-The calculation follows the EIP-1559 specification with Cosmos SDK adaptations ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/eip1559.go#L18-L69), [utils](https://github.com/cosmos/evm/blob/v0.4.1/utils/utils.go#L229-L254)):
-
-<Expandable title="View calculation implementation">
-```go
-func CalcGasBaseFee(gasUsed, gasTarget, baseFeeChangeDenom uint64,
-                    baseFee, minUnitGas, minGasPrice LegacyDec) LegacyDec {
-    // No change if at target
-    if gasUsed == gasTarget {
-        return baseFee
-    }
-
-    // Calculate adjustment magnitude
-    delta := abs(gasUsed - gasTarget)
-    adjustment := baseFee.Mul(delta).Quo(gasTarget).Quo(baseFeeChangeDenom)
-
-    if gasUsed > gasTarget {
-        // Increase base fee (minimum 1 unit)
-        baseFeeDelta := MaxDec(adjustment, minUnitGas)
-        return baseFee.Add(baseFeeDelta)
-    } else {
-        // Decrease base fee (not below minGasPrice)
-        return MaxDec(baseFee.Sub(adjustment), minGasPrice)
-    }
-}
-```
-
-The `minUnitGas` is calculated as `1 / 10^decimals` to ensure minimum increments based on token precision ([source](https://github.com/cosmos/evm/blob/v0.4.1/utils/utils.go#L229-L254)).
-</Expandable>
-
-## Keeper
-
-The keeper manages fee market state and calculations ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/keeper.go)):
-
-| Method | Description | Usage |
-|--------|-------------|-------|
-| `GetBaseFee()` / `SetBaseFee()` | Current base fee | Read/update during block processing |
-| `GetParams()` / `SetParams()` | Module parameters | Governance updates |
-| `GetBlockGasWanted()` / `SetBlockGasWanted()` | Gas tracking | Base fee calculation |
-| `CalculateBaseFee()` | Compute next base fee | Called in BeginBlock |
-
-The module also implements `PostTxProcessing` hooks for EVM transaction processing ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/hooks.go)).
-
-## Events
-
-The module emits the following events ([types](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/types/events.go)):
-
-### Fee Market Block Fees
-
-| Attribute Key | Attribute Value |
-|---------------|-----------------|
-| height | Current block height |
-| base_fee | New base fee |
-| gas_wanted | Total gas wanted in block |
-| gas_used | Total gas used in block |
-
-Example:
-```json
-{
-  "type": "fee_market_block_fees",
-  "attributes": [
-    {"key": "height", "value": "12345"},
-    {"key": "base_fee", "value": "1000000000"},
-    {"key": "gas_wanted", "value": "5000000"},
-    {"key": "gas_used", "value": "4800000"}
-  ]
-}
-```
 
 ## Configuration
 
@@ -302,6 +156,117 @@ The module supports different token decimal configurations:
 | 8 | 10^10 | 10^-10 | BTC-wrapped |
 | 18 | 1 | 1 | ETH, most EVM |
 
+## Configuration In Production
+
+Parameters can be updated through governance proposals ([msg server](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/msg_server.go)):
+
+```json
+// MsgUpdateParams structure
+// Source: github.com/cosmos/evm/blob/v0.4.1/proto/cosmos/evm/feemarket/v1/tx.proto
+{
+  "@type": "/cosmos.evm.feemarket.v1.MsgUpdateParams",
+  "authority": "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn",
+  "params": {
+    "no_base_fee": false,
+    "base_fee_change_denominator": 16,
+    "elasticity_multiplier": 2,
+    "enable_height": 100000,
+    "base_fee": "1000000000000000000000",
+    "min_gas_price": "1000000000000000000",
+    "min_gas_multiplier": "500000000000000000"
+  }
+}
+```
+
+Submit with:
+```bash
+# Submit governance proposal
+# Source: github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/msg_server.go#L17-L39
+evmd tx gov submit-proposal update-feemarket-params.json \
+  --from <key> \
+  --deposit 1000000000stake
+```
+
+## Best Practices
+
+### Parameter Selection by Use Case
+
+| **Chain Type** | **Denominator** | **Elasticity** | **MinGasPrice** | **Why** |
+|----------------|-----------------|----------------|-----------------|---------|
+| Testing/Development | 8 | 2 | Zero/Low | Quick iteration, Ethereum compatibility |
+| Production General | 8-16 | 2 | Medium | Balance stability and responsiveness |
+| High-Frequency Trading | 16-32 | 1-2 | Low | Predictable fees, high throughput |
+| Enterprise/Private | 32 | 2-3 | High | Maximum stability, cost predictability |
+| Gaming/Micro-tx | 4-8 | 1 | Very Low | Fast adjustments, minimal fees |
+
+### Block Time Correlation
+
+Faster blocks require higher denominators to maintain stability:
+
+```
+Recommended Denominator = 8 × (6s / YourBlockTime)
+```
+
+Examples:
+- 1s blocks → denominator ≥16 (prevents wild swings)
+- 6s blocks → denominator = 8 (Ethereum standard)
+- 12s blocks → denominator = 4 (can be more responsive)
+
+### Monitoring Key Metrics
+
+| **Metric** | **Formula** | **Healthy** | **Action if Unhealthy** |
+|------------|-------------|-------------|--------------------------|
+| Fee Volatility | `σ(fees)/μ(fees)` |\<20% daily | Increase denominator |
+| Utilization Rate | `gasUsed/maxGas` | 40-60% avg | Adjust elasticity |
+| Floor Hit Rate | `count(fee==min)\/blocks` | \<10% | Lower min_gas_price |
+| Recovery Speed | Blocks to return to baseline | 20-40 | Tune denominator |
+
+### Integration Guidelines
+
+<CodeGroup>
+
+```javascript Wallet-Integration
+// Get current base fee
+const baseFee = await provider.getBaseFee();
+
+// Add buffer for inclusion certainty
+const maxFeePerGas = baseFee * 1.2;  // 20% buffer
+const maxPriorityFeePerGas = 2_000_000_000;  // 2 gwei tip
+
+// Send EIP-1559 transaction
+const tx = {
+  type: 2,
+  maxFeePerGas,
+  maxPriorityFeePerGas,
+  to: "0x...",
+  value: ethers.parseEther("1.0"),
+  gasLimit: 21000
+};
+```
+
+```javascript dApp-Monitoring
+// Monitor base fee changes
+provider.on('block', async (blockNumber) => {
+  const baseFee = await provider.getBaseFee();
+  const feeHistory = await provider.send('eth_feeHistory', [
+    '0x10', // last 16 blocks
+    'latest',
+    [25, 50, 75]
+  ]);
+
+  updateFeeDisplay(baseFee, feeHistory);
+});
+
+// Check if fees are elevated
+async function isHighFee() {
+  const baseFee = await provider.getBaseFee();
+  const threshold = ethers.parseUnits('100', 'gwei');
+  return baseFee.gt(threshold);
+}
+```
+
+</CodeGroup>
+
 ## Interfaces
 
 ### EVM JSON-RPC
@@ -321,14 +286,14 @@ The fee market integrates with standard Ethereum JSON-RPC methods ([RPC backend]
 </ResponseField>
 
 <ResponseField name="eth_maxPriorityFeePerGas" type="string">
-  Returns suggested priority fee (tip) per gas. Currently returns minimal value as Cosmos SDK doesn't fully support transaction prioritization.
+  Returns suggested priority fee (tip) per gas. In cosmos/evm with the experimental mempool, transactions are prioritized by effective gas tip (fees), with ties broken by arrival time.
 
   ```json
   // Request
   {"jsonrpc":"2.0","method":"eth_maxPriorityFeePerGas","params":[],"id":1}
 
   // Response
-  {"jsonrpc":"2.0","id":1,"result":"0x0"} // 0 or minimal tip
+  {"jsonrpc":"2.0","id":1,"result":"0x77359400"} // Suggested tip in wei
   ```
 </ResponseField>
 
@@ -422,7 +387,7 @@ The fee market supports both legacy and EIP-1559 transaction types ([types](http
 {
   "type": "0x2",
   "maxFeePerGas": "0x3b9aca00",      // Maximum total fee willing to pay
-  "maxPriorityFeePerGas": "0x0",     // Tip for validator (currently minimal)
+  "maxPriorityFeePerGas": "0x77359400", // Tip that affects transaction priority in mempool
   "gas": "0x5208",
   "to": "0x...",
   "value": "0x...",
@@ -550,11 +515,160 @@ GET /cosmos/feemarket/v1/block_gas
 
 </CodeGroup>
 
-## AnteHandlers
+## Technical Implementation
+
+### State
+
+The module maintains the following state ([genesis proto](https://github.com/cosmos/evm/blob/v0.4.1/proto/cosmos/evm/feemarket/v1/genesis.proto)):
+
+#### State Objects
+
+| State Object | Description | Key | Value | Store |
+|--------------|-------------|-----|-------|-------|
+| BlockGasWanted | Gas wanted in the current block | `[]byte{1}` | `[]byte{uint64}` | Transient |
+| BaseFee | Current base fee | `Params.BaseFee` | `sdk.Dec` | KV |
+| Params | Module parameters | `[]byte{0x00}` | `Params` | KV |
+
+#### Genesis State
+
+```go
+type GenesisState struct {
+    Params Params
+    BaseFee sdk.Dec
+}
+```
+
+### Begin Block
+
+At the beginning of each block, the module calculates and sets the new base fee ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/abci.go#L16-L45)):
+
+```go
+func (k Keeper) BeginBlock(ctx sdk.Context) error {
+    baseFee := k.CalculateBaseFee(ctx)
+
+    // Skip if base fee is nil (not enabled)
+    if baseFee.IsNil() {
+        return nil
+    }
+
+    // Update the base fee in state
+    k.SetBaseFee(ctx, baseFee)
+
+    // Emit event with new base fee
+    ctx.EventManager().EmitEvent(
+        sdk.NewEvent(
+            "fee_market",
+            sdk.NewAttribute("base_fee", baseFee.String()),
+        ),
+    )
+    return nil
+}
+```
+
+### End Block
+
+At the end of each block, the module updates the gas wanted for base fee calculation ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/abci.go#L47-L92)):
+
+```go
+func (k Keeper) EndBlock(ctx sdk.Context) error {
+    gasWanted := k.GetTransientGasWanted(ctx)
+    gasUsed := ctx.BlockGasMeter().GasConsumedToLimit()
+
+    // Apply MinGasMultiplier to prevent manipulation
+    // gasWanted = max(gasWanted * MinGasMultiplier, gasUsed)
+    minGasMultiplier := k.GetParams(ctx).MinGasMultiplier
+    limitedGasWanted := NewDec(gasWanted).Mul(minGasMultiplier)
+    updatedGasWanted := MaxDec(limitedGasWanted, NewDec(gasUsed)).TruncateInt()
+
+    // Store for next block's base fee calculation
+    k.SetBlockGasWanted(ctx, updatedGasWanted)
+
+    ctx.EventManager().EmitEvent(
+        sdk.NewEvent(
+            "block_gas",
+            sdk.NewAttribute("height", fmt.Sprintf("%d", ctx.BlockHeight())),
+            sdk.NewAttribute("amount", fmt.Sprintf("%d", updatedGasWanted)),
+        ),
+    )
+    return nil
+}
+```
+
+### Base Fee Calculation Algorithm
+
+The calculation follows the EIP-1559 specification with Cosmos SDK adaptations ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/eip1559.go#L18-L69), [utils](https://github.com/cosmos/evm/blob/v0.4.1/utils/utils.go#L229-L254)):
+
+<Expandable title="View calculation implementation">
+```go
+func CalcGasBaseFee(gasUsed, gasTarget, baseFeeChangeDenom uint64,
+                    baseFee, minUnitGas, minGasPrice LegacyDec) LegacyDec {
+    // No change if at target
+    if gasUsed == gasTarget {
+        return baseFee
+    }
+
+    // Calculate adjustment magnitude
+    delta := abs(gasUsed - gasTarget)
+    adjustment := baseFee.Mul(delta).Quo(gasTarget).Quo(baseFeeChangeDenom)
+
+    if gasUsed > gasTarget {
+        // Increase base fee (minimum 1 unit)
+        baseFeeDelta := MaxDec(adjustment, minUnitGas)
+        return baseFee.Add(baseFeeDelta)
+    } else {
+        // Decrease base fee (not below minGasPrice)
+        return MaxDec(baseFee.Sub(adjustment), minGasPrice)
+    }
+}
+```
+
+The `minUnitGas` is calculated as `1 / 10^decimals` to ensure minimum increments based on token precision ([source](https://github.com/cosmos/evm/blob/v0.4.1/utils/utils.go#L229-L254)).
+</Expandable>
+
+### Keeper
+
+The keeper manages fee market state and calculations ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/keeper.go)):
+
+| Method | Description | Usage |
+|--------|-------------|-------|
+| `GetBaseFee()` / `SetBaseFee()` | Current base fee | Read/update during block processing |
+| `GetParams()` / `SetParams()` | Module parameters | Governance updates |
+| `GetBlockGasWanted()` / `SetBlockGasWanted()` | Gas tracking | Base fee calculation |
+| `CalculateBaseFee()` | Compute next base fee | Called in BeginBlock |
+
+The module also implements `PostTxProcessing` hooks for EVM transaction processing ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/hooks.go)).
+
+### Events
+
+The module emits the following events ([types](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/types/events.go)):
+
+#### Fee Market Block Fees
+
+| Attribute Key | Attribute Value |
+|---------------|-----------------|
+| height | Current block height |
+| base_fee | New base fee |
+| gas_wanted | Total gas wanted in block |
+| gas_used | Total gas used in block |
+
+Example:
+```json
+{
+  "type": "fee_market_block_fees",
+  "attributes": [
+    {"key": "height", "value": "12345"},
+    {"key": "base_fee", "value": "1000000000"},
+    {"key": "gas_wanted", "value": "5000000"},
+    {"key": "gas_used", "value": "4800000"}
+  ]
+}
+```
+
+### AnteHandlers
 
 The module integrates with EVM transactions through the `EVMMonoDecorator`, which performs all fee-related validations in a single pass ([source](https://github.com/cosmos/evm/blob/v0.4.1/ante/evm/mono_decorator.go#L50-L252)):
 
-### EVMMonoDecorator
+#### EVMMonoDecorator
 
 The primary ante handler that validates and processes EVM transaction fees ([mono_decorator.go](https://github.com/cosmos/evm/blob/v0.4.1/ante/evm/mono_decorator.go)):
 
@@ -589,9 +703,9 @@ if isLondon && baseFeeEnabled {
 ```
 </Expandable>
 
-### Fee Validation Functions
+#### Fee Validation Functions
 
-#### CheckMempoolFee
+##### CheckMempoolFee
 
 Validates transaction fees against the local mempool minimum ([source](https://github.com/cosmos/evm/blob/v0.4.1/ante/evm/02_mempool_fee.go#L13-L29)):
 
@@ -614,7 +728,7 @@ func CheckMempoolFee(fee, mempoolMinGasPrice, gasLimit LegacyDec, isLondon bool)
 **Note**: This check is bypassed for London-enabled chains since EIP-1559 base fee mechanism handles minimum pricing.
 </Expandable>
 
-#### CheckGlobalFee
+##### CheckGlobalFee
 
 Enforces the chain-wide minimum gas price set via governance ([source](https://github.com/cosmos/evm/blob/v0.4.1/ante/evm/03_global_fee.go#L20-L36)):
 
@@ -633,10 +747,12 @@ func CheckGlobalFee(fee, globalMinGasPrice, gasLimit LegacyDec) error {
 }
 ```
 
-For EIP-1559 transactions, if the effective price falls below `MinGasPrice`, users must increase the priority fee (tip) until the effective price meets the minimum.
+For EIP-1559 transactions, if the effective price falls below `MinGasPrice`, users must increase the priority fee (tip) until the effective price meets the minimum. 
+
+In cosmos/evm's experimental mempool, transactions are ordered by effective gas tip (calculated as `min(maxPriorityFeePerGas, maxFeePerGas - baseFee)`), with higher tips getting priority. When tips are equal, transactions are ordered by arrival time ([source](https://github.com/cosmos/evm/blob/v0.4.1/mempool/miner/ordering.go#L63-L71)).
 </Expandable>
 
-#### CheckGasWanted
+##### CheckGasWanted
 
 Tracks cumulative gas wanted for base fee calculation ([source](https://github.com/cosmos/evm/blob/v0.4.1/ante/evm/10_gas_wanted.go#L48-L82)):
 
@@ -663,118 +779,6 @@ func CheckGasWanted(ctx Context, feeMarketKeeper FeeMarketKeeper, tx Tx, isLondo
 
 This cumulative gas wanted is used at the end of the block to calculate the next block's base fee.
 </Expandable>
-
-## Configuration In Production
-
-Parameters can be updated through governance proposals ([msg server](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/msg_server.go)):
-
-```json
-// MsgUpdateParams structure
-// Source: github.com/cosmos/evm/blob/v0.4.1/proto/cosmos/evm/feemarket/v1/tx.proto
-{
-  "@type": "/cosmos.evm.feemarket.v1.MsgUpdateParams",
-  "authority": "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn",
-  "params": {
-    "no_base_fee": false,
-    "base_fee_change_denominator": 16,
-    "elasticity_multiplier": 2,
-    "enable_height": 100000,
-    "base_fee": "1000000000000000000000",
-    "min_gas_price": "1000000000000000000",
-    "min_gas_multiplier": "500000000000000000"
-  }
-}
-```
-
-Submit with:
-```bash
-# Submit governance proposal
-# Source: github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/msg_server.go#L17-L39
-evmd tx gov submit-proposal update-feemarket-params.json \
-  --from <key> \
-  --deposit 1000000000stake
-```
-
-## Best Practices
-
-### Parameter Selection by Use Case
-
-| **Chain Type** | **Denominator** | **Elasticity** | **MinGasPrice** | **Why** |
-|----------------|-----------------|----------------|-----------------|---------|
-| Testing/Development | 8 | 2 | Zero/Low | Quick iteration, Ethereum compatibility |
-| Production General | 8-16 | 2 | Medium | Balance stability and responsiveness |
-| High-Frequency Trading | 16-32 | 1-2 | Low | Predictable fees, high throughput |
-| Enterprise/Private | 32 | 2-3 | High | Maximum stability, cost predictability |
-| Gaming/Micro-tx | 4-8 | 1 | Very Low | Fast adjustments, minimal fees |
-
-### Block Time Correlation
-
-Faster blocks require higher denominators to maintain stability:
-
-```
-Recommended Denominator = 8 × (6s / YourBlockTime)
-```
-
-Examples:
-- 1s blocks → denominator ≥16 (prevents wild swings)
-- 6s blocks → denominator = 8 (Ethereum standard)
-- 12s blocks → denominator = 4 (can be more responsive)
-
-### Monitoring Key Metrics
-
-| **Metric** | **Formula** | **Healthy** | **Action if Unhealthy** |
-|------------|-------------|-------------|--------------------------|
-| Fee Volatility | `σ(fees)/μ(fees)` | \<20% daily | Increase denominator |
-| Utilization Rate | `gasUsed/maxGas` | 40-60% avg | Adjust elasticity |
-| Floor Hit Rate | `count(fee==min)/blocks` | \<10% | Lower min_gas_price |
-| Recovery Speed | Blocks to return to baseline | 20-40 | Tune denominator |
-
-### Integration Guidelines
-
-<CodeGroup>
-
-```javascript Wallet-Integration
-// Get current base fee
-const baseFee = await provider.getBaseFee();
-
-// Add buffer for inclusion certainty
-const maxFeePerGas = baseFee * 1.2;  // 20% buffer
-const maxPriorityFeePerGas = 2_000_000_000;  // 2 gwei tip
-
-// Send EIP-1559 transaction
-const tx = {
-  type: 2,
-  maxFeePerGas,
-  maxPriorityFeePerGas,
-  to: "0x...",
-  value: ethers.parseEther("1.0"),
-  gasLimit: 21000
-};
-```
-
-```javascript dApp-Monitoring
-// Monitor base fee changes
-provider.on('block', async (blockNumber) => {
-  const baseFee = await provider.getBaseFee();
-  const feeHistory = await provider.send('eth_feeHistory', [
-    '0x10', // last 16 blocks
-    'latest',
-    [25, 50, 75]
-  ]);
-
-  updateFeeDisplay(baseFee, feeHistory);
-});
-
-// Check if fees are elevated
-async function isHighFee() {
-  const baseFee = await provider.getBaseFee();
-  const threshold = ethers.parseUnits('100', 'gwei');
-  return baseFee.gt(threshold);
-}
-```
-
-</CodeGroup>
-
 
 ## Module Distinctions
 
