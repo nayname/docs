@@ -2,7 +2,6 @@
 title: "EIP Reference"
 description: "A complete list of Ethereum Mainnet \"Final\" EIPs and details on their implementation with Cosmos-EVM"
 mode: "custom"
-keywords: ['eip', 'ethereum improvement proposals', 'compatibility', 'support', 'implementation', 'cosmos evm', 'matrix', 'table']
 ---
 
 export const EIPData = () => {
@@ -803,7 +802,6 @@ export const EIPData = () => {
         </div>
       </div>
 
-      {/* Sort Dropdown */}
       <div className="mb-4">
         <select
           value={currentSort}
@@ -820,7 +818,6 @@ export const EIPData = () => {
         </select>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto shadow-[0_0_0_1px_rgba(156,163,175,0.3)] dark:shadow-[0_0_0_1px_rgba(75,85,99,0.5)] rounded-lg">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
           <thead className="bg-gray-50 dark:bg-gray-900">
@@ -902,7 +899,3 @@ export const EIPData = () => {
 This page provides a comprehensive list of Ethereum Improvement Proposals (EIPs) and their implementation status in Cosmos EVM version v0.4.x.
 
 <EIPData />
-
----
-
-*This is a static snapshot of EIP compatibility data frozen on August 21, 2025 for version v0.4.x.*
