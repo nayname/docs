@@ -179,25 +179,25 @@ The following namespaces are not implemented in Cosmos EVM but may be present in
 | `clique_status`                                                                       | Clique    | N          | N      | Returns undefined  |
 | `clique_getSigner`                                                                    | Clique    | N          | N      | Returns undefined  |
 | `debug_backtraceAt`                                                                   | Debug     | N          | N      | Returns undefined  |
-| `debug_blockProfile`                                                                  | Debug     | N          | N      | Requires Profiling config |
-| `debug_cpuProfile`                                                                    | Debug     | N          | N      | Requires Config  |
+| `debug_blockProfile`                                                                  | Debug     | N          | N      | Profiling disabled |
+| `debug_cpuProfile`                                                                    | Debug     | N          | N      | Profiling disabled |
 | `debug_dumpBlock`                                                                     | Debug     | N          | N      | Returns undefined  |
-| `debug_gcStats`                                                                       | Debug     | N          | N      | Requires Profiling config |
+| `debug_gcStats`                                                                       | Debug     | N          | N      | Profiling disabled |
 | [`debug_getBlockRlp`](#debug_getblockrlp)                                            | Debug     | N          | N      | Requires uint64 param |
-| `debug_goTrace`                                                                       | Debug     | N          | N      | Requires Profiling config |
-| `debug_freeOSMemory`                                                                  | Debug     | N          | N      | Requires Profiling config |
-| `debug_memStats`                                                                      | Debug     | N          | N      | Requires Profiling config |
-| `debug_mutexProfile`                                                                  | Debug     | N          | N      | Requires Profiling config |
+| `debug_goTrace`                                                                       | Debug     | N          | N      | Profiling disabled |
+| `debug_freeOSMemory`                                                                  | Debug     | N          | N      | Profiling disabled |
+| `debug_memStats`                                                                      | Debug     | N          | N      | Profiling disabled |
+| `debug_mutexProfile`                                                                  | Debug     | N          | N      | Profiling disabled |
 | `debug_seedHash`                                                                      | Debug     | N          | N      | Not implemented    |
 | `debug_setHead`                                                                       | Debug     | N          | N      | Not implemented    |
-| `debug_setBlockProfileRate`                                                           | Debug     | N          | N      | Requires Profiling config |
-| `debug_setGCPercent`                                                                  | Debug     | N          | N      | Requires Profiling config |
-| `debug_setMutexProfileFraction`                                                       | Debug     | N          | N      | Requires Profiling config |
-| `debug_stacks`                                                                        | Debug     | N          | N      | Requires Profiling config |
-| `debug_startCPUProfile`                                                               | Debug     | N          | N      | Requires Profiling config |
-| `debug_startGoTrace`                                                                  | Debug     | N          | N      | Requires Profiling config |
-| `debug_stopCPUProfile`                                                                | Debug     | N          | N      | Requires Profiling config |
-| `debug_stopGoTrace`                                                                   | Debug     | N          | N      | Requires Profiling config |
+| `debug_setBlockProfileRate`                                                           | Debug     | N          | N      | Profiling disabled |
+| `debug_setGCPercent`                                                                  | Debug     | N          | N      | Profiling disabled |
+| `debug_setMutexProfileFraction`                                                       | Debug     | N          | N      | Profiling disabled |
+| `debug_stacks`                                                                        | Debug     | N          | N      | Profiling disabled |
+| `debug_startCPUProfile`                                                               | Debug     | N          | N      | Profiling disabled |
+| `debug_startGoTrace`                                                                  | Debug     | N          | N      | Profiling disabled |
+| `debug_stopCPUProfile`                                                                | Debug     | N          | N      | Profiling disabled |
+| `debug_stopGoTrace`                                                                   | Debug     | N          | N      | Profiling disabled |
 | `debug_traceBlock`                                                                    | Debug     | N          | N      | Returns undefined  |
 | [`debug_traceBlockByNumber`](#debug_traceblockbynumber)                               | Debug     | Stub       | N      | Returns empty array |
 | [`debug_traceBlockByHash`](#debug_traceblockhash)                                    | Debug     | Stub       | N      | Returns empty array |
@@ -210,16 +210,16 @@ The following namespaces are not implemented in Cosmos EVM but may be present in
 | `debug_traceBadBlock`                                                                 | Debug     | N          | N      | Returns undefined  |
 | `debug_verbosity`                                                                     | Debug     | N          | N      | Not implemented    |
 | `debug_vmodule`                                                                       | Debug     | N          | N      | Not implemented    |
-| `debug_writeBlockProfile`                                                             | Debug     | N          | N      | Requires Profiling config |
-| `debug_writeMemProfile`                                                               | Debug     | N          | N      | Requires Profiling config |
-| `debug_writeMutexProfile`                                                             | Debug     | N          | N      | Requires Profiling config |
+| `debug_writeBlockProfile`                                                             | Debug     | N          | N      | Profiling disabled |
+| `debug_writeMemProfile`                                                               | Debug     | N          | N      | Profiling disabled |
+| `debug_writeMutexProfile`                                                             | Debug     | N          | N      | Profiling disabled |
 | `debug_getRawBlock`                                                                   | Debug     | N          | N      | Not implemented    |
 | `debug_getRawHeader`                                                                  | Debug     | N          | N      | Not implemented    |
 | `debug_getRawReceipts`                                                                | Debug     | N          | N      | Not implemented    |
 | `debug_getRawTransaction`                                                             | Debug     | N          | N      | Not implemented    |
 | [`debug_printBlock`](#debug_printblock)                                              | Debug     | N          | N      | Requires uint64 param |
 | [`debug_getHeaderRlp`](#debug_getheaderrlp)                                          | Debug     | N          | N      | Requires uint64 param |
-| `debug_intermediateRoots`                                                             | Debug     | N          | N      | Requires Profiling config |
+| `debug_intermediateRoots`                                                             | Debug     | N          | N      | Profiling disabled |
 | `debug_getBadBlocks`                                                                  | Debug     | Y          | N      |                    |
 | `debug_storageRangeAt`                                                                | Debug     | Y          | N      |                    |
 | `debug_getModifiedAccountsByNumber`                                                   | Debug     | Y          | N      |                    |
@@ -233,10 +233,10 @@ The following namespaces are not implemented in Cosmos EVM but may be present in
 | `les_latestCheckpoint`                                                                | Les       | N          | N      | Returns undefined  |
 | `les_getCheckpoint`                                                                   | Les       | N          | N      | Returns undefined  |
 | `les_getCheckpointContractAddress`                                                    | Les       | N          | N      | Returns undefined  |
-| [`txpool_content`](#txpool_content)                                                   | TxPool    | Y          | Y      | Requires `v0.4.x` mempool    |
-| [`txpool_contentFrom`](#txpool_contentfrom)                                           | TxPool    | Y          | Y      | Requires `v0.4.x` mempool    |
-| [`txpool_inspect`](#txpool_inspect)                                                   | TxPool    | Y          | Y      | Requires `v0.4.x` mempool    |
-| [`txpool_status`](#txpool_status)                                                     | TxPool    | Stub       | Y      | Requires `v0.4.x` mempool  |
+| [`txpool_content`](#txpool_content)                                                   | TxPool    | Y          | Y      | Requires config    |
+| [`txpool_contentFrom`](#txpool_contentfrom)                                           | TxPool    | Y          | Y      | Requires config    |
+| [`txpool_inspect`](#txpool_inspect)                                                   | TxPool    | Y          | Y      | Requires config    |
+| [`txpool_status`](#txpool_status)                                                     | TxPool    | Stub       | Y      | Returns empty obj  |
 | `trace_callMany`                                                                      | Trace     | N          | N      | Not implemented    |
 | `eth_signTypedData`                                                                   | Eth       | W         | N      | EIP-712 partial    |
 | `eth_fillTransaction`                                                                 | Eth       | Y          | Y      |                    |

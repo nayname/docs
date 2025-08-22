@@ -7,7 +7,7 @@ keywords: ['differences', 'ethereum', 'evm', 'cosmos', 'tendermint', 'consensus'
 Cosmos EVM provides **full Ethereum compatibility** for Cosmos-SDK based chains. All standard / common Ethereum dApps, tools, and workflows work seamlessly while gaining the benefits of Cosmos consensus and interoperability.
 
 <Info>
-All the tools and workflows you rely on work exactly as they should. Deploy contracts seamlessly, connect with MetaMask, and build with Web3.js/Ethers, Hardhat, Remix, Foundry—the full Ethereum toolkit.
+  **100% EVM Compatible:** All critical Ethereum behaviors are preserved. Deploy your contracts, use MetaMask, connect with Web3.js/Ethers - everything works as expected.
 </Info>
 
 ## Critical EVM Compatibility Features
@@ -79,7 +79,7 @@ These are completely independent values, not derived from each other.
 ## Precompiled Contracts
 
 <CardGroup cols={2}>
-  <Card title="Cosmos Precompiles" icon="cube" href="/docs/documentation/smart-contracts/precompiles">
+  <Card title="Cosmos Precompiles" icon="cube" href="/v0.4.x/documentation/smart-contracts/precompiles">
     Access Cosmos SDK modules (staking, governance, IBC) via precompiled contracts.
   </Card>
   <Card title="Standard Precompiles" icon="shield-check">
@@ -99,7 +99,7 @@ These are completely independent values, not derived from each other.
 
 ## JSON-RPC API
 
-<Card title="Full Ethereum RPC Support" icon="code" href="/docs/api-reference/ethereum-json-rpc/methods">
+<Card title="Full Ethereum RPC Support" icon="code" href="/v0.4.x/api-reference/ethereum-json-rpc/methods">
   All standard Ethereum JSON-RPC methods are implemented. View the complete reference.
 </Card>
 
@@ -116,7 +116,7 @@ The only methods that return empty/null are those related to Proof-of-Work minin
 
 ## EIP Support
 
-<Card title="EIP Compatibility Matrix" icon="list-check" href="/docs/documentation/evm-compatibility/eip-reference">
+<Card title="EIP Compatibility Matrix" icon="list-check" href="/v0.4.x/documentation/evm-compatibility/eip-reference">
   Interactive table showing support status for all 339+ Ethereum Improvement Proposals.
 </Card>
 
@@ -164,7 +164,7 @@ Key breaking changes when migrating:
 3. **Parameter Types:** Several parameter type changes (e.g., MinGasPrice: string → sdk.Dec)
 4. **Precompile Addresses:** Different addresses than Ethermint
 
-<Card title="Migration Guide" icon="arrow-up" href="/docs/documentation/integration/migration-v0.3-to-v0.4">
+<Card title="Migration Guide" icon="arrow-up" href="/v0.4.x/documentation/integration/migration-v0.3-to-v0.4">
   Detailed steps for migrating from Ethermint-based chains.
 </Card>
 
@@ -180,16 +180,16 @@ Key breaking changes when migrating:
 ## Resources
 
 <CardGroup cols={2}>
-  <Card title="Integration Guide" icon="plug" href="/docs/documentation/integration/evm-module-integration">
+  <Card title="Integration Guide" icon="plug" href="/v0.4.x/documentation/integration/evm-module-integration">
     Add EVM support to your Cosmos chain
   </Card>
-  <Card title="Concepts" icon="book" href="/docs/documentation/concepts">
+  <Card title="Concepts" icon="book" href="/v0.4.x/documentation/concepts">
     Deep dive into architecture and design
   </Card>
   <Card title="GitHub Repository" icon="github" href="https://github.com/cosmos/evm">
     Source code and issue tracker
   </Card>
-  <Card title="Precompiles Docs" icon="code" href="/docs/documentation/smart-contracts/precompiles">
+  <Card title="Precompiles Docs" icon="code" href="/v0.4.x/documentation/smart-contracts/precompiles">
     Using Cosmos functionality from contracts
   </Card>
 </CardGroup>
