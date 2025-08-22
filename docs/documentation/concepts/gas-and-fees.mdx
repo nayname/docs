@@ -116,11 +116,11 @@ Since all transactions are represented as Cosmos SDK transactions, transaction f
    * As part of this hook, the FeeMarket (EIP-1559) module tracks the total `TransientGasWanted` from the transactions on this block. This will be used for the next block’s `BaseFee`.
 
 2. Nodes receive transactions for a subsequent block and gossip these transactions to peers
-   * These can be sorted and prioritized by the included fee price (using EIP-1559 fee priority mechanics for EVM transactions - [code snippet](https://github.com/cosmos/evm/blob/57ed355c985d9f3116aba6aabfa2ee0f3f38e966/app/ante/eth.go)), to be included in the next block
+   * These can be sorted and prioritized by the included fee price (using EIP-1559 fee priority mechanics for EVM transactions - [code snippet](https://github.com/cosmos/evm/blob/v0.4.1/ante/evm/mono_decorator.go)), to be included in the next block
 
 3. Nodes run `BeginBlock` for the subsequent block
 
-   * The FeeMarket module calculates the `BaseFee` ([code snippet](https://github.com/cosmos/evm/blob/89fdd1984826ea524cb9b8feb089a99b6cfe8ace/x/feemarket/keeper/abci.go)) to be applied for this block using the total `GasWanted` from the previous block.
+   * The FeeMarket module calculates the `BaseFee` ([code snippet](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/abci.go)) to be applied for this block using the total `GasWanted` from the previous block.
    * The Distribution module [distributes](https://docs.cosmos.network/main/modules/distribution#begin-block) the previous block’s fee rewards to validators and delegators
 
 4. For each valid transaction that will be included in this block, nodes perform the following:
@@ -170,7 +170,7 @@ In order to match the gas consumed by the EVM, the gas consumption logic from th
 
 To ignore the SDK gas consumption, we reset the transaction `GasMeter` count to 0 and manually set it to the `gasUsed` value computed by the EVM module at the end of the execution.
 
-+++ [https://github.com/cosmos/evm/blob/098da6d0cc0e0c4cefbddf632df1057383973e4a/x/evm/keeper/state\_transition.go](https://github.com/cosmos/evm/blob/098da6d0cc0e0c4cefbddf632df1057383973e4a/x/evm/keeper/state_transition.go)
++++ [https://github.com/cosmos/evm/blob/v0.4.1/x/vm/keeper/state\_transition.go](https://github.com/cosmos/evm/blob/v0.4.1/x/vm/keeper/state_transition.go)
 
 ### `AnteHandler`[​](#antehandler "Direct link to antehandler")
 
@@ -196,7 +196,7 @@ For that reason, a specific query API `EstimateGas` is implemented in the Cosmos
 
 A cache context will be used during the whole execution to avoid changes be persisted in the state.
 
-+++ [https://github.com/cosmos/evm/blob/098da6d0cc0e0c4cefbddf632df1057383973e4a/x/evm/keeper/grpc\_query.go](https://github.com/cosmos/evm/blob/098da6d0cc0e0c4cefbddf632df1057383973e4a/x/evm/keeper/grpc_query.go)
++++ [https://github.com/cosmos/evm/blob/v0.4.1/x/vm/keeper/grpc\_query.go](https://github.com/cosmos/evm/blob/v0.4.1/x/vm/keeper/grpc_query.go)
 
 For Cosmos Tx's, developers can use Cosmos SDK's [transaction simulation](https://docs.cosmos.network/main/run-node/txs#simulating-a-transaction) to create an accurate estimate.
 

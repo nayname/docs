@@ -69,7 +69,7 @@ CometBFT receives the transactions and validates them in the app using CheckTx.
 
 ### 3. CheckTx Routing
 
-The CheckTx handler processes transactions with special handling for nonce gaps ([source](https://github.com/cosmos/evm/blob/main/mempool/check_tx.go)):
+The CheckTx handler processes transactions with special handling for nonce gaps ([source](https://github.com/cosmos/evm/blob/v0.4.1/mempool/check_tx.go)):
 
 **Success Path** - Valid transactions with correct nonces pass through to the Comet mempool for broadcast.
 
@@ -214,4 +214,4 @@ The mempool maintains transaction state through the unified `ExperimentalEVMMemp
 
 ## Testing
 
-The mempool behavior can be verified using the test scripts provided in the [cosmos/evm](https://github.com/cosmos/evm) repository. The [`tests/systemtests/Counter/script/SimpleSends.s.sol`](https://github.com/cosmos/evm/blob/main/tests/systemtests/Counter/script/SimpleSends.s.sol) script demonstrates typical Ethereum tooling behavior - it sends 10 sequential transactions in a batch, which naturally arrive out of order and create nonce gaps.
+The mempool behavior can be verified using the test scripts provided in the [cosmos/evm](https://github.com/cosmos/evm) repository. The [`tests/systemtests/Counter/script/SimpleSends.s.sol`](https://github.com/cosmos/evm/blob/v0.4.1/tests/systemtests/Counter/script/SimpleSends.s.sol) script demonstrates typical Ethereum tooling behavior - it sends 10 sequential transactions in a batch, which naturally arrive out of order and create nonce gaps.
