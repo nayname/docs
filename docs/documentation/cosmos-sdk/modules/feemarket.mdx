@@ -193,7 +193,7 @@ evmd tx gov submit-proposal update-feemarket-params.json \
 
 | **Chain Type** | **Denominator** | **Elasticity** | **MinGasPrice** | **Why** |
 |----------------|-----------------|----------------|-----------------|---------|
-| Testing/Development | 8 | 2 | Zero/Low | Quick iteration, Ethereum compatibility |
+| Testing/Development | 8 | 2 | Zero/Low | Quick iteration |
 | Production General | 8-16 | 2 | Medium | Balance stability and responsiveness |
 | High-Frequency Trading | 16-32 | 1-2 | Low | Predictable fees, high throughput |
 | Enterprise/Private | 32 | 2-3 | High | Maximum stability, cost predictability |
@@ -221,48 +221,52 @@ Examples:
 | Floor Hit Rate | `count(fee==min)\/blocks` | \<10% | Lower min_gas_price |
 | Recovery Speed | Blocks to return to baseline | 20-40 | Tune denominator |
 
-### Integration Guidelines
+### Integration Examples
 
 <CodeGroup>
 
 ```javascript Wallet-Integration
-// Get current base fee
-const baseFee = await provider.getBaseFee();
+// Get current base fee from latest block
+const block = await provider.getBlock('latest');
+const baseFee = block.baseFeePerGas;
 
-// Add buffer for inclusion certainty
-const maxFeePerGas = baseFee * 1.2;  // 20% buffer
-const maxPriorityFeePerGas = 2_000_000_000;  // 2 gwei tip
+// Add buffer for inclusion certainty (20% buffer)
+const maxFeePerGas = baseFee * 120n / 100n;
+const maxPriorityFeePerGas = ethers.parseUnits("2", "gwei");
 
 // Send EIP-1559 transaction
-const tx = {
+const tx = await wallet.sendTransaction({
   type: 2,
   maxFeePerGas,
   maxPriorityFeePerGas,
   to: "0x...",
   value: ethers.parseEther("1.0"),
   gasLimit: 21000
-};
+});
 ```
 
-```javascript dApp-Monitoring
-// Monitor base fee changes
-provider.on('block', async (blockNumber) => {
-  const baseFee = await provider.getBaseFee();
-  const feeHistory = await provider.send('eth_feeHistory', [
-    '0x10', // last 16 blocks
-    'latest',
-    [25, 50, 75]
-  ]);
+```javascript Fee-Monitoring
+// Get current gas price (includes base fee)
+const gasPrice = await provider.send('eth_gasPrice', []);
+console.log('Current gas price:', ethers.formatUnits(gasPrice, 'gwei'), 'gwei');
 
-  updateFeeDisplay(baseFee, feeHistory);
-});
+// Get fee history
+const feeHistory = await provider.send('eth_feeHistory', [
+  '0x10', // last 16 blocks
+  'latest',
+  [25, 50, 75]
+]);
+
+// Process base fees from history
+const baseFees = feeHistory.baseFeePerGas.map(fee =>
+  ethers.formatUnits(fee, 'gwei')
+);
+console.log('Base fee history:', baseFees);
 
 // Check if fees are elevated
-async function isHighFee() {
-  const baseFee = await provider.getBaseFee();
-  const threshold = ethers.parseUnits('100', 'gwei');
-  return baseFee.gt(threshold);
-}
+const currentBaseFee = BigInt(feeHistory.baseFeePerGas[feeHistory.baseFeePerGas.length - 1]);
+const threshold = ethers.parseUnits('100', 'gwei');
+const isHighFee = currentBaseFee > threshold;
 ```
 
 </CodeGroup>
@@ -747,7 +751,7 @@ func CheckGlobalFee(fee, globalMinGasPrice, gasLimit LegacyDec) error {
 }
 ```
 
-For EIP-1559 transactions, if the effective price falls below `MinGasPrice`, users must increase the priority fee (tip) until the effective price meets the minimum. 
+For EIP-1559 transactions, if the effective price falls below `MinGasPrice`, users must increase the priority fee (tip) until the effective price meets the minimum.
 
 In cosmos/evm's experimental mempool, transactions are ordered by effective gas tip (calculated as `min(maxPriorityFeePerGas, maxFeePerGas - baseFee)`), with higher tips getting priority. When tips are equal, transactions are ordered by arrival time ([source](https://github.com/cosmos/evm/blob/v0.4.1/mempool/miner/ordering.go#L63-L71)).
 </Expandable>
