@@ -4,21 +4,19 @@ description: "Find below a list of JSON-RPC methods supported on Cosmos EVM, sor
 keywords: ['json-rpc', 'ethereum', 'methods', 'api', 'web3', 'eth', 'debug', 'admin', 'personal', 'txpool', 'filter', 'websocket', 'trace', 'engine', 'clique', 'les', 'rpc methods', 'ethereum api', 'cosmos evm']
 ---
 
-<Warning>
-**Implementation Status**: While Cosmos EVM responds to all standard Ethereum RPC methods for compatibility, many are stub implementations that return empty or null responses. This page indicates the actual implementation status of each method.
-
+```ascii
 **Legend**:
 - **Y** - Functional
 - **Stub** - Returns success but with null/empty/zero values for compatibility
 - **N** - Not Implemented - Returns error or not available
-</Warning>
+```
 
 <Info>
 This documentation lists all Ethereum JSON-RPC methods and their implementation status in Cosmos EVM. For the official Ethereum JSON-RPC specification, see the [Ethereum Execution APIs](https://github.com/ethereum/execution-apis) repository.
 </Info>
 
 <Note>
-**Namespace Configuration**: By default, only the `eth`, `net`, and `web3` namespaces are enabled. To enable additional namespaces like `personal`, `txpool`, `debug`, or `miner`, you must configure them in your node's JSON-RPC API settings. Methods marked as "Requires `v0.4.x` mempool" are implemented but need their namespace to be explicitly enabled.
+**Namespace Configuration**: By default, only the `eth`, `net`, and `web3` namespaces are enabled. To enable additional namespaces like `personal`, `txpool`, `debug`, or `miner`, you must configure them in your node's `app.toml` config.
 </Note>
 
 ## Non-Implemented Namespaces
