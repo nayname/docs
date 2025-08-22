@@ -1,228 +1,240 @@
 ---
-title: "Single Token Representation"
-description: "How Cosmos EVM unifies native and ERC20 tokens without traditional wrapping, maintaining one source of truth across both ecosystems."
-icon: "circle-dot"
+title: "Single Token Representation v2"
+description: "Understanding unified token models across Cosmos and EVM ecosystems"
+icon: "coins"
 ---
 
-## Overview
+## The Problem: Token Fragmentation
 
-Single Token Representation is a key design in Cosmos EVM that removes the complexity and risks of traditional token wrapping. Instead of creating wrapped tokens with separate balances, Cosmos EVM provides multiple interfaces (native Cosmos operations, ERC20 contracts, and bank queries) all pointing to the same underlying token balance stored in the Cosmos SDK bank module.
+In traditional blockchain ecosystems with EVM support, tokens often exist in multiple representations:
 
-**Core Principle:** One token, multiple interfaces, one source of truth.
+- **Native tokens** in the base blockchain format
+- **Wrapped tokens** as ERC20 contracts
+- **IBC vouchers** for cross-chain assets
+- **Bridge tokens** from various bridge protocols
 
-## The Problem with Traditional Wrapping
+This fragmentation creates confusion, liquidity splitting, and poor user experience. Users must manually wrap/unwrap tokens, track multiple versions, and worry about using the correct representation.
 
-Wrapping tokens requires extra steps and introduces risks:
+## Single Token Representation v2 (STRv2)
 
-**Example: Ethereum's WETH contract:**
+STRv2 solves fragmentation by ensuring each asset has exactly one canonical representation that automatically adapts to its usage context.
 
-```solidity
-contract WETH {
-    mapping(address => uint256) private _balances;
+### Core Principles
 
-    function deposit() external payable {
-        _balances[msg.sender] += msg.value;
-    }
+**One Asset, One Representation**
+Each token exists in either Cosmos or EVM format at any given time, never both simultaneously. The representation automatically switches based on where it's being used.
 
-    function withdraw(uint256 amount) external {
-        _balances[msg.sender] -= amount;
-        payable(msg.sender).transfer(amount);
-    }
-}
+**Automatic Conversion**
+When tokens move between Cosmos and EVM contexts, conversion happens transparently:
+- Sending to an Ethereum address → converts to ERC20
+- Sending to a Cosmos address → converts to native coin
+- IBC transfer with EVM recipient → arrives as ERC20
+
+**Native Performance**
+Unlike wrapped tokens that require contract calls, STRv2 tokens operate at native speed through precompiled contracts that directly access bank balances.
+
+## Token Pairs: The Bridge
+
+A TokenPair links a Cosmos denomination with an ERC20 contract address, establishing the canonical mapping:
+
+```
+Cosmos Coin (uatom) ←→ TokenPair ←→ ERC20 Contract (0x...)
 ```
 
-**Issues:**
+### Origin Types
 
-* Liquidity fragmentation (ETH and WETH pools separate)
-* Smart contract risk (vulnerabilities or malicious upgrades)
-* User complexity (manual wrap/unwrap required)
-* Additional gas costs for wrap/unwrap operations
+**Native Cosmos Coins**
+- Start as Cosmos SDK coins (uatom, uosmo, etc.)
+- Module deploys an ERC20 contract representation
+- Contract owned by module (OWNER_MODULE)
+- Conversions use mint/burn mechanism
 
-## The Solution: Single Token Representation
+**Existing ERC20 Tokens**
+- Start as deployed ERC20 contracts
+- Module creates a Cosmos coin denomination
+- Contract owned externally (OWNER_EXTERNAL)
+- Conversions use escrow/release mechanism
 
-Cosmos EVM stores token balances only once (in the bank module), providing:
+## Precompiled Contracts: The Magic
 
-* **Single Balance:** All token amounts in the bank module
-* **Multiple Interfaces:** ERC20 precompiles, native operations, and queries access the same balance
-* **Automatic Sync:** All interfaces reflect the same state without conversion
-* **No Wrapping Needed:** Eliminates manual wrap/unwrap transactions
+Traditional wrapped tokens require expensive contract storage and logic. STRv2 uses precompiled contracts - native code that appears as ERC20 to the EVM but executes at native speed.
 
-## Technical Implementation
+### Native Precompiles
 
-### Precision Handling with x/precisebank
+For Cosmos-native assets, precompiles provide:
+- Standard ERC20 interface (transfer, approve, balanceOf)
+- Direct bank module integration
+- No contract storage overhead
+- Gas costs 10-100x lower than regular ERC20
 
-<Note>
-The key challenge is bridging Cosmos's 6-decimal precision with EVM's 18-decimal standard. The `x/precisebank` module solves this while maintaining single token representation.
-</Note>
+### Dynamic Precompiles
 
-Cosmos EVM uses the **precisebank module** to handle the precision difference:
+For advanced functionality:
+- WERC20 interfaces with deposit/withdraw
+- Custom extensions per token
+- Runtime registration
+- Module-specific features
 
-- **Cosmos native**: `uatom` with 6 decimals (1 ATOM = 10^6 uatom)
-- **EVM native**: `aatom` with 18 decimals (1 ATOM = 10^18 aatom)
-- **Conversion**: 1 uatom = 10^12 aatom
+## Conversion Mechanics
 
-The precisebank module wraps the bank module to:
-1. Store integer balances (uatom) in x/bank
-2. Store fractional balances (remainder aatom) in x/precisebank
-3. Maintain the invariant: `aatom_balance = uatom_balance * 10^12 + fractional_balance`
+### Cosmos → ERC20
 
-```go
-// From x/precisebank implementation
-// a(n) = b(n) * C + f(n)
-// where:
-// a(n) = aatom balance (18 decimals)
-// b(n) = uatom balance in x/bank (6 decimals)
-// f(n) = fractional balance in x/precisebank
-// C = 10^12 (conversion factor)
+When converting native coins to ERC20:
+
+1. **User initiates** conversion via message or automatic trigger
+2. **Module validates** token pair is enabled
+3. **Coins escrowed** in module account (removed from circulation)
+4. **ERC20 minted** to recipient address
+5. **Event emitted** for tracking
+
+The coins don't disappear - they're held in escrow, maintaining supply consistency.
+
+### ERC20 → Cosmos
+
+When converting ERC20 to native coins:
+
+1. **User initiates** conversion or automatic trigger
+2. **Module validates** sufficient ERC20 balance
+3. **Tokens burned** (if module-owned) or **escrowed** (if external)
+4. **Coins released** from module account
+5. **Event emitted** for tracking
+
+## IBC Integration
+
+STRv2 seamlessly integrates with IBC transfers through middleware:
+
+### Automatic Conversion
+
+When receiving IBC tokens:
+- If recipient is Ethereum address → convert to ERC20
+- If recipient is Cosmos address → keep as native
+- If token pair doesn't exist → create dynamically
+
+### Cross-Chain DeFi
+
+This enables powerful workflows:
+1. Receive OSMO from Osmosis via IBC
+2. Automatically converts to ERC20
+3. Use in Uniswap-style DEX
+4. Swap for other tokens
+5. Send back via IBC as native
+
+## Design Rationale
+
+### Why Not Simple Wrapping?
+
+Traditional wrapping (like WETH) has drawbacks:
+- **Double tokens**: Native ETH and WETH coexist
+- **Manual process**: Users must wrap/unwrap
+- **Liquidity split**: Separate pools for each version
+- **Gas overhead**: Extra contract calls
+
+### Why Precompiles?
+
+Precompiles provide:
+- **Native speed**: Direct state access
+- **Compatibility**: Standard ERC20 interface
+- **Efficiency**: No storage overhead
+- **Transparency**: Appears as regular token to contracts
+
+### Why Automatic Conversion?
+
+Automatic conversion improves UX:
+- **No manual steps**: Tokens "just work"
+- **Unified liquidity**: Single pool per asset
+- **Reduced errors**: No wrong token mistakes
+- **Better bridging**: Seamless cross-chain
+
+## Security Considerations
+
+### Supply Integrity
+
+The total supply remains constant across conversions:
+```
+Total Supply = Cosmos Circulating + ERC20 Circulating + Module Escrow
 ```
 
-### WERC20 Precompile
+### Ownership Models
 
-The WERC20 precompile ([source](https://github.com/cosmos/evm/blob/main/precompiles/werc20/werc20.go)) extends the ERC20 precompile to provide deposit/withdraw functionality:
+**Module Ownership** (Native Coins):
+- Module can mint/burn ERC20
+- Ensures 1:1 backing
+- No external control risks
 
-```go
-// WERC20 wraps ERC20 precompile with additional methods
-type Precompile struct {
-    *erc20.Precompile  // Inherits standard ERC20 functionality
-}
+**External Ownership** (ERC20 Origin):
+- Original deployer retains control
+- Module uses escrow mechanism
+- Preserves contract upgradeability
 
-// Key methods:
-// - Deposit(): Convert native tokens to ERC20 representation
-// - Withdraw(): Convert ERC20 representation back to native
-// - All ERC20 standard methods (transfer, approve, etc.)
-```
+### Attack Vectors
 
-**Important:** Despite the "deposit" and "withdraw" terminology, no actual wrapping occurs. These methods simply change which interface you're using to interact with the same underlying balance.
+**Malicious ERC20 Contracts**
+- Validation before registration
+- Event log verification
+- Balance checks pre/post operation
 
-## Real-World Example
+**Reentrancy Protection**
+- State changes before external calls
+- Checks-effects-interactions pattern
+- Gas limit enforcement
 
-```javascript
-const userAddress = "0x742d35cc6644c068532fddb11B4C36A58D6D3eAb";
+## Benefits for Users
 
-// Query native bank balance (returns uatom units)
-const bankBalance = await bankContract.balances(userAddress);
-console.log(bankBalance); // [{denom: "uatom", amount: "100"}] = 100 uatom
+### Simplified Experience
+- One token to rule them all
+- No manual wrapping
+- Automatic conversion where needed
+- Consistent balance across contexts
 
-// Query ERC20 balance (returns aatom units - 18 decimals)
-const watomBalance = await watomContract.balanceOf(userAddress);
-console.log(watomBalance); // "100000000000000" = 100 * 10^12 aatom
+### Better Capital Efficiency
+- No liquidity fragmentation
+- Single market per asset
+- Lower slippage
+- Unified order books
 
-// Transfer 30 uatom worth via ERC20 interface
-await watomContract.transfer(recipient, "30000000000000"); // 30 * 10^12 aatom
+### Enhanced Composability
+- Use any token in any context
+- Seamless DeFi integration
+- Cross-chain applications
+- Future-proof design
 
-// Check updated balances - both show 70 uatom worth
-console.log(await bankContract.balances(userAddress)); // 70 uatom
-console.log(await watomContract.balanceOf(userAddress)); // 70 * 10^12 aatom
+## Benefits for Developers
 
-// Native Cosmos operations also reflect changes automatically
-// cosmos tx bank send cosmos1... cosmos1... 20uatom
-// After this, ERC20 balance would show 50 * 10^12 aatom
-```
+### Easier Integration
+- Standard interfaces everywhere
+- No wrapper contract management
+- Automatic handling
+- Less code complexity
 
-## Benefits
+### Gas Optimization
+- Native precompile efficiency
+- No extra contract calls
+- Batched operations
+- Lower user costs
 
-1. **Unified Liquidity**
-   * No fragmented token pools
-   * DeFi protocols use the same liquidity regardless of interface
+### Innovation Enablement
+- Build cross-VM applications
+- Leverage both ecosystems
+- New DeFi primitives
+- Unified token standards
 
-2. **Reduced Smart Contract Risk**
-   * No wrapping contracts to exploit
-   * Bank module is well-tested and secure
+## Future Evolution
 
-3. **Simplified User Experience**
-   * No manual wrapping/unwrapping
-   * Seamless Cosmos and EVM integration
+### Potential Enhancements
 
-4. **Performance & Cost Efficiency**
-   * No extra gas for wrapping operations
-   * Direct access to optimized bank module
+**Multi-VM Support**
+- CosmWasm integration
+- Move VM compatibility
+- Universal token representation
 
-5. **Developer Friendly**
-   * Use standard ERC20 interfaces without wrapping logic
-   * Compatible with existing EVM tooling
+**Advanced Features**
+- Streaming payments
+- Programmable transfers
+- Conditional conversions
+- Batch operations
 
-## Implementation Examples
-
-### Solidity Liquidity Pool Integration
-
-```solidity
-contract LiquidityPool {
-    IERC20 public token;
-
-    function addLiquidity(uint256 amount) external {
-        // Works with native token's ERC20 interface
-        // No wrapping needed - operates on same underlying balance
-        token.transferFrom(msg.sender, address(this), amount);
-    }
-}
-```
-
-### Cross-Ecosystem Operations
-
-```javascript
-async function demonstrateUnification() {
-    // Native Cosmos transfer (6 decimals)
-    await execCmd("cosmos tx bank send cosmos1abc... cosmos1def... 100uatom");
-
-    // ERC20 operations (18 decimals)
-    await watomContract.approve(dexContract.address, "50000000000000"); // 50 uatom worth
-    await dexContract.swap(watomContract.address, "50000000000000");
-
-    // Native staking (6 decimals)
-    await execCmd("cosmos tx staking delegate cosmosvaloper1... 25uatom");
-
-    // All operations affect the same underlying balance
-}
-```
-
-## Comparison
-
-| Aspect               | Traditional Wrapping      | Single Token Representation |
-| -------------------- | ------------------------- | --------------------------- |
-| Liquidity            | Fragmented                | Unified                     |
-| Smart Contract Risk  | High                      | Minimal (bank module only)  |
-| User Complexity      | High (manual wrap/unwrap) | Low (automatic)             |
-| Gas Overhead         | High                      | Low                         |
-| State Management     | Dual balances             | Single source of truth      |
-| Developer Experience | Must handle wrapping      | Standard ERC20 interface    |
-| Interoperability     | Manual bridges            | Native cross-ecosystem      |
-| Decimal Precision    | Fixed per token           | Automatic conversion        |
-
-## Technical Details
-
-### Reserve Account
-
-The precisebank module maintains a reserve account to ensure supply consistency:
-
-```go
-// Reserve holds uatom equal to:
-// - All fractional balances (< 10^12 aatom per account)
-// - Plus remainder to maintain supply invariant
-reserve_uatom = sum(all_fractional_balances) / 10^12 + remainder
-```
-
-This ensures: `Total_aatom = Total_uatom * 10^12 - remainder` where `0 ≤ remainder < 10^12`
-
-### ERC20 Token Pairs
-
-The x/erc20 module manages the registration and tracking of token pairs:
-- Native Cosmos denoms  ERC20 contract addresses
-- Automatic registration for IBC tokens when enabled
-- Governance-controlled token pair registration
-
-## Related Technologies
-
-* **WERC20 Precompile:** Implements single token representation for native tokens at specific addresses. See [WERC20 docs](/docs/documentation/smart-contracts/precompiles/werc20).
-* **ERC20 Module:** Manages token pairs and automatic registration. See [ERC20 module docs](/docs/documentation/cosmos-sdk/modules/erc20).
-* **Bank Precompile:** Provides direct access to native token balances. See [Bank precompile docs](/docs/documentation/smart-contracts/precompiles/bank).
-* **PreciseBank Module:** Handles decimal precision conversion transparently.
-
-## Future Implications
-
-* Cross-chain DeFi without liquidity fragmentation
-* Easier multi-chain onboarding without learning new token models
-* Native interoperability without complex bridges
-* Unified developer experience across blockchain ecosystems
-* Seamless IBC token integration with automatic ERC20 representation
-
----
+**Cross-Chain Standards**
+- IBC native tokens
+- Universal asset IDs
+- Metadata preservation
+- Governance coordination

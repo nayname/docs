@@ -1,0 +1,168 @@
+---
+title: "Overview"
+description: "Understanding the Ethereum Virtual Machine as implemented in the Cosmos SDK"
+icon: "microchip"
+---
+
+## What is the EVM?
+
+The Ethereum Virtual Machine (EVM) is a computation engine that executes smart contracts in a deterministic, isolated environment. Every node computes identical results given the same starting state and transaction.
+
+### Core Components
+
+The EVM operates as a stack-based machine with:
+
+- **Virtual ROM**: Read-only memory containing contract bytecode
+- **Machine State**: Volatile memory that resets after each transaction
+  - Program Counter (PC)
+  - Gas meter
+  - Stack (1024 items max, 256-bit words)
+  - Memory (byte-addressable, expandable)
+- **Account Storage**: Persistent key-value store per contract
+
+## State Model
+
+### Account Types
+
+The EVM recognizes two types of accounts:
+
+1. **Externally Owned Accounts (EOAs)**
+   - Controlled by private keys
+   - Can initiate transactions
+   - Contains: nonce, balance
+
+2. **Smart Contracts**
+   - Controlled by code
+   - Activated by transactions or calls
+   - Contains: nonce, balance, code hash, storage root
+
+### State Transitions
+
+State transitions occur through transaction execution:
+
+1. Transaction validates (signature, nonce, balance)
+2. EVM instantiates with transaction context
+3. Code executes opcode by opcode
+4. State changes apply if successful
+5. Gas refunds calculated and applied
+
+## Cosmos EVM Integration
+
+### Architectural Differences
+
+Traditional Ethereum uses a Merkle Patricia Tree for state, while Cosmos EVM uses:
+
+- **IAVL Tree**: For consensus state storage
+- **KVStore**: For contract code and storage
+- **Dual Account Model**: Cosmos SDK accounts + Ethereum accounts
+
+### Consensus Integration
+
+Instead of Ethereum's proof-of-stake:
+- **CometBFT**: Byzantine fault-tolerant consensus
+- **Instant Finality**: No need for confirmations
+- **IBC Compatible**: Native cross-chain communication
+
+## Smart Contract Execution
+
+### EVM Bytecode
+
+Contracts compile to EVM bytecode - a low-level instruction set:
+
+```
+PUSH1 0x60    // Push 1 byte onto stack
+PUSH1 0x40    // Push another byte
+MSTORE        // Store in memory
+CALLVALUE     // Get msg.value
+DUP1          // Duplicate top stack item
+```
+
+Each opcode has a fixed gas cost reflecting computational complexity.
+
+### Execution Context
+
+When executing, the EVM has access to:
+
+- **Message Context**: sender, value, data, gas
+- **Block Context**: number, timestamp, difficulty
+- **Chain Context**: chainID, coinbase
+
+### Gas Model
+
+Gas serves two purposes:
+1. **Computation Metering**: Prevents infinite loops
+2. **Resource Pricing**: Allocates network resources
+
+Gas costs vary by operation type:
+- Arithmetic: 3-5 gas
+- Storage reads: 200 gas
+- Storage writes: 5,000-20,000 gas
+- Contract creation: 32,000 gas base
+
+## Transaction Types
+
+### Legacy (Pre-EIP-155)
+Simple transactions with:
+- Fixed gas price
+- No replay protection
+- No access lists
+
+### EIP-155 Transactions
+Replay protection features:
+- Chain ID in signature
+- Modified signature verification
+- Fork-specific validation
+
+### EIP-2930 Access Lists
+Access lists provide:
+- Pre-declared state access
+- Reduced gas costs for accessed items
+- Gas cost predictability
+
+### EIP-1559 Dynamic Fees
+Fee model with:
+- Base fee + priority tip structure
+- Dynamic base fee adjustment
+- Fee burning mechanism
+- Predictable fee estimation
+
+## Precompiled Contracts
+
+Precompiles are native implementations of common operations. Native implementation provides significantly better performance than EVM opcodes for cryptographic operations.
+
+### Cosmos Extensions
+Beyond Ethereum's precompiles, Cosmos EVM adds:
+- Native module interactions (staking, governance)
+- IBC operations
+- Cross-chain messaging
+- Bech32 address handling
+
+## State Management
+
+### Journaling System
+The EVM uses journaling for atomic state transitions:
+1. Record each state change
+2. Apply changes optimistically
+3. Revert on failure using journal
+4. Commit on success
+
+### Access Patterns
+State access follows specific patterns:
+- **Cold Access**: First access to account/slot (expensive)
+- **Warm Access**: Subsequent access (cheaper)
+- **Access Lists**: Pre-warm addresses and slots
+
+## Security Considerations
+
+### Isolation Properties
+- **Deterministic Execution**: Same input → same output
+- **Sandboxed Environment**: No system access
+- **Gas Limitations**: Bounded computation
+- **Atomic Transactions**: All or nothing execution
+
+### Attack Vectors and Mitigations
+- **Reentrancy**: Checks-effects-interactions pattern
+- **Integer Overflow**: SafeMath and Solidity 0.8+
+- **Front-running**: Commit-reveal schemes, private mempools
+- **DOS Attacks**: Gas limits, storage gas costs
+
