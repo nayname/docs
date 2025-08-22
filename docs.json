@@ -83,7 +83,7 @@
               {
                 "group": "Concepts",
                 "pages": [
-                  "docs/documentation/concepts/index",
+                  "docs/documentation/concepts/overview",
                   "docs/documentation/concepts/accounts",
                   "docs/documentation/concepts/chain-id",
                   "docs/documentation/concepts/encoding",
@@ -145,9 +145,9 @@
                   {
                     "group": "Modules",
                     "pages": [
-                      "docs/documentation/cosmos-sdk/modules/epochs",
                       "docs/documentation/cosmos-sdk/modules/erc20",
                       "docs/documentation/cosmos-sdk/modules/feemarket",
+                      "docs/documentation/cosmos-sdk/modules/precisebank",
                       "docs/documentation/cosmos-sdk/modules/vm"
                     ]
                   }
