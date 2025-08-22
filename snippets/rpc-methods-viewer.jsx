@@ -218,7 +218,7 @@ export default function RPCMethodsViewerVersionB() {
         { name: "txpool_content", status: "Y", description: "Returns the content of the transaction pool" },
         { name: "txpool_contentFrom", status: "Y", description: "Returns transactions from specific address" },
         { name: "txpool_inspect", status: "Y", description: "Returns a summary of the transaction pool" },
-        { name: "txpool_status", status: "Stub", description: "Returns the number of pending and queued transactions (returns empty object)" }
+        { name: "txpool_status", status: "Y", description: "Returns the number of pending and queued transactions" }
       ]
     },
     personal: {
