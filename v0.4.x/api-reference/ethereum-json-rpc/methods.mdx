@@ -26,8 +26,8 @@ This documentation lists all Ethereum JSON-RPC methods and their implementation 
 The following namespaces are not implemented in Cosmos EVM but may be present in the interactive explorer for testing against other networks:
 
 <AccordionGroup>
-  <Accordion title="debug - Debugging and Tracing (Not Implemented)">
-    The `debug` namespace provides debugging and tracing tools for development. These methods are not implemented in Cosmos EVM. For debugging needs, use standard logging and monitoring tools.
+  <Accordion title="debug - Debugging and Tracing (Partially Implemented)">
+    The `debug` namespace provides debugging and tracing tools for development. Some tracing and profiling methods are implemented in Cosmos EVM. Many methods require the Profiling config to be enabled.
   </Accordion>
 
   <Accordion title="admin - Node Administration (Not Applicable)">
@@ -97,27 +97,30 @@ The following namespaces are not implemented in Cosmos EVM but may be present in
 | `eth_compileSolidity`                                                                 | Eth       | N          | N      | Not implemented    |
 | `eth_compileSerpent`                                                                  | Eth       | N          | N      | Not implemented    |
 | `eth_signTransaction`                                                                 | Eth       | N          | N      | Not implemented    |
-| `eth_mining`                                                                          | Eth       | N          | Y      | Not implemented    |
-| [`eth_coinbase`](#eth_coinbase)                                                       | Eth       | N          | Y      | Not implemented    |
-| `eth_hashrate`                                                                        | Eth       | N          | Y      | Not implemented    |
+| `eth_mining`                                                                          | Eth       | Y          | Y      | Deprecated - always false |
+| [`eth_coinbase`](#eth_coinbase)                                                       | Eth       | Y          | Y      | Deprecated in geth |
+| `eth_hashrate`                                                                        | Eth       | Y          | Y      | Deprecated - always 0 |
 | `eth_getUncleCountByBlockHash`                                                        | Eth       | Stub       | Y      | Always "0x0"       |
 | `eth_getUncleCountByBlockNumber`                                                      | Eth       | Stub       | Y      | Always "0x0"       |
 | `eth_getUncleByBlockHashAndIndex`                                                     | Eth       | Stub       | Y      | Always null        |
 | `eth_getUncleByBlockNumberAndIndex`                                                   | Eth       | Stub       | Y      | Always null        |
-| [`eth_getProof`](#eth_getproof)                                                       | Eth       | N          | Y      | Requires valid height |
+| [`eth_getProof`](#eth_getproof)                                                       | Eth       | Y          | Y      |                    |
 | `eth_feeHistory`                                                                      | Eth       | Y          | Y      | EIP-1559           |
 | `eth_maxPriorityFeePerGas`                                                            | Eth       | Stub       | Y      | Returns "0x0"      |
 | `eth_chainId`                                                                         | Eth       | Y          | Y      |                    |
 | `eth_getBlockReceipts`                                                                | Eth       | Stub       | Y      | Returns empty array|
 | [`eth_resend`](#eth_resend)                                                          | Eth       | N          | Y      | Requires nonce param |
-| `eth_createAccessList`                                                                | Eth       | N          | Y      | Not implemented    |
-| `eth_blobBaseFee`                                                                     | Eth       | N          | Y      | Not implemented    |
+| `eth_createAccessList`                                                                | Eth       | Stub       | Y      | Returns partial data |
+| `eth_blobBaseFee`                                                                     | Eth       | N          | Y      | EIP-4844 not implemented |
 | `eth_fillTransaction`                                                                 | Eth       | N          | Y      | Not implemented    |
 | [`eth_signTypedData`](#eth_signtypeddata)                                            | Eth       | N          | N      | Requires domain param |
 | `eth_signTypedData_v3`                                                                | Eth       | N          | N      | Not implemented    |
 | `eth_signTypedData_v4`                                                                | Eth       | N          | N      | Not implemented    |
 | `eth_pendingTransactions`                                                             | Eth       | N          | Y      | Not implemented    |
-| `eth_getPendingTransactions`                                                          | Eth       | N          | Y      | Not implemented    |
+| `eth_getPendingTransactions`                                                          | Eth       | Y          | Y      | Deprecated in geth |
+| `eth_getHeaderByHash`                                                                 | Eth       | Y          | Y      |                    |
+| `eth_getHeaderByNumber`                                                               | Eth       | Y          | Y      |                    |
+| `eth_simulateV1`                                                                      | Eth       | N          | Y      | Geth-specific, not implemented |
 | `eth_getRawTransactionByHash`                                                         | Eth       | N          | Y      | Not implemented    |
 | `eth_getRawTransactionByBlockNumberAndIndex`                                          | Eth       | N          | Y      | Not implemented    |
 | `eth_getRawTransactionByBlockHashAndIndex`                                            | Eth       | N          | Y      | Not implemented    |
@@ -179,51 +182,51 @@ The following namespaces are not implemented in Cosmos EVM but may be present in
 | `clique_status`                                                                       | Clique    | N          | N      | Returns undefined  |
 | `clique_getSigner`                                                                    | Clique    | N          | N      | Returns undefined  |
 | `debug_backtraceAt`                                                                   | Debug     | N          | N      | Returns undefined  |
-| `debug_blockProfile`                                                                  | Debug     | N          | N      | Profiling disabled |
-| `debug_cpuProfile`                                                                    | Debug     | N          | N      | Profiling disabled |
+| `debug_blockProfile`                                                                  | Debug     | Y          | N      |                    |
+| `debug_cpuProfile`                                                                    | Debug     | Y          | N      |                    |
 | `debug_dumpBlock`                                                                     | Debug     | N          | N      | Returns undefined  |
-| `debug_gcStats`                                                                       | Debug     | N          | N      | Profiling disabled |
+| `debug_gcStats`                                                                       | Debug     | Y          | N      |                    |
 | [`debug_getBlockRlp`](#debug_getblockrlp)                                            | Debug     | N          | N      | Requires uint64 param |
-| `debug_goTrace`                                                                       | Debug     | N          | N      | Profiling disabled |
-| `debug_freeOSMemory`                                                                  | Debug     | N          | N      | Profiling disabled |
-| `debug_memStats`                                                                      | Debug     | N          | N      | Profiling disabled |
-| `debug_mutexProfile`                                                                  | Debug     | N          | N      | Profiling disabled |
+| `debug_goTrace`                                                                       | Debug     | Y          | N      |                    |
+| `debug_freeOSMemory`                                                                  | Debug     | Y          | N      |                    |
+| `debug_memStats`                                                                      | Debug     | Y          | N      |                    |
+| `debug_mutexProfile`                                                                  | Debug     | Y          | N      |                    |
 | `debug_seedHash`                                                                      | Debug     | N          | N      | Not implemented    |
 | `debug_setHead`                                                                       | Debug     | N          | N      | Not implemented    |
-| `debug_setBlockProfileRate`                                                           | Debug     | N          | N      | Profiling disabled |
-| `debug_setGCPercent`                                                                  | Debug     | N          | N      | Profiling disabled |
-| `debug_setMutexProfileFraction`                                                       | Debug     | N          | N      | Profiling disabled |
-| `debug_stacks`                                                                        | Debug     | N          | N      | Profiling disabled |
-| `debug_startCPUProfile`                                                               | Debug     | N          | N      | Profiling disabled |
-| `debug_startGoTrace`                                                                  | Debug     | N          | N      | Profiling disabled |
-| `debug_stopCPUProfile`                                                                | Debug     | N          | N      | Profiling disabled |
-| `debug_stopGoTrace`                                                                   | Debug     | N          | N      | Profiling disabled |
-| `debug_traceBlock`                                                                    | Debug     | N          | N      | Returns undefined  |
-| [`debug_traceBlockByNumber`](#debug_traceblockbynumber)                               | Debug     | Stub       | N      | Returns empty array |
-| [`debug_traceBlockByHash`](#debug_traceblockhash)                                    | Debug     | Stub       | N      | Returns empty array |
+| `debug_setBlockProfileRate`                                                           | Debug     | Y          | N      |                    |
+| `debug_setGCPercent`                                                                  | Debug     | Y          | N      |                    |
+| `debug_setMutexProfileFraction`                                                       | Debug     | Y          | N      |                    |
+| `debug_stacks`                                                                        | Debug     | Y          | N      |                    |
+| `debug_startCPUProfile`                                                               | Debug     | Y          | N      |                    |
+| `debug_startGoTrace`                                                                  | Debug     | Y          | N      |                    |
+| `debug_stopCPUProfile`                                                                | Debug     | Y          | N      |                    |
+| `debug_stopGoTrace`                                                                   | Debug     | Y          | N      |                    |
+| `debug_traceBlock`                                                                    | Debug     | Y          | N      |                    |
+| [`debug_traceBlockByNumber`](#debug_traceblockbynumber)                               | Debug     | Y          | N      |                    |
+| [`debug_traceBlockByHash`](#debug_traceblockhash)                                    | Debug     | Y          | N      |                    |
 | `debug_traceBlockFromFile`                                                            | Debug     | N          | N      | Returns undefined  |
 | `debug_standardTraceBlockToFile`                                                      | Debug     | N          | N      | Returns undefined  |
 | `debug_standardTraceBadBlockToFile`                                                   | Debug     | N          | N      | Returns undefined  |
-| [`debug_traceTransaction`](#debug_tracetransaction)                                   | Debug     | N          | N      | Returns undefined  |
-| `debug_traceCall`                                                                     | Debug     | N          | N      | Returns undefined  |
+| [`debug_traceTransaction`](#debug_tracetransaction)                                   | Debug     | Y          | N      |                    |
+| `debug_traceCall`                                                                     | Debug     | Y          | N      |                    |
 | `debug_traceChain`                                                                    | Debug     | N          | N      | Returns undefined  |
 | `debug_traceBadBlock`                                                                 | Debug     | N          | N      | Returns undefined  |
 | `debug_verbosity`                                                                     | Debug     | N          | N      | Not implemented    |
 | `debug_vmodule`                                                                       | Debug     | N          | N      | Not implemented    |
-| `debug_writeBlockProfile`                                                             | Debug     | N          | N      | Profiling disabled |
-| `debug_writeMemProfile`                                                               | Debug     | N          | N      | Profiling disabled |
-| `debug_writeMutexProfile`                                                             | Debug     | N          | N      | Profiling disabled |
+| `debug_writeBlockProfile`                                                             | Debug     | Y          | N      |                    |
+| `debug_writeMemProfile`                                                               | Debug     | Y          | N      |                    |
+| `debug_writeMutexProfile`                                                             | Debug     | Y          | N      |                    |
 | `debug_getRawBlock`                                                                   | Debug     | N          | N      | Not implemented    |
 | `debug_getRawHeader`                                                                  | Debug     | N          | N      | Not implemented    |
 | `debug_getRawReceipts`                                                                | Debug     | N          | N      | Not implemented    |
 | `debug_getRawTransaction`                                                             | Debug     | N          | N      | Not implemented    |
-| [`debug_printBlock`](#debug_printblock)                                              | Debug     | N          | N      | Requires uint64 param |
+| [`debug_printBlock`](#debug_printblock)                                              | Debug     | Y          | N      |                    |
 | [`debug_getHeaderRlp`](#debug_getheaderrlp)                                          | Debug     | N          | N      | Requires uint64 param |
-| `debug_intermediateRoots`                                                             | Debug     | N          | N      | Profiling disabled |
-| `debug_getBadBlocks`                                                                  | Debug     | Y          | N      |                    |
-| `debug_storageRangeAt`                                                                | Debug     | Y          | N      |                    |
-| `debug_getModifiedAccountsByNumber`                                                   | Debug     | Y          | N      |                    |
-| `debug_getModifiedAccountsByHash`                                                     | Debug     | Y          | N      |                    |
+| `debug_intermediateRoots`                                                             | Debug     | Y          | N      | Returns empty hash |
+| `debug_getBadBlocks`                                                                  | Debug     | N          | N      | Not implemented    |
+| `debug_storageRangeAt`                                                                | Debug     | N          | N      | Not implemented    |
+| `debug_getModifiedAccountsByNumber`                                                   | Debug     | N          | N      | Not implemented    |
+| `debug_getModifiedAccountsByHash`                                                     | Debug     | N          | N      | Not implemented    |
 | `les_serverInfo`                                                                      | Les       | N          | N      | Returns undefined  |
 | `les_clientInfo`                                                                      | Les       | N          | N      | Returns undefined  |
 | `les_priorityClientInfo`                                                              | Les       | N          | N      | Returns undefined  |
@@ -233,10 +236,10 @@ The following namespaces are not implemented in Cosmos EVM but may be present in
 | `les_latestCheckpoint`                                                                | Les       | N          | N      | Returns undefined  |
 | `les_getCheckpoint`                                                                   | Les       | N          | N      | Returns undefined  |
 | `les_getCheckpointContractAddress`                                                    | Les       | N          | N      | Returns undefined  |
-| [`txpool_content`](#txpool_content)                                                   | TxPool    | Y          | Y      | Requires `v0.4.x` mempool    |
-| [`txpool_contentFrom`](#txpool_contentfrom)                                           | TxPool    | Y          | Y      | Requires `v0.4.x` mempool    |
-| [`txpool_inspect`](#txpool_inspect)                                                   | TxPool    | Y          | Y      | Requires `v0.4.x` mempool    |
-| [`txpool_status`](#txpool_status)                                                     | TxPool    | Y          | Y      | Requires `v0.4.x` mempool    |
+| [`txpool_content`](#txpool_content)                                                   | TxPool    | Y          | Y      | See [experimental mempool](/v0.4.x/documentation/concepts/mempool) |
+| [`txpool_contentFrom`](#txpool_contentfrom)                                           | TxPool    | Y          | Y      | See [experimental mempool](/v0.4.x/documentation/concepts/mempool) |
+| [`txpool_inspect`](#txpool_inspect)                                                   | TxPool    | Y          | Y      | See [experimental mempool](/v0.4.x/documentation/concepts/mempool) |
+| [`txpool_status`](#txpool_status)                                                     | TxPool    | Y          | Y      | See [experimental mempool](/v0.4.x/documentation/concepts/mempool) |
 | `trace_callMany`                                                                      | Trace     | N          | N      | Not implemented    |
 | `eth_signTypedData`                                                                   | Eth       | W         | N      | EIP-712 partial    |
 | `eth_fillTransaction`                                                                 | Eth       | Y          | Y      |                    |
