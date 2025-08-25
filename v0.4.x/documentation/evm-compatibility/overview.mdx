@@ -99,20 +99,24 @@ These are completely independent values, not derived from each other.
 
 ## JSON-RPC API
 
-<Card title="Full Ethereum RPC Support" icon="code" href="/v0.4.x/api-reference/ethereum-json-rpc/methods">
-  All standard Ethereum JSON-RPC methods are implemented. View the complete reference.
+<Card title="Ethereum RPC Compatibility" icon="code" href="/v0.4.x/api-reference/ethereum-json-rpc/methods">
+  Most standard Ethereum JSON-RPC methods are supported, with some returning stub values for compatibility. View the complete reference.
 </Card>
 
-**Everything your dApp needs works:**
--  All transaction methods (`eth_sendTransaction`, `eth_call`, `eth_estimateGas`)
--  Block and receipt queries
+**Core functionality your dApp needs:**
+-  Essential transaction methods (`eth_sendRawTransaction`, `eth_call`, `eth_estimateGas`)
+-  Block and receipt queries (fully functional)
 -  Account balances and nonces
--  Event logs and filters
+-  Event logs and filters (basic support)
 -  Web3 utilities and net info
--  Debug and trace methods
--  Subscription support
+-  Debug namespace (partial - tracing and profiling methods available)
+-  Subscription support (WebSocket)
 
-The only methods that return empty/null are those related to Proof-of-Work mining (which don't apply to any modern Ethereum chain either).
+**Implementation notes:**
+- Some methods return stub values for compatibility (e.g., `eth_gasPrice` returns 0)
+- Mining-related methods are not applicable (Cosmos uses Tendermint consensus)
+- `txpool` methods require experimental mempool configuration
+- Debug namespace includes functional tracing and profiling tools
 
 ## EIP Support
 

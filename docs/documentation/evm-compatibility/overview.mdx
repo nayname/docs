@@ -99,36 +99,42 @@ These are completely independent values, not derived from each other.
 
 ## JSON-RPC API
 
-<Card title="Full Ethereum RPC Support" icon="code" href="/docs/api-reference/ethereum-json-rpc/methods">
-  All standard Ethereum JSON-RPC methods are implemented. View the complete reference.
+<Card title="Ethereum RPC Compatibility" icon="code" href="/docs/api-reference/ethereum-json-rpc/methods">
+  Most standard Ethereum JSON-RPC methods are supported, with some returning stub values for compatibility. View the complete reference.
 </Card>
 
-**Everything your dApp needs works:**
--  All transaction methods (`eth_sendTransaction`, `eth_call`, `eth_estimateGas`)
+**Core functionality for developers:**
+-  All standard transaction methods (`eth_sendRawTransaction`, `eth_call`, `eth_estimateGas`)
 -  Block and receipt queries
 -  Account balances and nonces
 -  Event logs and filters
 -  Web3 utilities and net info
--  Debug and trace methods
--  Subscription support
+-  Debug namespace (partial - tracing and profiling methods available)
+-  Websocket subscription support
 
-The only methods that return empty/null are those related to Proof-of-Work mining (which don't apply to any modern Ethereum chain either).
+**Implementation notes:**
+- Some methods return stub values for compatibility (e.g., `eth_gasPrice` returns 0)
+- Mining-related methods are not applicable (Cosmos uses Tendermint consensus)
+- `txpool` methods require experimental mempool configuration
+- Debug namespace includes functional tracing and profiling tools
 
 ## EIP Support
 
 <Card title="EIP Compatibility Matrix" icon="list-check" href="/docs/documentation/evm-compatibility/eip-reference">
-  Interactive table showing support status for all 339+ Ethereum Improvement Proposals.
+  Interactive table showing support status for Ethereum Improvement Proposals.
 </Card>
 
-### Notable Differences
+### Notable Implementation Details
 
-- **EIP-1559:** Base fee distributed to validators instead of burned
-- **EIP-155:** Replay protection enforced at chain level
+- **EIP-1559:** Fully supported - with base fee distributed to validators instead of burned
+- **EIP-155:** Partial - enforced through chain-wide params (full support in [PR #415](https://github.com/cosmos/evm/pull/415))
+- **EIP-3651:** Partial - COINBASE always returns empty address currently
+- **EIP-7702:** Set EOA code - planned for v0.5.0
 - **Custom Improvement Proposals (CIPs):** Chain-specific optimizations available
 
 ## Developer Experience
 
-### Everything You Know Still Works
+### Familiarity Out Of The Box
 
 **Your Ethereum skills and tools work unchanged:**
 - Deploy contracts with Hardhat, Foundry, or Remix
@@ -138,14 +144,13 @@ The only methods that return empty/null are those related to Proof-of-Work minin
 - Solidity and Vyper compile and run identically
 - Standard tooling like OpenZeppelin contracts work perfectly
 
-### Additional Benefits You Get
+### Additional Benefits
 
 **Enhanced capabilities without breaking compatibility:**
-- **Instant Finality:** No waiting for confirmations - transactions are final in ~2 seconds
-- **No Reorganizations:** Events and state changes are immediately permanent
 - **Native IBC:** Built-in cross-chain communication to any Cosmos chain
 - **Lower Costs:** Typically much lower gas fees than Ethereum mainnet
-- **Dual Address Access:** Same account reachable via both 0x and cosmos1 formats
+- **Faster Blocks:** 1-2 second block times vs 12 seconds on Ethereum
+- **Enhanced Security:** Byzantine Fault Tolerant consensus prevents attacks
 
 ### Transaction Pool
 
@@ -190,6 +195,6 @@ Key breaking changes when migrating:
     Source code and issue tracker
   </Card>
   <Card title="Precompiles Docs" icon="code" href="/docs/documentation/smart-contracts/precompiles">
-    Using Cosmos functionality from contracts
+    Using Cosmos functionality through Solidity
   </Card>
 </CardGroup>
