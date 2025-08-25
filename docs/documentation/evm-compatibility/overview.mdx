@@ -68,13 +68,13 @@ Both formats reference the same account - use either based on your needs.
 
 ### Chain ID Architecture
 
-<Warning>
-**Two Independent Chain IDs:** Cosmos EVM uses separate chain IDs for different purposes:
-- **Cosmos Chain ID:** String format (e.g., "cosmosevm-1") for consensus/IBC
-- **EVM Chain ID:** Integer format (e.g., 9000) for MetaMask/contracts
+<Info>
+**Two Independent Chain IDs:** Cosmos EVM uses separate chain IDs:
+- **Cosmos Chain ID:** [String] (e.g., "cosmosevm-1") for native features
+- **EVM Chain ID:** [integer] (e.g., 9000) for EVM compatibility
 
-These are completely independent values, not derived from each other.
-</Warning>
+Unlike with legacy Ethermint, these values are independent.
+</Info>
 
 ## Precompiled Contracts
 
