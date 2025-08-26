@@ -209,7 +209,7 @@ fi
 # Create a new sheet tab in Google Sheets for this version
 if node scripts/versioning/snapshot-eip-sheet.js "$CURRENT_VERSION"; then
     print_success "Created Google Sheets tab for $CURRENT_VERSION"
-    
+
     # Update the EIP compatibility table component with the new GID mapping
     print_info "Updating EIP component with new GID mapping..."
     if node scripts/versioning/update-eip-component-gids.js "$CURRENT_VERSION"; then
@@ -217,7 +217,7 @@ if node scripts/versioning/snapshot-eip-sheet.js "$CURRENT_VERSION"; then
     else
         print_warning "Failed to update EIP component GID mapping"
     fi
-    
+
     # Generate the MDX file that imports the component with sheet tab prop
     print_info "Generating MDX with sheet tab reference..."
     if node scripts/versioning/generate-eip-mdx-simple.js "$CURRENT_VERSION"; then

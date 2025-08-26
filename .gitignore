@@ -66,8 +66,10 @@ build/
 .yarn/
 scripts/*
 tests/*
+projects/
 .ingress/
 CLAUDE.md
+
 
 # Markdown lint cache
 .md-cache
