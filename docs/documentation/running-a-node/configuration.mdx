@@ -1,0 +1,284 @@
+---
+title: Node Configuration
+sidebar_label: Configuration
+description: Comprehensive guide to configuring a Cosmos EVM node
+---
+
+# Cosmos EVM Node Configuration
+
+This guide provides comprehensive documentation for configuring a Cosmos EVM node, focusing on the EVM-specific parameters that differentiate it from a standard Cosmos SDK chain.
+
+## Configuration Files
+
+When initializing a Cosmos EVM node using `evmd init`, three main configuration files are generated:
+
+- **`config.toml`** - CometBFT consensus configuration (standard across Cosmos chains)
+- **`app.toml`** - Application-specific configuration including EVM settings
+- **`client.toml`** - Client-side configuration
+
+## EVM-Specific Configuration Sections
+
+The Cosmos EVM extends the standard Cosmos SDK configuration with three additional sections in `app.toml`:
+
+### 1. EVM Configuration (`[evm]`)
+
+This section controls the Ethereum Virtual Machine execution environment.
+
+#### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `tracer` | string | `""` | VM tracer type for debugging. Valid options: `json`, `struct`, `access_list`, `markdown`. Enable with `--evm.tracer` flag at runtime. Used for transaction execution tracing and debugging. |
+| `max-tx-gas-wanted` | uint64 | `0` | Maximum gas limit for Ethereum transactions in CheckTx mode. Acts as a safety cap during mempool validation. `0` means no limit. Helps prevent DoS attacks via high gas transactions. |
+| `cache-preimage` | bool | `false` | Enables tracking of SHA3 preimages in the VM. Required for certain debugging scenarios and proof generation. Currently not fully implemented. |
+| `evm-chain-id` | uint64 | `262144` | EIP-155 compatible chain ID for replay protection. **Critical**: This must be different from the Cosmos chain ID. Used for transaction signatures and preventing cross-chain replay attacks. |
+
+#### Example Configuration
+
+```toml
+[evm]
+tracer = ""
+max-tx-gas-wanted = 0
+cache-preimage = false
+evm-chain-id = 262144
+```
+
+### 2. JSON-RPC Configuration (`[json-rpc]`)
+
+This section configures the Ethereum-compatible JSON-RPC server that provides Web3 API compatibility.
+
+#### Core Server Settings
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `enable` | bool | `false` | Enables the JSON-RPC server. Must be `true` to serve Ethereum RPC requests. |
+| `address` | string | `"127.0.0.1:8545"` | HTTP server bind address. Use `"0.0.0.0:8545"` for external access. |
+| `ws-address` | string | `"127.0.0.1:8546"` | WebSocket server bind address for real-time subscriptions. |
+| `ws-origins` | []string | `["127.0.0.1", "localhost"]` | Allowed origins for WebSocket connections. Add your domain for production. |
+| `api` | string | `"eth,net,web3"` | Enabled RPC namespaces. Available: `eth`, `net`, `web3`, `personal`, `txpool`, `debug`, `miner`. |
+
+#### Gas and Transaction Limits
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `gas-cap` | uint64 | `25000000` | Maximum gas for `eth_call` and `eth_estimateGas`. Prevents resource exhaustion. `0` = unlimited. |
+| `evm-timeout` | duration | `"5s"` | Global timeout for `eth_call` operations. Prevents long-running queries from blocking. |
+| `txfee-cap` | float64 | `1.0` | Maximum transaction fee (in ETH) for `eth_sendTransaction`. Prevents accidental high fees. |
+| `allow-unprotected-txs` | bool | `false` | Allow non-EIP155 (legacy) transactions. **Security risk** - only enable if required for compatibility. |
+
+#### Query and Filter Limits
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `filter-cap` | int32 | `200` | Maximum number of concurrent filters (for event subscriptions). |
+| `feehistory-cap` | int32 | `100` | Maximum blocks for `eth_feeHistory` queries. |
+| `logs-cap` | int32 | `10000` | Maximum results from single `eth_getLogs` query. |
+| `block-range-cap` | int32 | `10000` | Maximum block range for `eth_getLogs` queries. |
+
+#### Connection and Performance Settings
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `http-timeout` | duration | `"30s"` | Read/write timeout for HTTP connections. |
+| `http-idle-timeout` | duration | `"2m0s"` | Idle timeout before closing inactive connections. |
+| `max-open-connections` | int | `0` | Maximum simultaneous connections. `0` = unlimited. |
+| `batch-request-limit` | int | `1000` | Maximum requests in a JSON-RPC batch call. |
+| `batch-response-max-size` | int | `25000000` | Maximum bytes in batch response (25MB default). |
+
+#### Advanced Features
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `allow-insecure-unlock` | bool | `true` | Allow account unlocking via HTTP (for `personal` namespace). **Security risk in production**. |
+| `enable-indexer` | bool | `false` | Enable custom Ethereum transaction indexer for enhanced queries. |
+| `metrics-address` | string | `"127.0.0.1:6065"` | Metrics server address (Prometheus format at `/debug/metrics/prometheus`). |
+| `fix-revert-gas-refund-height` | int64 | `0` | Block height to activate gas refund fix for reverted transactions. Used for network upgrades. |
+| `enable-profiling` | bool | `false` | Enable profiling endpoints in `debug` namespace. **Never use on public nodes**. |
+
+#### Example Configuration
+
+```toml
+[json-rpc]
+enable = true
+address = "0.0.0.0:8545"
+ws-address = "0.0.0.0:8546"
+ws-origins = ["*"]
+api = "eth,net,web3,txpool"
+gas-cap = 50000000
+allow-insecure-unlock = false
+evm-timeout = "10s"
+txfee-cap = 10.0
+filter-cap = 500
+feehistory-cap = 200
+logs-cap = 10000
+block-range-cap = 10000
+http-timeout = "30s"
+http-idle-timeout = "2m0s"
+allow-unprotected-txs = false
+max-open-connections = 100
+enable-indexer = true
+metrics-address = "0.0.0.0:6065"
+batch-request-limit = 1000
+batch-response-max-size = 25000000
+enable-profiling = false
+```
+
+### 3. TLS Configuration (`[tls]`)
+
+Optional TLS configuration for secure JSON-RPC connections.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `certificate-path` | string | `""` | Path to TLS certificate file (`.pem` format). |
+| `key-path` | string | `""` | Path to TLS private key file (`.pem` format). |
+
+#### Example Configuration
+
+```toml
+[tls]
+certificate-path = "/path/to/cert.pem"
+key-path = "/path/to/key.pem"
+```
+
+## Key Differences from Standard Cosmos Chains
+
+### 1. Removed Sections
+- **`[wasm]`** section is not present in EVM configurations
+
+### 2. Modified Defaults
+- `minimum-gas-prices`: Set to `"0aatom"` by default (vs empty in Gaia)
+- `snapshot-interval`: `0` in EVM (vs `1000` in Gaia)
+- `snapshot-keep-recent`: `2` in EVM (vs `10` in Gaia)
+
+### 3. Additional Functionality
+- Full Ethereum JSON-RPC API compatibility
+- WebSocket support for real-time event subscriptions
+- Ethereum transaction indexing capabilities
+- EVM execution tracing and debugging tools
+
+## Production Recommendations
+
+### Security Settings
+
+For production deployments, ensure:
+
+```toml
+[json-rpc]
+enable = true
+allow-insecure-unlock = false  # Never allow in production
+allow-unprotected-txs = false  # Enforce EIP-155
+enable-profiling = false        # Disable debug profiling
+ws-origins = ["yourdomain.com"] # Restrict WebSocket origins
+```
+
+### Performance Tuning
+
+For high-traffic nodes:
+
+```toml
+[json-rpc]
+gas-cap = 50000000              # Increase for complex queries
+filter-cap = 500                # Increase for more subscriptions
+max-open-connections = 1000     # Handle more concurrent users
+batch-request-limit = 100       # Limit batch sizes for stability
+enable-indexer = true           # Enable for better query performance
+```
+
+### Monitoring
+
+Enable metrics for observability:
+
+```toml
+[json-rpc]
+metrics-address = "0.0.0.0:6065"  # Expose Prometheus metrics
+
+[telemetry]
+enabled = true
+prometheus-retention-time = 60
+```
+
+## Common Configuration Scenarios
+
+### 1. Archive Node
+
+```toml
+# Maintain full state history
+pruning = "nothing"
+pruning-keep-recent = "0"
+pruning-interval = "0"
+min-retain-blocks = 0
+
+[json-rpc]
+enable-indexer = true  # Index all transactions
+```
+
+### 2. RPC Endpoint
+
+```toml
+[json-rpc]
+enable = true
+address = "0.0.0.0:8545"
+ws-address = "0.0.0.0:8546"
+max-open-connections = 5000
+enable-indexer = true
+```
+
+### 3. Validator Node
+
+```toml
+[json-rpc]
+enable = false  # Disable RPC for security
+
+[api]
+enable = false  # Disable REST API
+
+[grpc]
+enable = false  # Disable gRPC
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **"Gas limit exceeded" errors**
+   - Increase `gas-cap` parameter
+   - Check `max-tx-gas-wanted` setting
+
+2. **WebSocket connection failures**
+   - Verify `ws-origins` includes client domain
+   - Check firewall rules for WebSocket port
+
+3. **Slow query performance**
+   - Enable `enable-indexer` for better performance
+   - Increase `evm-timeout` for complex queries
+
+4. **High memory usage**
+   - Reduce `filter-cap` and `logs-cap`
+   - Lower `batch-response-max-size`
+
+## Environment Variables
+
+All configuration parameters can be overridden via environment variables:
+
+- Prefix: `EVMD_`
+- Format: `EVMD_<SECTION>_<PARAMETER>`
+- Example: `EVMD_JSONRPC_ENABLE=true`
+
+## Configuration Validation
+
+The node validates configuration on startup. Key validations:
+
+- `tracer` must be one of: `json`, `struct`, `access_list`, `markdown`
+- `filter-cap` cannot be negative
+- `feehistory-cap` must be positive
+- TLS paths must use `.pem` extension if specified
+- API namespaces must not contain duplicates
+
+## Migration from Ethereum
+
+When migrating from Ethereum nodes:
+
+1. Map Ethereum chain ID to `evm-chain-id`
+2. Enable appropriate API namespaces based on your dApp requirements
+3. Adjust gas limits based on your Ethereum node settings
+4. Configure WebSocket origins for your existing clients

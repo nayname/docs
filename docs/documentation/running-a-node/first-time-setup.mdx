@@ -1,0 +1,436 @@
+---
+title: First-Time Setup Guide
+sidebar_label: First-Time Setup
+description: Complete beginner's guide to building and running your first Cosmos EVM node
+---
+
+# Your First Cosmos EVM Node
+
+Welcome! This guide will walk you through building and running a Cosmos EVM node from scratch. If you're new to blockchain nodes or the Cosmos ecosystem, don't worry - we'll explain everything step by step.
+
+## What You're Building
+
+A **node** is a computer that runs blockchain software and participates in the network. When you run a Cosmos EVM node, your computer:
+- Stores a copy of the blockchain data
+- Validates new transactions
+- Can serve Ethereum-compatible RPC requests (if configured)
+- Helps secure and decentralize the network
+
+Think of it like running a local database server, but one that's synchronized with thousands of other computers worldwide.
+
+## Before You Begin
+
+### System Requirements
+
+**Minimum Requirements:**
+- **CPU**: 4 cores (2.0 GHz or faster)
+- **RAM**: 8 GB
+- **Storage**: 250 GB SSD (minimum, 500 GB recommended)
+- **OS**: Ubuntu 20.04+, macOS 12+, or other Linux distributions
+- **Internet**: Stable broadband connection
+
+**Recommended for Production:**
+- **CPU**: 8+ cores
+- **RAM**: 16-32 GB
+- **Storage**: 1 TB+ NVMe SSD
+- **Internet**: 100+ Mbps with low latency
+
+### Required Software
+
+You'll need to install these tools first. Don't worry if you haven't used them before - we'll show you how!
+
+#### 1. Install Go (Programming Language)
+
+Cosmos EVM is written in Go, so we need Go installed to build it.
+
+**On Ubuntu/Debian:**
+```bash
+# Download and install Go 1.22
+wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
+
+# Add Go to your PATH
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+echo 'export PATH=$PATH:$HOME/go/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# Verify installation
+go version
+# Should output: go version go1.22.0 linux/amd64
+```
+
+**On macOS:**
+```bash
+# Using Homebrew (install from brew.sh if you don't have it)
+brew install go
+
+# Verify installation
+go version
+```
+
+#### 2. Install Git (Version Control)
+
+**On Ubuntu/Debian:**
+```bash
+sudo apt update
+sudo apt install git build-essential
+
+# Verify installation
+git --version
+```
+
+**On macOS:**
+```bash
+# Git comes with Xcode Command Line Tools
+xcode-select --install
+
+# Or using Homebrew
+brew install git
+```
+
+#### 3. Install Make (Build Tool)
+
+**On Ubuntu/Debian:**
+```bash
+# Usually comes with build-essential
+sudo apt install make
+
+# Verify
+make --version
+```
+
+**On macOS:**
+```bash
+# Comes with Xcode Command Line Tools
+# Or install via Homebrew
+brew install make
+```
+
+## Step 1: Download the Source Code
+
+Now let's get the Cosmos EVM code from GitHub:
+
+```bash
+# Create a workspace directory
+mkdir -p ~/cosmos-workspace
+cd ~/cosmos-workspace
+
+# Clone the repository
+git clone https://github.com/cosmos/evm.git
+cd evm
+
+# Check available versions
+git tag
+
+# Checkout the latest stable version (replace with actual latest)
+git checkout v0.4.0
+```
+
+> 💡 **What's happening?**  
+> We're downloading the source code from GitHub and selecting a specific version to build. Using tagged versions ensures stability.
+
+## Step 2: Build the Node Software
+
+Time to compile the code into an executable program:
+
+```bash
+# Build the evmd binary
+make build
+
+# This creates the binary in ./build/evmd
+ls -la build/
+
+# Verify it worked
+./build/evmd version
+```
+
+**Optional: Install globally** (makes it available from anywhere):
+```bash
+sudo make install
+
+# Now you can use evmd from any directory
+evmd version
+```
+
+> 📝 **Note:** The build process might take 2-5 minutes depending on your computer. You'll see lots of output - that's normal!
+
+### Troubleshooting Build Issues
+
+**"command not found: make"**
+- Install make using the instructions above
+
+**"go: command not found"**
+- Go isn't installed or not in PATH. Revisit the Go installation steps
+
+**"permission denied"**
+- Use `sudo` for install command or check file permissions
+
+## Step 3: Initialize Your Node
+
+Before starting, we need to initialize the node's data directory and configuration:
+
+```bash
+# Choose a name for your node (moniker)
+NODE_NAME="my-first-node"
+
+# Initialize the node
+evmd init $NODE_NAME
+
+# This creates:
+# ~/.evmd/config/ - Configuration files
+# ~/.evmd/data/   - Blockchain data
+```
+
+**What just happened?**
+- Created necessary directories
+- Generated node keys (unique identity)
+- Created default configuration files
+- Set up genesis file (blockchain starting point)
+
+Let's look at what was created:
+```bash
+ls ~/.evmd/config/
+# app.toml       - Application configuration
+# client.toml    - Client configuration  
+# config.toml    - Consensus configuration
+# genesis.json   - Initial blockchain state
+# node_key.json  - Node's P2P identity
+# priv_validator_key.json - Validator key (if validating)
+```
+
+## Step 4: Configure for First Run
+
+For your first node, let's enable the Ethereum RPC server so you can interact with it:
+
+```bash
+# Enable JSON-RPC (Ethereum compatibility)
+sed -i 's/enable = false/enable = true/' ~/.evmd/config/app.toml
+
+# Or manually edit the file
+nano ~/.evmd/config/app.toml
+# Find [json-rpc] section and set enable = true
+```
+
+### Key Configuration Changes for Beginners
+
+Edit `~/.evmd/config/app.toml`:
+
+```toml
+# Minimum gas prices (accept free transactions for testing)
+minimum-gas-prices = "0aatom"
+
+[json-rpc]
+# Enable Ethereum JSON-RPC
+enable = true
+
+# Local access only (safe for testing)
+address = "127.0.0.1:8545"
+ws-address = "127.0.0.1:8546"
+
+# Enable all APIs for testing
+api = "eth,net,web3,debug,personal,txpool"
+
+# Development-friendly settings
+allow-insecure-unlock = true  # Only for testing!
+allow-unprotected-txs = true  # Only for testing!
+```
+
+## Step 5: Start Your Node
+
+### For Local Development (Single Node)
+
+If you're just testing locally:
+
+```bash
+# Start the node
+evmd start
+
+# You'll see output like:
+# INF starting node with ABCI CometBFT in-process module=server
+# INF service start impl=multiAppConn module=proxy
+# INF starting JSON-RPC server address=127.0.0.1:8545
+```
+
+**Keep this terminal open** - the node is running! Press `Ctrl+C` to stop.
+
+### Connecting to a Network
+
+To join an existing network, you need:
+1. The network's genesis file
+2. Seed nodes to connect to
+3. Correct chain ID
+
+Example for joining a testnet:
+```bash
+# Download genesis file (example)
+curl https://example-testnet.com/genesis.json > ~/.evmd/config/genesis.json
+
+# Add seed nodes in config.toml
+sed -i 's/seeds = ""/seeds = "node-id@ip:26656"/' ~/.evmd/config/config.toml
+
+# Start syncing
+evmd start
+```
+
+## Step 6: Interact with Your Node
+
+Once running, test your node in a new terminal:
+
+### Check Node Status
+
+```bash
+# Check if node is running
+curl -X POST http://localhost:26657/status | jq .
+
+# Check Ethereum RPC
+curl -X POST http://localhost:8545 \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'
+```
+
+### Using MetaMask
+
+1. Open MetaMask
+2. Click network dropdown → "Add Network"
+3. Add manually:
+   - Network Name: `Local Cosmos EVM`
+   - RPC URL: `http://localhost:8545`
+   - Chain ID: `262144` (or your configured chain ID)
+   - Currency Symbol: `ATOM`
+4. Click "Save"
+
+### Send Your First Transaction
+
+```bash
+# Create a test account
+evmd keys add testuser
+
+# Get test tokens (only works on local/test networks)
+# You'll need to fund this account with tokens
+
+# Check balance
+evmd query bank balances $(evmd keys show testuser -a)
+```
+
+## Step 7: Running as a Background Service
+
+For production or long-term use, run your node as a system service:
+
+### Create Service File (Linux)
+
+```bash
+sudo nano /etc/systemd/system/evmd.service
+```
+
+Add:
+```ini
+[Unit]
+Description=Cosmos EVM Node
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+ExecStart=/home/YOUR_USERNAME/go/bin/evmd start
+Restart=always
+RestartSec=3
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable evmd
+sudo systemctl start evmd
+
+# Check status
+sudo systemctl status evmd
+
+# View logs
+sudo journalctl -u evmd -f
+```
+
+## Common Issues & Solutions
+
+### "Cannot connect to node"
+- Check if node is running: `ps aux | grep evmd`
+- Check ports aren't blocked: `sudo netstat -tulpn | grep evmd`
+- Ensure firewall allows connections
+
+### "Node not syncing"
+- Check you have peers: `curl localhost:26657/net_info | jq .`
+- Verify correct genesis file
+- Check system time is accurate
+
+### "Out of memory"
+- Increase system swap space
+- Adjust cache settings in `config.toml`
+- Consider pruning old blocks
+
+### "Disk full"
+- Enable pruning in `app.toml`: set `pruning = "everything"`
+- Move data directory to larger disk
+- Consider running pruned node
+
+## What's Next?
+
+Congratulations! You've successfully built and run your first Cosmos EVM node. Here's what you can explore next:
+
+### Learn More About:
+- **[Configuration Guide](./configuration)** - Fine-tune your node settings
+- **[Becoming a Validator](../concepts/staking)** - Participate in consensus
+- **[Smart Contract Development](../smart-contracts/introduction)** - Deploy your first contract
+
+### Advanced Topics:
+- Setting up monitoring and alerts
+- Configuring state sync for faster syncing
+- Running archive nodes for historical data
+- Setting up high-availability infrastructure
+
+## Quick Commands Reference
+
+```bash
+# Build
+make build
+
+# Initialize
+evmd init <moniker>
+
+# Start node
+evmd start
+
+# Start with custom home
+evmd start --home /path/to/home
+
+# Check version
+evmd version
+
+# Reset blockchain data
+evmd tendermint unsafe-reset-all
+
+# Export/backup keys
+evmd keys export <key-name>
+
+# Check sync status
+curl localhost:26657/status | jq .result.sync_info
+
+# Get node ID
+evmd tendermint show-node-id
+```
+
+## Need Help?
+
+- **Documentation**: [evm.cosmos.network](https://evm.cosmos.network)
+- **Discord**: Join the Cosmos Network Discord
+- **Telegram**: [Cosmos Tech Stack Group](https://t.me/cosmostechstack)
+- **GitHub Issues**: [github.com/cosmos/evm/issues](https://github.com/cosmos/evm/issues)
+
+Remember: Running a node is a learning experience. Don't be discouraged if things don't work perfectly the first time. The community is here to help!
+
+---
+
+> 🎉 **You did it!** You're now part of the decentralized web3 infrastructure. Every node makes the network stronger and more resilient.

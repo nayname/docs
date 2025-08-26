@@ -1,0 +1,211 @@
+---
+title: Configuration Quick Reference
+sidebar_label: Quick Reference
+description: Quick reference guide for Cosmos EVM node configuration
+---
+
+# Configuration Quick Reference
+
+Quick reference for the most important Cosmos EVM configuration parameters.
+
+## Essential EVM Parameters
+
+```toml
+# app.toml - EVM-specific configurations
+
+[evm]
+# EVM Chain ID (must differ from Cosmos chain ID)
+evm-chain-id = 262144
+
+# Transaction gas limit (0 = unlimited)
+max-tx-gas-wanted = 0
+
+# Execution tracer (empty = disabled)
+tracer = ""
+
+[json-rpc]
+# Enable Ethereum JSON-RPC server
+enable = true
+
+# Server endpoints
+address = "127.0.0.1:8545"      # HTTP endpoint
+ws-address = "127.0.0.1:8546"   # WebSocket endpoint
+
+# API namespaces to expose
+api = "eth,net,web3"
+
+# Security settings
+allow-unprotected-txs = false   # Require EIP-155 signatures
+allow-insecure-unlock = false   # Disable account unlocking
+
+# Resource limits
+gas-cap = 25000000              # Max gas for eth_call
+logs-cap = 10000                # Max logs per query
+filter-cap = 200                # Max concurrent filters
+```
+
+## Configuration Templates
+
+### Development Node
+
+```toml
+[evm]
+evm-chain-id = 1337
+max-tx-gas-wanted = 0
+tracer = ""
+
+[json-rpc]
+enable = true
+address = "127.0.0.1:8545"
+ws-address = "127.0.0.1:8546"
+api = "eth,net,web3,debug,personal,txpool"
+allow-insecure-unlock = true
+allow-unprotected-txs = true
+gas-cap = 0
+enable-profiling = true
+```
+
+### Production RPC Node
+
+```toml
+[evm]
+evm-chain-id = 262144
+max-tx-gas-wanted = 10000000
+tracer = ""
+
+[json-rpc]
+enable = true
+address = "0.0.0.0:8545"
+ws-address = "0.0.0.0:8546"
+ws-origins = ["yourdomain.com", "*.yourdomain.com"]
+api = "eth,net,web3"
+allow-insecure-unlock = false
+allow-unprotected-txs = false
+gas-cap = 50000000
+filter-cap = 500
+logs-cap = 10000
+block-range-cap = 10000
+max-open-connections = 1000
+enable-indexer = true
+metrics-address = "127.0.0.1:6065"
+```
+
+### Archive Node
+
+```toml
+# Base configuration
+pruning = "nothing"
+min-retain-blocks = 0
+
+[evm]
+evm-chain-id = 262144
+
+[json-rpc]
+enable = true
+enable-indexer = true
+logs-cap = 50000
+block-range-cap = 0  # Unlimited for archive queries
+```
+
+### Validator Node
+
+```toml
+[evm]
+evm-chain-id = 262144
+max-tx-gas-wanted = 5000000
+
+[json-rpc]
+enable = false  # Disable RPC for security
+
+[api]
+enable = false
+
+[grpc]
+enable = false
+```
+
+## Parameter Limits & Ranges
+
+| Parameter | Min | Max | Recommended |
+|-----------|-----|-----|-------------|
+| `gas-cap` | 0 (unlimited) | uint64 max | 25M-50M |
+| `filter-cap` | 0 | int32 max | 200-500 |
+| `logs-cap` | 0 | int32 max | 10K-50K |
+| `block-range-cap` | 0 | int32 max | 10K-100K |
+| `batch-request-limit` | 0 | int max | 100-1000 |
+| `max-open-connections` | 0 (unlimited) | int max | 100-5000 |
+| `evm-timeout` | 1s | - | 5s-30s |
+| `http-timeout` | 1s | - | 30s-60s |
+
+## Critical Settings by Use Case
+
+### High-Traffic RPC
+
+- ✅ `enable-indexer = true`
+- ✅ `max-open-connections = 5000`
+- ✅ `gas-cap = 50000000`
+- ✅ `batch-request-limit = 100`
+
+### DeFi Applications
+
+- ✅ `allow-unprotected-txs = false`
+- ✅ `txfee-cap = 10.0`
+- ✅ `evm-timeout = "10s"`
+- ✅ `ws-origins = ["app.domain.com"]`
+
+### NFT Platforms
+
+- ✅ `logs-cap = 50000`
+- ✅ `block-range-cap = 100000`
+- ✅ `enable-indexer = true`
+- ✅ `filter-cap = 1000`
+
+### Development/Testing
+
+- ✅ `allow-insecure-unlock = true`
+- ✅ `allow-unprotected-txs = true`
+- ✅ `gas-cap = 0`
+- ✅ `api = "eth,net,web3,debug,personal"`
+
+## Environment Variable Overrides
+
+```bash
+# Override any parameter via environment variables
+export EVMD_JSONRPC_ENABLE=true
+export EVMD_JSONRPC_ADDRESS="0.0.0.0:8545"
+export EVMD_EVM_EVMCHAINID=1337
+export EVMD_JSONRPC_GASCAP=50000000
+```
+
+## Common Pitfalls to Avoid
+
+❌ **Don't** use the same ID for `evm-chain-id` and Cosmos chain ID  
+❌ **Don't** enable `allow-insecure-unlock` in production  
+❌ **Don't** enable `enable-profiling` on public nodes  
+❌ **Don't** set `gas-cap = 0` on public RPC endpoints  
+❌ **Don't** use `ws-origins = ["*"]` in production  
+
+## Health Check Commands
+
+```bash
+# Check if JSON-RPC is running
+curl -X POST http://localhost:8545 \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"net_version","params":[],"id":1}'
+
+# Check WebSocket connection
+wscat -c ws://localhost:8546
+> {"jsonrpc":"2.0","method":"net_version","params":[],"id":1}
+
+# Check metrics endpoint
+curl http://localhost:6065/debug/metrics/prometheus
+```
+
+## Performance Tuning Matrix
+
+| Load Level | Connections | Gas Cap | Filters | Indexer |
+|------------|-------------|---------|---------|---------|
+| Light | 100 | 25M | 200 | Optional |
+| Medium | 500 | 35M | 500 | Recommended |
+| Heavy | 1000 | 50M | 1000 | Required |
+| Very Heavy | 5000+ | 75M+ | 2000+ | Required |
