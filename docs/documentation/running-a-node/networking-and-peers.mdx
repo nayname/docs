@@ -224,68 +224,6 @@ watch -n 5 'curl -s localhost:26657/net_info | jq .result.n_peers'
 curl -s localhost:26657/status | jq '.result.sync_info'
 ```
 
-## Troubleshooting Connection Issues
-
-### No Peers Connected
-
-**Check seed configuration:**
-```bash
-# Verify seeds are set
-grep "^seeds" ~/.evmd/config/config.toml
-
-# Test seed connectivity
-nc -zv seed.example.com 26656
-```
-
-**Verify firewall:**
-```bash
-# Check if port is open
-sudo netstat -tulpn | grep 26656
-
-# Test from outside
-telnet YOUR_IP 26656
-```
-
-### Stuck at "Looking for peers"
-
-1. **Check time sync:**
-```bash
-# Ensure system time is accurate
-timedatectl status
-sudo ntpdate -s time.nist.gov
-```
-
-2. **Increase peer limits:**
-```toml
-max_num_inbound_peers = 100
-max_num_outbound_peers = 50
-```
-
-3. **Try different seeds:**
-```bash
-# Ask community for current seeds
-# Update config.toml with fresh seeds
-```
-
-### Peers Disconnecting
-
-**Common causes:**
-- Network instability
-- Different chain versions
-- Genesis mismatch
-- Time drift
-
-**Solutions:**
-```bash
-# Check version compatibility
-evmd version
-
-# Verify genesis hash
-sha256sum ~/.evmd/config/genesis.json
-
-# Monitor logs
-tail -f ~/.evmd/evmd.log | grep "peer"
-```
 
 ## Advanced Networking
 

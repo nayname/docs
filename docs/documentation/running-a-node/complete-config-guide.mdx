@@ -329,14 +329,16 @@ max-txs = -1
 # WARNING: Tracers significantly slow down the node!
 tracer = ""
 
-# Maximum gas for a single EVM transaction in CheckTx
-# 0 = no limit (use with caution!)
-# 5000000 = reasonable limit for most networks
-# This prevents mempool DoS via high-gas transactions
+# Maximum gas wanted for EVM tx in CheckTx mode (mempool validation)
+# Caps the gas_wanted to prevent mempool calculation abuse
+# 0 = no limit (actual tx gas limit still applies)
+# When set, gas_wanted = min(tx.gas, max-tx-gas-wanted)
+# Only affects mempool priority/eviction, NOT execution
 max-tx-gas-wanted = 0
 
-# Track SHA3 preimages (for debugging/proofs)
-# false = normal operation, true = debugging mode
+# Enable SHA3 preimage recording in EVM (go-ethereum vm.Config)
+# false = normal operation
+# true = records preimages (currently no-op in StateDB)
 cache-preimage = false
 
 # EVM Chain ID for EIP-155 replay protection
@@ -375,9 +377,11 @@ ws-origins = ["127.0.0.1", "localhost"]
 # NEVER enable "debug" or "personal" in production!
 api = "eth,net,web3"
 
-# Maximum gas for eth_call/estimateGas
-# Prevents resource exhaustion attacks
+# Maximum gas for eth_call/estimateGas RPC methods
+# Passed as GasCap in EthCallRequest to EVM module
+# Prevents resource exhaustion from expensive queries
 # 25000000 = default, 50000000 = complex contracts
+# 0 = unlimited (NEVER use in production)
 gas-cap = 25000000
 
 # Allow account unlocking over HTTP
@@ -394,19 +398,23 @@ evm-timeout = "5s"
 # 1 = 1 EVMOS max fee per transaction
 txfee-cap = 1
 
-# Maximum concurrent event filters
-# Higher = more subscriptions, more memory
+# Maximum concurrent filter subscriptions
+# Enforced when creating new filters via RPC
+# Prevents memory exhaustion from filter abuse
+# Each filter tracks: pending txs, new blocks, or logs
 filter-cap = 200
 
 # Maximum blocks for fee history queries
 feehistory-cap = 100
 
-# Maximum logs returned per query
-# Prevent memory exhaustion on large queries
+# Maximum logs returned from eth_getLogs
+# Enforced in filter.Logs() method
+# Prevents memory/CPU exhaustion from large result sets
 logs-cap = 10000
 
-# Maximum block range for getLogs
-# Smaller = faster queries, less memory
+# Maximum block range for eth_getLogs queries
+# Enforced alongside logs-cap in filter.Logs()
+# Limits query scope to prevent resource exhaustion
 block-range-cap = 10000
 
 # HTTP server timeouts
@@ -414,9 +422,10 @@ block-range-cap = 10000
 http-timeout = "30s"
 http-idle-timeout = "2m0s"
 
-# Allow non-EIP155 transactions
-# false = secure (require chain ID in signature)
-# true = backwards compatible but less secure
+# Allow non-EIP155 signed transactions (no chainID)
+# Controls Backend.AllowUnprotectedTxs in RPC layer
+# false = require EIP155 signatures (replay protection)
+# true = accept legacy transactions (pre-EIP155)
 allow-unprotected-txs = false
 
 # Maximum simultaneous connections
@@ -424,25 +433,29 @@ allow-unprotected-txs = false
 max-open-connections = 0
 
 # Enable custom EVM transaction indexer
-# true = better eth_getLogs performance, more disk usage
+# Indexes Ethereum transactions separately from Cosmos txs
+# true = faster eth_getLogs, more disk usage
+# false = queries scan blocks (slower)
 enable-indexer = false
 
 # Metrics server endpoint
 # Prometheus format at /debug/metrics/prometheus
 metrics-address = "127.0.0.1:6065"
 
-# Block height for gas refund fix
-# 0 = fix active from genesis
-# >0 = activate fix at specific height (for upgrades)
+# Upgrade height for revert gas refund fix
+# Changes gas refund calculation for failed EVM txs
+# 0 = correct behavior from genesis
+# >0 = switch behavior at specific height
 fix-revert-gas-refund-height = 0
 
-# JSON-RPC batch request limits
-# Prevent DoS via huge batch requests
+# JSON-RPC batch limits (passed to go-ethereum rpc.Server.SetBatchLimits)
+# Enforced at RPC server level before processing
 batch-request-limit = 1000
 batch-response-max-size = 25000000
 
-# Enable debug namespace profiling
-# NEVER enable on public nodes (security risk!)
+# Enable debug namespace profiling endpoints
+# Exposes CPU/memory profiling via debug_* RPC methods
+# SECURITY WARNING: Allows arbitrary profiling dumps!
 enable-profiling = false
 
 ###############################################################################
@@ -984,20 +997,3 @@ evmd tendermint unsafe-reset-all
 rm ~/.evmd/config/addrbook.json
 ```
 
-## The "It's Not Working" Checklist
-
-1. ✅ Genesis hash matches network?
-2. ✅ Same software version as network?
-3. ✅ System time synchronized?
-4. ✅ Ports open in firewall?
-5. ✅ Using correct chain-id?
-6. ✅ Seeds/peers actually online?
-7. ✅ Disk has enough space?
-8. ✅ RAM not exhausted?
-
-If all yes and still not working:
-```bash
-# The nuclear option
-rm -rf ~/.evmd/data ~/.evmd/config/addrbook.json
-# Start fresh with state sync
-```

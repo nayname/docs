@@ -28,9 +28,9 @@ This section controls the Ethereum Virtual Machine execution environment.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `tracer` | string | `""` | VM tracer type for debugging. Valid options: `json`, `struct`, `access_list`, `markdown`. Enable with `--evm.tracer` flag at runtime. Used for transaction execution tracing and debugging. |
-| `max-tx-gas-wanted` | uint64 | `0` | Maximum gas limit for Ethereum transactions in CheckTx mode. Acts as a safety cap during mempool validation. `0` means no limit. Helps prevent DoS attacks via high gas transactions. |
-| `cache-preimage` | bool | `false` | Enables tracking of SHA3 preimages in the VM. Required for certain debugging scenarios and proof generation. Currently not fully implemented. |
+| `tracer` | string | `""` | VM tracer type for debugging. Valid options: `json`, `struct`, `access_list`, `markdown`. Enable with `--evm.tracer` flag at runtime. Passed directly to go-ethereum's EVM for transaction execution tracing. |
+| `max-tx-gas-wanted` | uint64 | `0` | Caps the gas_wanted value during CheckTx to prevent mempool spam. When non-zero, limits each EVM transaction's gas_wanted to min(tx.gas, max-tx-gas-wanted) for mempool inclusion calculations only. Does NOT affect actual execution gas limits. |
+| `cache-preimage` | bool | `false` | Enables SHA3 preimage recording in the EVM. Passed to go-ethereum's vm.Config.EnablePreimageRecording. Used for debugging and certain proof systems. Note: Currently a no-op in StateDB implementation. |
 | `evm-chain-id` | uint64 | `262144` | EIP-155 compatible chain ID for replay protection. **Critical**: This must be different from the Cosmos chain ID. Used for transaction signatures and preventing cross-chain replay attacks. |
 
 #### Example Configuration
@@ -61,19 +61,19 @@ This section configures the Ethereum-compatible JSON-RPC server that provides We
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `gas-cap` | uint64 | `25000000` | Maximum gas for `eth_call` and `eth_estimateGas`. Prevents resource exhaustion. `0` = unlimited. |
+| `gas-cap` | uint64 | `25000000` | Hard limit on gas for `eth_call` and `eth_estimateGas` RPC methods. Passed as GasCap field in EthCallRequest to prevent resource exhaustion from expensive queries. `0` = unlimited (dangerous). |
 | `evm-timeout` | duration | `"5s"` | Global timeout for `eth_call` operations. Prevents long-running queries from blocking. |
 | `txfee-cap` | float64 | `1.0` | Maximum transaction fee (in ETH) for `eth_sendTransaction`. Prevents accidental high fees. |
-| `allow-unprotected-txs` | bool | `false` | Allow non-EIP155 (legacy) transactions. **Security risk** - only enable if required for compatibility. |
+| `allow-unprotected-txs` | bool | `false` | Allow non-EIP155 signed transactions (missing chainID). Controls Backend.AllowUnprotectedTxs which affects transaction validation in RPC endpoints. Enabling bypasses replay protection. |
 
 #### Query and Filter Limits
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `filter-cap` | int32 | `200` | Maximum number of concurrent filters (for event subscriptions). |
+| `filter-cap` | int32 | `200` | Maximum number of concurrent filter subscriptions. Enforced in eth_newBlockFilter, eth_newPendingTransactionFilter, and eth_newFilter. Prevents memory exhaustion from filter abuse. |
 | `feehistory-cap` | int32 | `100` | Maximum blocks for `eth_feeHistory` queries. |
-| `logs-cap` | int32 | `10000` | Maximum results from single `eth_getLogs` query. |
-| `block-range-cap` | int32 | `10000` | Maximum block range for `eth_getLogs` queries. |
+| `logs-cap` | int32 | `10000` | Maximum number of logs returned from single `eth_getLogs` query. Enforced in filter.Logs() to prevent memory exhaustion from large queries. |
+| `block-range-cap` | int32 | `10000` | Maximum block range allowed for `eth_getLogs` queries. Enforced in filter.Logs() alongside logs-cap to limit query scope. |
 
 #### Connection and Performance Settings
 
@@ -90,9 +90,9 @@ This section configures the Ethereum-compatible JSON-RPC server that provides We
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `allow-insecure-unlock` | bool | `true` | Allow account unlocking via HTTP (for `personal` namespace). **Security risk in production**. |
-| `enable-indexer` | bool | `false` | Enable custom Ethereum transaction indexer for enhanced queries. |
+| `enable-indexer` | bool | `false` | Enable custom Ethereum transaction indexer. When enabled, indexes EVM transactions for faster eth_getLogs queries. Requires additional storage. |
 | `metrics-address` | string | `"127.0.0.1:6065"` | Metrics server address (Prometheus format at `/debug/metrics/prometheus`). |
-| `fix-revert-gas-refund-height` | int64 | `0` | Block height to activate gas refund fix for reverted transactions. Used for network upgrades. |
+| `fix-revert-gas-refund-height` | int64 | `0` | Upgrade height for fixing gas refund calculation on reverted transactions. At this height, the chain switches to correct gas refund behavior for failed EVM transactions. |
 | `enable-profiling` | bool | `false` | Enable profiling endpoints in `debug` namespace. **Never use on public nodes**. |
 
 #### Example Configuration
@@ -236,25 +236,6 @@ enable = false  # Disable REST API
 enable = false  # Disable gRPC
 ```
 
-## Troubleshooting
-
-### Common Issues
-
-1. **"Gas limit exceeded" errors**
-   - Increase `gas-cap` parameter
-   - Check `max-tx-gas-wanted` setting
-
-2. **WebSocket connection failures**
-   - Verify `ws-origins` includes client domain
-   - Check firewall rules for WebSocket port
-
-3. **Slow query performance**
-   - Enable `enable-indexer` for better performance
-   - Increase `evm-timeout` for complex queries
-
-4. **High memory usage**
-   - Reduce `filter-cap` and `logs-cap`
-   - Lower `batch-response-max-size`
 
 ## Environment Variables
 

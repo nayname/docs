@@ -155,16 +155,6 @@ evmd version
 
 > 📝 **Note:** The build process might take 2-5 minutes depending on your computer. You'll see lots of output - that's normal!
 
-### Troubleshooting Build Issues
-
-**"command not found: make"**
-- Install make using the instructions above
-
-**"go: command not found"**
-- Go isn't installed or not in PATH. Revisit the Go installation steps
-
-**"permission denied"**
-- Use `sudo` for install command or check file permissions
 
 ## Step 3: Initialize Your Node
 
@@ -354,27 +344,6 @@ sudo systemctl status evmd
 sudo journalctl -u evmd -f
 ```
 
-## Common Issues & Solutions
-
-### "Cannot connect to node"
-- Check if node is running: `ps aux | grep evmd`
-- Check ports aren't blocked: `sudo netstat -tulpn | grep evmd`
-- Ensure firewall allows connections
-
-### "Node not syncing"
-- Check you have peers: `curl localhost:26657/net_info | jq .`
-- Verify correct genesis file
-- Check system time is accurate
-
-### "Out of memory"
-- Increase system swap space
-- Adjust cache settings in `config.toml`
-- Consider pruning old blocks
-
-### "Disk full"
-- Enable pruning in `app.toml`: set `pruning = "everything"`
-- Move data directory to larger disk
-- Consider running pruned node
 
 ## What's Next?
 
