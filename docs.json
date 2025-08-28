@@ -208,6 +208,16 @@
                     ]
                   },
                   {
+                    "group": "Running a Node",
+                    "pages": [
+                      "docs/documentation/running-a-node/first-time-setup",
+                      "docs/documentation/running-a-node/configuration",
+                      "docs/documentation/running-a-node/config-quick-reference",
+                      "docs/documentation/running-a-node/complete-config-guide",
+                      "docs/documentation/running-a-node/networking-and-peers"
+                    ]
+                  },
+                  {
                     "group": "Integration",
                     "pages": [
                       "docs/documentation/integration/evm-module-integration",
