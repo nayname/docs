@@ -37,19 +37,7 @@ Thumbs.db
 .context/
 context/
 
-# Optional: lock files if using alternative package managers
-
-package-lock.json
-pnpm-lock.yaml
-
-# Coverage
-
-coverage/
-
 # Python virtual environments and OpenAPI generation artifacts
-openapi_venv/
-jsonrpc_discovery_venv/
-venv/
 __pycache__/
 *.pyc
 *.pyo
@@ -59,17 +47,10 @@ __pycache__/
 schema.json
 
 # Misc
-docs/logs/
-logs/
-dist/
-build/
-.yarn/
-tests/*
-projects/
 .ingress/
 CLAUDE.md
 .projects/
-
+tests/
 
 # Markdown lint cache
 .md-cache
