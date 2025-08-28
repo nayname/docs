@@ -64,7 +64,6 @@ logs/
 dist/
 build/
 .yarn/
-scripts/*
 tests/*
 .ingress/
 CLAUDE.md

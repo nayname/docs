@@ -208,16 +208,6 @@
                     ]
                   },
                   {
-                    "group": "Running a Node",
-                    "pages": [
-                      "docs/documentation/running-a-node/first-time-setup",
-                      "docs/documentation/running-a-node/configuration",
-                      "docs/documentation/running-a-node/config-quick-reference",
-                      "docs/documentation/running-a-node/networking-and-peers",
-                      "docs/documentation/running-a-node/advanced-operations"
-                    ]
-                  },
-                  {
                     "group": "Integration",
                     "pages": [
                       "docs/documentation/integration/evm-module-integration",
@@ -296,6 +286,7 @@
                       "docs/documentation/cosmos-sdk/overview",
                       "docs/documentation/cosmos-sdk/cli",
                       "docs/documentation/cosmos-sdk/protocol",
+                      "docs/documentation/cosmos-sdk/configuration",
                       {
                         "group": "Modules",
                         "pages": [
