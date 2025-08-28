@@ -68,6 +68,7 @@ tests/*
 projects/
 .ingress/
 CLAUDE.md
+.projects/
 
 
 # Markdown lint cache

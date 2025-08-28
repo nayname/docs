@@ -1,0 +1,387 @@
+---
+title: EVM RPC Configuration
+description: EVM and JSON-RPC configuration for Cosmos EVM nodes
+mode: "wide"
+---
+
+Configure EVM and JSON-RPC settings for your Cosmos EVM node in `~/.appd/config/app.toml`.
+
+<Tabs>
+  <Tab title="Basic Setup">
+    Essential configuration for getting started with EVM and JSON-RPC.
+
+    <CodeGroup>
+    ```toml json-rpc
+    [json-rpc]
+    # Enable JSON-RPC server
+    enable = true
+
+    # HTTP server listen address
+    address = "127.0.0.1:8545"
+
+    # WebSocket server listen address
+    ws-address = "127.0.0.1:8546"
+
+    # Enabled API namespaces
+    api = "eth,net,web3"
+
+    # Enable transaction indexer (required for eth_getLogs)
+    enable-indexer = false
+    ```
+
+    ```toml evm
+    [evm]
+    # EVM execution tracer (leave empty for production)
+    tracer = ""
+
+    # Maximum gas wanted for mempool transactions
+    # 0 = unlimited
+    max-tx-gas-wanted = 0
+    ```
+    </CodeGroup>
+
+    ### Quick Start Examples
+
+    <CodeGroup>
+    ```toml "Local Development"
+    [json-rpc]
+    enable = true
+    address = "127.0.0.1:8545"
+    ws-address = "127.0.0.1:8546"
+    api = "eth,net,web3,txpool,debug"
+    enable-indexer = true
+
+    [evm]
+    tracer = "json"
+    max-tx-gas-wanted = 0
+    ```
+
+    ```toml "Public RPC"
+    [json-rpc]
+    enable = true
+    address = "0.0.0.0:8545"
+    ws-address = "0.0.0.0:8546"
+    api = "eth,net,web3"
+    enable-indexer = true
+
+    [evm]
+    tracer = ""
+    max-tx-gas-wanted = 30000000
+    ```
+
+    ```toml "Archive Node"
+    [json-rpc]
+    enable = true
+    address = "0.0.0.0:8545"
+    ws-address = "0.0.0.0:8546"
+    api = "eth,net,web3,txpool"
+    enable-indexer = true
+
+    [evm]
+    tracer = ""
+    max-tx-gas-wanted = 50000000
+    ```
+    </CodeGroup>
+  </Tab>
+
+  <Tab title="Full Configuration">
+    Complete configuration with all available parameters and descriptions.
+
+    <CodeGroup>
+    ```toml json-rpc
+    [json-rpc]
+    # Enable the JSON-RPC server
+    enable = true
+
+    # HTTP server listen address
+    address = "127.0.0.1:8545"
+
+    # WebSocket server listen address
+    ws-address = "127.0.0.1:8546"
+
+    # Enabled API namespaces
+    # Options: eth, net, web3, debug, personal, txpool, miner
+    api = "eth,net,web3"
+
+    # Gas cap for eth_call/estimateGas (0 = default)
+    gas-cap = 25000000
+
+    # Transaction fee cap in ether
+    txfee-cap = 1
+
+    # Maximum number of filters per WebSocket connection
+    filter-cap = 200
+
+    # Maximum number of requests in a batch
+    batch-request-limit = 1000
+
+    # Timeout for EVM call operations
+    evm-timeout = "5s"
+
+    # Maximum number of logs returned by eth_getLogs
+    logs-cap = 10000
+
+    # Maximum block range for eth_getLogs queries
+    block-range-cap = 10000
+
+    # HTTP request timeout
+    http-timeout = "30s"
+
+    # HTTP idle connection timeout
+    http-idle-timeout = "120s"
+
+    # Maximum number of open connections (0 = unlimited)
+    max-open-connections = 0
+
+    # Enable EVM transaction indexer
+    enable-indexer = false
+
+    # Enable profiling endpoints in debug namespace
+    enable-profiling = false
+
+    # Prometheus metrics server address
+    metrics-address = "127.0.0.1:6065"
+    ```
+
+    ```toml evm
+    [evm]
+    # EVM execution tracer for debugging
+    # Options: "", "json", "struct", "access_list", "markdown"
+    # WARNING: Significantly impacts performance
+    tracer = ""
+
+    # Maximum gas wanted for transactions in mempool
+    # Prevents spam by rejecting high gas transactions
+    # 0 = unlimited (not recommended for public nodes)
+    max-tx-gas-wanted = 0
+    ```
+
+    ```toml mempool
+    [mempool]
+    # Mempool type affects transaction ordering
+    # Options: "flood", "prioritized"
+    # prioritized = better for EVM (sorts by gas price)
+    type = "prioritized"
+    ```
+    </CodeGroup>
+
+    ### Performance Profiles
+
+    <CodeGroup>
+    ```toml "High Performance"
+    [json-rpc]
+    enable = true
+    address = "0.0.0.0:8545"
+    ws-address = "0.0.0.0:8546"
+    api = "eth,net,web3"
+    gas-cap = 50000000
+    filter-cap = 1000
+    batch-request-limit = 100
+    evm-timeout = "10s"
+    logs-cap = 50000
+    block-range-cap = 50000
+    http-timeout = "30s"
+    http-idle-timeout = "300s"
+    max-open-connections = 10000
+    enable-indexer = true
+    enable-profiling = false
+
+    [evm]
+    tracer = ""
+    max-tx-gas-wanted = 50000000
+
+    [mempool]
+    type = "prioritized"
+    ```
+
+    ```toml "Resource Limited"
+    [json-rpc]
+    enable = true
+    address = "127.0.0.1:8545"
+    ws-address = "127.0.0.1:8546"
+    api = "eth,net,web3"
+    gas-cap = 10000000
+    filter-cap = 100
+    batch-request-limit = 10
+    evm-timeout = "5s"
+    logs-cap = 1000
+    block-range-cap = 1000
+    http-timeout = "10s"
+    http-idle-timeout = "30s"
+    max-open-connections = 100
+    enable-indexer = false
+
+    [evm]
+    tracer = ""
+    max-tx-gas-wanted = 10000000
+
+    [mempool]
+    type = "flood"
+    ```
+
+    ```toml "Debug Mode"
+    [json-rpc]
+    enable = true
+    address = "127.0.0.1:8545"
+    api = "eth,net,web3,debug,txpool"
+    gas-cap = 100000000
+    evm-timeout = "30s"
+    enable-indexer = true
+    enable-profiling = true
+    metrics-address = "127.0.0.1:6065"
+
+    [evm]
+    tracer = "json"
+    max-tx-gas-wanted = 0
+    ```
+    </CodeGroup>
+  </Tab>
+
+  <Tab title="API Namespaces">
+    Configure which Ethereum JSON-RPC namespaces are exposed.
+
+    ### Available Namespaces
+
+    <CodeGroup>
+    ```toml "Core APIs"
+    [json-rpc]
+    # Essential namespaces for basic functionality
+    # Always safe to enable in production
+    api = "eth,net,web3"
+
+    # Available namespaces:
+    # - eth: Ethereum blockchain interaction
+    # - net: Network information
+    # - web3: Utility functions
+    # - txpool: Transaction pool inspection
+    # - debug: Transaction tracing and debugging
+    # - personal: Account management
+    # - miner: Mining/validator operations
+    ```
+
+    ```toml "Extended APIs"
+    [json-rpc]
+    # Additional namespaces for enhanced functionality
+    api = "eth,net,web3,txpool,miner"
+
+    # txpool: Transaction pool inspection
+    # miner: Mining/validator operations
+    ```
+
+    ```toml "Debug APIs"
+    [json-rpc]
+    # Development and debugging namespaces
+    # WARNING: Do not enable in production
+    api = "eth,net,web3,debug,personal"
+
+    # debug: Transaction tracing and debugging
+    # personal: Account management (UNSAFE)
+
+    # Also enable profiling for debug namespace
+    enable-profiling = true
+    ```
+    </CodeGroup>
+
+    ### Namespace Reference
+
+    | Namespace | Methods | Use Case |
+    |-----------|---------|----------|
+    | `eth` | eth_call, eth_getBalance, eth_sendTransaction, etc. | Core Ethereum functionality |
+    | `net` | net_version, net_listening, net_peerCount | Network information |
+    | `web3` | web3_clientVersion, web3_sha3 | Utility functions |
+    | `txpool` | txpool_content, txpool_status, txpool_inspect | Transaction pool monitoring |
+    | `debug` | debug_traceTransaction, debug_getBadBlocks | Debugging and tracing |
+    | `personal` | personal_newAccount, personal_unlockAccount | Account management |
+    | `miner` | miner_start, miner_stop, miner_setGasPrice | Mining operations |
+
+    ### Security Recommendations
+
+    <Warning>
+    **Production Environment:**
+    - Only enable `eth`, `net`, `web3` namespaces
+    - Never enable `debug` or `personal` namespaces
+    - Consider `txpool` only if needed for monitoring
+
+    **Development Environment:**
+    - All namespaces can be enabled
+    - Enable `enable-profiling` for performance analysis
+    - Use `debug` namespace for transaction tracing
+    </Warning>
+
+    ### Common Configurations
+
+    <CodeGroup>
+    ```toml "dApp RPC"
+    [json-rpc]
+    # Standard configuration for dApp support
+    api = "eth,net,web3"
+    enable-indexer = true  # Required for eth_getLogs
+    ```
+
+    ```toml "Block Explorer"
+    [json-rpc]
+    # Enhanced configuration for explorers
+    api = "eth,net,web3,txpool"
+    enable-indexer = true
+    logs-cap = 50000
+    block-range-cap = 100000
+    ```
+
+    ```toml "Validator Node"
+    [json-rpc]
+    # Minimal exposure for validators
+    enable = false  # Or restrict to localhost
+    # If enabled:
+    # address = "127.0.0.1:8545"
+    # api = "eth,net"
+    ```
+    </CodeGroup>
+  </Tab>
+</Tabs>
+
+## Transaction Indexing
+
+The transaction indexer is required for certain RPC methods to function properly.
+
+<Accordion title="Methods Requiring Indexer">
+The following methods require `enable-indexer = true`:
+- `eth_getLogs` - Query event logs
+- `eth_getFilterLogs` - Get logs for a filter
+- `eth_getFilterChanges` - Get changes for a filter
+- `eth_newFilter` - Create event filter
+- `eth_newBlockFilter` - Create block filter
+- `eth_getTransactionReceipt` - Requires indexed receipts
+</Accordion>
+
+<Accordion title="Indexing Historical Transactions">
+To index existing transactions after enabling the indexer:
+
+```bash
+# Index from genesis to latest block
+appd index-eth-tx forward
+
+# Index from latest to genesis (faster for recent transactions)
+appd index-eth-tx backward
+```
+</Accordion>
+
+## Monitoring
+
+Enable Prometheus metrics to monitor RPC performance:
+
+```toml
+[json-rpc]
+metrics-address = "127.0.0.1:6065"
+```
+
+Key metrics available at `http://localhost:6065/metrics`:
+- `rpc_request_duration_seconds` - Request latency
+- `rpc_request_total` - Total requests by method
+- `txpool_pending_transactions` - Pending transaction count
+- `evm_gas_used` - Gas consumption metrics
+
+## See Also
+
+- [API Methods](/docs/api-reference/ethereum-json-rpc/methods) - Complete JSON-RPC method reference
+- [EVM Module](/docs/documentation/cosmos-sdk/modules/vm) - EVM module documentation
+- [CLI Reference](/docs/documentation/cosmos-sdk/cli) - Command-line interface

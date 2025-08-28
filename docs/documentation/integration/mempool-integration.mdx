@@ -1,26 +1,13 @@
 ---
 title: "EVM Mempool Integration"
-description: "Step-by-step guide to integrate the experimental EVM mempool in your Cosmos SDK chain"
+description: "Integrate the EVM mempool with your Cosmos EVM chain"
 ---
-
-<Warning>
-This mempool implementation is **experimental** and under active development. It is intended for testing and evaluation purposes. Use in production environments is **not recommended** without thorough testing and risk assessment.
+<Danger>
+This mempool is **experimental** and in active development. It is intended for testing and evaluation purposes. Use in production environments is **not recommended** without thorough testing and risk assessment.
 Please [report issues](https://github.com/cosmos/evm/issues/new) and submit feedback to help improve stability.
-</Warning>
+</Danger>
 
 ## Overview
-
-This guide explains how to integrate the EVM mempool in your Cosmos SDK chain to enable Ethereum-compatible transaction flows, including out-of-order transactions and nonce gap handling.
-
-## Prerequisites
-
-Before integrating the EVM mempool:
-
-1. **EVM Module Integration**: Complete the [EVM module integration](/docs/documentation/integration/evm-module-integration) first
-2. **FeeMarket Module**: Ensure the feemarket module is properly configured for base fee calculations
-3. **Compatible AnteHandler**: Your ante handler must support EVM transaction validation
-
-## Quick Start
 
 ### Step 1: Add EVM Mempool to App Struct
 
