@@ -1,276 +1,362 @@
 ---
-title: First-Time Setup Guide
+title: First-Time Setup
 sidebar_label: First-Time Setup
-description: Complete beginner's guide to building and running your first Cosmos EVM node
+description: Building and running a Cosmos EVM node
 ---
 
-# Your First Cosmos EVM Node
+## System Requirements
 
-Welcome! This guide will walk you through building and running a Cosmos EVM node from scratch. If you're new to blockchain nodes or the Cosmos ecosystem, don't worry - we'll explain everything step by step.
-
-## What You're Building
-
-A **node** is a computer that runs blockchain software and participates in the network. When you run a Cosmos EVM node, your computer:
-- Stores a copy of the blockchain data
-- Validates new transactions
-- Can serve Ethereum-compatible RPC requests (if configured)
-- Helps secure and decentralize the network
-
-Think of it like running a local database server, but one that's synchronized with thousands of other computers worldwide.
-
-## Before You Begin
-
-### System Requirements
-
-**Minimum Requirements:**
-- **CPU**: 4 cores (2.0 GHz or faster)
-- **RAM**: 8 GB
-- **Storage**: 250 GB SSD (minimum, 500 GB recommended)
-- **OS**: Ubuntu 20.04+, macOS 12+, or other Linux distributions
+- **OS**: Ubuntu 20.04+, macOS 12+, Docker, or other Linux distributions
+- **CPU**: Multi-core processor
+- **RAM**: 8GB minimum recommended
+- **Storage**: SSD with sufficient space for blockchain data
 - **Internet**: Stable broadband connection
 
-**Recommended for Production:**
-- **CPU**: 8+ cores
-- **RAM**: 16-32 GB
-- **Storage**: 1 TB+ NVMe SSD
-- **Internet**: 100+ Mbps with low latency
+## Installation
 
-### Required Software
+<Tabs>
+  <Tab title="Ubuntu/Debian">
+    ### Install Prerequisites
 
-You'll need to install these tools first. Don't worry if you haven't used them before - we'll show you how!
+    #### 1. Install Go 1.22+
+    ```bash
+    # Download and install Go
+    wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
+    sudo rm -rf /usr/local/go
+    sudo tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
 
-#### 1. Install Go (Programming Language)
+    # Add Go to PATH
+    echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+    echo 'export PATH=$PATH:$HOME/go/bin' >> ~/.bashrc
+    source ~/.bashrc
 
-Cosmos EVM is written in Go, so we need Go installed to build it.
+    # Verify installation
+    go version
+    ```
 
-**On Ubuntu/Debian:**
-```bash
-# Download and install Go 1.22
-wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
-sudo rm -rf /usr/local/go
-sudo tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
+    #### 2. Install Build Tools
+    ```bash
+    sudo apt update
+    sudo apt install git build-essential make
+    ```
 
-# Add Go to your PATH
-echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
-echo 'export PATH=$PATH:$HOME/go/bin' >> ~/.bashrc
-source ~/.bashrc
+    #### 3. Build from Source
+    ```bash
+    # Clone repository
+    mkdir -p ~/cosmos-workspace
+    cd ~/cosmos-workspace
+    git clone https://github.com/cosmos/evm.git
+    cd evm
 
-# Verify installation
-go version
-# Should output: go version go1.22.0 linux/amd64
+    # Checkout version
+    git checkout v0.4.0
+
+    # Build binary
+    make build
+
+    # Optional: Install globally
+    sudo make install
+    ```
+
+    ### System Service Setup
+
+    Create a systemd service for automatic startup:
+
+    ```bash
+    sudo nano /etc/systemd/system/evmd.service
+    ```
+
+    ```ini
+    [Unit]
+    Description=Cosmos EVM Node
+    After=network.target
+
+    [Service]
+    Type=simple
+    User=YOUR_USERNAME
+    ExecStart=/home/YOUR_USERNAME/go/bin/evmd start
+    Restart=always
+    RestartSec=3
+    LimitNOFILE=65535
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+    Enable and start:
+    ```bash
+    sudo systemctl daemon-reload
+    sudo systemctl enable evmd
+    sudo systemctl start evmd
+    ```
+  </Tab>
+
+  <Tab title="macOS">
+    ### Install Prerequisites
+
+    #### 1. Install Homebrew (if needed)
+    ```bash
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    ```
+
+    #### 2. Install Go and Build Tools
+    ```bash
+    # Install Go
+    brew install go
+
+    # Install build tools
+    xcode-select --install
+    brew install make
+
+    # Verify installation
+    go version
+    ```
+
+    #### 3. Build from Source
+    ```bash
+    # Clone repository
+    mkdir -p ~/cosmos-workspace
+    cd ~/cosmos-workspace
+    git clone https://github.com/cosmos/evm.git
+    cd evm
+
+    # Checkout version
+    git checkout v0.4.0
+
+    # Build binary
+    make build
+
+    # Optional: Install globally
+    sudo make install
+    ```
+
+    ### Background Service Setup
+
+    Create a LaunchDaemon for automatic startup:
+
+    ```bash
+    nano ~/Library/LaunchAgents/com.cosmos.evmd.plist
+    ```
+
+    ```xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+        <key>Label</key>
+        <string>com.cosmos.evmd</string>
+        <key>ProgramArguments</key>
+        <array>
+            <string>/usr/local/bin/evmd</string>
+            <string>start</string>
+        </array>
+        <key>RunAtLoad</key>
+        <true/>
+        <key>KeepAlive</key>
+        <true/>
+        <key>StandardErrorPath</key>
+        <string>/tmp/evmd.err</string>
+        <key>StandardOutPath</key>
+        <string>/tmp/evmd.out</string>
+    </dict>
+    </plist>
+    ```
+
+    Load the service:
+    ```bash
+    launchctl load ~/Library/LaunchAgents/com.cosmos.evmd.plist
+    ```
+  </Tab>
+
+  <Tab title="Docker">
+    ### Using Docker Image
+
+    #### 1. Pull Docker Image
+    ```bash
+    # Pull official image (when available)
+    docker pull cosmos/evm:latest
+    ```
+
+    #### 2. Initialize Configuration
+    ```bash
+    # Create data directory
+    mkdir -p ~/.evmd-docker
+
+    # Initialize node
+    docker run -v ~/.evmd-docker:/root/.evmd cosmos/evm:latest init mynode
+    ```
+
+    #### 3. Run Container
+    ```bash
+    # Run with port mapping
+    docker run -d \
+      --name evmd \
+      -p 26656:26656 \
+      -p 26657:26657 \
+      -p 8545:8545 \
+      -p 8546:8546 \
+      -v ~/.evmd-docker:/root/.evmd \
+      cosmos/evm:latest start
+    ```
+
+    #### 4. Docker Compose Setup
+
+    Create `docker-compose.yml`:
+    ```yaml
+    version: '3.8'
+    services:
+      evmd:
+        image: cosmos/evm:latest
+        container_name: evmd
+        ports:
+          - "26656:26656"
+          - "26657:26657"
+          - "8545:8545"
+          - "8546:8546"
+        volumes:
+          - evmd-data:/root/.evmd
+        restart: always
+        command: start
+
+    volumes:
+      evmd-data:
+    ```
+
+    Start with:
+    ```bash
+    docker-compose up -d
+    ```
+  </Tab>
+</Tabs>
+
+## Initialize Node
+
+After installation, initialize your node:
+
+<CodeGroup>
+```bash Ubuntu/Debian
+evmd init <moniker>
 ```
 
-**On macOS:**
-```bash
-# Using Homebrew (install from brew.sh if you don't have it)
-brew install go
-
-# Verify installation
-go version
+```bash macOS
+evmd init <moniker>
 ```
 
-#### 2. Install Git (Version Control)
-
-**On Ubuntu/Debian:**
-```bash
-sudo apt update
-sudo apt install git build-essential
-
-# Verify installation
-git --version
+```bash Docker
+docker run -v ~/.evmd-docker:/root/.evmd cosmos/evm:latest init <moniker>
 ```
+</CodeGroup>
 
-**On macOS:**
-```bash
-# Git comes with Xcode Command Line Tools
-xcode-select --install
+This creates:
+- `~/.evmd/config/` - Configuration files
+- `~/.evmd/data/` - Blockchain data
 
-# Or using Homebrew
-brew install git
-```
+### Configuration Files
 
-#### 3. Install Make (Build Tool)
+- `app.toml` - Application configuration
+- `client.toml` - Client configuration
+- `config.toml` - Consensus configuration
+- `genesis.json` - Initial blockchain state
+- `node_key.json` - P2P identity
+- `priv_validator_key.json` - Validator key
 
-**On Ubuntu/Debian:**
-```bash
-# Usually comes with build-essential
-sudo apt install make
+## Basic Configuration
 
-# Verify
-make --version
-```
+Enable JSON-RPC for Ethereum compatibility:
 
-**On macOS:**
-```bash
-# Comes with Xcode Command Line Tools
-# Or install via Homebrew
-brew install make
-```
-
-## Step 1: Download the Source Code
-
-Now let's get the Cosmos EVM code from GitHub:
-
-```bash
-# Create a workspace directory
-mkdir -p ~/cosmos-workspace
-cd ~/cosmos-workspace
-
-# Clone the repository
-git clone https://github.com/cosmos/evm.git
-cd evm
-
-# Check available versions
-git tag
-
-# Checkout the latest stable version (replace with actual latest)
-git checkout v0.4.0
-```
-
-> 💡 **What's happening?**  
-> We're downloading the source code from GitHub and selecting a specific version to build. Using tagged versions ensures stability.
-
-## Step 2: Build the Node Software
-
-Time to compile the code into an executable program:
-
-```bash
-# Build the evmd binary
-make build
-
-# This creates the binary in ./build/evmd
-ls -la build/
-
-# Verify it worked
-./build/evmd version
-```
-
-**Optional: Install globally** (makes it available from anywhere):
-```bash
-sudo make install
-
-# Now you can use evmd from any directory
-evmd version
-```
-
-> 📝 **Note:** The build process might take 2-5 minutes depending on your computer. You'll see lots of output - that's normal!
-
-
-## Step 3: Initialize Your Node
-
-Before starting, we need to initialize the node's data directory and configuration:
-
-```bash
-# Choose a name for your node (moniker)
-NODE_NAME="my-first-node"
-
-# Initialize the node
-evmd init $NODE_NAME
-
-# This creates:
-# ~/.evmd/config/ - Configuration files
-# ~/.evmd/data/   - Blockchain data
-```
-
-**What just happened?**
-- Created necessary directories
-- Generated node keys (unique identity)
-- Created default configuration files
-- Set up genesis file (blockchain starting point)
-
-Let's look at what was created:
-```bash
-ls ~/.evmd/config/
-# app.toml       - Application configuration
-# client.toml    - Client configuration  
-# config.toml    - Consensus configuration
-# genesis.json   - Initial blockchain state
-# node_key.json  - Node's P2P identity
-# priv_validator_key.json - Validator key (if validating)
-```
-
-## Step 4: Configure for First Run
-
-For your first node, let's enable the Ethereum RPC server so you can interact with it:
-
-```bash
-# Enable JSON-RPC (Ethereum compatibility)
+<CodeGroup>
+```bash Ubuntu/Debian
 sed -i 's/enable = false/enable = true/' ~/.evmd/config/app.toml
-
-# Or manually edit the file
-nano ~/.evmd/config/app.toml
-# Find [json-rpc] section and set enable = true
 ```
 
-### Key Configuration Changes for Beginners
+```bash macOS
+sed -i '' 's/enable = false/enable = true/' ~/.evmd/config/app.toml
+```
 
-Edit `~/.evmd/config/app.toml`:
+```bash Docker
+docker exec evmd sed -i 's/enable = false/enable = true/' /root/.evmd/config/app.toml
+```
+</CodeGroup>
+
+Or manually edit `app.toml`:
 
 ```toml
-# Minimum gas prices (accept free transactions for testing)
+# Accept free transactions (testing only)
 minimum-gas-prices = "0aatom"
 
 [json-rpc]
-# Enable Ethereum JSON-RPC
 enable = true
-
-# Local access only (safe for testing)
 address = "127.0.0.1:8545"
 ws-address = "127.0.0.1:8546"
-
-# Enable all APIs for testing
-api = "eth,net,web3,debug,personal,txpool"
-
-# Development-friendly settings
-allow-insecure-unlock = true  # Only for testing!
-allow-unprotected-txs = true  # Only for testing!
+api = "eth,net,web3"
 ```
 
-## Step 5: Start Your Node
+## Start Node
 
-### For Local Development (Single Node)
+### Local Development
 
-If you're just testing locally:
-
-```bash
-# Start the node
+<CodeGroup>
+```bash Ubuntu/Debian
 evmd start
-
-# You'll see output like:
-# INF starting node with ABCI CometBFT in-process module=server
-# INF service start impl=multiAppConn module=proxy
-# INF starting JSON-RPC server address=127.0.0.1:8545
 ```
 
-**Keep this terminal open** - the node is running! Press `Ctrl+C` to stop.
+```bash macOS
+evmd start
+```
 
-### Connecting to a Network
+```bash Docker
+docker start evmd
+# Or view logs
+docker logs -f evmd
+```
+</CodeGroup>
 
-To join an existing network, you need:
-1. The network's genesis file
-2. Seed nodes to connect to
-3. Correct chain ID
+### Join Network
 
-Example for joining a testnet:
-```bash
-# Download genesis file (example)
-curl https://example-testnet.com/genesis.json > ~/.evmd/config/genesis.json
+To join an existing network:
 
-# Add seed nodes in config.toml
+<CodeGroup>
+```bash Ubuntu/Debian
+# Download genesis
+curl https://network.com/genesis.json > ~/.evmd/config/genesis.json
+
+# Add seeds
 sed -i 's/seeds = ""/seeds = "node-id@ip:26656"/' ~/.evmd/config/config.toml
 
-# Start syncing
+# Start
 evmd start
 ```
 
-## Step 6: Interact with Your Node
+```bash macOS
+# Download genesis
+curl https://network.com/genesis.json > ~/.evmd/config/genesis.json
 
-Once running, test your node in a new terminal:
+# Add seeds
+sed -i '' 's/seeds = ""/seeds = "node-id@ip:26656"/' ~/.evmd/config/config.toml
 
-### Check Node Status
+# Start
+evmd start
+```
+
+```bash Docker
+# Download genesis
+curl https://network.com/genesis.json > genesis.json
+docker cp genesis.json evmd:/root/.evmd/config/genesis.json
+
+# Update config
+docker exec evmd sed -i 's/seeds = ""/seeds = "node-id@ip:26656"/' /root/.evmd/config/config.toml
+
+# Restart
+docker restart evmd
+```
+</CodeGroup>
+
+## Verify Operation
+
+Check that your node is running correctly:
 
 ```bash
-# Check if node is running
+# Check node status
 curl -X POST http://localhost:26657/status | jq .
 
 # Check Ethereum RPC
@@ -279,127 +365,118 @@ curl -X POST http://localhost:8545 \
   -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'
 ```
 
-### Using MetaMask
+### MetaMask Configuration
 
-1. Open MetaMask
-2. Click network dropdown → "Add Network"
-3. Add manually:
-   - Network Name: `Local Cosmos EVM`
-   - RPC URL: `http://localhost:8545`
-   - Chain ID: `262144` (or your configured chain ID)
-   - Currency Symbol: `ATOM`
-4. Click "Save"
+Add to MetaMask:
+- Network Name: `Local Cosmos EVM`
+- RPC URL: `http://localhost:8545`
+- Chain ID: `262144`
+- Currency Symbol: `ATOM`
 
-### Send Your First Transaction
+## Service Management
 
-```bash
-# Create a test account
-evmd keys add testuser
+<Tabs>
+  <Tab title="Ubuntu/Debian">
+    ```bash
+    # View status
+    sudo systemctl status evmd
 
-# Get test tokens (only works on local/test networks)
-# You'll need to fund this account with tokens
+    # View logs
+    sudo journalctl -u evmd -f
 
-# Check balance
-evmd query bank balances $(evmd keys show testuser -a)
-```
+    # Stop service
+    sudo systemctl stop evmd
 
-## Step 7: Running as a Background Service
+    # Restart service
+    sudo systemctl restart evmd
+    ```
+  </Tab>
 
-For production or long-term use, run your node as a system service:
+  <Tab title="macOS">
+    ```bash
+    # View status
+    launchctl list | grep evmd
 
-### Create Service File (Linux)
+    # View logs
+    tail -f /tmp/evmd.out
+    tail -f /tmp/evmd.err
 
-```bash
-sudo nano /etc/systemd/system/evmd.service
-```
+    # Stop service
+    launchctl unload ~/Library/LaunchAgents/com.cosmos.evmd.plist
 
-Add:
-```ini
-[Unit]
-Description=Cosmos EVM Node
-After=network.target
+    # Restart service
+    launchctl unload ~/Library/LaunchAgents/com.cosmos.evmd.plist
+    launchctl load ~/Library/LaunchAgents/com.cosmos.evmd.plist
+    ```
+  </Tab>
 
-[Service]
-Type=simple
-User=YOUR_USERNAME
-ExecStart=/home/YOUR_USERNAME/go/bin/evmd start
-Restart=always
-RestartSec=3
-LimitNOFILE=65535
+  <Tab title="Docker">
+    ```bash
+    # View status
+    docker ps | grep evmd
 
-[Install]
-WantedBy=multi-user.target
-```
+    # View logs
+    docker logs -f evmd
 
-Enable and start:
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable evmd
-sudo systemctl start evmd
+    # Stop container
+    docker stop evmd
 
-# Check status
-sudo systemctl status evmd
+    # Restart container
+    docker restart evmd
 
-# View logs
-sudo journalctl -u evmd -f
-```
+    # Remove container
+    docker rm evmd
+    ```
+  </Tab>
+</Tabs>
 
+## Commands Reference
 
-## What's Next?
+### Essential Commands
 
-Congratulations! You've successfully built and run your first Cosmos EVM node. Here's what you can explore next:
-
-### Learn More About:
-- **[Configuration Guide](./configuration)** - Fine-tune your node settings
-- **[Becoming a Validator](../concepts/staking)** - Participate in consensus
-- **[Smart Contract Development](../smart-contracts/introduction)** - Deploy your first contract
-
-### Advanced Topics:
-- Setting up monitoring and alerts
-- Configuring state sync for faster syncing
-- Running archive nodes for historical data
-- Setting up high-availability infrastructure
-
-## Quick Commands Reference
-
-```bash
-# Build
-make build
-
-# Initialize
+<CodeGroup>
+```bash Native
+# Node management
 evmd init <moniker>
-
-# Start node
 evmd start
-
-# Start with custom home
 evmd start --home /path/to/home
-
-# Check version
 evmd version
-
-# Reset blockchain data
 evmd tendermint unsafe-reset-all
 
-# Export/backup keys
-evmd keys export <key-name>
+# Key management
+evmd keys add <key-name>
+evmd keys list
+evmd keys show <key-name> -a
 
-# Check sync status
-curl localhost:26657/status | jq .result.sync_info
-
-# Get node ID
+# Node info
 evmd tendermint show-node-id
 ```
 
-## Need Help?
+```bash Docker
+# Node management
+docker exec evmd evmd init <moniker>
+docker exec evmd evmd version
+docker exec evmd evmd tendermint unsafe-reset-all
 
-- **Documentation**: [evm.cosmos.network](https://evm.cosmos.network)
-- **Discord**: Join the Cosmos Network Discord
-- **Telegram**: [Cosmos Tech Stack Group](https://t.me/cosmostechstack)
-- **GitHub Issues**: [github.com/cosmos/evm/issues](https://github.com/cosmos/evm/issues)
+# Key management
+docker exec -it evmd evmd keys add <key-name>
+docker exec evmd evmd keys list
+docker exec evmd evmd keys show <key-name> -a
 
-Remember: Running a node is a learning experience. Don't be discouraged if things don't work perfectly the first time. The community is here to help!
+# Node info
+docker exec evmd evmd tendermint show-node-id
+```
+</CodeGroup>
 
----
+### Status Checks
 
-> 🎉 **You did it!** You're now part of the decentralized web3 infrastructure. Every node makes the network stronger and more resilient.
+```bash
+# Sync status
+curl localhost:26657/status | jq .result.sync_info
+
+# Peer count
+curl localhost:26657/net_info | jq .result.n_peers
+
+# Latest block
+curl localhost:26657/status | jq .result.sync_info.latest_block_height
+```

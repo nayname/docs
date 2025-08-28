@@ -1,22 +1,10 @@
 ---
 title: Networking and Peers
 sidebar_label: Networking & Peers
-description: Understanding how Cosmos EVM nodes connect and communicate
+description: Node networking and peer connectivity
 ---
 
-# Node Networking and Peers
-
-This guide explains how Cosmos EVM nodes find and connect to each other, a crucial aspect for syncing your node with the network.
-
-## Understanding Node Networking
-
-### How Nodes Connect
-
-Think of blockchain networking like a social network:
-- **Your node** has a unique identity (node ID)
-- **Other nodes** are potential friends (peers)
-- **Seeds** are like mutual friends who introduce you to others
-- **Persistent peers** are your close friends you always stay connected to
+## Network Architecture
 
 ```mermaid
 graph LR
@@ -27,9 +15,7 @@ graph LR
     A -->|Always connected| E[Persistent Peer]
 ```
 
-### Port Requirements
-
-Your node uses several network ports:
+## Port Requirements
 
 | Port | Protocol | Purpose | Direction |
 |------|----------|---------|-----------|
@@ -39,210 +25,241 @@ Your node uses several network ports:
 | **8546** | TCP | Ethereum WebSocket | Inbound |
 | **6060** | TCP | Metrics (optional) | Inbound |
 
-## Finding Your Node Information
+## Node Information
 
-### Get Your Node ID
+### Get Node ID
 
-Every node has a unique identifier:
-
-```bash
-# Show your node ID
+<CodeGroup>
+```bash CLI
 evmd tendermint show-node-id
-
-# Example output:
-# 3f472746f46e1b8c1d8e5216b961e56e0b3c4d56
+# Output: 3f472746f46e1b8c1d8e5216b961e56e0b3c4d56
 ```
 
-### Get Your Node Address
+```bash CURL
+curl -s localhost:26657/status | jq -r '.result.node_info.id'
+# Output: 3f472746f46e1b8c1d8e5216b961e56e0b3c4d56
+```
+</CodeGroup>
 
-To share with others so they can connect to you:
+### Get Node Address
 
-```bash
-# Format: <node-id>@<ip>:<port>
+<CodeGroup>
+```bash CLI
 echo "$(evmd tendermint show-node-id)@$(curl -s ifconfig.me):26656"
-
-# Example output:
-# 3f472746f46e1b8c1d8e5216b961e56e0b3c4d56@203.0.113.1:26656
+# Output: 3f472746f46e1b8c1d8e5216b961e56e0b3c4d56@203.0.113.1:26656
 ```
 
-## Configuring Network Connections
+```bash CURL
+echo "$(curl -s localhost:26657/status | jq -r '.result.node_info.id')@$(curl -s ifconfig.me):26656"
+# Output: 3f472746f46e1b8c1d8e5216b961e56e0b3c4d56@203.0.113.1:26656
+```
+</CodeGroup>
+
+## Network Configuration
 
 Edit `~/.evmd/config/config.toml`:
 
-### 1. Seed Nodes
-
-Seeds help you discover other peers:
+### Seed Nodes
 
 ```toml
-# Comma separated list of seed nodes
+# Comma separated list
 seeds = "node-id-1@ip1:26656,node-id-2@ip2:26656"
-
-# Example for testnet
-seeds = "3f472746f46e1b8c1d8e5216b961e56e0b3c4d56@seed1.testnet.com:26656"
 ```
 
-### 2. Persistent Peers
-
-Nodes you always want to stay connected to:
+### Persistent Peers
 
 ```toml
-# These connections are maintained even if the node restarts
+# Always maintain these connections
 persistent_peers = "node-id@ip:26656"
-
-# Can specify multiple
-persistent_peers = "id1@ip1:26656,id2@ip2:26656"
 ```
 
-### 3. Connection Limits
-
-Control how many peers you connect to:
+### Connection Limits
 
 ```toml
-# Maximum number of inbound peers
 max_num_inbound_peers = 40
-
-# Maximum number of outbound peers
 max_num_outbound_peers = 10
-
-# Unconditional peers (always accept connections from)
 unconditional_peer_ids = "trusted-node-id-1,trusted-node-id-2"
 ```
 
-## Joining Different Networks
+## Network Types
 
-### Local Development Network
-
-For local testing (single node):
+### Local Development
 
 ```toml
-# No seeds or peers needed
 seeds = ""
 persistent_peers = ""
-
-# Accept local connections only
 laddr = "tcp://127.0.0.1:26656"
 ```
 
 ### Private Network
 
-For a private network between known nodes:
-
 ```bash
-# Node 1 (IP: 10.0.0.1)
+# Node 1 (10.0.0.1)
 persistent_peers = "node2-id@10.0.0.2:26656,node3-id@10.0.0.3:26656"
 
-# Node 2 (IP: 10.0.0.2)
+# Node 2 (10.0.0.2)
 persistent_peers = "node1-id@10.0.0.1:26656,node3-id@10.0.0.3:26656"
 
-# Node 3 (IP: 10.0.0.3)
+# Node 3 (10.0.0.3)
 persistent_peers = "node1-id@10.0.0.1:26656,node2-id@10.0.0.2:26656"
 ```
 
 ### Public Testnet
 
-Example configuration for joining a public testnet:
-
 ```toml
-# Use official seeds
-seeds = "official-seed-1@seed1.testnet.com:26656,official-seed-2@seed2.testnet.com:26656"
-
-# Optional: Add known good peers
+seeds = "seed1@seed1.testnet.com:26656,seed2@seed2.testnet.com:26656"
 persistent_peers = "validator1@val1.testnet.com:26656"
-
-# Allow external connections
 laddr = "tcp://0.0.0.0:26656"
-
-# Advertise your public IP
 external_address = "YOUR_PUBLIC_IP:26656"
 ```
 
 ## Firewall Configuration
 
-### Open Required Ports
+<Tabs>
+  <Tab title="Linux (UFW)">
+    ```bash
+    # Allow P2P port
+    sudo ufw allow 26656/tcp
 
-**Ubuntu/Debian with UFW:**
-```bash
-# P2P port
-sudo ufw allow 26656/tcp
+    # Optional: Allow RPC ports if public
+    sudo ufw allow 26657/tcp  # Tendermint RPC
+    sudo ufw allow 8545/tcp   # Ethereum JSON-RPC
+    sudo ufw allow 8546/tcp   # Ethereum WebSocket
 
-# RPC (if public)
-sudo ufw allow 26657/tcp
+    # Enable firewall
+    sudo ufw enable
 
-# Ethereum RPC (if public)
-sudo ufw allow 8545/tcp
-sudo ufw allow 8546/tcp
+    # Check status
+    sudo ufw status
+    ```
+  </Tab>
 
-# Enable firewall
-sudo ufw enable
+  <Tab title="Linux (iptables)">
+    ```bash
+    # Allow P2P port
+    sudo iptables -A INPUT -p tcp --dport 26656 -j ACCEPT
+
+    # Optional: Allow RPC ports
+    sudo iptables -A INPUT -p tcp --dport 26657 -j ACCEPT
+    sudo iptables -A INPUT -p tcp --dport 8545 -j ACCEPT
+    sudo iptables -A INPUT -p tcp --dport 8546 -j ACCEPT
+
+    # Save rules
+    sudo netfilter-persistent save
+    ```
+  </Tab>
+
+  <Tab title="AWS">
+    **Security Group Settings:**
+
+    | Port | Protocol | Source | Purpose |
+    |------|----------|--------|---------|
+    | 26656 | TCP | 0.0.0.0/0 | P2P (required) |
+    | 26657 | TCP | Your IP | Tendermint RPC |
+    | 8545 | TCP | Your IP | Ethereum RPC |
+    | 8546 | TCP | Your IP | WebSocket RPC |
+
+    Configure via AWS Console or CLI:
+    ```bash
+    aws ec2 authorize-security-group-ingress \
+      --group-id sg-xxxxxx \
+      --protocol tcp \
+      --port 26656 \
+      --cidr 0.0.0.0/0
+    ```
+  </Tab>
+
+  <Tab title="Google Cloud">
+    ```bash
+    # Create firewall rule for P2P
+    gcloud compute firewall-rules create cosmos-p2p \
+      --allow tcp:26656 \
+      --source-ranges 0.0.0.0/0
+
+    # Optional: Create rules for RPC
+    gcloud compute firewall-rules create cosmos-rpc \
+      --allow tcp:26657,tcp:8545,tcp:8546 \
+      --source-ranges YOUR_IP/32
+    ```
+  </Tab>
+</Tabs>
+
+## Monitoring Peers
+
+### Get Peer Information
+
+<CodeGroup>
+```bash CLI
+evmd status | jq '.SyncInfo'
 ```
 
-**Using iptables:**
-```bash
-# P2P port
-sudo iptables -A INPUT -p tcp --dport 26656 -j ACCEPT
+```bash CURL
+curl -s localhost:26657/net_info | jq '.result'
+```
+</CodeGroup>
 
-# Save rules
-sudo netfilter-persistent save
+### Count Connected Peers
+
+<CodeGroup>
+```bash CLI
+evmd status | jq '.SyncInfo | length'
 ```
 
-### Cloud Provider Settings
-
-**AWS Security Group:**
-- Port 26656: TCP, Source 0.0.0.0/0 (P2P)
-- Port 26657: TCP, Your IP only (RPC)
-- Port 8545: TCP, Your IP only (Ethereum RPC)
-
-**Google Cloud Firewall:**
-```bash
-gcloud compute firewall-rules create cosmos-p2p \
-  --allow tcp:26656 \
-  --source-ranges 0.0.0.0/0
-```
-
-## Monitoring Peer Connections
-
-### Check Current Peers
-
-```bash
-# Get peer info
-curl -s localhost:26657/net_info | jq .
-
-# Count connected peers
+```bash CURL
 curl -s localhost:26657/net_info | jq '.result.n_peers'
+```
+</CodeGroup>
 
-# List peer IDs
-curl -s localhost:26657/net_info | jq '.result.peers[].node_info.id'
+### List Peer IDs
+
+<CodeGroup>
+```bash CLI
+evmd query tendermint-validator-set | jq '.validators[].address'
 ```
 
-### Monitor Connection Health
+```bash CURL
+curl -s localhost:26657/net_info | jq -r '.result.peers[].node_info.id'
+```
+</CodeGroup>
 
-```bash
-# Watch peer count
-watch -n 5 'curl -s localhost:26657/net_info | jq .result.n_peers'
+### Check Sync Status
 
-# Check if syncing
+<CodeGroup>
+```bash CLI
+evmd status | jq '.SyncInfo'
+```
+
+```bash CURL
 curl -s localhost:26657/status | jq '.result.sync_info'
 ```
+</CodeGroup>
 
+### Monitor Peer Count
 
-## Advanced Networking
+<CodeGroup>
+```bash Watch-CLI
+watch -n 5 'evmd status | jq .SyncInfo.latest_block_height'
+```
 
-### State Sync Configuration
+```bash Watch-CURL
+watch -n 5 'curl -s localhost:26657/net_info | jq .result.n_peers'
+```
+</CodeGroup>
 
-For faster initial sync:
+## Advanced Configuration
+
+### State Sync
 
 ```toml
 [statesync]
 enable = true
-rpc_servers = "node1:26657,node2:26657"
-trust_height = 1000000
-trust_hash = "hash_from_trusted_source"
-trust_period = "168h0m0s"
+rpc_servers = ""  # RPC servers for state sync
+trust_height = 0  # Block height to trust
+trust_hash = ""   # Block hash to trust
+trust_period = "" # Trust period duration
 ```
 
-### Private Sentry Node Architecture
-
-For validators:
+### Sentry Node Architecture
 
 ```mermaid
 graph TD
@@ -252,110 +269,134 @@ graph TD
     S2 -->|Public| P
 ```
 
-Validator config:
+Validator configuration:
 ```toml
-# Only connect to sentries
 persistent_peers = "sentry1-id@private-ip1:26656,sentry2-id@private-ip2:26656"
 pex = false
 addr_book_strict = false
 ```
 
-### Using DNS Seeds
-
-Instead of hardcoded IPs:
+### DNS Seeds
 
 ```toml
-# DNS seeds resolve to multiple IPs
 seeds = "seeds.testnet.com:26656"
 ```
 
-## Network Discovery Protocol
+## Peer Discovery
 
-Understanding how peer exchange works:
-
-1. **Initial Connection**: Node connects to seeds
-2. **Peer Exchange**: Seeds share other peer addresses
+1. **Initial Connection**: Connect to seeds
+2. **Peer Exchange**: Seeds share peer addresses
 3. **Gossip Protocol**: Peers share blockchain data
-4. **Address Book**: Node saves discovered peers in `addrbook.json`
+4. **Address Book**: Save discovered peers in `addrbook.json`
+
+### Address Book Management
 
 ```bash
-# View address book
+# View address book size
 cat ~/.evmd/config/addrbook.json | jq '.addrs | length'
 
-# Reset address book (if corrupted)
+# Reset address book
 rm ~/.evmd/config/addrbook.json
-evmd start  # Will recreate
 ```
 
-## Best Practices
+## Security Notes
 
-### For Node Operators
-
-✅ **DO:**
-- Keep your node updated
-- Monitor peer connections
-- Use multiple seeds
-- Set reasonable peer limits
-- Keep ports secured
-
-❌ **DON'T:**
-- Expose RPC ports publicly without authentication
-- Use same node key on multiple machines
-- Ignore version updates
-- Set peer limits too low
-
-### For Validators
-
-✅ **DO:**
-- Use sentry nodes
+### Validators
+- Sentry node architecture recommended
 - Keep validator IP private
-- Monitor peer quality
-- Use persistent peers wisely
+- Avoid direct public exposure
 
-❌ **DON'T:**
-- Expose validator directly to public
-- Share node keys
-- Ignore DDoS protection
+## Command Reference
 
-## Quick Reference
+### Node Information
 
-```bash
-# Show node info
+<CodeGroup>
+```bash CLI
+# Get node ID
 evmd tendermint show-node-id
+
+# Get node status
+evmd status
+```
+
+```bash CURL
+# Get node ID
+curl -s localhost:26657/status | jq -r '.result.node_info.id'
+
+# Get node status
+curl -s localhost:26657/status | jq '.result'
+```
+</CodeGroup>
+
+### Network Diagnostics
+
+<CodeGroup>
+```bash CLI
+# Check sync info
+evmd status | jq '.SyncInfo'
+
+# Get full status
 evmd status
 
-# Network diagnostics
-curl localhost:26657/net_info
-curl localhost:26657/status
-
-# Peer management
-# Add persistent peer (requires restart)
-sed -i 's/persistent_peers = ""/persistent_peers = "id@ip:port"/' ~/.evmd/config/config.toml
-
-# Check connectivity
-ping seed.example.com
-nc -zv peer.example.com 26656
-telnet peer.example.com 26656
-
-# Firewall commands
-sudo ufw allow 26656/tcp
-sudo ufw status
-
-# Monitor peers
-watch 'curl -s localhost:26657/net_info | jq .result.n_peers'
+# Get version info
+evmd version --long
 ```
 
-## Getting Help
+```bash CURL
+# Check peer info
+curl -s localhost:26657/net_info | jq '.result'
 
-If you're having networking issues:
+# Check sync status
+curl -s localhost:26657/status | jq '.result.sync_info'
 
-1. **Check the basics**: Firewall, ports, connectivity
-2. **Verify configuration**: Seeds, peers, genesis file
-3. **Ask the community**: Discord, Telegram with your node logs
-4. **Share diagnostics**: 
-   ```bash
-   curl localhost:26657/status
-   curl localhost:26657/net_info
-   ```
+# Consensus state
+curl -s localhost:26657/consensus_state | jq '.result'
+```
+</CodeGroup>
 
-Remember: Networking issues are common when starting out. The community has likely seen your issue before and can help!
+### Combined Diagnostics
+
+```bash
+# Generate full diagnostic report
+echo "=== Node Status ==="
+curl -s localhost:26657/status | jq '.result.sync_info'
+echo "\n=== Network Info ==="
+curl -s localhost:26657/net_info | jq '.result | {n_peers, listening, peers: [.peers[].node_info.moniker]}'
+echo "\n=== Node Info ==="
+curl -s localhost:26657/status | jq '.result.node_info'
+```
+
+## Utilities
+
+### Connectivity Testing
+
+```bash
+# Test DNS resolution
+ping seed.example.com
+
+# Test port connectivity
+nc -zv peer.example.com 26656
+
+# Alternative port test
+telnet peer.example.com 26656
+```
+
+### Configuration Updates
+
+<CodeGroup>
+```bash Linux
+# Update persistent peers
+sed -i 's/persistent_peers = ""/persistent_peers = "id@ip:port"/' ~/.evmd/config/config.toml
+
+# Update seeds
+sed -i 's/seeds = ""/seeds = "id@ip:port"/' ~/.evmd/config/config.toml
+```
+
+```bash macOS
+# Update persistent peers
+sed -i '' 's/persistent_peers = ""/persistent_peers = "id@ip:port"/' ~/.evmd/config/config.toml
+
+# Update seeds
+sed -i '' 's/seeds = ""/seeds = "id@ip:port"/' ~/.evmd/config/config.toml
+```
+</CodeGroup>
