@@ -1,387 +1,680 @@
 ---
-title: EVM RPC Configuration
-description: EVM and JSON-RPC configuration for Cosmos EVM nodes
+title: EVM Configuration Reference
+description: EVM-specific configuration parameters for Cosmos EVM nodes
 mode: "wide"
 ---
 
-Configure EVM and JSON-RPC settings for your Cosmos EVM node in `~/.appd/config/app.toml`.
+Configure EVM-specific settings in `~/.evmd/config/app.toml`. This reference covers parameters unique to the EVM implementation.
 
 <Tabs>
-  <Tab title="Basic Setup">
-    Essential configuration for getting started with EVM and JSON-RPC.
 
-    <CodeGroup>
-    ```toml json-rpc
-    [json-rpc]
-    # Enable JSON-RPC server
-    enable = true
+  <Tab title="EVM Parameters">
+    EVM execution environment configuration.
 
-    # HTTP server listen address
-    address = "127.0.0.1:8545"
+    <ParamField body="tracer" type="string" default='""'>
+      Controls VM execution tracing for debugging.
 
-    # WebSocket server listen address
-    ws-address = "127.0.0.1:8546"
+      **Valid Options:**
+      - `""` - Disabled (default)
+      - `"json"` - Full execution trace in JSON format, used by debug_traceTransaction RPC
+      - `"struct"` - Go struct format for programmatic processing
+      - `"access_list"` - Generates EIP-2930 access lists for gas optimization
+      - `"markdown"` - Human-readable format for manual analysis
 
-    # Enabled API namespaces
-    api = "eth,net,web3"
+      **Source:** `server/config/config.go:139`
+      **Implementation:** `x/vm/keeper/state_transition.go:150-157`
+    </ParamField>
 
-    # Enable transaction indexer (required for eth_getLogs)
-    enable-indexer = false
+    <ParamField body="max-tx-gas-wanted" type="number" default="0">
+      Limits gas for transactions in CheckTx mode to prevent DoS attacks.
+
+      When set to 0, any gas amount is accepted which can lead to mempool spam.
+
+      **Source:** `server/config/config.go:141`
+      **Testnet Default:** Set by `evmd/cmd/evmd/cmd/testnet.go:303`
+    </ParamField>
+
+    <ParamField body="cache-preimage" type="boolean" default="false">
+      Enables SHA3 preimage recording in the VM for debugging tools to reverse hash lookups.
+
+      Increases memory usage when enabled.
+
+      **Source:** `server/config/config.go:143`
+    </ParamField>
+
+    <ParamField body="evm-chain-id" type="number" default="262144">
+      EIP-155 replay protection chain ID.
+
+      Must match the expected network chain ID. Used for transaction signing validation.
+
+      **Source:** `server/config/config.go:145`
+      **Used in:** `x/vm/genesis.go:22`
+    </ParamField>
+  </Tab>
+
+  <Tab title="JSON-RPC Parameters">
+    Ethereum JSON-RPC server configuration.
+
+    ## Core Settings
+
+    <ParamField body="enable" type="boolean" default="false">
+      Enable the JSON-RPC server.
+
+      Must be `true` for Ethereum compatibility.
+
+      **Source:** `server/config/config.go:169`
+      **Testnet configuration:** `evmd/cmd/evmd/cmd/testnet.go:303`
+    </ParamField>
+
+    <ParamField body="address" type="string" default='"127.0.0.1:8545"'>
+      HTTP server bind address using standard Ethereum RPC port.
+
+      **Source:** `server/config/config.go:153`
+    </ParamField>
+
+    <ParamField body="ws-address" type="string" default='"127.0.0.1:8546"'>
+      WebSocket server address for eth_subscribe methods.
+
+      **Source:** `server/config/config.go:155`
+      **Implementation:** `rpc/stream/rpc.go`
+    </ParamField>
+
+    <ParamField body="api" type="string" default='"eth,net,web3"'>
+      JSON-RPC namespaces to enable.
+
+      **Available namespaces:** `web3`, `eth`, `personal`, `net`, `txpool`, `debug`, `miner`
+
+      **Source:** `server/config/config.go:151`
+      **Namespace implementations:** `rpc/namespaces/`
+    </ParamField>
+
+    <ParamField body="ws-origins" type="string[]" default='["127.0.0.1", "localhost"]'>
+      Allowed CORS origins for WebSocket connections.
+
+      **Source:** `server/config/config.go:195`
+    </ParamField>
+
+    ## Resource Limits
+
+    <ParamField body="gas-cap" type="number" default="25000000">
+      Gas limit for eth_call/estimateGas operations (25M gas).
+
+      Set to 0 for unlimited.
+
+      **Source:** `server/config/config.go:157`
+      **Enforced:** `rpc/namespaces/ethereum/eth/api.go:1039`
+    </ParamField>
+
+    <ParamField body="txfee-cap" type="number" default="1">
+      Maximum transaction fee cap in ether for eth_sendTransaction.
+
+      **Source:** `server/config/config.go:163`
+      **Enforced:** `rpc/namespaces/ethereum/eth/api.go:1586`
+    </ParamField>
+
+    <ParamField body="filter-cap" type="number" default="200">
+      Maximum concurrent filters per connection.
+
+      **Source:** `server/config/config.go:165`
+      **Implementation:** `rpc/namespaces/ethereum/eth/filters/`
+    </ParamField>
+
+    <ParamField body="feehistory-cap" type="number" default="100">
+      Maximum blocks that can be fetched for eth_feeHistory.
+
+      **Source:** `server/config/config.go:167`
+    </ParamField>
+
+    <ParamField body="logs-cap" type="number" default="10000">
+      Maximum logs returned from a single eth_getLogs query.
+
+      **Source:** `server/config/config.go:171`
+      **Enforced:** `rpc/namespaces/ethereum/eth/filters/api.go:442`
+    </ParamField>
+
+    <ParamField body="block-range-cap" type="number" default="10000">
+      Maximum block range allowed for eth_getLogs queries.
+
+      **Source:** `server/config/config.go:173`
+      **Enforced:** `rpc/namespaces/ethereum/eth/filters/filter.go:268`
+    </ParamField>
+
+    ## Connection Settings
+
+    <ParamField body="batch-request-limit" type="number" default="1000">
+      Maximum number of requests in a batch (go-ethereum standard).
+
+      **Source:** `server/config/config.go:182`
+    </ParamField>
+
+    <ParamField body="batch-response-max-size" type="number" default="25000000">
+      Maximum bytes returned from a batched call (25MB).
+
+      **Source:** `server/config/config.go:184`
+    </ParamField>
+
+    <ParamField body="http-timeout" type="string" default='"30s"'>
+      Read/write timeout for HTTP JSON-RPC server.
+
+      **Source:** `server/config/config.go:175`
+    </ParamField>
+
+    <ParamField body="http-idle-timeout" type="string" default='"120s"'>
+      Idle timeout for HTTP connections.
+
+      **Source:** `server/config/config.go:177`
+    </ParamField>
+
+    <ParamField body="max-open-connections" type="number" default="0">
+      Maximum simultaneous connections for the server listener.
+
+      Set to 0 for unlimited.
+
+      **Source:** `server/config/config.go:187`
+    </ParamField>
+
+    <ParamField body="evm-timeout" type="string" default='"5s"'>
+      Global timeout for eth_call operations.
+
+      **Source:** `server/config/config.go:161`
+    </ParamField>
+
+    ## Features
+
+    <ParamField body="enable-indexer" type="boolean" default="false">
+      Enable custom transaction indexer for EVM transactions.
+
+      **Required for:** `eth_getLogs`, `eth_getTransactionReceipt`
+
+      **Source:** `server/config/config.go:189`
+      **Testnet default:** `evmd/cmd/evmd/cmd/testnet.go:303`
+    </ParamField>
+
+    <ParamField body="enable-profiling" type="boolean" default="false">
+      Enable pprof endpoints in debug namespace.
+
+      **Source:** `server/config/config.go:197`
+    </ParamField>
+
+    <ParamField body="metrics-address" type="string" default='"127.0.0.1:6065"'>
+      Prometheus metrics server address.
+
+      **Metrics path:** `/debug/metrics/prometheus`
+
+      **Source:** `server/config/config.go:191`
+    </ParamField>
+
+    ## Security
+
+    <ParamField body="allow-unprotected-txs" type="boolean" default="false">
+      Allow non-EIP155 signed transactions to be submitted.
+
+      **Source:** `server/config/config.go:180`
+    </ParamField>
+
+    <ParamField body="allow-insecure-unlock" type="boolean" default="true">
+      Allow insecure account unlocking when personal namespace is enabled.
+
+      **Source:** `server/config/config.go:159`
+    </ParamField>
+
+    <ParamField body="fix-revert-gas-refund-height" type="number" default="0">
+      Chain-specific upgrade height for gas refund fix.
+
+      Set to 0 to disable.
+
+      **Source:** `server/config/config.go:193`
+    </ParamField>
+  </Tab>
+
+  <Tab title="TLS Configuration">
+    TLS settings for JSON-RPC server.
+
+    <ParamField body="certificate-path" type="string" default='""'>
+      Path to TLS certificate `.pem` file.
+
+      Leave empty to disable TLS.
+
+      **Source:** `server/config/config.go:203`
+      **Validation:** `server/config/config.go:342-343`
+    </ParamField>
+
+    <ParamField body="key-path" type="string" default='""'>
+      Path to TLS private key `.pem` file.
+
+      Leave empty to disable TLS.
+
+      **Source:** `server/config/config.go:205`
+      **Validation:** `server/config/config.go:348-350`
+    </ParamField>
+  </Tab>
+
+  <Tab title="Command-Line Flags">
+    Complete list of EVM-specific command-line flags for `evmd start`.
+
+    ## EVM Flags
+
+    <ParamField body="--evm.tracer" type="string">
+      Set VM execution tracer (`json`, `struct`, `access_list`, `markdown`)
+    </ParamField>
+
+    <ParamField body="--evm.max-tx-gas-wanted" type="number">
+      Maximum gas wanted for each eth tx in CheckTx mode
+    </ParamField>
+
+    <ParamField body="--evm.cache-preimage" type="boolean">
+      Enable SHA3 preimage recording in the VM
+    </ParamField>
+
+    <ParamField body="--evm.evm-chain-id" type="number">
+      EIP-155 replay protection chain ID
+    </ParamField>
+
+    ## JSON-RPC Flags
+
+    <ParamField body="--json-rpc.enable" type="boolean">
+      Enable the JSON-RPC server
+    </ParamField>
+
+    <ParamField body="--json-rpc.api" type="string">
+      JSON-RPC namespaces to enable (comma-separated: `eth,net,web3,txpool,debug,personal,miner`)
+    </ParamField>
+
+    <ParamField body="--json-rpc.address" type="string">
+      HTTP server bind address (default: `127.0.0.1:8545`)
+    </ParamField>
+
+    <ParamField body="--json-rpc.ws-address" type="string">
+      WebSocket server bind address (default: `127.0.0.1:8546`)
+    </ParamField>
+
+    <ParamField body="--json-rpc.ws-origins" type="string">
+      Allowed WebSocket origins (comma-separated)
+    </ParamField>
+
+    <ParamField body="--json-rpc.gas-cap" type="number">
+      Gas cap for eth_call/estimateGas operations
+    </ParamField>
+
+    <ParamField body="--json-rpc.allow-insecure-unlock" type="boolean">
+      Allow insecure account unlocking via HTTP
+    </ParamField>
+
+    <ParamField body="--json-rpc.evm-timeout" type="duration">
+      Global timeout for eth_call operations (e.g., `5s`)
+    </ParamField>
+
+    <ParamField body="--json-rpc.txfee-cap" type="float">
+      Maximum transaction fee cap in ether
+    </ParamField>
+
+    <ParamField body="--json-rpc.filter-cap" type="number">
+      Maximum concurrent filters per connection
+    </ParamField>
+
+    <ParamField body="--json-rpc.logs-cap" type="number">
+      Maximum logs returned from eth_getLogs
+    </ParamField>
+
+    <ParamField body="--json-rpc.block-range-cap" type="number">
+      Maximum block range for eth_getLogs queries
+    </ParamField>
+
+    <ParamField body="--json-rpc.http-timeout" type="duration">
+      HTTP server read/write timeout (e.g., `30s`)
+    </ParamField>
+
+    <ParamField body="--json-rpc.http-idle-timeout" type="duration">
+      HTTP server idle timeout (e.g., `120s`)
+    </ParamField>
+
+    <ParamField body="--json-rpc.allow-unprotected-txs" type="boolean">
+      Allow non-EIP155 signed transactions
+    </ParamField>
+
+    <ParamField body="--json-rpc.max-open-connections" type="number">
+      Maximum simultaneous connections (0 = unlimited)
+    </ParamField>
+
+    <ParamField body="--json-rpc.enable-indexer" type="boolean">
+      Enable EVM transaction indexer
+    </ParamField>
+
+    <ParamField body="--json-rpc.batch-request-limit" type="number">
+      Maximum requests in a batch
+    </ParamField>
+
+    <ParamField body="--json-rpc.batch-response-max-size" type="number">
+      Maximum bytes in batch response
+    </ParamField>
+
+    <ParamField body="--json-rpc.enable-profiling" type="boolean">
+      Enable pprof profiling endpoints
+    </ParamField>
+
+    <ParamField body="--json-rpc.fix-revert-gas-refund-height" type="number">
+      Upgrade height for gas refund fix
+    </ParamField>
+
+    <ParamField body="--metrics" type="boolean">
+      Enable Prometheus metrics for JSON-RPC server
+    </ParamField>
+
+    ## TLS Flags
+
+    <ParamField body="--tls.certificate-path" type="string">
+      Path to TLS certificate `.pem` file
+    </ParamField>
+
+    <ParamField body="--tls.key-path" type="string">
+      Path to TLS private key `.pem` file
+    </ParamField>
+
+    ## Usage Examples
+
+    ### Basic JSON-RPC
+    ```bash
+    evmd start --json-rpc.enable
     ```
 
-    ```toml evm
-    [evm]
-    # EVM execution tracer (leave empty for production)
-    tracer = ""
-
-    # Maximum gas wanted for mempool transactions
-    # 0 = unlimited
-    max-tx-gas-wanted = 0
-    ```
-    </CodeGroup>
-
-    ### Quick Start Examples
-
-    <CodeGroup>
-    ```toml "Local Development"
-    [json-rpc]
-    enable = true
-    address = "127.0.0.1:8545"
-    ws-address = "127.0.0.1:8546"
-    api = "eth,net,web3,txpool,debug"
-    enable-indexer = true
-
-    [evm]
-    tracer = "json"
-    max-tx-gas-wanted = 0
+    ### Full Debug Setup
+    ```bash
+    evmd start \
+      --json-rpc.enable \
+      --json-rpc.api eth,net,web3,txpool,debug \
+      --json-rpc.enable-indexer \
+      --json-rpc.enable-profiling \
+      --evm.tracer json \
+      --metrics
     ```
 
-    ```toml "Public RPC"
-    [json-rpc]
-    enable = true
-    address = "0.0.0.0:8545"
-    ws-address = "0.0.0.0:8546"
-    api = "eth,net,web3"
-    enable-indexer = true
-
-    [evm]
-    tracer = ""
-    max-tx-gas-wanted = 30000000
+    ### Production Configuration
+    ```bash
+    evmd start \
+      --json-rpc.enable \
+      --json-rpc.api eth,net,web3 \
+      --json-rpc.enable-indexer \
+      --json-rpc.gas-cap 50000000 \
+      --json-rpc.allow-unprotected-txs=false \
+      --json-rpc.max-open-connections 100 \
+      --evm.max-tx-gas-wanted 40000000
     ```
 
-    ```toml "Archive Node"
-    [json-rpc]
-    enable = true
-    address = "0.0.0.0:8545"
-    ws-address = "0.0.0.0:8546"
-    api = "eth,net,web3,txpool"
-    enable-indexer = true
-
-    [evm]
-    tracer = ""
-    max-tx-gas-wanted = 50000000
+    ### TLS Enabled
+    ```bash
+    evmd start \
+      --json-rpc.enable \
+      --tls.certificate-path /path/to/cert.pem \
+      --tls.key-path /path/to/key.pem
     ```
-    </CodeGroup>
+
+    ## Flag Priority
+
+    1. Command-line flags (highest)
+    2. Environment variables
+    3. Configuration file (`app.toml`)
+    4. Default values (lowest)
+
+    <Note>
+      Flag definitions: `server/flags/flags.go`
+    </Note>
   </Tab>
 
   <Tab title="Full Configuration">
-    Complete configuration with all available parameters and descriptions.
+    Complete `app.toml` with EVM-specific sections highlighted.
 
-    <CodeGroup>
-    ```toml json-rpc
+    ```toml app.toml lines highlight={131-133,135,137-140,142-143,145-146,148-149,151-153,155,157-158,160-161,163-164,166-168,170-172,174-175,177-178,180-181,183-184,186-187,189-190,192-193,195-196,198-199,201-202,204-206,208-210,212-213,215-217,219-220,222-223,225-226,228-229,231-233,235,237-238,240-241}
+    # This is a TOML config file.
+    # For more information, see https://github.com/toml-lang/toml
+
+    ###############################################################################
+    ###                           Base Configuration                            ###
+    ###############################################################################
+
+    # The minimum gas prices a validator is willing to accept for processing a
+    # transaction. A transaction's fees must meet the minimum of any denomination
+    # specified in this config (e.g. 0.25token1,0.0001token2).
+    minimum-gas-prices = "0stake"
+
+    # The maximum gas a query coming over rest/grpc may consume.
+    # If this is set to zero, the query can consume an unbounded amount of gas.
+    query-gas-limit = "0"
+
+    # default: the last 362880 states are kept, pruning at 10 block intervals
+    # nothing: all historic states will be saved, nothing will be deleted (i.e. archiving node)
+    # everything: 2 latest states will be kept; pruning at 10 block intervals.
+    # custom: allow pruning options to be manually specified through 'pruning-keep-recent', and 'pruning-interval'
+    pruning = "default"
+
+    # These are applied if and only if the pruning strategy is custom.
+    pruning-keep-recent = "0"
+    pruning-interval = "0"
+
+    # HaltHeight contains a non-zero block height at which a node will gracefully
+    # halt and shutdown that can be used to assist upgrades and testing.
+    halt-height = 0
+
+    # HaltTime contains a non-zero minimum block time (in Unix seconds) at which
+    # a node will gracefully halt and shutdown that can be used to assist upgrades and testing.
+    halt-time = 0
+
+    # MinRetainBlocks defines the minimum block height offset from the current
+    # block being committed, such that all blocks past this offset are pruned
+    # from CometBFT. It is used as part of the process of determining the
+    # ResponseCommit.RetainHeight value during ABCI Commit. A value of 0 indicates
+    # that no blocks should be pruned.
+    min-retain-blocks = 0
+
+    # InterBlockCache enables inter-block caching.
+    inter-block-cache = true
+
+    # IndexEvents defines the set of events in the form {eventType}.{attributeKey},
+    # which informs CometBFT what to index. If empty, all events will be indexed.
+    index-events = []
+
+    # IavlCacheSize set the size of the iavl tree cache (in number of nodes).
+    iavl-cache-size = 10000
+
+    # IAVLDisableFastNode enables or disables the fast node feature of IAVL. 
+    # Default is false.
+    iavl-disable-fastnode = false
+
+    # AppDBBackend defines the type of Database to use for the application and snapshots DBs.
+    app-db-backend = "goleveldb"
+
+    ###############################################################################
+    ###                         Telemetry Configuration                         ###
+    ###############################################################################
+
+    [telemetry]
+
+    # Prefixed with keys to separate services.
+    service-name = ""
+
+    # Enabled enables the application telemetry functionality. When enabled,
+    # an in-memory sink is also enabled by default. Operators may also enabled
+    # other sinks such as Prometheus.
+    enabled = false
+
+    # Enable prefixing gauge values with hostname.
+    enable-hostname = false
+
+    # Enable adding hostname to labels.
+    enable-hostname-label = false
+
+    # Enable adding service to labels.
+    enable-service-label = false
+
+    # PrometheusRetentionTime, when positive, enables a Prometheus metrics sink.
+    prometheus-retention-time = 0
+
+    # GlobalLabels defines a global set of name/value label tuples applied to all
+    # metrics emitted using the wrapper functions defined in telemetry package.
+    [telemetry.global-labels]
+
+    ###############################################################################
+    ###                           API Configuration                             ###
+    ###############################################################################
+
+    [api]
+
+    # Enable defines if the API server should be enabled.
+    enable = false
+
+    # Swagger defines if swagger documentation should automatically be registered.
+    swagger = false
+
+    # Address defines the API server to listen on.
+    address = "tcp://localhost:1317"
+
+    # MaxOpenConnections defines the number of maximum open connections.
+    max-open-connections = 1000
+
+    # The maximum number of requests that can be serviced at the same time 
+    rpc-read-timeout = 10
+
+    # RPCWriteTimeout defines the CometBFT RPC write timeout (in seconds).
+    rpc-write-timeout = 0
+
+    # RPCMaxBodyBytes defines the CometBFT maximum request body (in bytes).
+    rpc-max-body-bytes = 1000000
+
+    # EnabledUnsafeCORS defines if CORS should be enabled (unsafe - use it at your own risk).
+    enabled-unsafe-cors = false
+
+    ###############################################################################
+    ###                           gRPC Configuration                            ###
+    ###############################################################################
+
+    [grpc]
+
+    # Enable defines if the gRPC server should be enabled.
+    enable = false
+
+    # Address defines the gRPC server address to bind to.
+    address = "localhost:9090"
+
+    ###############################################################################
+    ###                             EVM Configuration                           ###
+    ###############################################################################
+
+    [evm]
+
+    # Tracer defines the 'vm.Tracer' type that the EVM will use when the node is run in
+    # debug mode. To enable tracing use the '--evm.tracer' flag when starting your node.
+    # Valid types are: json|struct|access_list|markdown
+    tracer = ""
+
+    # MaxTxGasWanted defines the gas wanted for each eth tx returned in ante handler in check tx mode.
+    max-tx-gas-wanted = 0
+
+    # EnablePreimageRecording enables tracking of SHA3 preimages in the VM
+    cache-preimage = false
+
+    # EVMChainID is the EIP-155 compatible replay protection chain ID. This is separate from the Cosmos chain ID.
+    evm-chain-id = 262144
+
+    ###############################################################################
+    ###                           JSON RPC Configuration                        ###
+    ###############################################################################
+
     [json-rpc]
-    # Enable the JSON-RPC server
-    enable = true
 
-    # HTTP server listen address
+    # Enable defines if the JSON-RPC server should be enabled.
+    enable = false
+
+    # EVM RPC HTTP server address to bind to.
     address = "127.0.0.1:8545"
 
-    # WebSocket server listen address
+    # Address defines the EVM WebSocket server address to bind to.
     ws-address = "127.0.0.1:8546"
 
-    # Enabled API namespaces
-    # Options: eth, net, web3, debug, personal, txpool, miner
+    # WSOrigins defines the allowed origins for WebSocket connections.
+    # Example: ["localhost", "127.0.0.1", "myapp.example.com"]
+    ws-origins = ["127.0.0.1", "localhost"]
+
+    # API defines a list of JSON-RPC namespaces that should be enabled
+    # Example: "eth,txpool,personal,net,debug,web3"
     api = "eth,net,web3"
 
-    # Gas cap for eth_call/estimateGas (0 = default)
+    # GasCap sets a cap on gas that can be used in eth_call/estimateGas (0=infinite).
     gas-cap = 25000000
 
-    # Transaction fee cap in ether
+    # Allow insecure account unlocking when account-related RPCs are exposed by http
+    allow-insecure-unlock = true
+
+    # EVMTimeout is the global timeout for eth_call. Default: 5s.
+    evm-timeout = "5s"
+
+    # TxFeeCap is the global tx-fee cap for send transaction. Default: 1eth.
     txfee-cap = 1
 
-    # Maximum number of filters per WebSocket connection
+    # FilterCap sets the global cap for total number of filters that can be created
     filter-cap = 200
 
-    # Maximum number of requests in a batch
-    batch-request-limit = 1000
+    # FeeHistoryCap sets the global cap for total number of blocks that can be fetched
+    feehistory-cap = 100
 
-    # Timeout for EVM call operations
-    evm-timeout = "5s"
-
-    # Maximum number of logs returned by eth_getLogs
+    # LogsCap defines the max number of results can be returned from single 'eth_getLogs' query.
     logs-cap = 10000
 
-    # Maximum block range for eth_getLogs queries
+    # BlockRangeCap defines the max block range allowed for 'eth_getLogs' query.
     block-range-cap = 10000
 
-    # HTTP request timeout
+    # HTTPTimeout is the read/write timeout of http json-rpc server.
     http-timeout = "30s"
 
-    # HTTP idle connection timeout
+    # HTTPIdleTimeout is the idle timeout of http json-rpc server.
     http-idle-timeout = "120s"
 
-    # Maximum number of open connections (0 = unlimited)
+    # AllowUnprotectedTxs restricts unprotected (non EIP155 signed) transactions to be submitted via
+    # the node's RPC when the global parameter is disabled.
+    allow-unprotected-txs = false
+
+    # MaxOpenConnections sets the maximum number of simultaneous connections
+    # for the server listener.
     max-open-connections = 0
 
-    # Enable EVM transaction indexer
+    # EnableIndexer enables the custom transaction indexer for the EVM (ethereum transactions).
     enable-indexer = false
 
-    # Enable profiling endpoints in debug namespace
-    enable-profiling = false
-
-    # Prometheus metrics server address
-    metrics-address = "127.0.0.1:6065"
-    ```
-
-    ```toml evm
-    [evm]
-    # EVM execution tracer for debugging
-    # Options: "", "json", "struct", "access_list", "markdown"
-    # WARNING: Significantly impacts performance
-    tracer = ""
-
-    # Maximum gas wanted for transactions in mempool
-    # Prevents spam by rejecting high gas transactions
-    # 0 = unlimited (not recommended for public nodes)
-    max-tx-gas-wanted = 0
-    ```
-
-    ```toml mempool
-    [mempool]
-    # Mempool type affects transaction ordering
-    # Options: "flood", "prioritized"
-    # prioritized = better for EVM (sorts by gas price)
-    type = "prioritized"
-    ```
-    </CodeGroup>
-
-    ### Performance Profiles
-
-    <CodeGroup>
-    ```toml "High Performance"
-    [json-rpc]
-    enable = true
-    address = "0.0.0.0:8545"
-    ws-address = "0.0.0.0:8546"
-    api = "eth,net,web3"
-    gas-cap = 50000000
-    filter-cap = 1000
-    batch-request-limit = 100
-    evm-timeout = "10s"
-    logs-cap = 50000
-    block-range-cap = 50000
-    http-timeout = "30s"
-    http-idle-timeout = "300s"
-    max-open-connections = 10000
-    enable-indexer = true
-    enable-profiling = false
-
-    [evm]
-    tracer = ""
-    max-tx-gas-wanted = 50000000
-
-    [mempool]
-    type = "prioritized"
-    ```
-
-    ```toml "Resource Limited"
-    [json-rpc]
-    enable = true
-    address = "127.0.0.1:8545"
-    ws-address = "127.0.0.1:8546"
-    api = "eth,net,web3"
-    gas-cap = 10000000
-    filter-cap = 100
-    batch-request-limit = 10
-    evm-timeout = "5s"
-    logs-cap = 1000
-    block-range-cap = 1000
-    http-timeout = "10s"
-    http-idle-timeout = "30s"
-    max-open-connections = 100
-    enable-indexer = false
-
-    [evm]
-    tracer = ""
-    max-tx-gas-wanted = 10000000
-
-    [mempool]
-    type = "flood"
-    ```
-
-    ```toml "Debug Mode"
-    [json-rpc]
-    enable = true
-    address = "127.0.0.1:8545"
-    api = "eth,net,web3,debug,txpool"
-    gas-cap = 100000000
-    evm-timeout = "30s"
-    enable-indexer = true
-    enable-profiling = true
+    # MetricsAddress defines the EVM Metrics server address to bind to. Pass --metrics in CLI to enable
+    # Prometheus metrics path: /debug/metrics/prometheus
     metrics-address = "127.0.0.1:6065"
 
-    [evm]
-    tracer = "json"
-    max-tx-gas-wanted = 0
-    ```
-    </CodeGroup>
-  </Tab>
+    # Upgrade height for fix of revert gas refund logic when transaction reverted.
+    fix-revert-gas-refund-height = 0
 
-  <Tab title="API Namespaces">
-    Configure which Ethereum JSON-RPC namespaces are exposed.
+    # Maximum number of requests in a batch.
+    batch-request-limit = 1000
 
-    ### Available Namespaces
+    # Maximum number of bytes returned from a batched call.
+    batch-response-max-size = 25000000
 
-    <CodeGroup>
-    ```toml "Core APIs"
-    [json-rpc]
-    # Essential namespaces for basic functionality
-    # Always safe to enable in production
-    api = "eth,net,web3"
+    # Enabled profiling in the debug namespace
+    enable-profiling = false
 
-    # Available namespaces:
-    # - eth: Ethereum blockchain interaction
-    # - net: Network information
-    # - web3: Utility functions
-    # - txpool: Transaction pool inspection
-    # - debug: Transaction tracing and debugging
-    # - personal: Account management
-    # - miner: Mining/validator operations
+    ###############################################################################
+    ###                             TLS Configuration                           ###
+    ###############################################################################
+
+    [tls]
+
+    # Certificate path defines the cert.pem file path for the TLS configuration.
+    certificate-path = ""
+
+    # Key path defines the key.pem file path for the TLS configuration.
+    key-path = ""
     ```
 
-    ```toml "Extended APIs"
-    [json-rpc]
-    # Additional namespaces for enhanced functionality
-    api = "eth,net,web3,txpool,miner"
-
-    # txpool: Transaction pool inspection
-    # miner: Mining/validator operations
-    ```
-
-    ```toml "Debug APIs"
-    [json-rpc]
-    # Development and debugging namespaces
-    # WARNING: Do not enable in production
-    api = "eth,net,web3,debug,personal"
-
-    # debug: Transaction tracing and debugging
-    # personal: Account management (UNSAFE)
-
-    # Also enable profiling for debug namespace
-    enable-profiling = true
-    ```
-    </CodeGroup>
-
-    ### Namespace Reference
-
-    | Namespace | Methods | Use Case |
-    |-----------|---------|----------|
-    | `eth` | eth_call, eth_getBalance, eth_sendTransaction, etc. | Core Ethereum functionality |
-    | `net` | net_version, net_listening, net_peerCount | Network information |
-    | `web3` | web3_clientVersion, web3_sha3 | Utility functions |
-    | `txpool` | txpool_content, txpool_status, txpool_inspect | Transaction pool monitoring |
-    | `debug` | debug_traceTransaction, debug_getBadBlocks | Debugging and tracing |
-    | `personal` | personal_newAccount, personal_unlockAccount | Account management |
-    | `miner` | miner_start, miner_stop, miner_setGasPrice | Mining operations |
-
-    ### Security Recommendations
-
-    <Warning>
-    **Production Environment:**
-    - Only enable `eth`, `net`, `web3` namespaces
-    - Never enable `debug` or `personal` namespaces
-    - Consider `txpool` only if needed for monitoring
-
-    **Development Environment:**
-    - All namespaces can be enabled
-    - Enable `enable-profiling` for performance analysis
-    - Use `debug` namespace for transaction tracing
-    </Warning>
-
-    ### Common Configurations
-
-    <CodeGroup>
-    ```toml "dApp RPC"
-    [json-rpc]
-    # Standard configuration for dApp support
-    api = "eth,net,web3"
-    enable-indexer = true  # Required for eth_getLogs
-    ```
-
-    ```toml "Block Explorer"
-    [json-rpc]
-    # Enhanced configuration for explorers
-    api = "eth,net,web3,txpool"
-    enable-indexer = true
-    logs-cap = 50000
-    block-range-cap = 100000
-    ```
-
-    ```toml "Validator Node"
-    [json-rpc]
-    # Minimal exposure for validators
-    enable = false  # Or restrict to localhost
-    # If enabled:
-    # address = "127.0.0.1:8545"
-    # api = "eth,net"
-    ```
-    </CodeGroup>
+    <Note>
+      **Highlighted lines (130-233):** EVM-specific configuration sections added by Cosmos EVM
+      
+      **Standard sections (1-129):** Base Cosmos SDK configuration for consensus, state, API, and telemetry
+      
+      **Template sources:** 
+      - SDK config: `cosmos-sdk/server/config/toml.go`
+      - EVM config: `evm/server/config/toml.go:4-116`
+    </Note>
   </Tab>
 </Tabs>
-
-## Transaction Indexing
-
-The transaction indexer is required for certain RPC methods to function properly.
-
-<Accordion title="Methods Requiring Indexer">
-The following methods require `enable-indexer = true`:
-- `eth_getLogs` - Query event logs
-- `eth_getFilterLogs` - Get logs for a filter
-- `eth_getFilterChanges` - Get changes for a filter
-- `eth_newFilter` - Create event filter
-- `eth_newBlockFilter` - Create block filter
-- `eth_getTransactionReceipt` - Requires indexed receipts
-</Accordion>
-
-<Accordion title="Indexing Historical Transactions">
-To index existing transactions after enabling the indexer:
-
-```bash
-# Index from genesis to latest block
-appd index-eth-tx forward
-
-# Index from latest to genesis (faster for recent transactions)
-appd index-eth-tx backward
-```
-</Accordion>
-
-## Monitoring
-
-Enable Prometheus metrics to monitor RPC performance:
-
-```toml
-[json-rpc]
-metrics-address = "127.0.0.1:6065"
-```
-
-Key metrics available at `http://localhost:6065/metrics`:
-- `rpc_request_duration_seconds` - Request latency
-- `rpc_request_total` - Total requests by method
-- `txpool_pending_transactions` - Pending transaction count
-- `evm_gas_used` - Gas consumption metrics
-
-## See Also
-
-- [API Methods](/docs/api-reference/ethereum-json-rpc/methods) - Complete JSON-RPC method reference
-- [EVM Module](/docs/documentation/cosmos-sdk/modules/vm) - EVM module documentation
-- [CLI Reference](/docs/documentation/cosmos-sdk/cli) - Command-line interface
