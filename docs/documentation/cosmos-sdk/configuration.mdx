@@ -11,7 +11,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This reference cov
   <Tab title="EVM Parameters">
     EVM execution environment configuration.
 
-    <ParamField body="tracer" type="string" default='""'>
+    <ParamField body="tracer" type="string" default="">
       Controls VM execution tracing for debugging.
 
       **Valid Options:**
@@ -66,20 +66,20 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This reference cov
       **Testnet configuration:** `evmd/cmd/evmd/cmd/testnet.go:303`
     </ParamField>
 
-    <ParamField body="address" type="string" default='"127.0.0.1:8545"'>
+    <ParamField body="address" type="string" default="127.0.0.1:8545">
       HTTP server bind address using standard Ethereum RPC port.
 
       **Source:** `server/config/config.go:153`
     </ParamField>
 
-    <ParamField body="ws-address" type="string" default='"127.0.0.1:8546"'>
+    <ParamField body="ws-address" type="string" default="127.0.0.1:8546">
       WebSocket server address for eth_subscribe methods.
 
       **Source:** `server/config/config.go:155`
       **Implementation:** `rpc/stream/rpc.go`
     </ParamField>
 
-    <ParamField body="api" type="string" default='"eth,net,web3"'>
+    <ParamField body="api" type="string" default="eth,net,web3">
       JSON-RPC namespaces to enable.
 
       **Available namespaces:** `web3`, `eth`, `personal`, `net`, `txpool`, `debug`, `miner`
@@ -88,7 +88,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This reference cov
       **Namespace implementations:** `rpc/namespaces/`
     </ParamField>
 
-    <ParamField body="ws-origins" type="string[]" default='["127.0.0.1", "localhost"]'>
+    <ParamField body="ws-origins" type="string[]" default="['127.0.0.1', 'localhost']">
       Allowed CORS origins for WebSocket connections.
 
       **Source:** `server/config/config.go:195`
@@ -153,13 +153,13 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This reference cov
       **Source:** `server/config/config.go:184`
     </ParamField>
 
-    <ParamField body="http-timeout" type="string" default='"30s"'>
+    <ParamField body="http-timeout" type="string" default="30s">
       Read/write timeout for HTTP JSON-RPC server.
 
       **Source:** `server/config/config.go:175`
     </ParamField>
 
-    <ParamField body="http-idle-timeout" type="string" default='"120s"'>
+    <ParamField body="http-idle-timeout" type="string" default="120s">
       Idle timeout for HTTP connections.
 
       **Source:** `server/config/config.go:177`
@@ -173,7 +173,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This reference cov
       **Source:** `server/config/config.go:187`
     </ParamField>
 
-    <ParamField body="evm-timeout" type="string" default='"5s"'>
+    <ParamField body="evm-timeout" type="string" default="5s">
       Global timeout for eth_call operations.
 
       **Source:** `server/config/config.go:161`
@@ -196,7 +196,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This reference cov
       **Source:** `server/config/config.go:197`
     </ParamField>
 
-    <ParamField body="metrics-address" type="string" default='"127.0.0.1:6065"'>
+    <ParamField body="metrics-address" type="string" default="127.0.0.1:6065">
       Prometheus metrics server address.
 
       **Metrics path:** `/debug/metrics/prometheus`
@@ -230,7 +230,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This reference cov
   <Tab title="TLS Configuration">
     TLS settings for JSON-RPC server.
 
-    <ParamField body="certificate-path" type="string" default='""'>
+    <ParamField body="certificate-path" type="string" default="">
       Path to TLS certificate `.pem` file.
 
       Leave empty to disable TLS.
@@ -239,7 +239,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This reference cov
       **Validation:** `server/config/config.go:342-343`
     </ParamField>
 
-    <ParamField body="key-path" type="string" default='""'>
+    <ParamField body="key-path" type="string" default="">
       Path to TLS private key `.pem` file.
 
       Leave empty to disable TLS.
