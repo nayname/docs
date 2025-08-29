@@ -285,6 +285,7 @@
                       "docs/documentation/cosmos-sdk/overview",
                       "docs/documentation/cosmos-sdk/cli",
                       "docs/documentation/cosmos-sdk/protocol",
+                      "docs/documentation/cosmos-sdk/configuration",
                       {
                         "group": "Modules",
                         "pages": [

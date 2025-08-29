@@ -37,19 +37,7 @@ Thumbs.db
 .context/
 context/
 
-# Optional: lock files if using alternative package managers
-
-package-lock.json
-pnpm-lock.yaml
-
-# Coverage
-
-coverage/
-
 # Python virtual environments and OpenAPI generation artifacts
-openapi_venv/
-jsonrpc_discovery_venv/
-venv/
 __pycache__/
 *.pyc
 *.pyo
@@ -59,17 +47,15 @@ __pycache__/
 schema.json
 
 # Misc
-docs/logs/
-logs/
-dist/
-build/
-.yarn/
-scripts/*
-tests/*
 .ingress/
-docs/api-reference/ethereum-json-rpc/methods-improved.mdx docs/api-reference/ethereum-json-rpc/methods-tabbed.mdx
-docs/api-reference/ethereum-json-rpc/openapi.yaml
+CLAUDE.md
+.projects/
+tests/
 
 # Markdown lint cache
 .md-cache
 .claude/settings.local.json
+
+# Google Sheets API credentials
+**/service-account-key.json
+scripts/versioning/node_modules/
