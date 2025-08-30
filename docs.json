@@ -221,8 +221,7 @@
                     "group": "EVM Compatibility", 
                     "pages": [
                       "docs/documentation/evm-compatibility/overview",
-                      "docs/documentation/evm-compatibility/eip-reference",
-                      "docs/documentation/evm-compatibility/eip-reference-test2"
+                      "docs/documentation/evm-compatibility/eip-reference"
                     ]
                   },
                   {
