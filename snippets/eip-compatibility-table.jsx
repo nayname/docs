@@ -35,6 +35,7 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
     loadGoogleSheetData();
   }, [effectiveSheetTab]);
 
+
   const loadGoogleSheetData = async () => {
     try {
       // Debug logging
