@@ -207,7 +207,7 @@ evmd status
 evmd keys list --keyring-backend test
 
 # Query balances
-evmd query bank balances <address>
+evmd q bank balances $(evmd keys show <keyname> --address)
 
 # Test JSON-RPC connectivity
 curl -X POST -H "Content-Type: application/json" \
