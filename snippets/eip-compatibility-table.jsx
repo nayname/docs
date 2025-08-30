@@ -7,14 +7,14 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
 
   // Google Sheets configuration
   const SHEET_ID = '1OGscheUSh-g15p7mNYjSaxI05E8O_3R3tDK0IwXaczk';
-  
+
   // Map sheet names to their GIDs (Google Sheet IDs)
   const SHEET_GIDS = {
     'v0.4.x': '422015233',
     'eip_compatibility_data': '3257530',
     // Add more version mappings as needed
   };
-  
+
   // Detect version from URL path as a fallback for Mintlify prop passing issues
   const detectVersionFromPath = () => {
     if (typeof window !== 'undefined') {
@@ -27,7 +27,7 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
     }
     return null;
   };
-  
+
   // Use prop if provided, otherwise detect from URL
   const effectiveSheetTab = sheetTab || detectVersionFromPath();
 
@@ -43,12 +43,12 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
       console.log('EIP Table - Detected from URL:', detectVersionFromPath());
       console.log('EIP Table - Effective sheet tab:', effectiveSheetTab);
       console.log('EIP Table - Available GIDs:', SHEET_GIDS);
-      
+
       // Using Google Visualization API which supports CORS
       // Build URL based on whether effectiveSheetTab is available
       let url;
       let debugInfo = '';
-      
+
       if (effectiveSheetTab && SHEET_GIDS[effectiveSheetTab]) {
         // Use GID parameter for specific sheet tabs - this is most reliable
         // Add headers=1 to tell the API to use first row as headers
@@ -66,13 +66,13 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
         url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=3257530&tqx=out:json`;
         debugInfo = 'Using default main sheet (GID 3257530)';
       }
-      
+
       console.log('EIP Table - ' + debugInfo);
       console.log('EIP Table - Fetching URL:', url);
 
       const response = await fetch(url);
       const text = await response.text();
-      
+
       console.log('EIP Table - Response status:', response.status);
       console.log('EIP Table - Response text preview:', text.substring(0, 200));
 
@@ -84,16 +84,16 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
       }
 
       const data = JSON.parse(jsonMatch[1]);
-      
+
       // Check for errors in the response
       if (data.status === 'error') {
         console.error('EIP Table - Google Sheets API error:', data.errors);
         throw new Error(`Google Sheets error: ${data.errors?.[0]?.message || 'Unknown error'}`);
       }
-      
+
       const rows = data.table?.rows || [];
       const cols = data.table?.cols || [];
-      
+
       console.log('EIP Table - Rows found:', rows.length);
       console.log('EIP Table - Columns found:', cols.length);
 
@@ -101,14 +101,14 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
       if (cols.length > 0) {
         console.log('EIP Table - Column labels:', cols.map(c => c.label || c.id));
       }
-      
+
       // Convert to our format
       const parsed = rows.map((row, rowIndex) => {
         const obj = {};
         cols.forEach((col, index) => {
           const value = row.c[index] ? row.c[index].v : null;
           const label = col.label || col.id;
-          
+
           // Debug first row to see data structure
           if (rowIndex === 0) {
             console.log(`EIP Table - Row 0, Col ${label}:`, value);
@@ -131,7 +131,7 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
 
       setEipData(parsed);
       setLoading(false);
-      
+
       // Debug: log first few EIPs to verify correct sheet
       console.log('EIP Table - Data loaded, first 3 EIPs:', parsed.slice(0, 3).map(e => ({
         eip: e.eip,
