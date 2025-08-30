@@ -29,7 +29,6 @@
       "chatgpt",
       "claude",
       "perplexity",
-      "mcp",
       "cursor",
       "vscode"
     ]
@@ -192,6 +191,8 @@
                       "docs/documentation/getting-started/index",
                       "docs/documentation/getting-started/faq",
                       "docs/documentation/getting-started/development-environment",
+                      "docs/documentation/getting-started/local-network-setup",
+                      "docs/documentation/getting-started/node-configuration",
                       {
                         "group": "Tooling and Resources",
                         "pages": [
@@ -217,10 +218,11 @@
                     ]
                   },
                   {
-                    "group": "EVM Compatibility",
+                    "group": "EVM Compatibility", 
                     "pages": [
                       "docs/documentation/evm-compatibility/overview",
-                      "docs/documentation/evm-compatibility/eip-reference"
+                      "docs/documentation/evm-compatibility/eip-reference",
+                      "docs/documentation/evm-compatibility/eip-reference-test2"
                     ]
                   },
                   {
@@ -285,7 +287,6 @@
                       "docs/documentation/cosmos-sdk/overview",
                       "docs/documentation/cosmos-sdk/cli",
                       "docs/documentation/cosmos-sdk/protocol",
-                      "docs/documentation/cosmos-sdk/configuration",
                       {
                         "group": "Modules",
                         "pages": [
