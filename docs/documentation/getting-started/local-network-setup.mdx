@@ -19,7 +19,8 @@ Currently there are some key network initialization steps that differ from stand
 # Initialize the node with your custom moniker
 evmd init <your-node-name> --chain-id <your-chain-id>
 
-# Set the chain ID in client configuration (REQUIRED)
+# REQUIRED: Set chain ID in client config BEFORE running gentx commands
+# This prevents runtime panics in genesis transaction creation
 evmd config set client chain-id <your-chain-id>
 evmd config set client keyring-backend test
 ```
@@ -82,13 +83,17 @@ At this point, you can modify the configuration files to suit your needs:
 - Pruning settings
 - **EVM and JSON-RPC settings** (see [Node Configuration Guide](/docs/documentation/getting-started/node-configuration))
 
-### Enable JSON-RPC (Recommended)
+### Enable JSON-RPC (Required for Ethereum Compatibility)
 
-For Ethereum compatibility, enable the JSON-RPC server in `~/.evmd/config/app.toml`:
+<Warning>
+**Manual Configuration Required**: JSON-RPC is disabled by default and must be manually enabled in `~/.evmd/config/app.toml`. There is no CLI command to configure these settings.
+</Warning>
+
+Edit `~/.evmd/config/app.toml`:
 
 ```toml
 [json-rpc]
-# Enable the JSON-RPC server
+# Enable the JSON-RPC server (disabled by default)
 enable = true
 
 # Enable transaction indexer for eth_getLogs support
@@ -169,66 +174,23 @@ gas-cap = 50000000
 
 ## Appendix
 
-This section covers known issues and temporary workarounds for Cosmos EVM network initialization that differ from standard Cosmos SDK chains.
-
-### Required Chain ID Configuration
+### Known Issues
 
 <Warning>
-**Genesis Transaction Panic Fix**: Manual setup requires setting the chain ID in client configuration before running `gentx` commands to avoid a runtime panic.
+**Genesis Transaction Panic**: Setting the chain ID in client configuration before running `gentx` commands is required to prevent runtime panics.
 </Warning>
 
-**The Issue**: When running `evmd genesis gentx`, you may encounter a panic like:
-```
-panic: runtime error: invalid memory address or nil pointer dereference
-[signal SIGSEGV: segmentation violation code=0x2 addr=0x30 pc=0x104340e24]
-```
+**Issue**: `evmd genesis gentx` panics with segmentation violation because `GetEVMCoinDecimals()` accesses uninitialized coin metadata. EVM app options only initialize when a valid chain ID is present in client context.
 
-**Root Cause**: The panic occurs because `GetEVMCoinDecimals()` tries to access uninitialized coin metadata. The EVM app options only initialize when a valid chain ID is present in the client context.
-
-**Workaround**: Always run this command after `evmd init` and before `evmd genesis gentx`:
-```bash
-evmd config set client chain-id <your-chain-id>
-```
-
-**Why local_node.sh works**: The script automatically sets the chain ID in client configuration at [line 174](https://github.com/cosmos/evm/blob/main/local_node.sh#L174).
-
-### Process Management Issues
+**Solution**: Run `evmd config set client chain-id <your-chain-id>` after `evmd init` and before any `gentx` commands.
 
 <Warning>
-**Process Cleanup**: Networks started with `local_node.sh` may not stop properly when using Ctrl+C or closing the terminal.
+**Process Management**: Networks started with `local_node.sh` may not stop properly with Ctrl+C.
 </Warning>
 
-**The Issue**: The `evmd` process may continue running in the background even after attempting to stop it with standard methods.
+**Issue**: `evmd` process continues running in background after terminal closure, causing port conflicts on restart.
 
-**Symptoms**:
-- Ctrl+C doesn't stop the process
-- Closing the terminal leaves `evmd` running
-- Port conflicts when trying to restart
-- Multiple `evmd` processes consuming resources
-
-**Workaround**: Force kill the process using one of these commands:
-```bash
-# Kill all evmd processes
-pkill -9 evmd
-
-# Alternative: Find and kill specific process
-ps aux | grep evmd
-kill -9 <process-id>
-
-# Alternative: Kill by port if using default JSON-RPC port
-lsof -ti:8545 | xargs kill -9
-```
-
-**Prevention**: When using `local_node.sh`, consider running it in a way that makes process management easier:
-```bash
-# Run in foreground for easier stopping
-./local_node.sh -y
-
-# Or run with explicit process tracking
-./local_node.sh -y &
-LOCAL_NODE_PID=$!
-# Later: kill $LOCAL_NODE_PID
-```
+**Solution**: Force kill with `pkill -9 evmd` or `lsof -ti:8545 | xargs kill -9`.
 
 ### Validation Commands
 
