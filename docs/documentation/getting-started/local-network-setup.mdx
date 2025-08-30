@@ -20,7 +20,7 @@ Currently there are some key network initialization steps that differ from stand
 evmd init <your-node-name> --chain-id <your-chain-id>
 
 # REQUIRED: Set chain ID in client config BEFORE running gentx commands
-# This prevents runtime panics in genesis transaction creation
+# This is a temporary workarond that prevents runtime panics in genesis transaction creation
 evmd config set client chain-id <your-chain-id>
 evmd config set client keyring-backend test
 ```
