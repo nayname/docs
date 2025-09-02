@@ -70,20 +70,22 @@ func (k Keeper) ERC20BalanceOf(account common.Address) *big.Int {
 }
 ```
 
-### Why Deposit/Withdraw are No-Ops
+### Deposit/Withdraw Implementation Details
 
-Since ATOM and WATOM represent the same underlying token, traditional deposit/withdraw operations are meaningless:
+Since ATOM and WATOM provide different interfaces to the same bank module token, deposit/withdraw functions exist for WETH interface compatibility:
 
 ```solidity
-// These functions exist for interface compatibility but do nothing
+// These functions exist for WETH interface compatibility
 function deposit() external payable {
-    // No-op: msg.value automatically increases your bank balance
-    // Your WATOM balance is identical to your ATOM balance
+    // Handles msg.value by sending received coins back to the caller
+    // Emits Deposit event for interface compatibility
+    // Your bank balance reflects the same amount accessible via ERC20 interface
 }
 
 function withdraw(uint256 amount) external {
-    // No-op: your ATOM balance is already accessible
-    // No conversion needed as they're the same token
+    // No-op implementation that only emits Withdrawal event
+    // No actual token movement since bank balance is directly accessible
+    // Exists purely for WETH interface compatibility
 }
 ```
 
@@ -363,23 +365,23 @@ curl -X POST <RPC_URL> \
 ```
 </CodeGroup>
 
-### Legacy Methods (Interface Compatibility)
+### WETH Compatibility Methods
 
-These methods exist for WETH compatibility but are no-ops:
+These methods exist for WETH interface compatibility:
 
 ### `deposit`
-**No-op function** - Included for interface compatibility with WETH contracts.
+**WETH compatibility function** - Handles payable deposits for interface compatibility.
 
-<Warning>
-This function does nothing because ATOM and WATOM are the same token. Sending native tokens to this function will increase your balance, but the function itself performs no conversion logic.
-</Warning>
+<Info>
+This function receives msg.value and immediately sends the coins back to the caller via the bank module, then emits a Deposit event. Since WATOM and ATOM are the same underlying bank module token, no actual wrapping occurs - your balance is simply accessible through both native and ERC20 interfaces.
+</Info>
 
 ### `withdraw`
 **No-op function** - Included for interface compatibility with WETH contracts.
 
-<Warning>
-This function does nothing because ATOM and WATOM are the same token. Your native token balance is always directly accessible without any unwrapping process.
-</Warning>
+<Info>
+This function only emits a Withdrawal event but performs no actual token movement. Since WATOM and ATOM are the same underlying bank module token, your native token balance is always directly accessible without any unwrapping process.
+</Info>
 
 ## Usage Examples
 

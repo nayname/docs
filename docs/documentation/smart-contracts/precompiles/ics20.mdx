@@ -45,10 +45,33 @@ IBC transfers include two timeout options to prevent tokens from being locked in
 At least one timeout mechanism must be set. Recommended practice is to use timestamp timeout set to 1 hour from the current time.
 </Info>
 
+## Address Format Requirements
+
+<Warning>
+**Current Limitation**: Receiver addresses must be in bech32 format (e.g., `cosmos1...`). Hex addresses (e.g., `0x...`) are not currently supported for the receiver parameter, though this limitation will be removed in a future release.
+
+The sender parameter is automatically converted from hex to bech32 format internally.
+</Warning>
+
+## EVM Callbacks Support
+
+The ICS20 precompile supports EVM callbacks through the `memo` field, enabling smart contracts to:
+- Execute automatically when receiving cross-chain transfers
+- Handle acknowledgments and timeouts for sent transfers
+- Implement complex cross-chain contract interactions
+
+<Info>
+For detailed callback implementation, see [IBC Module](/docs/documentation/cosmos-sdk/modules/ibc) and [Callbacks Interface](/docs/documentation/smart-contracts/precompiles/callbacks).
+</Info>
+
 ## Transaction Methods
 
 ### `transfer`
 Initiates a cross-chain token transfer using the IBC protocol.
+
+<Warning>
+**Receiver Address Format**: Currently only accepts bech32 addresses (e.g., `cosmos1...`) for the receiver parameter. Hex address support (e.g., `0x...`) will be added in a future release.
+</Warning>
 
 <CodeGroup>
 ```javascript Ethers.js expandable lines
@@ -321,7 +344,7 @@ interface ICS20I {
     /// @param denom the denomination of the Coin to be transferred to the receiver
     /// @param amount the amount of the Coin to be transferred to the receiver
     /// @param sender the hex address of the sender
-    /// @param receiver the bech32 address of the receiver
+    /// @param receiver the bech32 address of the receiver (hex addresses not yet supported)
     /// @param timeoutHeight the timeout height relative to the current block height.
     /// The timeout is disabled when set to 0
     /// @param timeoutTimestamp the timeout timestamp in absolute nanoseconds since unix epoch.
