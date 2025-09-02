@@ -218,7 +218,7 @@
                     ]
                   },
                   {
-                    "group": "EVM Compatibility", 
+                    "group": "EVM Compatibility",
                     "pages": [
                       "docs/documentation/evm-compatibility/overview",
                       "docs/documentation/evm-compatibility/eip-reference"
@@ -291,6 +291,7 @@
                         "pages": [
                           "docs/documentation/cosmos-sdk/modules/erc20",
                           "docs/documentation/cosmos-sdk/modules/feemarket",
+                          "docs/documentation/cosmos-sdk/modules/ibc",
                           "docs/documentation/cosmos-sdk/modules/precisebank",
                           "docs/documentation/cosmos-sdk/modules/vm"
                         ]

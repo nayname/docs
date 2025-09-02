@@ -174,23 +174,23 @@ gas-cap = 50000000
 
 ## Appendix
 
-### Known Issues
+### Key Differences from Standard Cosmos SDK Networks
 
-<Warning>
-**Genesis Transaction Panic**: Setting the chain ID in client configuration before running `gentx` commands is required to prevent runtime panics.
-</Warning>
+<Info>
+**Chain ID Configuration**: Unlike standard Cosmos SDK chains, the chain ID must be set in client configuration before running genesis transaction commands.
+</Info>
 
-**Issue**: `evmd genesis gentx` panics with segmentation violation because `GetEVMCoinDecimals()` accesses uninitialized coin metadata. EVM app options only initialize when a valid chain ID is present in client context.
+**Background**: EVM-specific initialization requires the chain ID to be present in client context for proper coin metadata setup. This differs from standard Cosmos SDK workflows where the chain ID is typically set later in the process.
 
-**Solution**: Run `evmd config set client chain-id <your-chain-id>` after `evmd init` and before any `gentx` commands.
+**Workflow**: Run `evmd config set client chain-id <your-chain-id>` after `evmd init` and before any `gentx` commands.
 
-<Warning>
-**Process Management**: Networks started with `local_node.sh` may not stop properly with Ctrl+C.
-</Warning>
+<Info>
+**Process Management**: Networks started with `local_node.sh` use background process management that differs from interactive mode.
+</Info>
 
-**Issue**: `evmd` process continues running in background after terminal closure, causing port conflicts on restart.
+**Background**: The local node script runs `evmd` as a background process, which continues running after terminal closure. This is different from typical development setups where processes stop with the terminal.
 
-**Solution**: Force kill with `pkill -9 evmd` or `lsof -ti:8545 | xargs kill -9`.
+**Management**: Use `pkill -9 evmd` or `lsof -ti:8545 | xargs kill -9` to properly terminate background processes.
 
 ### Validation Commands
 
@@ -219,7 +219,7 @@ netstat -an | grep -E "(8545|26656|26657|1317|9090)"
 ```
 
 <Note>
-These issues are known and being addressed in future releases. The workarounds above are temporary solutions to help with current manual setup requirements.
+These workflow differences will be streamlined in future releases to align more closely with standard Cosmos SDK patterns. The current setup steps ensure proper EVM initialization during network genesis.
 </Note>
 
 ## Next Steps

@@ -30,9 +30,9 @@ The precompile defines the following constants for the various Cosmos SDK messag
 
 ```solidity
 // Transaction message type URLs
-string constant MSG_CLAIM_REWARDS = "/cosmos.distribution.v1beta1.MsgClaimRewards";
-string constant MSG_SET_WITHDRAW_ADDRESS = "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress";
+string constant MSG_SET_WITHDRAWER_ADDRESS = "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress";
 string constant MSG_WITHDRAW_DELEGATOR_REWARD = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward";
+string constant MSG_WITHDRAW_VALIDATOR_COMMISSION = "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission";
 ```
 
 ## Transaction Methods
@@ -104,7 +104,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0x2035859e000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+            "data": "0x54be1a28000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
         },
         "latest"
     ],
@@ -154,7 +154,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0x38433b36000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa960450000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e30707172737475760000000000000000000000000000000000000000000000"
+            "data": "0x9ad563b4000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa960450000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e30707172737475760000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
@@ -203,7 +203,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0x9c438b94000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+            "data": "0xa66cb605000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
         },
         "latest"
     ],
@@ -252,7 +252,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0x288594aa000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+            "data": "0x5431f450000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
         },
         "latest"
     ],
@@ -347,7 +347,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0xddf24bb30000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e30707172737475760000000000000000000000000000000000000000000000"
+            "data": "0x3dd40f780000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e30707172737475760000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
@@ -396,7 +396,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0x7bc291620000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e30707172737475760000000000000000000000000000000000000000000000"
+            "data": "0x54212a890000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e30707172737475760000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
@@ -445,7 +445,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0x6280384c0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e30707172737475760000000000000000000000000000000000000000000000"
+            "data": "0x85b2d2da0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e30707172737475760000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
@@ -509,7 +509,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000801",
-            "data": "0xa83ec8c30000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000003e800000000000000000000000000000000000000000000000000000000000007d000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e3070717273747576000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
+            "data": "0x8f2473ce0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000003e800000000000000000000000000000000000000000000000000000000000007d000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000002b61727476616c6f70657231713233347273673574367568766a6b6c376c38396d6e3070717273747576000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
@@ -587,27 +587,763 @@ interface DistributionI {
   "contractName": "DistributionI",
   "sourceName": "solidity/precompiles/distribution/DistributionI.sol",
   "abi": [
-    { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "ClaimRewards", "type": "event" },
-    { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "depositor", "type": "address" }, { "indexed": true, "internalType": "address", "name": "validatorAddress", "type": "address" }, { "indexed": false, "internalType": "string", "name": "denom", "type": "string" }, { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "DepositValidatorRewardsPool", "type": "event" },
-    { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "depositor", "type": "address" }, { "indexed": false, "internalType": "string", "name": "denom", "type": "string" }, { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "FundCommunityPool", "type": "event" },
-    { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "caller", "type": "address" }, { "indexed": false, "internalType": "string", "name": "withdrawerAddress", "type": "string" } ], "name": "SetWithdrawerAddress", "type": "event" },
-    { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "indexed": true, "internalType": "address", "name": "validatorAddress", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "WithdrawDelegatorReward", "type": "event" },
-    { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "string", "name": "validatorAddress", "type": "string" }, { "indexed": false, "internalType": "uint256", "name": "commission", "type": "uint256" } ], "name": "WithdrawValidatorCommission", "type": "event" },
-    { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "internalType": "uint32", "name": "maxRetrieve", "type": "uint32" } ], "name": "claimRewards", "outputs": [ { "internalType": "bool", "name": "success", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" },
-    { "inputs": [], "name": "communityPool", "outputs": [ { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint8", "name": "precision", "type": "uint8" } ], "internalType": "struct DecCoin[]", "name": "coins", "type": "tuple[]" } ], "stateMutability": "view", "type": "function" },
-    { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "internalType": "string", "name": "validatorAddress", "type": "string" } ], "name": "delegationRewards", "outputs": [ { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint8", "name": "precision", "type": "uint8" } ], "internalType": "struct DecCoin[]", "name": "rewards", "type": "tuple[]" } ], "stateMutability": "view", "type": "function" },
-    { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" } ], "name": "delegationTotalRewards", "outputs": [ { "components": [ { "internalType": "string", "name": "validatorAddress", "type": "string" }, { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint8", "name": "precision", "type": "uint8" } ], "internalType": "struct DecCoin[]", "name": "reward", "type": "tuple[]" } ], "internalType": "struct DelegationDelegatorReward[]", "name": "rewards", "type": "tuple[]" }, { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint8", "name": "precision", "type": "uint8" } ], "internalType": "struct DecCoin[]", "name": "total", "type": "tuple[]" } ], "stateMutability": "view", "type": "function" },
-    { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" } ], "name": "delegatorValidators", "outputs": [ { "internalType": "string[]", "name": "validators", "type": "string[]" } ], "stateMutability": "view", "type": "function" },
-    { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" } ], "name": "delegatorWithdrawAddress", "outputs": [ { "internalType": "string", "name": "withdrawAddress", "type": "string" } ], "stateMutability": "view", "type": "function" },
-    { "inputs": [ { "internalType": "address", "name": "depositor", "type": "address" }, { "internalType": "string", "name": "validatorAddress", "type": "string" }, { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "internalType": "struct Coin[]", "name": "amount", "type": "tuple[]" } ], "name": "depositValidatorRewardsPool", "outputs": [ { "internalType": "bool", "name": "success", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" },
-    { "inputs": [ { "internalType": "address", "name": "depositor", "type": "address" }, { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "internalType": "struct Coin[]", "name": "amount", "type": "tuple[]" } ], "name": "fundCommunityPool", "outputs": [ { "internalType": "bool", "name": "success", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" },
-    { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "internalType": "string", "name": "withdrawerAddress", "type": "string" } ], "name": "setWithdrawAddress", "outputs": [ { "internalType": "bool", "name": "success", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" },
-    { "inputs": [ { "internalType": "string", "name": "validatorAddress", "type": "string" } ], "name": "validatorCommission", "outputs": [ { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint8", "name": "precision", "type": "uint8" } ], "internalType": "struct DecCoin[]", "name": "commission", "type": "tuple[]" } ], "stateMutability": "view", "type": "function" },
-    { "inputs": [ { "internalType": "string", "name": "validatorAddress", "type": "string" } ], "name": "validatorDistributionInfo", "outputs": [ { "components": [ { "internalType": "string", "name": "operatorAddress", "type": "string" }, { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint8", "name": "precision", "type": "uint8" } ], "internalType": "struct DecCoin[]", "name": "selfBondRewards", "type": "tuple[]" }, { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint8", "name": "precision", "type": "uint8" } ], "internalType": "struct DecCoin[]", "name": "commission", "type": "tuple[]" } ], "internalType": "struct ValidatorDistributionInfo", "name": "distributionInfo", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
-    { "inputs": [ { "internalType": "string", "name": "validatorAddress", "type": "string" } ], "name": "validatorOutstandingRewards", "outputs": [ { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint8", "name": "precision", "type": "uint8" } ], "internalType": "struct DecCoin[]", "name": "rewards", "type": "tuple[]" } ], "stateMutability": "view", "type": "function" },
-    { "inputs": [ { "internalType": "string", "name": "validatorAddress", "type": "string" }, { "internalType": "uint64", "name": "startingHeight", "type": "uint64" }, { "internalType": "uint64", "name": "endingHeight", "type": "uint64" }, { "components": [ { "internalType": "bytes", "name": "key", "type": "bytes" }, { "internalType": "uint64", "name": "offset", "type": "uint64" }, { "internalType": "uint64", "name": "limit", "type": "uint64" }, { "internalType": "bool", "name": "countTotal", "type": "bool" }, { "internalType": "bool", "name": "reverse", "type": "bool" } ], "internalType": "struct PageRequest", "name": "pageRequest", "type": "tuple" } ], "name": "validatorSlashes", "outputs": [ { "components": [ { "internalType": "uint64", "name": "validatorPeriod", "type": "uint64" }, { "components": [ { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint8", "name": "precision", "type": "uint8" } ], "internalType": "struct Dec", "name": "fraction", "type": "tuple" } ], "internalType": "struct ValidatorSlashEvent[]", "name": "slashes", "type": "tuple[]" }, { "components": [ { "internalType": "bytes", "name": "nextKey", "type": "bytes" }, { "internalType": "uint64", "name": "total", "type": "uint64" } ], "internalType": "struct PageResponse", "name": "pageResponse", "type": "tuple" } ], "stateMutability": "view", "type": "function" },
-    { "inputs": [ { "internalType": "address", "name": "delegatorAddress", "type": "address" }, { "internalType": "string", "name": "validatorAddress", "type": "string" } ], "name": "withdrawDelegatorRewards", "outputs": [ { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "internalType": "struct Coin[]", "name": "amount", "type": "tuple[]" } ], "stateMutability": "nonpayable", "type": "function" },
-    { "inputs": [ { "internalType": "string", "name": "validatorAddress", "type": "string" } ], "name": "withdrawValidatorCommission", "outputs": [ { "components": [ { "internalType": "string", "name": "denom", "type": "string" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "internalType": "struct Coin[]", "name": "amount", "type": "tuple[]" } ], "stateMutability": "nonpayable", "type": "function" }
-  ]
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "delegatorAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "ClaimRewards",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "depositor",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "validatorAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "denom",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "DepositValidatorRewardsPool",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "depositor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "denom",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "FundCommunityPool",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "caller",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "withdrawerAddress",
+          "type": "string"
+        }
+      ],
+      "name": "SetWithdrawerAddress",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "delegatorAddress",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "validatorAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "WithdrawDelegatorReward",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "validatorAddress",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "commission",
+          "type": "uint256"
+        }
+      ],
+      "name": "WithdrawValidatorCommission",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "delegatorAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint32",
+          "name": "maxRetrieve",
+          "type": "uint32"
+        }
+      ],
+      "name": "claimRewards",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "communityPool",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "precision",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct DecCoin[]",
+          "name": "coins",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "delegatorAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "validatorAddress",
+          "type": "string"
+        }
+      ],
+      "name": "delegationRewards",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "precision",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct DecCoin[]",
+          "name": "rewards",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "delegatorAddress",
+          "type": "address"
+        }
+      ],
+      "name": "delegationTotalRewards",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "validatorAddress",
+              "type": "string"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "denom",
+                  "type": "string"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "precision",
+                  "type": "uint8"
+                }
+              ],
+              "internalType": "struct DecCoin[]",
+              "name": "reward",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct DelegationDelegatorReward[]",
+          "name": "rewards",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "precision",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct DecCoin[]",
+          "name": "total",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "delegatorAddress",
+          "type": "address"
+        }
+      ],
+      "name": "delegatorValidators",
+      "outputs": [
+        {
+          "internalType": "string[]",
+          "name": "validators",
+          "type": "string[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "delegatorAddress",
+          "type": "address"
+        }
+      ],
+      "name": "delegatorWithdrawAddress",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "withdrawAddress",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "depositor",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "validatorAddress",
+          "type": "string"
+        },
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Coin[]",
+          "name": "amount",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "depositValidatorRewardsPool",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "depositor",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Coin[]",
+          "name": "amount",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "fundCommunityPool",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "delegatorAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "withdrawerAddress",
+          "type": "string"
+        }
+      ],
+      "name": "setWithdrawAddress",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "validatorAddress",
+          "type": "string"
+        }
+      ],
+      "name": "validatorCommission",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "precision",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct DecCoin[]",
+          "name": "commission",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "validatorAddress",
+          "type": "string"
+        }
+      ],
+      "name": "validatorDistributionInfo",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "operatorAddress",
+              "type": "string"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "denom",
+                  "type": "string"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "precision",
+                  "type": "uint8"
+                }
+              ],
+              "internalType": "struct DecCoin[]",
+              "name": "selfBondRewards",
+              "type": "tuple[]"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "denom",
+                  "type": "string"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "precision",
+                  "type": "uint8"
+                }
+              ],
+              "internalType": "struct DecCoin[]",
+              "name": "commission",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct ValidatorDistributionInfo",
+          "name": "distributionInfo",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "validatorAddress",
+          "type": "string"
+        }
+      ],
+      "name": "validatorOutstandingRewards",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "precision",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct DecCoin[]",
+          "name": "rewards",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "validatorAddress",
+          "type": "string"
+        },
+        {
+          "internalType": "uint64",
+          "name": "startingHeight",
+          "type": "uint64"
+        },
+        {
+          "internalType": "uint64",
+          "name": "endingHeight",
+          "type": "uint64"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bytes",
+              "name": "key",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint64",
+              "name": "offset",
+              "type": "uint64"
+            },
+            {
+              "internalType": "uint64",
+              "name": "limit",
+              "type": "uint64"
+            },
+            {
+              "internalType": "bool",
+              "name": "countTotal",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "reverse",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct PageRequest",
+          "name": "pageRequest",
+          "type": "tuple"
+        }
+      ],
+      "name": "validatorSlashes",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint64",
+              "name": "validatorPeriod",
+              "type": "uint64"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "value",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "precision",
+                  "type": "uint8"
+                }
+              ],
+              "internalType": "struct Dec",
+              "name": "fraction",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct ValidatorSlashEvent[]",
+          "name": "slashes",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bytes",
+              "name": "nextKey",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint64",
+              "name": "total",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct PageResponse",
+          "name": "pageResponse",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "delegatorAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "validatorAddress",
+          "type": "string"
+        }
+      ],
+      "name": "withdrawDelegatorRewards",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Coin[]",
+          "name": "amount",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "validatorAddress",
+          "type": "string"
+        }
+      ],
+      "name": "withdrawValidatorCommission",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "denom",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct Coin[]",
+          "name": "amount",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
 }
 ```
