@@ -171,23 +171,43 @@ interface Bech32I {
   "abi": [
     {
       "inputs": [
-        { "internalType": "string", "name": "bech32Address", "type": "string" }
+        {
+          "internalType": "string",
+          "name": "bech32Address",
+          "type": "string"
+        }
       ],
       "name": "bech32ToHex",
       "outputs": [
-        { "internalType": "address", "name": "addr", "type": "address" }
+        {
+          "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        }
       ],
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "inputs": [
-        { "internalType": "address", "name": "addr", "type": "address" },
-        { "internalType": "string", "name": "prefix", "type": "string" }
+        {
+          "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "prefix",
+          "type": "string"
+        }
       ],
       "name": "hexToBech32",
       "outputs": [
-        { "internalType": "string", "name": "bech32Address", "type": "string" }
+        {
+          "internalType": "string",
+          "name": "bech32Address",
+          "type": "string"
+        }
       ],
       "stateMutability": "nonpayable",
       "type": "function"
