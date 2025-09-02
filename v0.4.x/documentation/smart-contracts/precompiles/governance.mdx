@@ -85,7 +85,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000805",
-            "data": "0xc73dce9c0000000000000000000000000000000000000000000000000000000000000001"
+            "data": "0xf1610a280000000000000000000000000000000000000000000000000000000000000001"
         },
         "latest"
     ],
@@ -103,7 +103,7 @@ import { ethers } from "ethers";
 
 // ABI for the precompile, including the complex return struct
 const precompileAbi = [
-  "function getProposals(tuple(uint64 offset, bytes key, uint64 limit, bool count_total, bool reverse) pagination, uint8 proposal_status, address voter, address depositor) view returns (tuple(uint64 id, address proposer, string metadata, uint64 submit_time, uint64 voting_start_time, uint64 voting_end_time, uint8 status, tuple(string yes_count, string abstain_count, string no_count, string no_with_veto_count) final_tally_result, tuple(string denom, uint256 amount)[] total_deposit, string[] messages)[] proposals, tuple(bytes next_key, uint64 total) page_response)"
+  "function getProposals(uint32 proposal_status, address voter, address depositor, tuple(bytes key, uint64 offset, uint64 limit, bool count_total, bool reverse) pagination) view returns (tuple(uint64 id, string[] messages, uint32 status, tuple(string yes_count, string abstain_count, string no_count, string no_with_veto_count) final_tally_result, uint64 submit_time, uint64 deposit_end_time, tuple(string denom, uint256 amount)[] total_deposit, uint64 voting_start_time, uint64 voting_end_time, string metadata, string title, string summary, address proposer)[] proposals, tuple(bytes next_key, uint64 total) page_response)"
 ];
 
 // Provider and contract setup
@@ -117,9 +117,9 @@ const pagination = {
   key: "0x", // Start from the beginning
   limit: 10,
   count_total: true,
-  reverse: false,
+  reverse: true,
 };
-const proposalStatus = 0; // 0 for Unspecified, 1 for Deposit, 2 for Voting, etc.
+const proposalStatus = 4; // 0 for Unspecified, 1 for Deposit, 2 for Voting, etc.
 const voterAddress = ethers.ZeroAddress; // Filter by voter, or ZeroAddress for none
 const depositorAddress = ethers.ZeroAddress; // Filter by depositor, or ZeroAddress for none
 
@@ -146,7 +146,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000805",
-            "data": "0x458af537000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "data": "0xb01ceebc000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
@@ -201,7 +201,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000805",
-            "data": "0x25a8c82a0000000000000000000000000000000000000000000000000000000000000001"
+            "data": "0xba66a6480000000000000000000000000000000000000000000000000000000000000001"
         },
         "latest"
     ],
@@ -252,7 +252,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000805",
-            "data": "0x54f6530f0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+            "data": "0x335e4f9a0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
         },
         "latest"
     ],
@@ -270,7 +270,7 @@ import { ethers } from "ethers";
 
 // ABI for the precompile
 const precompileAbi = [
-  "function getVotes(uint64 proposalId, tuple(uint64 offset, bytes key, uint64 limit, bool count_total, bool reverse) pagination) view returns (tuple(uint64 proposal_id, address voter, tuple(uint8 option, string weight)[] options, string metadata)[] votes, tuple(bytes next_key, uint64 total) page_response)"
+  "function getVotes(uint64 proposalId, tuple(bytes key, uint64 offset, uint64 limit, bool count_total, bool reverse) pagination) view returns (tuple(uint64 proposal_id, address voter, tuple(uint8 option, string weight)[] options, string metadata)[] votes, tuple(bytes next_key, uint64 total) page_response)"
 ];
 
 // Provider and contract setup
@@ -310,7 +310,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000805",
-            "data": "0x6f74a8f300000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
+            "data": "0xe2bb86da0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
@@ -361,7 +361,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000805",
-            "data": "0x582138a30000000000000000000000000000000000000000000000000000000000000001000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
+            "data": "0x774127820000000000000000000000000000000000000000000000000000000000000001000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045"
         },
         "latest"
     ],
@@ -379,7 +379,7 @@ import { ethers } from "ethers";
 
 // ABI for the precompile
 const precompileAbi = [
-  "function getDeposits(uint64 proposalId, tuple(uint64 offset, bytes key, uint64 limit, bool count_total, bool reverse) pagination) view returns (tuple(address depositor, tuple(string denom, uint256 amount)[] amount)[] deposits, tuple(bytes next_key, uint64 total) page_response)"
+  "function getDeposits(uint64 proposalId, tuple(bytes key, uint64 offset, uint64 limit, bool count_total, bool reverse) pagination) view returns (tuple(address depositor, tuple(string denom, uint256 amount)[] amount)[] deposits, tuple(bytes next_key, uint64 total) page_response)"
 ];
 
 // Provider and contract setup
@@ -419,7 +419,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000805",
-            "data": "0x3677fd5500000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
+            "data": "0x5e982a9b0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
@@ -437,7 +437,7 @@ import { ethers } from "ethers";
 
 // ABI for the precompile
 const precompileAbi = [
-  "function getParams() view returns (tuple(string[] min_deposit, string max_deposit_period, string voting_period, string yes_quorum, string veto_threshold, string min_initial_deposit_ratio, string proposal_cancel_ratio, string proposal_cancel_dest, string min_deposit_ratio) params)"
+  "function getParams() view returns (tuple(int64 voting_period, tuple(string denom, uint256 amount)[] min_deposit, int64 max_deposit_period, string quorum, string threshold, string veto_threshold, string min_initial_deposit_ratio, string proposal_cancel_ratio, string proposal_cancel_dest, int64 expedited_voting_period, string expedited_threshold, tuple(string denom, uint256 amount)[] expedited_min_deposit, bool burn_vote_quorum, bool burn_proposal_deposit_prevote, bool burn_vote_veto, string min_deposit_ratio) params)"
 ];
 
 // Provider and contract setup
@@ -448,7 +448,7 @@ const contract = new ethers.Contract(precompileAddress, precompileAbi, provider)
 async function getGovParams() {
   try {
     const params = await contract.getParams();
-    console.log("Governance Parameters:", JSON.stringify(params, null, 2));
+    console.log("Governance Parameters:", params);
   } catch (error) {
     console.error("Error fetching governance parameters:", error);
   }
@@ -514,7 +514,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000805",
-            "data": "0x04b12c7f"
+            "data": "0xee05ad82"
         },
         "latest"
     ],
