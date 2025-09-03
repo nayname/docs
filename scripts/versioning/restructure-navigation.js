@@ -105,6 +105,6 @@ console.log(' docs.json updated');
 // Provide guidance
 console.log('\n Navigation structure explanation:');
 console.log('   - Versions are listed newest to oldest');
-console.log('   - "main" represents ongoing development (docs/ directory)');
+console.log('   - "next" represents ongoing development (docs/next/ directory)');
 console.log('   - Numbered versions (e.g., v0.4.0) are frozen snapshots');
 console.log(`   - Default version for users: ${versionsJson.defaultVersion}`);
