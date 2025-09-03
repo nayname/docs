@@ -68,7 +68,7 @@ jobs:
           export BATCH_MODE=true
           
           # Run the automated version freeze
-          echo "$NEW_VERSION" | ./scripts/versioning/version-manager.sh
+          NEW_VERSION="$NEW_VERSION" node scripts/versioning/version-manager.js
 
       - name: Commit and create PR
         run: |

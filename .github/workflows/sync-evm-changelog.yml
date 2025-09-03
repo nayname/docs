@@ -48,9 +48,9 @@ jobs:
 
           echo "Successfully fetched changelog ($(wc -l < /tmp/changelog.md) lines)"
 
-      - name: Parse and convert changelog
+      - name: Parse and convert changelog  
         id: convert
-        run: node scripts/parse-evm-changelog.js
+        run: node scripts/versioning/release-notes.js ${{ steps.fetch-changelog.outputs.release_tag }}
 
       - name: Update changelog file
         run: |
