@@ -90,14 +90,17 @@ The script will:
 ### Core Scripts (ESM)
 
 #### `version-manager.js`
+
 Main orchestration script for complete version freezing workflow.
 
 **Usage:**
+
 ```bash
 npm run freeze
 ```
 
 **What it does:**
+
 - Creates frozen copy of `docs/next/` at version path
 - Calls sheets-manager for Google Sheets operations
 - Updates all internal links in frozen version
@@ -105,28 +108,34 @@ npm run freeze
 - Creates version metadata files
 
 #### `sheets-manager.js`
+
 Google Sheets operations for EIP data versioning.
 
 **Usage:**
+
 ```bash
 npm run sheets <version>
 ```
 
 **What it does:**
+
 - Creates version-specific tab in Google Sheets
 - Copies data from main sheet to version tab
 - Generates EIP reference MDX with sheetTab prop
 - Handles authentication and error recovery
 
 #### `release-notes.js`
+
 Standalone changelog and release notes management.
 
 **Usage:**
+
 ```bash
 npm run release-notes [version|latest]
 ```
 
 **What it does:**
+
 - Fetches changelog from cosmos/evm repository
 - Parses and converts to Mintlify format
 - Updates release notes file in docs/next/
@@ -134,14 +143,17 @@ npm run release-notes [version|latest]
 ### Supporting Scripts
 
 #### `test-versioning.js`
+
 System testing and validation.
 
 **Usage:**
+
 ```bash
 npm run test
 ```
 
 #### `restructure-navigation.js`
+
 Navigation structure cleanup utility.
 
 ## Google Sheets Integration

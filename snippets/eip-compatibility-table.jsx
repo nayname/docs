@@ -19,8 +19,8 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
   const detectVersionFromPath = () => {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
-      // Check if we're in a versioned path like /v0.4.x/
-      const versionMatch = path.match(/^\/([vV]\d+\.\d+\.[\dx]+)\//);
+      // Check if we're in a versioned path like /docs/v0.4.x/
+      const versionMatch = path.match(/\/docs\/([vV]\d+\.\d+\.[\dx]+)\//);
       if (versionMatch) {
         return versionMatch[1];
       }
