@@ -58,7 +58,7 @@ docs/
 
 1. **Google Sheets API Access**
    - Service account key saved as `service-account-key.json`
-   - See [GSHEET-SETUP.md](./GSHEET-SETUP.md) for detailed setup
+   - See [GSHEET-SETUP.md](https://github.com/cosmos/docs/blob/main/scripts/versioning/GSHEET-SETUP.md) for detailed setup
 
 2. **Install Dependencies**
 
@@ -146,7 +146,7 @@ Navigation structure cleanup utility.
 
 ## Google Sheets Integration
 
-EIP compatibility data is versioned through Google Sheets tabs. See [GSHEET-SETUP.md](./GSHEET-SETUP.md) for setup and configuration.
+EIP compatibility data is versioned through Google Sheets tabs. See [GSHEET-SETUP.md](https://github.com/cosmos/docs/blob/main/scripts/versioning/GSHEET-SETUP.md) for setup and configuration.
 
 ### Shared Component
 
@@ -240,7 +240,7 @@ See [Mintlify Constraints](../../CLAUDE.md) for details.
 
 ### 1. Google Sheets API Setup
 
-Follow [GOOGLE_API_SETUP_GUIDE.md](./GOOGLE_API_SETUP_GUIDE.md) to:
+Follow [GSHEET-SETUP.md](https://github.com/cosmos/docs/blob/main/scripts/versioning/GSHEET-SETUP.md) to:
 
 1. Create a Google Cloud project
 2. Enable Sheets API
@@ -375,5 +375,5 @@ scripts/versioning/
 
 - [Main README](../../README.md) - Project overview
 - [CLAUDE.md](../../CLAUDE.md) - AI assistant context
-- [GSHEET-SETUP.md](./GSHEET-SETUP.md) - Google Sheets API setup
+- [GSHEET-SETUP.md](https://github.com/cosmos/docs/blob/main/scripts/versioning/GSHEET-SETUP.md) - Google Sheets API setup
 - [Mintlify Documentation](https://mintlify.com/docs) - MDX reference

@@ -236,10 +236,10 @@ The following namespaces are not implemented in Cosmos EVM but may be present in
 | `les_latestCheckpoint`                                                                | Les       | N          | N      | Returns undefined  |
 | `les_getCheckpoint`                                                                   | Les       | N          | N      | Returns undefined  |
 | `les_getCheckpointContractAddress`                                                    | Les       | N          | N      | Returns undefined  |
-| [`txpool_content`](#txpool_content)                                                   | TxPool    | Y          | Y      | See [experimental mempool](/v0.4.x/documentation/concepts/mempool) |
-| [`txpool_contentFrom`](#txpool_contentfrom)                                           | TxPool    | Y          | Y      | See [experimental mempool](/v0.4.x/documentation/concepts/mempool) |
-| [`txpool_inspect`](#txpool_inspect)                                                   | TxPool    | Y          | Y      | See [experimental mempool](/v0.4.x/documentation/concepts/mempool) |
-| [`txpool_status`](#txpool_status)                                                     | TxPool    | Y          | Y      | See [experimental mempool](/v0.4.x/documentation/concepts/mempool) |
+| [`txpool_content`](#txpool_content)                                                   | TxPool    | Y          | Y      | See [experimental mempool](/docs/v0.4.x/documentation/concepts/mempool) |
+| [`txpool_contentFrom`](#txpool_contentfrom)                                           | TxPool    | Y          | Y      | See [experimental mempool](/docs/v0.4.x/documentation/concepts/mempool) |
+| [`txpool_inspect`](#txpool_inspect)                                                   | TxPool    | Y          | Y      | See [experimental mempool](/docs/v0.4.x/documentation/concepts/mempool) |
+| [`txpool_status`](#txpool_status)                                                     | TxPool    | Y          | Y      | See [experimental mempool](/docs/v0.4.x/documentation/concepts/mempool) |
 | `trace_callMany`                                                                      | Trace     | N          | N      | Not implemented    |
 | `eth_signTypedData`                                                                   | Eth       | W         | N      | EIP-712 partial    |
 | `eth_fillTransaction`                                                                 | Eth       | Y          | Y      |                    |
@@ -310,7 +310,7 @@ Block Number can be entered as a Hex string, `"earliest"`, `"latest"` or `"pendi
 * `personal_unlockAccount` - Always returns false
 * `debug_traceTransaction` - Has issues with block height
 
-For more details on how Cosmos EVM differs from standard Ethereum implementations, see [Differences from Standard EVMs](/v0.4.x/documentation/evm-compatibility/overview).
+For more details on how Cosmos EVM differs from standard Ethereum implementations, see [Differences from Standard EVMs](/docs/v0.4.x/documentation/evm-compatibility/overview).
 </Info>
 
 ## Examples

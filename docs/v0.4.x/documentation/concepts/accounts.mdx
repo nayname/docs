@@ -45,7 +45,7 @@ The custom Cosmos EVM [EthAccount](https://github.com/cosmos/evm/blob/v0.4.1/typ
 // EthAccountI represents the interface of an EVM compatible accounttype EthAccountI interface {    authtypes.AccountI    // EthAddress returns the ethereum Address representation of the AccAddress    EthAddress() common.Address    // CodeHash is the keccak256 hash of the contract code (if any)    GetCodeHash() common.Hash    // SetCodeHash sets the code hash to the account fields    SetCodeHash(code common.Hash) error    // Type returns the type of Ethereum Account (EOA or Contract)    Type() int8}
 ```
 
-For more information on Ethereum accounts head over to the [x/vm module](/v0.4.x/documentation/cosmos-sdk/modules/vm).
+For more information on Ethereum accounts head over to the [x/vm module](/docs/v0.4.x/documentation/cosmos-sdk/modules/vm).
 
 ### Addresses and Public Keys
 
@@ -233,6 +233,6 @@ You can query an account address using CLI, gRPC, REST, or JSON-RPC:
 </Tabs>
 
 <Note>
-For JSON-RPC methods, see [`eth_accounts`](/v0.4.x/api-reference/ethereum-json-rpc/methods#eth-accounts) and [`personal_listAccounts`](/v0.4.x/api-reference/ethereum-json-rpc/methods#personal-listAccounts) documentation.
+For JSON-RPC methods, see [`eth_accounts`](/docs/v0.4.x/api-reference/ethereum-json-rpc/methods#eth-accounts) and [`personal_listAccounts`](/docs/v0.4.x/api-reference/ethereum-json-rpc/methods#personal-listAccounts) documentation.
 </Note>
 
