@@ -48,13 +48,13 @@ jobs:
 
           echo "Successfully fetched changelog ($(wc -l < /tmp/changelog.md) lines)"
 
-      - name: Parse and convert changelog
+      - name: Parse and convert changelog  
         id: convert
-        run: node scripts/parse-evm-changelog.js
+        run: node scripts/versioning/release-notes.js ${{ steps.fetch-changelog.outputs.release_tag }}
 
       - name: Update changelog file
         run: |
-          CHANGELOG_FILE="docs/changelog/release-notes.mdx"
+          CHANGELOG_FILE="docs/next/changelog/release-notes.mdx"
 
           # Create directory if it doesn't exist
           mkdir -p "$(dirname "$CHANGELOG_FILE")"
@@ -69,7 +69,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-          git add docs/changelog/release-notes.mdx
+          git add docs/next/changelog/release-notes.mdx
 
           if git diff --staged --quiet; then
             echo "No changes to commit"

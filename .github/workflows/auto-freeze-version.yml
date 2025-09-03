@@ -1,0 +1,131 @@
+# .github/workflows/auto-freeze-version.yml
+name: Auto Freeze Documentation Version
+
+on:
+  repository_dispatch:
+    types: [evm-version-freeze]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to freeze (e.g., v0.5.0)'
+        required: true
+        type: string
+      new_dev_version:
+        description: 'New development version (e.g., v0.6.0)'
+        required: true
+        type: string
+
+jobs:
+  freeze-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout docs repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Extract version information
+        id: version-info
+        run: |
+          # Get version from either repository_dispatch or workflow_dispatch
+          if [[ "${{ github.event_name }}" == "repository_dispatch" ]]; then
+            VERSION="${{ github.event.client_payload.version }}"
+            NEW_DEV_VERSION="${{ github.event.client_payload.new_dev_version }}"
+          else
+            VERSION="${{ github.event.inputs.version }}"
+            NEW_DEV_VERSION="${{ github.event.inputs.new_dev_version }}"
+          fi
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "new_dev_version=$NEW_DEV_VERSION" >> $GITHUB_OUTPUT
+          
+          echo "Freezing version: $VERSION"
+          echo "Next development version: $NEW_DEV_VERSION"
+
+      - name: Install versioning dependencies
+        run: |
+          cd scripts/versioning
+          npm install
+
+      - name: Setup Google Sheets API credentials
+        run: |
+          echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}' > scripts/versioning/service-account-key.json
+          echo "✓ Google Sheets API credentials configured"
+
+      - name: Run version freeze process
+        env:
+          CURRENT_VERSION: ${{ steps.version-info.outputs.version }}
+          NEW_VERSION: ${{ steps.version-info.outputs.new_dev_version }}
+        run: |
+          # Set non-interactive mode for the version manager
+          export CI=true
+          export BATCH_MODE=true
+          
+          # Run the automated version freeze
+          NEW_VERSION="$NEW_VERSION" node scripts/versioning/version-manager.js
+
+      - name: Commit and create PR
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Stage all changes
+          git add -A
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          # Create commit
+          git commit -m "docs: freeze ${{ steps.version-info.outputs.version }} and begin ${{ steps.version-info.outputs.new_dev_version }} development
+
+          Automated version freeze triggered by cosmos/evm release ${{ steps.version-info.outputs.version }}
+          
+          Changes:
+          - Frozen documentation snapshot at ${{ steps.version-info.outputs.version }}/
+          - Created Google Sheets tab for version-specific EIP data
+          - Updated navigation structure
+          - Prepared ${{ steps.version-info.outputs.new_dev_version }} development version"
+
+          # Create a new branch for the PR
+          BRANCH_NAME="auto-freeze-${{ steps.version-info.outputs.version }}"
+          git checkout -b "$BRANCH_NAME"
+          git push origin "$BRANCH_NAME"
+
+          # Create pull request using GitHub CLI
+          gh pr create \
+            --title "Freeze documentation for ${{ steps.version-info.outputs.version }}" \
+            --body "Automated version freeze triggered by cosmos/evm release \`${{ steps.version-info.outputs.version }}\`.
+
+          ## Changes Made
+
+          - ✅ **Documentation Frozen**: Complete snapshot at \`${{ steps.version-info.outputs.version }}/\`
+          - ✅ **Google Sheets Tab**: Created version-specific EIP data tab
+          - ✅ **Navigation Updated**: Added new version to docs.json
+          - ✅ **Links Updated**: Internal links updated in frozen version
+          - ✅ **Next Version**: Prepared \`${{ steps.version-info.outputs.new_dev_version }}\` development
+
+          ## Review Checklist
+
+          - [ ] Verify frozen documentation renders correctly
+          - [ ] Check Google Sheets tab was created successfully  
+          - [ ] Confirm navigation includes new version
+          - [ ] Test EIP compatibility table shows version-specific data
+
+          This PR can be merged once review is complete." \
+            --head "$BRANCH_NAME" \
+            --base main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup credentials
+        if: always()
+        run: |
+          rm -f scripts/versioning/service-account-key.json
