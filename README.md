@@ -1,6 +1,13 @@
-# Cosmos Documentation Hub
+# Cosmos EVM Documentation
 
-> *A work in progress, striving to unify and provide a single source of truth for all documentation encompassing the broader Cosmos stack.*
+Documentation for Cosmos EVM, a framework for running Ethereum Virtual Machine (EVM) on Cosmos SDK chains with IBC support.
+
+## Project Structure
+
+- `docs/next/` - Active development documentation
+- `docs/v0.4.x/` - Frozen version documentation  
+- `scripts/versioning/` - Documentation versioning tools
+- `snippets/` - Shared React components
 
 ## Contributing
 
@@ -23,7 +30,7 @@ Create a branch
 
 Make your changes
 
-- Edit or add files under `docs/` as needed.
+- Edit or add files under `docs/next/` as needed.
 - Follow existing file structure and naming conventions.
 - Ensure Markdown is valid and links resolve.
 
