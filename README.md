@@ -6,7 +6,7 @@ Documentation for Cosmos EVM, a framework for running Ethereum Virtual Machine (
 
 - `docs/next/` - Active development documentation
 - `docs/v0.4.x/` - Frozen version documentation  
-- `scripts/versioning/` - Documentation versioning tools
+- `scripts/versioning/` - Documentation versioning tools (see [README](scripts/versioning/README.md))
 - `snippets/` - Shared React components
 
 ## Contributing
@@ -37,17 +37,12 @@ Make your changes
 Local testing & validation
 
 ```bash
-   # Start a live-reload preview
-   npx mint dev
+# Start a live-reload preview
+npx mint dev
 
-   # Check for broken internal links
-   npx mint broken-links
-
-   # Validate OpenAPI specs (if applicable)
-   npx mint openapi-check path/to/openapi.yaml
+# Check for broken internal links
+npx mint broken-links
 ```
-
-   *Source: [Mintlify CLI docs](https://mintlify.com/docs)*
 
 Commit and push
 
