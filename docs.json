@@ -64,8 +64,6 @@
                           "docs/v0.4.x/documentation/getting-started/tooling-and-resources/testing-and-fuzzing",
                           "docs/v0.4.x/documentation/getting-started/tooling-and-resources/wallet-integration"
                         ]
-                      }
-                    ]
                   },
                   {
                     "group": "Integration",
