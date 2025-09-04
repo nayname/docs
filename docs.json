@@ -1,344 +1,498 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
-  "name": "Cosmos Documentation",
-  "description": "Build the future of the internet of blockchains with Cosmos.",
-  "theme": "mint",
-  "colors": {
-    "primary": "#000000",
-    "light": "#cccccc",
-    "dark": "#0E0E0E"
-  },
-  "icons": {
-    "library": "lucide"
-  },
-  "styling": {
-    "codeblocks": "system"
-  },
-  "favicon": {
-    "light": "/assets/brand/cosmos.svg",
-    "dark": "/assets/brand/cosmos-dark.svg"
-  },
-  "logo": {
-    "light": "/assets/brand/cosmos-wordmark-dark.svg",
-    "dark": "/assets/brand/cosmos-wordmark.svg"
-  },
-  "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
-    ]
-  },
-  "navigation": {
-    "versions": [
-      {
-        "version": "v0.4.x",
-        "tabs": [
-          {
-            "tab": "Documentation",
-            "groups": [
-              {
-                "group": "Cosmos EVM",
-                "pages": [
-                  "docs/v0.4.x/documentation/overview",
-                  {
-                    "group": "Getting Started",
-                    "pages": [
-                      "docs/v0.4.x/documentation/getting-started/index",
-                      "docs/v0.4.x/documentation/getting-started/faq",
-                      "docs/v0.4.x/documentation/getting-started/development-environment"
-                    ]
-                      {
-                        "group": "Tooling and Resources",
-                        "pages": [
-                          "docs/v0.4.x/documentation/getting-started/tooling-and-resources/overview",
-                          "docs/v0.4.x/documentation/getting-started/tooling-and-resources/block-explorers",
-                          "docs/v0.4.x/documentation/getting-started/tooling-and-resources/foundry",
-                          "docs/v0.4.x/documentation/getting-started/tooling-and-resources/hardhat",
-                          "docs/v0.4.x/documentation/getting-started/tooling-and-resources/remix",
-                          "docs/v0.4.x/documentation/getting-started/tooling-and-resources/testing-and-fuzzing",
-                          "docs/v0.4.x/documentation/getting-started/tooling-and-resources/wallet-integration"
-                        ]
-                  },
-                  {
-                    "group": "Integration",
-                    "pages": [
-                      "docs/v0.4.x/documentation/integration/evm-module-integration",
-                      "docs/v0.4.x/documentation/integration/mempool-integration",
-                      "docs/v0.4.x/documentation/integration/upgrade-handlers",
-                      "docs/v0.4.x/documentation/integration/migration-v0.3-to-v0.4",
-                      "docs/v0.4.x/documentation/integration/erc20-precompiles-migration"
-                    ]
-                  },
-                  {
-                    "group": "EVM Compatibility",
-                    "pages": [
-                      "docs/v0.4.x/documentation/evm-compatibility/overview",
-                      "docs/v0.4.x/documentation/evm-compatibility/eip-reference"
-                    ]
-                  },
-                  {
-                    "group": "Concepts",
-                    "pages": [
-                      "docs/v0.4.x/documentation/concepts/overview",
-                      "docs/v0.4.x/documentation/concepts/accounts",
-                      "docs/v0.4.x/documentation/concepts/chain-id",
-                      "docs/v0.4.x/documentation/concepts/encoding",
-                      "docs/v0.4.x/documentation/concepts/gas-and-fees",
-                      "docs/v0.4.x/documentation/concepts/ibc",
-                      "docs/v0.4.x/documentation/concepts/mempool",
-                      "docs/v0.4.x/documentation/concepts/migrations",
-                      "docs/v0.4.x/documentation/concepts/pending-state",
-                      "docs/v0.4.x/documentation/concepts/replay-protection",
-                      "docs/v0.4.x/documentation/concepts/signing",
-                      "docs/v0.4.x/documentation/concepts/single-token-representation",
-                      "docs/v0.4.x/documentation/concepts/tokens",
-                      "docs/v0.4.x/documentation/concepts/transactions",
-                      "docs/v0.4.x/documentation/concepts/predeployed-contracts"
-                    ]
-                  },
-                  {
-                    "group": "Smart Contracts",
-                    "pages": [
-                      "docs/v0.4.x/documentation/smart-contracts/introduction",
-                      {
-                        "group": "Precompiles",
-                        "pages": [
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/index",
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/overview",
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/bank",
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/bech32",
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/callbacks",
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/distribution",
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/erc20",
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/governance",
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/ics20",
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/p256",
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/slashing",
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/staking",
-                          "docs/v0.4.x/documentation/smart-contracts/precompiles/werc20"
-                        ]
-                      },
-                      {
-                        "group": "Predeployed Contracts",
-                        "pages": [
-                          "docs/v0.4.x/documentation/smart-contracts/predeployed-contracts/overview",
-                          "docs/v0.4.x/documentation/smart-contracts/predeployed-contracts/implementation-guide",
-                          "docs/v0.4.x/documentation/smart-contracts/predeployed-contracts/create2",
-                          "docs/v0.4.x/documentation/smart-contracts/predeployed-contracts/multicall3",
-                          "docs/v0.4.x/documentation/smart-contracts/predeployed-contracts/permit2",
-                          "docs/v0.4.x/documentation/smart-contracts/predeployed-contracts/safe-factory"
-                        ]
-                      }
-                    ]
-                  },
-                  "docs/v0.4.x/documentation/custom-improvement-proposals",
-                  {
-                    "group": "Cosmos SDK",
-                    "pages": [
-                      "docs/v0.4.x/documentation/cosmos-sdk/overview",
-                      "docs/v0.4.x/documentation/cosmos-sdk/cli",
-                      "docs/v0.4.x/documentation/cosmos-sdk/protocol",
-                      {
-                        "group": "Modules",
-                        "pages": [
-                          "docs/v0.4.x/documentation/cosmos-sdk/modules/erc20",
-                          "docs/v0.4.x/documentation/cosmos-sdk/modules/feemarket",
-                          "docs/v0.4.x/documentation/cosmos-sdk/modules/precisebank",
-                          "docs/v0.4.x/documentation/cosmos-sdk/modules/vm"
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "API Reference",
-            "pages": [
-              "docs/v0.4.x/api-reference/ethereum-json-rpc/index",
-              "docs/v0.4.x/api-reference/ethereum-json-rpc/methods",
-              "docs/v0.4.x/api-reference/ethereum-json-rpc/rpc-explorer"
-            ]
-          },
-          {
-            "tab": "Release Notes",
-            "pages": [
-              "docs/v0.4.x/changelog/release-notes"
-            ]
-          }
+    "$schema": "https://mintlify.com/docs.json",
+    "name": "Cosmos Documentation",
+    "description": "Build the future of the internet of blockchains with Cosmos.",
+    "theme": "mint",
+    "colors": {
+        "primary": "#000000",
+        "light": "#cccccc",
+        "dark": "#0E0E0E"
+    },
+    "icons": {
+        "library": "lucide"
+    },
+    "styling": {
+        "codeblocks": "system"
+    },
+    "favicon": {
+        "light": "/assets/brand/cosmos.svg",
+        "dark": "/assets/brand/cosmos-dark.svg"
+    },
+    "logo": {
+        "light": "/assets/brand/cosmos-wordmark-dark.svg",
+        "dark": "/assets/brand/cosmos-wordmark.svg"
+    },
+    "contextual": {
+        "options": [
+            "copy",
+            "view",
+            "chatgpt",
+            "claude",
+            "perplexity",
+            "mcp",
+            "cursor",
+            "vscode"
         ]
-      },
-      {
-        "version": "next",
-        "tabs": [
-          {
-            "tab": "Documentation",
-            "groups": [
-              {
-                "group": "Cosmos EVM",
-                "pages": [
-                  "docs/next/documentation/overview",
-                  {
-                    "group": "Getting Started",
-                    "pages": [
-                      "docs/next/documentation/getting-started/index",
-                      "docs/next/documentation/getting-started/faq",
-                      "docs/next/documentation/getting-started/development-environment",
-                      "docs/next/documentation/getting-started/local-network-setup",
-                      "docs/next/documentation/getting-started/node-configuration" 
-                      {
-                        "group": "Tooling and Resources",
-                        "pages": [
-                          "docs/next/documentation/getting-started/tooling-and-resources/overview",
-                          "docs/next/documentation/getting-started/tooling-and-resources/block-explorers",
-                          "docs/next/documentation/getting-started/tooling-and-resources/foundry",
-                          "docs/next/documentation/getting-started/tooling-and-resources/hardhat",
-                          "docs/next/documentation/getting-started/tooling-and-resources/remix",
-                          "docs/next/documentation/getting-started/tooling-and-resources/testing-and-fuzzing",
-                          "docs/next/documentation/getting-started/tooling-and-resources/wallet-integration"
+    },
+    "navigation": {
+        "versions": [
+            {
+                "version": "v0.4.x",
+                "tabs": [
+                    {
+                        "tab": "Documentation",
+                        "groups": [
+                            {
+                                "group": "Cosmos EVM",
+                                "pages": [
+                                    "docs/v0.4.x/documentation/overview",
+                                    {
+                                        "group": "Getting Started",
+                                        "pages": [
+                                            "docs/v0.4.x/documentation/getting-started/index",
+                                            "docs/v0.4.x/documentation/getting-started/faq",
+                                            "docs/v0.4.x/documentation/getting-started/development-environment"
+                                        ]
+                                    },
+                                    {
+                                        "group": "Tooling and Resources",
+                                        "pages": [
+                                            "docs/v0.4.x/documentation/getting-started/tooling-and-resources/overview",
+                                            "docs/v0.4.x/documentation/getting-started/tooling-and-resources/block-explorers",
+                                            "docs/v0.4.x/documentation/getting-started/tooling-and-resources/foundry",
+                                            "docs/v0.4.x/documentation/getting-started/tooling-and-resources/hardhat",
+                                            "docs/v0.4.x/documentation/getting-started/tooling-and-resources/remix",
+                                            "docs/v0.4.x/documentation/getting-started/tooling-and-resources/testing-and-fuzzing",
+                                            "docs/v0.4.x/documentation/getting-started/tooling-and-resources/wallet-integration"
+                                        ]
+                                    },
+                                    {
+                                        "group": "Integration",
+                                        "pages": [
+                                            "docs/v0.4.x/documentation/integration/evm-module-integration",
+                                            "docs/v0.4.x/documentation/integration/mempool-integration",
+                                            "docs/v0.4.x/documentation/integration/upgrade-handlers",
+                                            "docs/v0.4.x/documentation/integration/migration-v0.3-to-v0.4",
+                                            "docs/v0.4.x/documentation/integration/erc20-precompiles-migration"
+                                        ]
+                                    },
+                                    {
+                                        "group": "EVM Compatibility",
+                                        "pages": [
+                                            "docs/v0.4.x/documentation/evm-compatibility/overview",
+                                            "docs/v0.4.x/documentation/evm-compatibility/eip-reference"
+                                        ]
+                                    },
+                                    {
+                                        "group": "Concepts",
+                                        "pages": [
+                                            "docs/v0.4.x/documentation/concepts/overview",
+                                            "docs/v0.4.x/documentation/concepts/accounts",
+                                            "docs/v0.4.x/documentation/concepts/chain-id",
+                                            "docs/v0.4.x/documentation/concepts/encoding",
+                                            "docs/v0.4.x/documentation/concepts/gas-and-fees",
+                                            "docs/v0.4.x/documentation/concepts/ibc",
+                                            "docs/v0.4.x/documentation/concepts/mempool",
+                                            "docs/v0.4.x/documentation/concepts/migrations",
+                                            "docs/v0.4.x/documentation/concepts/pending-state",
+                                            "docs/v0.4.x/documentation/concepts/replay-protection",
+                                            "docs/v0.4.x/documentation/concepts/signing",
+                                            "docs/v0.4.x/documentation/concepts/single-token-representation",
+                                            "docs/v0.4.x/documentation/concepts/tokens",
+                                            "docs/v0.4.x/documentation/concepts/transactions",
+                                            "docs/v0.4.x/documentation/concepts/predeployed-contracts"
+                                        ]
+                                    },
+                                    {
+                                        "group": "Smart Contracts",
+                                        "pages": [
+                                            "docs/v0.4.x/documentation/smart-contracts/introduction",
+                                            {
+                                                "group": "Precompiles",
+                                                "pages": [
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/index",
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/overview",
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/bank",
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/bech32",
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/callbacks",
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/distribution",
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/erc20",
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/governance",
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/ics20",
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/p256",
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/slashing",
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/staking",
+                                                    "docs/v0.4.x/documentation/smart-contracts/precompiles/werc20"
+                                                ]
+                                            },
+                                            {
+                                                "group": "Predeployed Contracts",
+                                                "pages": [
+                                                    "docs/v0.4.x/documentation/smart-contracts/predeployed-contracts/overview",
+                                                    "docs/v0.4.x/documentation/smart-contracts/predeployed-contracts/implementation-guide",
+                                                    "docs/v0.4.x/documentation/smart-contracts/predeployed-contracts/create2",
+                                                    "docs/v0.4.x/documentation/smart-contracts/predeployed-contracts/multicall3",
+                                                    "docs/v0.4.x/documentation/smart-contracts/predeployed-contracts/permit2",
+                                                    "docs/v0.4.x/documentation/smart-contracts/predeployed-contracts/safe-factory"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "docs/v0.4.x/documentation/custom-improvement-proposals",
+                                    {
+                                        "group": "Cosmos SDK",
+                                        "pages": [
+                                            "docs/v0.4.x/documentation/cosmos-sdk/overview",
+                                            "docs/v0.4.x/documentation/cosmos-sdk/cli",
+                                            "docs/v0.4.x/documentation/cosmos-sdk/protocol",
+                                            {
+                                                "group": "Modules",
+                                                "pages": [
+                                                    "docs/v0.4.x/documentation/cosmos-sdk/modules/erc20",
+                                                    "docs/v0.4.x/documentation/cosmos-sdk/modules/feemarket",
+                                                    "docs/v0.4.x/documentation/cosmos-sdk/modules/precisebank",
+                                                    "docs/v0.4.x/documentation/cosmos-sdk/modules/vm"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
                         ]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "Integration",
-                    "pages": [
-                      "docs/next/documentation/integration/evm-module-integration",
-                      "docs/next/documentation/integration/mempool-integration",
-                      "docs/next/documentation/integration/upgrade-handlers",
-                      "docs/next/documentation/integration/migration-v0.3-to-v0.4",
-                      "docs/next/documentation/integration/erc20-precompiles-migration"
-                    ]
-                  },
-                  {
-                    "group": "EVM Compatibility",
-                    "pages": [
-                      "docs/next/documentation/evm-compatibility/overview",
-                      "docs/next/documentation/evm-compatibility/eip-reference"
-                    ]
-                  },
-                  {
-                    "group": "Concepts",
-                    "pages": [
-                      "docs/next/documentation/concepts/overview",
-                      "docs/next/documentation/concepts/accounts",
-                      "docs/next/documentation/concepts/chain-id",
-                      "docs/next/documentation/concepts/encoding",
-                      "docs/next/documentation/concepts/gas-and-fees",
-                      "docs/next/documentation/concepts/ibc",
-                      "docs/next/documentation/concepts/mempool",
-                      "docs/next/documentation/concepts/migrations",
-                      "docs/next/documentation/concepts/pending-state",
-                      "docs/next/documentation/concepts/replay-protection",
-                      "docs/next/documentation/concepts/signing",
-                      "docs/next/documentation/concepts/single-token-representation",
-                      "docs/next/documentation/concepts/tokens",
-                      "docs/next/documentation/concepts/transactions",
-                      "docs/next/documentation/concepts/predeployed-contracts"
-                    ]
-                  },
-                  {
-                    "group": "Smart Contracts",
-                    "pages": [
-                      "docs/next/documentation/smart-contracts/introduction",
-                      {
-                        "group": "Precompiles",
+                    },
+                    {
+                        "tab": "API Reference",
                         "pages": [
-                          "docs/next/documentation/smart-contracts/precompiles/index",
-                          "docs/next/documentation/smart-contracts/precompiles/overview",
-                          "docs/next/documentation/smart-contracts/precompiles/bank",
-                          "docs/next/documentation/smart-contracts/precompiles/bech32",
-                          "docs/next/documentation/smart-contracts/precompiles/callbacks",
-                          "docs/next/documentation/smart-contracts/precompiles/distribution",
-                          "docs/next/documentation/smart-contracts/precompiles/erc20",
-                          "docs/next/documentation/smart-contracts/precompiles/governance",
-                          "docs/next/documentation/smart-contracts/precompiles/ics20",
-                          "docs/next/documentation/smart-contracts/precompiles/p256",
-                          "docs/next/documentation/smart-contracts/precompiles/slashing",
-                          "docs/next/documentation/smart-contracts/precompiles/staking",
-                          "docs/next/documentation/smart-contracts/precompiles/werc20"
+                            "docs/v0.4.x/api-reference/ethereum-json-rpc/index",
+                            "docs/v0.4.x/api-reference/ethereum-json-rpc/methods",
+                            "docs/v0.4.x/api-reference/ethereum-json-rpc/rpc-explorer"
                         ]
-                      },
-                      {
-                        "group": "Predeployed Contracts",
+                    },
+                    {
+                        "tab": "Release Notes",
                         "pages": [
-                          "docs/next/documentation/smart-contracts/predeployed-contracts/overview",
-                          "docs/next/documentation/smart-contracts/predeployed-contracts/implementation-guide",
-                          "docs/next/documentation/smart-contracts/predeployed-contracts/create2",
-                          "docs/next/documentation/smart-contracts/predeployed-contracts/multicall3",
-                          "docs/next/documentation/smart-contracts/predeployed-contracts/permit2",
-                          "docs/next/documentation/smart-contracts/predeployed-contracts/safe-factory"
+                            "docs/v0.4.x/changelog/release-notes"
                         ]
-                      }
-                    ]
-                  },
-                  "docs/next/documentation/custom-improvement-proposals",
-                  {
-                    "group": "Cosmos SDK",
-                    "pages": [
-                      "docs/next/documentation/cosmos-sdk/overview",
-                      "docs/next/documentation/cosmos-sdk/cli",
-                      "docs/next/documentation/cosmos-sdk/protocol",
-                      {
-                        "group": "Modules",
-                        "pages": [
-                          "docs/next/documentation/cosmos-sdk/modules/erc20",
-                          "docs/next/documentation/cosmos-sdk/modules/feemarket",
-                          "docs/next/documentation/cosmos-sdk/modules/ibc",
-                          "docs/next/documentation/cosmos-sdk/modules/precisebank",
-                          "docs/next/documentation/cosmos-sdk/modules/vm"
-                        ]
-                      }
-                    ]
-                  }
+                    }
                 ]
-              }
-            ]
-          },
-          {
-            "tab": "API Reference",
-            "pages": [
-              "docs/next/api-reference/ethereum-json-rpc/index",
-              "docs/next/api-reference/ethereum-json-rpc/methods",
-              "docs/next/api-reference/ethereum-json-rpc/rpc-explorer"
-            ]
-          },
-          {
-            "tab": "Release Notes",
-            "pages": [
-              "docs/next/changelog/release-notes"
-            ]
-          }
+            },
+            {
+                "version": "next",
+                "tabs": [
+                    {
+                        "tab": "Documentation",
+                        "groups": [
+                            {
+                                "group": "Cosmos EVM",
+                                "pages": [
+                                    "docs/next/documentation/overview",
+                                    {
+                                        "group": "Getting Started",
+                                        "pages": [
+                                            "docs/next/documentation/getting-started/index",
+                                            "docs/next/documentation/getting-started/faq",
+                                            "docs/next/documentation/getting-started/development-environment",
+                                            "docs/next/documentation/getting-started/local-network-setup",
+                                            "docs/next/documentation/getting-started/node-configuration"
+                                        ]
+                                    },
+                                    {
+                                        "group": "Tooling and Resources",
+                                        "pages": [
+                                            "docs/next/documentation/getting-started/tooling-and-resources/overview",
+                                            "docs/next/documentation/getting-started/tooling-and-resources/block-explorers",
+                                            "docs/next/documentation/getting-started/tooling-and-resources/foundry",
+                                            "docs/next/documentation/getting-started/tooling-and-resources/hardhat",
+                                            "docs/next/documentation/getting-started/tooling-and-resources/remix",
+                                            "docs/next/documentation/getting-started/tooling-and-resources/testing-and-fuzzing",
+                                            "docs/next/documentation/getting-started/tooling-and-resources/wallet-integration"
+                                        ]
+                                    },
+                                    {
+                                        "group": "Integration",
+                                        "pages": [
+                                            "docs/next/documentation/integration/evm-module-integration",
+                                            "docs/next/documentation/integration/mempool-integration",
+                                            "docs/next/documentation/integration/upgrade-handlers",
+                                            "docs/next/documentation/integration/migration-v0.3-to-v0.4",
+                                            "docs/next/documentation/integration/erc20-precompiles-migration"
+                                        ]
+                                    },
+                                    {
+                                        "group": "EVM Compatibility",
+                                        "pages": [
+                                            "docs/next/documentation/evm-compatibility/overview",
+                                            "docs/next/documentation/evm-compatibility/eip-reference",
+                                            "docs/next/documentation/evm-compatibility/eip-2935",
+                                            "docs/next/documentation/evm-compatibility/eip-7702"
+                                        ]
+                                    },
+                                    {
+                                        "group": "Concepts",
+                                        "pages": [
+                                            "docs/next/documentation/concepts/overview",
+                                            "docs/next/documentation/concepts/accounts",
+                                            "docs/next/documentation/concepts/chain-id",
+                                            "docs/next/documentation/concepts/encoding",
+                                            "docs/next/documentation/concepts/gas-and-fees",
+                                            "docs/next/documentation/concepts/ibc",
+                                            "docs/next/documentation/concepts/mempool",
+                                            "docs/next/documentation/concepts/migrations",
+                                            "docs/next/documentation/concepts/pending-state",
+                                            "docs/next/documentation/concepts/replay-protection",
+                                            "docs/next/documentation/concepts/signing",
+                                            "docs/next/documentation/concepts/single-token-representation",
+                                            "docs/next/documentation/concepts/tokens",
+                                            "docs/next/documentation/concepts/transactions",
+                                            "docs/next/documentation/concepts/predeployed-contracts",
+                                            "docs/next/documentation/concepts/eip-1559-feemarket",
+                                            "docs/next/documentation/concepts/performance",
+                                            "docs/next/documentation/concepts/precision-handling"
+                                        ]
+                                    },
+                                    {
+                                        "group": "Smart Contracts",
+                                        "pages": [
+                                            "docs/next/documentation/smart-contracts/introduction",
+                                            {
+                                                "group": "Precompiles",
+                                                "pages": [
+                                                    "docs/next/documentation/smart-contracts/precompiles/index",
+                                                    "docs/next/documentation/smart-contracts/precompiles/overview",
+                                                    "docs/next/documentation/smart-contracts/precompiles/bank",
+                                                    "docs/next/documentation/smart-contracts/precompiles/bech32",
+                                                    "docs/next/documentation/smart-contracts/precompiles/callbacks",
+                                                    "docs/next/documentation/smart-contracts/precompiles/distribution",
+                                                    "docs/next/documentation/smart-contracts/precompiles/erc20",
+                                                    "docs/next/documentation/smart-contracts/precompiles/governance",
+                                                    "docs/next/documentation/smart-contracts/precompiles/ics20",
+                                                    "docs/next/documentation/smart-contracts/precompiles/p256",
+                                                    "docs/next/documentation/smart-contracts/precompiles/slashing",
+                                                    "docs/next/documentation/smart-contracts/precompiles/staking",
+                                                    "docs/next/documentation/smart-contracts/precompiles/werc20"
+                                                ]
+                                            },
+                                            {
+                                                "group": "Predeployed Contracts",
+                                                "pages": [
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/overview",
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/implementation-guide",
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/create2",
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/multicall3",
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/permit2",
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/safe-factory"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "docs/next/documentation/custom-improvement-proposals",
+                                    {
+                                        "group": "Cosmos SDK",
+                                        "pages": [
+                                            "docs/next/documentation/cosmos-sdk/overview",
+                                            "docs/next/documentation/cosmos-sdk/cli",
+                                            "docs/next/documentation/cosmos-sdk/protocol",
+                                            {
+                                                "group": "Modules",
+                                                "pages": [
+                                                    "docs/next/documentation/cosmos-sdk/modules/erc20",
+                                                    "docs/next/documentation/cosmos-sdk/modules/feemarket",
+                                                    "docs/next/documentation/cosmos-sdk/modules/ibc",
+                                                    "docs/next/documentation/cosmos-sdk/modules/precisebank",
+                                                    "docs/next/documentation/cosmos-sdk/modules/vm"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "tab": "API Reference",
+                        "pages": [
+                            "docs/v0.4.x/api-reference/ethereum-json-rpc/index",
+                            "docs/v0.4.x/api-reference/ethereum-json-rpc/methods",
+                            "docs/v0.4.x/api-reference/ethereum-json-rpc/rpc-explorer"
+                        ]
+                    },
+                    {
+                        "tab": "Release Notes",
+                        "pages": [
+                            "docs/v0.4.x/changelog/release-notes"
+                        ]
+                    }
+                ]
+            },
+            {
+                "version": "next",
+                "tabs": [
+                    {
+                        "tab": "Documentation",
+                        "groups": [
+                            {
+                                "group": "Cosmos EVM",
+                                "pages": [
+                                    "docs/next/documentation/overview",
+                                    {
+                                        "group": "Getting Started",
+                                        "pages": [
+                                            "docs/next/documentation/getting-started/index",
+                                            "docs/next/documentation/getting-started/faq",
+                                            "docs/next/documentation/getting-started/development-environment",
+                                            "docs/next/documentation/getting-started/local-network-setup",
+                                            "docs/next/documentation/getting-started/node-configuration"
+                                        ]
+                                    },
+                                    {
+                                        "group": "Tooling and Resources",
+                                        "pages": [
+                                            "docs/next/documentation/getting-started/tooling-and-resources/overview",
+                                            "docs/next/documentation/getting-started/tooling-and-resources/block-explorers",
+                                            "docs/next/documentation/getting-started/tooling-and-resources/foundry",
+                                            "docs/next/documentation/getting-started/tooling-and-resources/hardhat",
+                                            "docs/next/documentation/getting-started/tooling-and-resources/remix",
+                                            "docs/next/documentation/getting-started/tooling-and-resources/testing-and-fuzzing",
+                                            "docs/next/documentation/getting-started/tooling-and-resources/wallet-integration"
+                                        ]
+                                    },
+                                    {
+                                        "group": "Integration",
+                                        "pages": [
+                                            "docs/next/documentation/integration/evm-module-integration",
+                                            "docs/next/documentation/integration/mempool-integration",
+                                            "docs/next/documentation/integration/upgrade-handlers",
+                                            "docs/next/documentation/integration/migration-v0.3-to-v0.4",
+                                            "docs/next/documentation/integration/erc20-precompiles-migration"
+                                        ]
+                                    },
+                                    {
+                                        "group": "EVM Compatibility",
+                                        "pages": [
+                                            "docs/next/documentation/evm-compatibility/overview",
+                                            "docs/next/documentation/evm-compatibility/eip-reference",
+                                            "docs/next/documentation/evm-compatibility/eip-2935",
+                                            "docs/next/documentation/evm-compatibility/eip-7702"
+                                        ]
+                                    },
+                                    {
+                                        "group": "Concepts",
+                                        "pages": [
+                                            "docs/next/documentation/concepts/overview",
+                                            "docs/next/documentation/concepts/accounts",
+                                            "docs/next/documentation/concepts/chain-id",
+                                            "docs/next/documentation/concepts/encoding",
+                                            "docs/next/documentation/concepts/gas-and-fees",
+                                            "docs/next/documentation/concepts/ibc",
+                                            "docs/next/documentation/concepts/mempool",
+                                            "docs/next/documentation/concepts/migrations",
+                                            "docs/next/documentation/concepts/pending-state",
+                                            "docs/next/documentation/concepts/replay-protection",
+                                            "docs/next/documentation/concepts/signing",
+                                            "docs/next/documentation/concepts/single-token-representation",
+                                            "docs/next/documentation/concepts/tokens",
+                                            "docs/next/documentation/concepts/transactions",
+                                            "docs/next/documentation/concepts/predeployed-contracts",
+                                            "docs/next/documentation/concepts/eip-1559-feemarket",
+                                            "docs/next/documentation/concepts/performance",
+                                            "docs/next/documentation/concepts/precision-handling"
+                                        ]
+                                    },
+                                    {
+                                        "group": "Smart Contracts",
+                                        "pages": [
+                                            "docs/next/documentation/smart-contracts/introduction",
+                                            {
+                                                "group": "Precompiles",
+                                                "pages": [
+                                                    "docs/next/documentation/smart-contracts/precompiles/index",
+                                                    "docs/next/documentation/smart-contracts/precompiles/overview",
+                                                    "docs/next/documentation/smart-contracts/precompiles/bank",
+                                                    "docs/next/documentation/smart-contracts/precompiles/bech32",
+                                                    "docs/next/documentation/smart-contracts/precompiles/callbacks",
+                                                    "docs/next/documentation/smart-contracts/precompiles/distribution",
+                                                    "docs/next/documentation/smart-contracts/precompiles/erc20",
+                                                    "docs/next/documentation/smart-contracts/precompiles/governance",
+                                                    "docs/next/documentation/smart-contracts/precompiles/ics20",
+                                                    "docs/next/documentation/smart-contracts/precompiles/p256",
+                                                    "docs/next/documentation/smart-contracts/precompiles/slashing",
+                                                    "docs/next/documentation/smart-contracts/precompiles/staking",
+                                                    "docs/next/documentation/smart-contracts/precompiles/werc20"
+                                                ]
+                                            },
+                                            {
+                                                "group": "Predeployed Contracts",
+                                                "pages": [
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/overview",
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/implementation-guide",
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/create2",
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/multicall3",
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/permit2",
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/safe-factory"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "docs/next/documentation/custom-improvement-proposals",
+                                    {
+                                        "group": "Cosmos SDK",
+                                        "pages": [
+                                            "docs/next/documentation/cosmos-sdk/overview",
+                                            "docs/next/documentation/cosmos-sdk/cli",
+                                            "docs/next/documentation/cosmos-sdk/protocol",
+                                            {
+                                                "group": "Modules",
+                                                "pages": [
+                                                    "docs/next/documentation/cosmos-sdk/modules/erc20",
+                                                    "docs/next/documentation/cosmos-sdk/modules/feemarket",
+                                                    "docs/next/documentation/cosmos-sdk/modules/ibc",
+                                                    "docs/next/documentation/cosmos-sdk/modules/precisebank",
+                                                    "docs/next/documentation/cosmos-sdk/modules/vm"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "tab": "API Reference",
+                        "pages": [
+                            "docs/next/api-reference/ethereum-json-rpc/index",
+                            "docs/next/api-reference/ethereum-json-rpc/methods",
+                            "docs/next/api-reference/ethereum-json-rpc/rpc-explorer"
+                        ]
+                    },
+                    {
+                        "tab": "Release Notes",
+                        "pages": [
+                            "docs/next/changelog/release-notes"
+                        ]
+                    }
+                ]
+            }
         ]
-      }
-    ]
-  },
-  "footer": {
-    "socials": {
-      "twitter": "https://twitter.com/cosmos",
-      "github": "https://github.com/cosmos",
-      "discord": "https://discord.gg/interchain",
-      "website": "https://cosmos.network"
+    },
+    "footer": {
+        "socials": {
+            "twitter": "https://twitter.com/cosmos",
+            "github": "https://github.com/cosmos",
+            "discord": "https://discord.gg/interchain",
+            "website": "https://cosmos.network"
+        }
+    },
+    "appearance": {
+        "default": "system",
+        "strict": false
+    },
+    "search": {
+        "prompt": "Search docs..."
+    },
+    "background": {
+        "color": {
+            "light": "#F1F1F1",
+            "dark": "#000000"
+        }
     }
-  },
-  "appearance": {
-    "default": "system",
-    "strict": false
-  },
-  "search": {
-    "prompt": "Search docs..."
-  },
-  "background": {
-    "color": {
-      "light": "#F1F1F1",
-      "dark": "#000000"
-    }
-  }
 }

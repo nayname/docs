@@ -16,12 +16,16 @@ The module parameters control EVM behavior and access policies ([source](https:/
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `evm_denom` | string | `"aatom"` | Token denomination for EVM transactions (18 decimals) |
+| `evm_denom` | string | `"atest"` | Token denomination for EVM transactions (18 decimals) |
 | `extra_eips` | []int64 | `[]` | Additional EIPs to activate beyond hard fork defaults |
-| `allow_unprotected_txs` | bool | `false` | Allow non-EIP155 replay-protected transactions |
 | `active_static_precompiles` | []string | `[]` | Activated static precompile addresses |
 | `evm_channels` | []string | `[]` | IBC channel IDs for EVM-compatible chains |
 | `access_control` | AccessControl | Permissionless | Permission policy for EVM operations |
+| `history_serve_window` | uint64 | `8192` | Historical block hash depth for EIP-2935 (v0.5.0+) |
+
+<Warning>
+**Breaking Change in v0.5.0:** The `allow_unprotected_txs` parameter has been removed from consensus parameters. Non-EIP155 transaction acceptance is now configured per-node in `app.toml` under `[json-rpc].allow-unprotected-txs`.
+</Warning>
 
 ### Parameter Details
 
@@ -47,6 +51,43 @@ Activates additional EIPs beyond fork defaults:
 | 3855 | PUSH0 instruction | New opcode |
 </Expandable>
 
+<Expandable title="history_serve_window (v0.5.0+)">
+Controls EIP-2935 historical block hash storage depth:
+
+**Purpose:** Enables smart contracts to access historical block hashes via `BLOCKHASH` opcode
+**Range:** Must be > 0, recommended ≤ 8192 for optimal performance
+**Storage Impact:** Higher values increase node storage requirements
+
+**Configuration Examples:**
+```json
+{
+  "history_serve_window": 8192   // Default: full EIP-2935 compatibility
+}
+```
+
+```json
+{
+  "history_serve_window": 1024   // Performance optimized: reduced storage
+}
+```
+
+```json  
+{
+  "history_serve_window": 16384  // Extended history: maximum compatibility
+}
+```
+
+**Smart Contract Usage:**
+```solidity
+contract HistoryExample {
+    function getRecentBlockHash(uint256 blockNumber) public view returns (bytes32) {
+        // Works for blocks within history_serve_window range
+        return blockhash(blockNumber);
+    }
+}
+```
+</Expandable>
+
 <Expandable title="access_control">
 Granular control over contract operations:
 
@@ -69,17 +110,18 @@ type AccessControl struct {
   <Tab title="Ethereum Compatible">
     ```json
     {
-      "evm_denom": "aatom",
+      "evm_denom": "atest",
       "extra_eips": [3855],
-      "allow_unprotected_txs": false,
       "active_static_precompiles": [
         "0x0000000000000000000000000000000000000100",
         "0x0000000000000000000000000000000000000400"
       ],
+      "evm_channels": [],
       "access_control": {
-        "create": {"access_type": "PERMISSIONLESS", "list": []},
-        "call": {"access_type": "PERMISSIONLESS", "list": []}
-      }
+        "create": {"access_type": "PERMISSIONLESS", "access_control_list": []},
+        "call": {"access_type": "PERMISSIONLESS", "access_control_list": []}
+      },
+      "history_serve_window": 8192
     }
     ```
   </Tab>
@@ -88,17 +130,18 @@ type AccessControl struct {
     {
       "evm_denom": "atoken",
       "extra_eips": [],
-      "allow_unprotected_txs": false,
       "active_static_precompiles": [
         "0x0000000000000000000000000000000000000804"
       ],
+      "evm_channels": [],
       "access_control": {
         "create": {
           "access_type": "PERMISSIONED",
-          "list": ["0x1234...", "0xABCD..."]
+          "access_control_list": ["0x1234...", "0xABCD..."]
         },
-        "call": {"access_type": "PERMISSIONLESS", "list": []}
-      }
+        "call": {"access_type": "PERMISSIONLESS", "access_control_list": []}
+      },
+      "history_serve_window": 4096
     }
     ```
   </Tab>
@@ -107,15 +150,16 @@ type AccessControl struct {
     {
       "evm_denom": "asecure",
       "extra_eips": [],
-      "allow_unprotected_txs": false,
       "active_static_precompiles": [],
+      "evm_channels": [],
       "access_control": {
-        "create": {"access_type": "RESTRICTED", "list": []},
+        "create": {"access_type": "RESTRICTED", "access_control_list": []},
         "call": {
           "access_type": "PERMISSIONED",
-          "list": ["0xTrustedContract"]
+          "access_control_list": ["0xTrustedContract"]
         }
-      }
+      },
+      "history_serve_window": 1024
     }
     ```
   </Tab>
@@ -323,7 +367,8 @@ evmd query vm trace-block 12345
     | `eth_blockNumber` | Current block number |
     | `eth_call` | Execute call without tx |
     | `eth_chainId` | Get chain ID |
-    | `eth_estimateGas` | Estimate gas usage |
+    | `eth_createAccessList` | Generate access list for tx optimization (v0.5.0+) |
+    | `eth_estimateGas` | Estimate gas usage (optimized in v0.5.0+) |
     | `eth_gasPrice` | Current gas price |
     | `eth_getBalance` | Get account balance |
     | `eth_getBlockByHash` | Get block by hash |
@@ -333,7 +378,7 @@ evmd query vm trace-block 12345
     | `eth_getStorageAt` | Get storage value |
     | `eth_getTransactionByHash` | Get tx by hash |
     | `eth_getTransactionCount` | Get account nonce |
-    | `eth_getTransactionReceipt` | Get tx receipt |
+    | `eth_getTransactionReceipt` | Get tx receipt (enhanced with max_used_gas in v0.5.0+) |
     | `eth_sendRawTransaction` | Submit signed tx |
     | `eth_syncing` | Sync status |
   </Tab>

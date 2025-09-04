@@ -73,7 +73,8 @@ The following namespaces are not implemented in Cosmos EVM but may be present in
 | [`eth_sendTransaction`](#eth_sendtransaction)                                         | Eth       | N          | N      | Not implemented    |
 | [`eth_sendRawTransaction`](#eth_sendrawtransaction)                                   | Eth       | Y          | Y      |                    |
 | [`eth_call`](#eth_call)                                                               | Eth       | Stub       | Y      | Returns "0x"       |
-| [`eth_estimateGas`](#eth_estimategas)                                                 | Eth       | Y          | Y      |                    |
+| [`eth_createAccessList`](#eth_createaccesslist)                                       | Eth       | Y          | Y      | v0.5.0+            |
+| [`eth_estimateGas`](#eth_estimategas)                                                 | Eth       | Y          | Y      | Optimized in v0.5.0+ |
 | [`eth_getBlockByNumber`](#eth_getblockbynumber)                                       | Eth       | Y          | Y      |                    |
 | [`eth_getBlockByHash`](#eth_getblockbyhash)                                           | Eth       | Y          | Y      |                    |
 | [`eth_getTransactionByHash`](#eth_gettransactionbyhash)                               | Eth       | Stub       | Y      | Returns null       |
@@ -698,6 +699,111 @@ Executes a new message call immediately without creating a transaction on the bl
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_call","params":[{"from":"0x3b7252d007059ffc82d16d022da3cbf9992d2f70", "to":"0xddd64b4712f7c8f1ace3c145c950339eddaf221d", "gas":"0x5208", "gasPrice":"0x55ae82600", "value":"0x16345785d8a0000", "data": "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"}, "0x0"],"id":1}'  -H "Content-Type: application/json" http://localhost:8545
 // Result
 {"jsonrpc":"2.0","id":1,"result":"0x"}
+```
+
+### `eth_createAccessList`
+
+Creates an access list for a transaction. Access lists specify which addresses and storage keys a transaction will access, potentially reducing gas costs for complex transactions.
+
+**Implementation:** [`rpc/backend/tx_info.go:396`](https://github.com/cosmos/evm/blob/main/rpc/backend/tx_info.go#L396)
+
+#### Parameters
+
+- Object containing transaction data:
+  - `from`: `DATA`, 20 Bytes - (optional) The address the transaction is sent from
+  - `to`: `DATA`, 20 Bytes - The address the transaction is directed to
+  - `gas`: `QUANTITY` - (optional) Gas provided for execution
+  - `gasPrice`: `QUANTITY` - (optional) Gas price for each unit of gas
+  - `value`: `QUANTITY` - (optional) Value sent with the transaction
+  - `data`: `DATA` - (optional) Transaction data payload
+  
+- Block number or Block Hash ([EIP-1898](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1898.md))
+
+#### Returns
+
+- Object containing:
+  - `accessList`: Array of access list entries
+    - `address`: `DATA`, 20 Bytes - Account address
+    - `storageKeys`: Array of `DATA` - Storage keys accessed
+  - `gasUsed`: `QUANTITY` - Gas used for execution with access list
+
+#### Client Examples
+
+Shell HTTP
+```shell
+curl -X POST --data '{
+  "jsonrpc":"2.0",
+  "method":"eth_createAccessList",
+  "params":[{
+    "from":"0x8ba1f109551bD432803012645Hac136c5dd7E3D40",
+    "to":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "gas":"0x76c0",
+    "gasPrice":"0x9184e72a000",
+    "data":"0xa9059cbb000000000000000000000000a0b86a33e6d1cde81f9c1ce51dd74f3d1111bb9e0000000000000000000000000000000000000000000000000de0b6b3a7640000"
+  }, "latest"],
+  "id":1
+}' -H "Content-Type: application/json" http://localhost:8545
+```
+
+Websocket
+```shell
+wscat -c ws://localhost:8546 -x '{
+  "jsonrpc": "2.0", 
+  "id": 1, 
+  "method": "eth_createAccessList", 
+  "params": [{
+    "from":"0x8ba1f109551bD432803012645Hac136c5dd7E3D40",
+    "to":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "data":"0xa9059cbb000000000000000000000000a0b86a33e6d1cde81f9c1ce51dd74f3d1111bb9e0000000000000000000000000000000000000000000000000de0b6b3a7640000"
+  }, "latest"]
+}'
+```
+
+Javascript Console
+```javascript
+await provider.send("eth_createAccessList", [{
+  from: "0x8ba1f109551bD432803012645Hac136c5dd7E3D40",
+  to: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  data: "0xa9059cbb000000000000000000000000a0b86a33e6d1cde81f9c1ce51dd74f3d1111bb9e0000000000000000000000000000000000000000000000000de0b6b3a7640000"
+}, "latest"]);
+```
+
+#### Result
+
+```json
+{
+  "jsonrpc":"2.0",
+  "id":1,
+  "result":{
+    "accessList":[
+      {
+        "address":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "storageKeys":[
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x405787fa12a823e0f2b7631cc41b3ba8828b3321ca811111fa75cd3aa3bb5ace"
+        ]
+      }
+    ],
+    "gasUsed":"0x7536"
+  }
+}
+```
+
+#### Usage Example
+
+```javascript
+// Generate access list for optimization
+const accessList = await provider.send("eth_createAccessList", [{
+    to: contractAddress,
+    data: contract.interface.encodeFunctionData("complexFunction", [arg1, arg2]),
+    gasPrice: "0x" + gasPrice.toString(16)
+}, "latest"]);
+
+// Use access list in actual transaction for gas savings
+const tx = await contract.complexFunction(arg1, arg2, {
+    accessList: accessList.accessList,
+    gasLimit: accessList.gasUsed
+});
 ```
 
 ### `eth_estimateGas`

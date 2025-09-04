@@ -52,11 +52,6 @@ if evmtypes.GetChainConfig() != nil {
     )
     app.EVMMempool = evmMempool
 
-    // Set the global mempool for RPC access
-    if err := evmmempool.SetGlobalEVMMempool(evmMempool); err != nil {
-        panic(err)
-    }
-
     // Replace BaseApp mempool
     app.SetMempool(evmMempool)
 
@@ -75,6 +70,10 @@ if evmtypes.GetChainConfig() != nil {
 }
 ```
 
+<Warning>
+**v0.5.0 Breaking Change:** The global mempool registry (`SetGlobalEVMMempool`) has been removed. Mempool is now passed directly to the JSON-RPC server during initialization.
+</Warning>
+
 ## Configuration Options
 
 The `EVMMempoolConfig` struct provides several configuration options for customizing the mempool behavior:
@@ -88,7 +87,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
 }
 ```
 
-### Full Configuration Options
+### Full Configuration Options (v0.5.0+)
 
 ```go
 type EVMMempoolConfig struct {
@@ -98,14 +97,45 @@ type EVMMempoolConfig struct {
     // Required: Block gas limit for transaction selection
     BlockGasLimit uint64
 
-    // Optional: Custom TxPool (defaults to LegacyPool)
-    TxPool        *txpool.TxPool
+    // Optional: Custom legacy pool configuration (replaces TxPool)
+    LegacyPoolConfig *legacypool.Config
 
-    // Optional: Custom Cosmos pool (defaults to PriorityNonceMempool)
-    CosmosPool    sdkmempool.ExtMempool
+    // Optional: Custom Cosmos pool configuration (replaces CosmosPool)
+    CosmosPoolConfig *sdkmempool.PriorityNonceMempoolConfig[math.Int]
 
     // Optional: Custom broadcast function for promoted transactions
     BroadCastTxFn func(txs []*ethtypes.Transaction) error
+}
+```
+
+### v0.4.x to v0.5.0 Migration
+
+**Breaking Change:** Pre-built pools replaced with configuration objects
+
+**Before (v0.4.x):**
+```go
+mempoolConfig := &evmmempool.EVMMempoolConfig{
+    TxPool:     customTxPool,      // ← REMOVED
+    CosmosPool: customCosmosPool,  // ← REMOVED
+    AnteHandler: app.GetAnteHandler(),
+    BlockGasLimit: 100_000_000,
+}
+```
+
+**After (v0.5.0):**
+```go
+mempoolConfig := &evmmempool.EVMMempoolConfig{
+    LegacyPoolConfig: &legacypool.Config{     // ← NEW
+        AccountSlots: 16,
+        GlobalSlots:  5120,
+        PriceLimit:   1,
+        // ... other config options
+    },
+    CosmosPoolConfig: &sdkmempool.PriorityNonceMempoolConfig[math.Int]{ // ← NEW
+        TxPriority: customPriorityConfig,
+    },
+    AnteHandler:   app.GetAnteHandler(),
+    BlockGasLimit: 100_000_000,
 }
 ```
 
@@ -143,9 +173,9 @@ priorityConfig := sdkmempool.PriorityNonceMempoolConfig[math.Int]{
 }
 
 mempoolConfig := &evmmempool.EVMMempoolConfig{
-    AnteHandler:   app.GetAnteHandler(),
-    BlockGasLimit: 100_000_000,
-    CosmosPool:    sdkmempool.NewPriorityMempool(priorityConfig),
+    AnteHandler:      app.GetAnteHandler(),
+    BlockGasLimit:    100_000_000,
+    CosmosPoolConfig: &priorityConfig, // Pass config instead of pre-built pool
 }
 ```
 
