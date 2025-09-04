@@ -193,7 +193,7 @@
                       "docs/next/documentation/getting-started/faq",
                       "docs/next/documentation/getting-started/development-environment",
                       "docs/next/documentation/getting-started/local-network-setup",
-                      "docs/next/documentation/getting-started/mode-configuration" 
+                      "docs/next/documentation/getting-started/node-configuration" 
                       {
                         "group": "Tooling and Resources",
                         "pages": [
