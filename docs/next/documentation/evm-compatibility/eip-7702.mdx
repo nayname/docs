@@ -32,26 +32,26 @@ Cosmos EVM provides **full EIP-7702 support** with the following components:
 
 | Component | Implementation | Source |
 |-----------|----------------|---------|
-| **SetCodeTx Transaction Type** | ✅ Complete | [`tests/integration/x/vm/state_transition_benchmark.go:47`](https://github.com/cosmos/evm/blob/main/tests/integration/x/vm/state_transition_benchmark.go#L47) |
-| **Authorization Validation** | ✅ Complete | [`x/vm/keeper/state_transition.go:563`](https://github.com/cosmos/evm/blob/main/x/vm/keeper/state_transition.go#L563) |
-| **Code Delegation** | ✅ Complete | [`x/vm/keeper/state_transition.go:536`](https://github.com/cosmos/evm/blob/main/x/vm/keeper/state_transition.go#L536) |
-| **Ante Handler Support** | ✅ Complete | [`ante/evm/06_account_verification.go:33`](https://github.com/cosmos/evm/blob/main/ante/evm/06_account_verification.go#L33) |
-| **RPC Integration** | ✅ Complete | [`rpc/types/utils.go:322+`](https://github.com/cosmos/evm/blob/main/rpc/types/utils.go#L322) |
+| **SetCodeTx Transaction Type** |  Complete | [`tests/integration/x/vm/state_transition_benchmark.go:47`](https://github.com/cosmos/evm/blob/main/tests/integration/x/vm/state_transition_benchmark.go#L47) |
+| **Authorization Validation** |  Complete | [`x/vm/keeper/state_transition.go:563`](https://github.com/cosmos/evm/blob/main/x/vm/keeper/state_transition.go#L563) |
+| **Code Delegation** |  Complete | [`x/vm/keeper/state_transition.go:536`](https://github.com/cosmos/evm/blob/main/x/vm/keeper/state_transition.go#L536) |
+| **Ante Handler Support** |  Complete | [`ante/evm/06_account_verification.go:33`](https://github.com/cosmos/evm/blob/main/ante/evm/06_account_verification.go#L33) |
+| **RPC Integration** |  Complete | [`rpc/types/utils.go:322+`](https://github.com/cosmos/evm/blob/main/rpc/types/utils.go#L322) |
 
 ### Differences from Ethereum EIP-7702
 
 **Similarities with Ethereum:**
-- ✅ Same transaction structure (`SetCodeTx`)
-- ✅ Same authorization signature format
-- ✅ Same nonce validation rules
-- ✅ Same delegation bytecode format
-- ✅ Same gas cost parameters
+-  Same transaction structure (`SetCodeTx`)
+-  Same authorization signature format
+-  Same nonce validation rules
+-  Same delegation bytecode format
+-  Same gas cost parameters
 
 **Cosmos EVM Enhancements:**
-- **✨ Instant Finality:** Delegations are final after one block (~2s) vs. 12+ confirmations
-- **✨ Lower Gas Costs:** Typically much lower transaction costs than Ethereum mainnet
-- **✨ Enhanced Debugging:** Better error messages and transaction tracing
-- **✨ IBC Integration:** Delegated code can interact with IBC precompiles
+- ** Instant Finality:** Delegations are final after one block (~2s) vs. 12+ confirmations
+- ** Lower Gas Costs:** Typically much lower transaction costs than Ethereum mainnet
+- ** Enhanced Debugging:** Better error messages and transaction tracing
+- ** IBC Integration:** Delegated code can interact with IBC precompiles
 
 ## Transaction Structure
 

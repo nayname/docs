@@ -231,14 +231,14 @@ The system handles three types of paths:
 
 The system works within Mintlify's MDX compiler limitations:
 
-### What Works ✅
+### What Works 
 
 - Component imports from `/snippets/`
 - Props passed to components
 - Standard MDX syntax
 - HTML comments for metadata
 
-### What Doesn't Work ❌
+### What Doesn't Work 
 
 - Inline component definitions
 - Dynamic imports
