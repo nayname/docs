@@ -119,6 +119,9 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
             obj[label] = parseInt(value) || 0;
           } else if (label === 'critical') {
             obj[label] = value === true || value === 'TRUE';
+          } else if (label === 'issue' || label === 'pr') {
+            // Convert to string for link handling
+            obj[label] = value ? String(value) : '';
           } else if (label === 'geth' || label === 'priority' || label === 'triage') {
             // Skip these columns
             return;
@@ -143,19 +146,7 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
       console.error('Error loading sheet data:', err);
       setError('Failed to load data from Google Sheets');
       setLoading(false);
-      // Load fallback data
-      loadFallbackData();
     }
-  };
-
-  const loadFallbackData = () => {
-    // Embedded fallback data
-    const fallback = [
-      { eip: 7702, title: "Set Code for EOAs", status: "not_supported", critical: true, cosmos: "Not implemented", note: "We will support that fully in v0.5.0 - Requires compatibility discussion" },
-      { eip: 155, title: "Simple replay attack protection", status: "partial", critical: true, cosmos: "Enforced through chain-wide params", note: "Currently enforcing as chain-wide params, plan for making it similar with Geth - Requires compatibility discussion", issue: "401" },
-      // Add more fallback data as needed
-    ];
-    setEipData(fallback);
   };
 
   const handleSort = (key) => {
@@ -171,7 +162,8 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
 
     // Define status priority (higher = better)
     const statusPriority = {
-      'supported': 4,
+      'supported': 5,
+      'in_development': 4,
       'partial': 3,
       'not_applicable': 2,
       'unknown': 1,
@@ -239,9 +231,87 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
     'partial': 'text-yellow-600 dark:text-yellow-400',
     'not_supported': 'text-red-600 dark:text-red-400',
     'not_applicable': 'text-gray-500 dark:text-gray-400',
+    'in_development': 'text-cyan-600 dark:text-cyan-400',
     'unknown': 'text-gray-400 dark:text-gray-500'
   };
 
+
+  // Function to parse and render hyperlinks in text
+  const renderTextWithLinks = (text) => {
+    if (!text || typeof text !== 'string') {
+      return <span>{text || ''}</span>;
+    }
+
+    // Debug logging
+    if (text.includes('7702') || text.includes('EOA') || text.includes('[')) {
+      console.log('EIP Table - Parsing text for links:', JSON.stringify(text));
+    }
+
+    // Parse markdown-style links [text](url)
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+    let keyIndex = 0;
+
+    // Process all matches
+    while ((match = linkRegex.exec(text)) !== null) {
+      console.log('EIP Table - Found link match:', { 
+        full: match[0], 
+        text: match[1], 
+        url: match[2],
+        index: match.index 
+      });
+
+      // Add text before the link
+      if (match.index > lastIndex) {
+        const beforeText = text.slice(lastIndex, match.index);
+        if (beforeText) {
+          parts.push(
+            <span key={`text-${keyIndex++}`}>
+              {beforeText}
+            </span>
+          );
+        }
+      }
+      
+      // Add the link
+      parts.push(
+        <a
+          key={`link-${keyIndex++}`}
+          href={match[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors"
+        >
+          {match[1]}
+        </a>
+      );
+      
+      lastIndex = match.index + match[0].length;
+    }
+    
+    // Add remaining text
+    if (lastIndex < text.length) {
+      const remainingText = text.slice(lastIndex);
+      if (remainingText) {
+        parts.push(
+          <span key={`text-${keyIndex++}`}>
+            {remainingText}
+          </span>
+        );
+      }
+    }
+    
+    // Return appropriate JSX
+    if (parts.length === 0) {
+      return <span>{text}</span>;
+    } else if (parts.length === 1) {
+      return parts[0];
+    } else {
+      return <>{parts}</>;
+    }
+  };
 
   const SortIcon = ({ column }) => {
     if (sortConfig.key !== column) {
@@ -355,24 +425,38 @@ export default function EIPCompatibilityTable({ sheetTab } = {}) {
                     {eip.status ? eip.status.replace(/_/g, ' ') : ''}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                <td className="px-7 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                   {eip.critical ? 'Yes' : '-'}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
-                  {eip.cosmos}
+                  <div>
+                    {renderTextWithLinks(eip.cosmos)}
+                    {eip.pr && (
+                      <a
+                        href={`https://github.com/cosmos/evm/pull/${eip.pr}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        #{eip.pr}
+                      </a>
+                    )}
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                  {eip.note}
-                  {eip.issue && (
-                    <a
-                      href={`https://github.com/cosmos/evm/issues/${eip.issue}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-2 text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      #{eip.issue}
-                    </a>
-                  )}
+                  <div>
+                    {renderTextWithLinks(eip.note)}
+                    {eip.issue && (
+                      <a
+                        href={`https://github.com/cosmos/evm/issues/${eip.issue}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        #{eip.issue}
+                      </a>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

@@ -126,9 +126,11 @@ Unlike with legacy Ethermint, these values are independent.
 ### Notable Implementation Details
 
 - **EIP-1559:** Fully supported - with base fee distributed to validators instead of burned
-- **EIP-155:** Partial - enforced through chain-wide params (full support in [PR #415](https://github.com/cosmos/evm/pull/415))
+- **EIP-155:** Fully supported - per-node configuration for unprotected transactions (v0.5.0+)
+- **EIP-2935:** Full support - historical block hash storage with configurable depth (v0.5.0+) 
 - **EIP-3651:** Partial - COINBASE always returns empty address currently
-- **EIP-7702:** Set EOA code - planned for v0.5.0
+- **EIP-7702:** Full support - EOA code delegation for account abstraction (v0.5.0+)
+- **Access Lists:** Full support via `eth_createAccessList` RPC method (v0.5.0+)
 - **Custom Improvement Proposals (CIPs):** Chain-specific optimizations available
 
 ## Developer Experience
@@ -150,6 +152,42 @@ Unlike with legacy Ethermint, these values are independent.
 - **Lower Costs:** Typically much lower gas fees than Ethereum mainnet
 - **Faster Blocks:** 1-2 second block times vs 12 seconds on Ethereum
 - **Enhanced Security:** Byzantine Fault Tolerant consensus prevents attacks
+
+## v0.5.0 Compatibility Enhancements
+
+### EVM Equivalency Improvements
+
+**EOA Code Delegation (EIP-7702):**
+- **What:** Externally owned accounts can temporarily execute smart contract code
+- **Benefit:** Account abstraction, batched operations, enhanced wallet functionality
+- **Use Case:** Multi-sig wallets, automated strategies, custom transaction validation
+
+**Historical Block Hash Access (EIP-2935):**
+- **What:** BLOCKHASH opcode now provides reliable access to historical block hashes
+- **Benefit:** Smart contracts can access up to 8192 previous block hashes (configurable)
+- **Use Case:** Protocols requiring verifiable randomness or block-based logic
+
+**Access List Optimization:**
+- **What:** New `eth_createAccessList` RPC method for transaction optimization
+- **Benefit:** Generate access lists to reduce transaction costs  
+- **Compatibility:** Matches Ethereum's access list functionality exactly
+
+**Enhanced Transaction Responses:**
+- **What:** Added `max_used_gas` field to transaction responses
+- **Benefit:** Better gas estimation and transaction analytics
+- **Use Case:** Tools can optimize gas usage more effectively
+
+### Performance Optimizations
+
+**Smart Gas Estimation:**
+- **Plain Transfer Detection:** Simple ETH transfers return 21000 gas immediately (~90% faster)
+- **Optimistic Bounds:** Complex transactions use initial execution results for better estimation bounds
+- **Result:** Significantly faster `eth_estimateGas` for all transaction types
+
+**Mempool Configurability:**
+- **What:** Transaction pool limits, timeouts, and priority functions now fully configurable
+- **Benefit:** Chains can optimize for their specific throughput and economic requirements
+- **Example:** High-frequency DeFi chains can increase pool sizes, games can use custom priority
 
 ### Transaction Pool
 

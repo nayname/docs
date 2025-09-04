@@ -48,6 +48,90 @@ These libraries are used across the stack to write tests, simulate transactions,
 - Flexible task system (`hardhat.config.js`), plugin support, and network forking.
 - Integrates with Ethers.js and Solidity tooling for deployments, gas tracking, and test orchestration.
 
+## v0.5.0 Compatibility Testing Framework
+
+Cosmos EVM v0.5.0 introduces comprehensive compatibility testing to ensure seamless integration with major Ethereum development tools.
+
+### EVM Tools Compatibility Testing
+
+**Automated Testing Suites:** Five comprehensive test suites validate compatibility with popular Ethereum tools:
+
+| Tool | Test Coverage | GitHub Workflow |
+|------|---------------|-----------------|
+| **Foundry** | Contract deployment, testing, gas estimation | `.github/workflows/tests-compatibility-foundry.yml` |
+| **Hardhat** | Contract deployment, ethers.js integration | `.github/workflows/tests-compatibility-hardhat.yml` |
+| **Viem** | TypeScript client compatibility, RPC methods | `.github/workflows/tests-compatibility-viem.yml` |
+| **Web3.js** | Legacy client compatibility, transaction handling | `.github/workflows/tests-compatibility-web3js.yml` |
+| **Foundry + UniswapV3** | Complex DeFi protocol deployment | `.github/workflows/tests-compatibility-foundry-uniswap-v3.yml` |
+
+### Running Compatibility Tests
+
+**Local Testing:**
+```bash
+# Run JSON-RPC compatibility tests
+cd /path/to/cosmos-evm
+make test-rpc-compat  # Makefile:373
+
+# Test specific tool
+./scripts/tests_compatibility_foundry.sh
+./scripts/tests_compatibility_hardhat.sh
+./scripts/tests_compatibility_viem.sh
+./scripts/tests_compatibility_web3js.sh
+./scripts/tests_compatibility_foundry_uniswap_v3.sh
+```
+
+**Test Structure:**
+```
+tests/evm-tools-compatibility/
+├── foundry/          # Foundry compatibility tests
+├── hardhat/          # Hardhat + Ethers.js tests
+├── viem/             # Viem TypeScript tests
+├── web3.js/          # Web3.js legacy tests
+└── foundry-uniswap-v3/ # Complex DeFi protocol tests
+```
+
+### JSON-RPC Compatibility Testing
+
+**Comprehensive RPC Validation:** New framework compares Cosmos EVM responses against geth for accuracy.
+
+**Setup:**
+```bash
+# Start comparison testing environment
+cd tests/jsonrpc
+
+# Build required Docker images
+make localnet-build-env
+
+# Start both evmd and geth for comparison
+./scripts/start-networks.sh
+
+# Run compatibility test suite
+cd simulator && go build . && ./simulator
+
+# Stop testing environment
+./scripts/stop-networks.sh
+```
+
+**Test Coverage:**
+- **Transaction Processing:** Compare transaction execution results
+- **Block Queries:** Validate block structure and data
+- **Account Queries:** Verify balance and nonce handling
+- **Event Logs:** Ensure log filtering and retrieval accuracy
+- **Gas Estimation:** Compare gas estimation algorithms
+
+**Configuration:**
+```go
+// tests/jsonrpc/simulator/config/config.go:27-36
+type Config struct {
+    EvmdHttpEndpoint string // Default: "http://localhost:8545"
+    EvmdWsEndpoint   string // Default: "ws://localhost:8546"
+    GethHttpEndpoint string // Default: "http://localhost:8547"
+    GethWsEndpoint   string // Default: "ws://localhost:8548"
+    RichPrivKey      string
+    Timeout          string
+}
+```
+
 ## Fuzz (Property-Based) Testing
 
 Fuzz testing generates random inputs to find edge cases that violate expected properties.

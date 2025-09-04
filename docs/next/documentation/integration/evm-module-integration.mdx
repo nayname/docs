@@ -40,7 +40,7 @@ These version numbers may change as development continues. Check [github.com/cos
 require (
     github.com/cosmos/cosmos-sdk v0.53.0
     github.com/cosmos/ibc-go/v10 v10.2.0
-    github.com/cosmos/evm v0.3.0
+    github.com/cosmos/evm v0.5.0
 )
 
 replace (
@@ -276,6 +276,7 @@ import (
     "fmt"
     "maps"
 
+    "cosmossdk.io/core/address"
     evidencekeeper "cosmossdk.io/x/evidence/keeper"
     authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
     bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -285,6 +286,7 @@ import (
     stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
     bankprecompile "github.com/cosmos/evm/precompiles/bank"
     "github.com/cosmos/evm/precompiles/bech32"
+    "github.com/cosmos/evm/precompiles/common" // v0.5.0+: Required for interfaces
     distprecompile "github.com/cosmos/evm/precompiles/distribution"
     evidenceprecompile "github.com/cosmos/evm/precompiles/evidence"
     govprecompile "github.com/cosmos/evm/precompiles/gov"
@@ -296,13 +298,14 @@ import (
     transferkeeper "github.com/cosmos/evm/x/ibc/transfer/keeper"
     "github.com/cosmos/evm/x/vm/core/vm"
     evmkeeper "github.com/cosmos/evm/x/vm/keeper"
-    channelkeeper "github.com/cosmos/ibc-go/v8/modules/core/04-channel/keeper"
+    channelkeeper "github.com/cosmos/ibc-go/v10/modules/core/04-channel/keeper" // Updated to v10
     "github.com/ethereum/go-ethereum/common"
 )
 
 const bech32PrecompileBaseGas = 6_000
 
 // NewAvailableStaticPrecompiles returns all available static precompiled contracts
+// v0.5.0+: Uses keeper interfaces instead of concrete types
 func NewAvailableStaticPrecompiles(
     stakingKeeper stakingkeeper.Keeper,
     distributionKeeper distributionkeeper.Keeper,
@@ -315,6 +318,7 @@ func NewAvailableStaticPrecompiles(
     govKeeper govkeeper.Keeper,
     slashingKeeper slashingkeeper.Keeper,
     evidenceKeeper evidencekeeper.Keeper,
+    addressCodec address.Codec, // Required for v0.5.0+
 ) map[common.Address]vm.PrecompiledContract {
     precompiles := maps.Clone(vm.PrecompiledContractsBerlin)
 
@@ -325,56 +329,81 @@ func NewAvailableStaticPrecompiles(
         panic(fmt.Errorf("failed to instantiate bech32 precompile: %w", err))
     }
 
-    stakingPrecompile, err := stakingprecompile.NewPrecompile(stakingKeeper, authzKeeper)
+    // v0.5.0+: Cast concrete keepers to interfaces
+    stakingPrecompile, err := stakingprecompile.NewPrecompile(
+        common.StakingKeeper(stakingKeeper), // Cast to interface
+    )
     if err != nil {
         panic(fmt.Errorf("failed to instantiate staking precompile: %w", err))
     }
 
-    distributionPrecompile, err := distprecompile.NewPrecompile(distributionKeeper, stakingKeeper, authzKeeper, evmKeeper)
+    distributionPrecompile, err := distprecompile.NewPrecompile(
+        common.DistributionKeeper(distributionKeeper), // Cast to interface
+        evmKeeper.Codec(), 
+        addressCodec, // Required in v0.5.0+
+    )
     if err != nil {
         panic(fmt.Errorf("failed to instantiate distribution precompile: %w", err))
     }
 
-    ibcTransferPrecompile, err := ics20precompile.NewPrecompile(stakingKeeper, transferKeeper, channelKeeper, authzKeeper, evmKeeper)
+    // ICS20 precompile - bankKeeper now first parameter in v0.5.0+
+    ibcTransferPrecompile, err := ics20precompile.NewPrecompile(
+        common.BankKeeper(bankKeeper),        // Now first parameter
+        common.StakingKeeper(stakingKeeper),  // Cast to interface
+        common.TransferKeeper(transferKeeper), // Cast to interface
+        common.ChannelKeeper(channelKeeper),  // Cast to interface
+    )
     if err != nil {
         panic(fmt.Errorf("failed to instantiate ICS20 precompile: %w", err))
     }
 
-    bankPrecompile, err := bankprecompile.NewPrecompile(bankKeeper, erc20Keeper)
+    bankPrecompile, err := bankprecompile.NewPrecompile(
+        common.BankKeeper(bankKeeper), // Cast to interface
+    )
     if err != nil {
         panic(fmt.Errorf("failed to instantiate bank precompile: %w", err))
     }
 
-    govPrecompile, err := govprecompile.NewPrecompile(govKeeper, authzKeeper)
+    // Gov precompile - now requires AddressCodec in v0.5.0+
+    govPrecompile, err := govprecompile.NewPrecompile(
+        govKeeper, 
+        evmKeeper.Codec(),
+        addressCodec, // Required in v0.5.0+
+    )
     if err != nil {
         panic(fmt.Errorf("failed to instantiate gov precompile: %w", err))
     }
 
-    slashingPrecompile, err := slashingprecompile.NewPrecompile(slashingKeeper, authzKeeper)
+    slashingPrecompile, err := slashingprecompile.NewPrecompile(
+        common.SlashingKeeper(slashingKeeper), // Cast to interface
+    )
     if err != nil {
         panic(fmt.Errorf("failed to instantiate slashing precompile: %w", err))
-    }
-
-    evidencePrecompile, err := evidenceprecompile.NewPrecompile(evidenceKeeper, authzKeeper)
-    if err != nil {
-        panic(fmt.Errorf("failed to instantiate evidence precompile: %w", err))
     }
 
     // Stateless precompiles
     precompiles[bech32Precompile.Address()] = bech32Precompile
     precompiles[p256Precompile.Address()] = p256Precompile
 
-    // Stateful precompiles
+    // Stateful precompiles  
     precompiles[stakingPrecompile.Address()] = stakingPrecompile
     precompiles[distributionPrecompile.Address()] = distributionPrecompile
     precompiles[ibcTransferPrecompile.Address()] = ibcTransferPrecompile
     precompiles[bankPrecompile.Address()] = bankPrecompile
     precompiles[govPrecompile.Address()] = govPrecompile
     precompiles[slashingPrecompile.Address()] = slashingPrecompile
-    precompiles[evidencePrecompile.Address()] = evidencePrecompile
 
     return precompiles
 }
+
+<Warning>
+**v0.5.0 Breaking Changes Applied Above:**
+- Precompile constructors now use keeper interfaces (cast required)  
+- ICS20 precompile: `bankKeeper` now first parameter
+- Gov precompile: `AddressCodec` now required
+- Distribution precompile: Simplified parameter list
+- Source: [`precompiles/common/interfaces.go`](https://github.com/cosmos/evm/blob/main/precompiles/common/interfaces.go)
+</Warning>
 ```
 
 ## Step 7: Update app.go Wiring
