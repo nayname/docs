@@ -51,7 +51,8 @@
                     "pages": [
                       "docs/v0.4.x/documentation/getting-started/index",
                       "docs/v0.4.x/documentation/getting-started/faq",
-                      "docs/v0.4.x/documentation/getting-started/development-environment",
+                      "docs/v0.4.x/documentation/getting-started/development-environment"
+                    ]
                       {
                         "group": "Tooling and Resources",
                         "pages": [
