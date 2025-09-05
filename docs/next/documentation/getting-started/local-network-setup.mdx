@@ -123,22 +123,6 @@ evmd start > ~/.evmd/node.log 2>&1 &
 
 ## Advanced Configuration Examples
 
-### Multi-Node Setup
-
-For testing with multiple validators:
-
-```bash
-# Node 1
-evmd init node1 --chain-id local-1 --home ~/.evmd-node1
-evmd config set client chain-id local-1 --home ~/.evmd-node1
-
-# Node 2
-evmd init node2 --chain-id local-1 --home ~/.evmd-node2
-evmd config set client chain-id local-1 --home ~/.evmd-node2
-
-# Configure persistent peers between nodes
-# Edit ~/.evmd-node1/config/config.toml and ~/.evmd-node2/config/config.toml
-```
 
 ### Custom Chain ID and Denom
 
@@ -213,8 +197,8 @@ cache-preimage = true
 # EIP-155 replay protection chain ID (must match your network)
 evm-chain-id = 1337
 
-# Minimum priority fee (tip) for transaction inclusion  
-min-tip = "1000000000"  # 1 gwei minimum tip
+# Minimum priority fee (tip) for transaction inclusion
+min-tip = 1000000000  # 1 gwei minimum tip (uint64 format)
 ```
 
 ```toml
@@ -297,27 +281,6 @@ evmd validate-genesis ~/.evmd/config/genesis.json
 - **Heavy Load Testing**: `200000000` (200M gas) - Complex DeFi protocols
 - **Stress Testing**: `500000000` (500M gas) - Maximum throughput testing
 
-### Mempool Priority Configuration
-
-Configure transaction priority and gas price enforcement:
-
-```toml
-# In app.toml - Priority fee configuration
-[evm]
-# Minimum tip (priority fee) required for transaction inclusion
-min-tip = "1000000000"  # 1 gwei (adjust based on network economics)
-
-# Alternative configurations for different scenarios:
-# min-tip = "0"             # No minimum tip (testing only)
-# min-tip = "5000000000"    # 5 gwei (higher priority threshold)
-# min-tip = "20000000000"   # 20 gwei (production-like environment)
-```
-
-**Priority Fee Best Practices:**
-- **Local Development**: Set `min-tip = "0"` to allow zero-fee transactions
-- **Testnet Simulation**: Use `min-tip = "1000000000"` (1 gwei) for realistic behavior
-- **Load Testing**: Increase `min-tip` to test fee market dynamics
-- **DeFi Protocol Testing**: Configure competitive fee levels for MEV testing
 
 ### Genesis Configuration Workarounds
 
