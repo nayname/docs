@@ -1,5 +1,5 @@
 ---
-title: Node Configuration Guide
+title: Node Configuration
 description: Complete reference for configuring Cosmos EVM nodes, JSON-RPC settings, and command-line options
 mode: "wide"
 ---
@@ -8,7 +8,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
 
 <Tabs>
 
-  <Tab title="EVM Parameters">
+  <Tab title="EVM">
     EVM execution environment configuration.
 
     <ParamField body="tracer" type="string" default="">
@@ -50,9 +50,19 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
       **Source:** `server/config/config.go:145`
       **Used in:** `x/vm/genesis.go:22`
     </ParamField>
+
+    <ParamField body="min-tip" type="string" default="0">
+      Minimum priority fee (tip) required for transaction inclusion.
+
+      Set to 0 to allow zero-fee transactions for development.
+
+      **Flag:** `--evm.min-tip`
+      **Source:** `config/server_app_options.go` via `GetMinTip()`
+      **Implementation:** `server/flags/flags.go:EVMMinTip`
+    </ParamField>
   </Tab>
 
-  <Tab title="JSON-RPC Parameters">
+  <Tab title="JSON-RPC">
     Ethereum JSON-RPC server configuration.
 
     ## Core Settings
@@ -227,7 +237,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     </ParamField>
   </Tab>
 
-  <Tab title="TLS Configuration">
+  <Tab title="TLS">
     TLS settings for JSON-RPC server.
 
     <ParamField body="certificate-path" type="string" default="">
@@ -249,7 +259,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     </ParamField>
   </Tab>
 
-  <Tab title="Command-Line Flags">
+  <Tab title="CLI Flags">
     Complete list of EVM-specific command-line flags for `evmd start`.
 
     ## EVM Flags
@@ -420,7 +430,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     </Note>
   </Tab>
 
-  <Tab title="Full Configuration">
+  <Tab title="app.toml">
     Complete `app.toml` with EVM-specific sections highlighted.
 
     ```toml app.toml lines highlight={131-133,135,137-140,142-143,145-146,148-149,151-153,155,157-158,160-161,163-164,166-168,170-172,174-175,177-178,180-181,183-184,186-187,189-190,192-193,195-196,198-199,201-202,204-206,208-210,212-213,215-217,219-220,222-223,225-226,228-229,231-233,235,237-238,240-241}
@@ -678,54 +688,8 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     </Note>
   </Tab>
 
-  <Tab title="Chain Configuration">
-    Dynamic chain configuration system for runtime parameter management.
-
-    ## Configuration Methods
-
-    ### CLI Flags (Highest Priority)
-
-    Override any configuration parameter at runtime:
-
-    ```bash
-    evmd start \
-      --chain-id custom-evm-1 \
-      --evm-chain-id 1234 \
-      --denom ucustom \
-      --coin-type 60 \
-      --decimals 18
-    ```
-
-    ### Configuration Files
-
-    Create `config/chain.toml` for persistent settings:
-
-    ```toml
-    [chain]
-    id = "custom-evm-1"
-    evm-chain-id = 1234
-    denom = "ucustom"
-    extended-denom = "custom"
-    display-denom = "CUSTOM"
-    decimals = 18
-    coin-type = 60
-    ```
-
-    ### Environment Variables
-
-    Set configuration through environment:
-
-    ```bash
-    export EVMD_CHAIN_ID="custom-evm-1"
-    export EVMD_EVM_CHAIN_ID="1234"
-    export EVMD_DENOM="ucustom"
-    export EVMD_EXTENDED_DENOM="custom"
-    export EVMD_DISPLAY_DENOM="CUSTOM"
-    export EVMD_DECIMALS="18"
-    export EVMD_COIN_TYPE="60"
-    ```
-
-    ## Parameter Reference
+  <Tab title="Chain">
+    Chain-specific configuration parameters.
 
     <ParamField body="chain-id" type="string" default="local-1">
       Cosmos SDK chain identifier for transaction signing and network identification.
@@ -783,95 +747,5 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
       **Config File:** `chain.coin-type`
     </ParamField>
 
-    ## Configuration Priority
-
-    Parameters are resolved in this order (highest to lowest):
-
-    1. **CLI Flags** - Runtime command-line arguments
-    2. **Configuration Files** - `config/chain.toml` settings
-    3. **Environment Variables** - System environment settings
-    4. **Built-in Defaults** - Fallback values
-
-    ## Environment Examples
-
-    ### Development Setup
-    ```bash
-    # Local development with custom parameters
-    evmd start \
-      --chain-id dev-evm-1337 \
-      --evm-chain-id 1337 \
-      --denom udev \
-      --json-rpc.enable \
-      --json-rpc.api eth,net,web3,debug
-    ```
-
-    ### Production Setup
-    ```toml
-    # Production config/chain.toml
-    [chain]
-    id = "production-evm-1"
-    evm-chain-id = 1001
-    denom = "uprod"
-    extended-denom = "prod"
-    display-denom = "PROD"
-    decimals = 18
-    coin-type = 60
-    ```
-
-    ```bash
-    # Production node startup
-    evmd start --config /etc/evmd/config
-    ```
-
-    ### Testing Setup
-    ```bash
-    # Testnet with isolated parameters
-    evmd testnet \
-      --v 4 \
-      --output-dir ./testnet \
-      --chain-id test-evm-999 \
-      --evm-chain-id 999 \
-      --denom utest \
-      --coin-type 1
-    ```
-
-    ## Configuration Validation
-
-    Verify your configuration setup:
-
-    ```bash
-    # Check current configuration
-    evmd config show
-
-    # Validate configuration hierarchy
-    evmd config validate
-
-    # Test specific parameter resolution
-    evmd config get chain.id
-    evmd config get chain.evm-chain-id
-    ```
-
-    ## Legacy Migration
-
-    **Pre-v0.5.0 (Static Configuration):**
-    ```go
-    // Hard-coded in source
-    const ChainID = "local-1"
-    const Denom = "atest"
-    ```
-
-    **v0.5.0+ (Dynamic Configuration):**
-    ```bash
-    # Runtime configuration
-    evmd start --chain-id local-1 --denom atest
-    ```
-
-    <Warning>
-    **Breaking Change**: v0.5.0 removes static configuration constants. Use the dynamic configuration system for all chain parameters.
-    </Warning>
-
-    <Note>
-      **Configuration Location**: Chain configuration files should be placed in the node's config directory alongside `app.toml` and `config.toml`.
-    </Note>
   </Tab>
 </Tabs>
