@@ -52,13 +52,13 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     </ParamField>
 
     <ParamField body="min-tip" type="number" default="0">
-      Minimum priority fee (tip) required for transaction inclusion.
+      Minimum priority fee (tip) required for transaction inclusion in mempool.
 
-      Set to 0 to disable minimum tip requirement.
+      Transactions with tips below this value may be rejected. Set to 0 to disable filtering.
 
-      **Flag:** `srvflags.EVMMinTip` 
+      **Flag:** `EVMMinTip` 
       **Source:** `config/server_app_options.go:GetMinTip()`
-      **Type:** `uint256.Int`
+      **Type:** Converted to `uint256.Int` internally
     </ParamField>
 
   </Tab>
@@ -279,10 +279,6 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
 
     <ParamField body="--evm.evm-chain-id" type="number">
       EIP-155 replay protection chain ID
-    </ParamField>
-
-    <ParamField body="--evm.min-tip" type="number">
-      Minimum priority fee (tip) for transaction inclusion
     </ParamField>
 
     ## JSON-RPC Flags
@@ -588,9 +584,6 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
 
     # EVMChainID is the EIP-155 compatible replay protection chain ID. This is separate from the Cosmos chain ID.
     evm-chain-id = 262144
-    
-    # MinTip is the minimum priority fee for transaction inclusion (uint64 format).
-    min-tip = 0
 
     ###############################################################################
     ###                           JSON RPC Configuration                        ###
