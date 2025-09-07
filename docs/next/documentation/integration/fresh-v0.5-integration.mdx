@@ -336,7 +336,7 @@ if cosmosevmtypes.GetChainConfig() != nil {
     mempoolConfig := &evmmempool.EVMMempoolConfig{
         AnteHandler:   app.GetAnteHandler(),      // Must be set first
         BlockGasLimit: blockGasLimit,             // From genesis consensus params
-        MinTip:        minTip,                    // From app.toml evm.min-tip
+        MinTip:        minTip,                    // From app.toml evm.min-tip (v0.5.0)
     }
 
     // Initialize EVM mempool
@@ -522,7 +522,7 @@ rootCmd.AddCommand(
 ### app.toml EVM Section
 
 ```toml
-# EVM configuration (required for v0.5.0)
+# EVM configuration (v0.5.0)
 [evm]
 # Minimum priority fee for mempool (in wei)
 min-tip = 0
@@ -756,7 +756,7 @@ error: mempool config must not be nil
 mempoolConfig := &evmmempool.EVMMempoolConfig{
     AnteHandler:   app.GetAnteHandler(),  // Must be set AFTER ante handler
     BlockGasLimit: blockGasLimit,
-    MinTip:        minTip,
+    MinTip:        minTip,                // From app.toml evm.min-tip (v0.5.0)
 }
 ```
 

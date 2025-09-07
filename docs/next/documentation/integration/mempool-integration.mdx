@@ -3,10 +3,6 @@ title: "EVM Mempool Integration"
 description: "Integrate the EVM mempool with your Cosmos EVM chain"
 tags: ["mempool"]
 ---
-<Danger>
-This mempool is **experimental** and in active development. It is intended for testing and evaluation purposes. Use in production environments is **not recommended** without thorough testing and risk assessment.
-Please [report issues](https://github.com/cosmos/evm/issues/new) and submit feedback to help improve stability.
-</Danger>
 
 ## Overview
 
@@ -74,7 +70,7 @@ if evmtypes.GetChainConfig() != nil {
 ```
 
 <Warning>
-**v0.5.0 Breaking Change:** The global mempool registry (`SetGlobalEVMMempool`) has been removed. Mempool is now passed directly to the JSON-RPC server during initialization.
+**Breaking Change from v0.4.x:** The global mempool registry (`SetGlobalEVMMempool`) has been removed. Mempool is now passed directly to the JSON-RPC server during initialization.
 </Warning>
 
 ## Configuration Options
@@ -90,7 +86,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
 }
 ```
 
-### Full Configuration Options (v0.5.0+)
+### Full Configuration Options
 
 ```go
 type EVMMempoolConfig struct {
