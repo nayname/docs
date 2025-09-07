@@ -689,23 +689,28 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     </Note>
   </Tab>
 
-  <Tab title="Chain">
-    Chain-specific configuration parameters.
+  <Tab title="Runtime Flags">
+    CLI flags and environment variables for runtime configuration. These parameters can be set via command line or environment variables to override configuration file settings.
+
+    <Note>
+    **Context**: These are EVM-specific runtime parameters that complement the standard Cosmos SDK flags. They control chain initialization and runtime behavior specific to EVM functionality.
+    </Note>
 
     <ParamField body="chain-id" type="string" default="local-1">
       Cosmos SDK chain identifier for transaction signing and network identification.
 
       **CLI Flag:** `--chain-id`
       **Environment:** `EVMD_CHAIN_ID`
-      **Config File:** `chain.id`
+      **Usage:** `evmd start --chain-id mychain-1`
     </ParamField>
 
     <ParamField body="evm-chain-id" type="number" default="262144">
-      EIP-155 replay protection chain ID for Ethereum compatibility.
+      EIP-155 replay protection chain ID for Ethereum compatibility. Must be unique across all EVM networks.
 
-      **CLI Flag:** `--evm-chain-id`
+      **CLI Flag:** `--evm.evm-chain-id`
       **Environment:** `EVMD_EVM_CHAIN_ID`
-      **Config File:** `chain.evm-chain-id`
+      **Usage:** `evmd start --evm.evm-chain-id 9000`
+      **Config Alternative:** Set in `app.toml` under `[evm] evm-chain-id`
     </ParamField>
 
     <ParamField body="denom" type="string" default="atest">
@@ -713,40 +718,94 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
 
       **CLI Flag:** `--denom`
       **Environment:** `EVMD_DENOM`
-      **Config File:** `chain.denom`
+      **Usage:** `evmd init mynode --denom mytoken`
     </ParamField>
 
-    <ParamField body="extended-denom" type="string" default="test">
-      Extended denomination for token metadata and display purposes.
+    <ParamField body="min-tip" type="number" default="0">
+      Minimum priority fee (in wei) required for mempool inclusion.
 
-      **CLI Flag:** `--extended-denom`
-      **Environment:** `EVMD_EXTENDED_DENOM`
-      **Config File:** `chain.extended-denom`
+      **CLI Flag:** `--evm.min-tip`
+      **Environment:** `EVMD_EVM_MIN_TIP`
+      **Usage:** `evmd start --evm.min-tip 1000000000`
+      **Config Alternative:** Set in `app.toml` under `[evm] min-tip`
     </ParamField>
 
-    <ParamField body="display-denom" type="string" default="TEST">
-      Human-readable denomination displayed in wallets and interfaces.
+    <ParamField body="max-tx-gas-wanted" type="number" default="0">
+      Maximum gas limit for transactions in CheckTx validation mode.
 
-      **CLI Flag:** `--display-denom`
-      **Environment:** `EVMD_DISPLAY_DENOM`
-      **Config File:** `chain.display-denom`
+      **CLI Flag:** `--evm.max-tx-gas-wanted`
+      **Environment:** `EVMD_MAX_TX_GAS_WANTED`
+      **Usage:** `evmd start --evm.max-tx-gas-wanted 50000000`
+      **Config Alternative:** Set in `app.toml` under `[evm] max-tx-gas-wanted`
     </ParamField>
 
-    <ParamField body="decimals" type="number" default="18">
-      Number of decimal places for the native token (Ethereum standard).
+  </Tab>
 
-      **CLI Flag:** `--decimals`
-      **Environment:** `EVMD_DECIMALS`
-      **Config File:** `chain.decimals`
-    </ParamField>
+  <Tab title="genesis.json">
+    Blockchain initialization parameters set during chain genesis. These EVM-specific parameters configure the initial state and behavior of the EVM module.
 
-    <ParamField body="coin-type" type="number" default="60">
-      BIP-44 coin type for HD wallet derivation (60 = Ethereum standard).
+    <Note>
+    **Context**: These parameters are set once during chain initialization and typically cannot be changed without governance proposals or network upgrades. They control fundamental EVM behavior and compatibility.
+    </Note>
 
-      **CLI Flag:** `--coin-type`
-      **Environment:** `EVMD_COIN_TYPE`
-      **Config File:** `chain.coin-type`
-    </ParamField>
+    ```json
+    {
+      "chain_id": "mychain-1",
+      "app_state": {
+        "evm": {
+          "params": {
+            "evm_denom": "atest",
+            "history_serve_window": 8192,
+            "active_static_precompiles": [
+              "0x0000000000000000000000000000000000000100",
+              "0x0000000000000000000000000000000000000400",
+              "0x0000000000000000000000000000000000000800",
+              "0x0000000000000000000000000000000000000801",
+              "0x0000000000000000000000000000000000000802",
+              "0x0000000000000000000000000000000000000804",
+              "0x0000000000000000000000000000000000000805"
+            ],
+            "access_control": {
+              "create": {"access_type": "ACCESS_TYPE_PERMISSIONLESS"},
+              "call": {"access_type": "ACCESS_TYPE_PERMISSIONLESS"}
+            }
+          }
+        },
+        "feemarket": {
+          "params": {
+            "no_base_fee": false,
+            "base_fee_change_denominator": 8,
+            "elasticity_multiplier": 2,
+            "base_fee": "1000000000",
+            "min_gas_price": "0",
+            "min_gas_multiplier": "0.5"
+          }
+        }
+      },
+      "consensus": {
+        "params": {
+          "block": {
+            "max_bytes": "22020096",
+            "max_gas": "100000000"
+          }
+        }
+      }
+    }
+    ```
+
+    **EVM-Specific Parameters:**
+    - `evm_denom`: Base denomination for EVM operations and gas payments
+    - `history_serve_window`: Number of historical block hashes to store (EIP-2935)
+    - `active_static_precompiles`: Enabled precompile contract addresses
+    - `access_control`: Permissions for contract creation and execution
+
+    **Fee Market Parameters:**
+    - `base_fee`: Initial EIP-1559 base fee value
+    - `base_fee_change_denominator`: Rate of base fee adjustment
+    - `elasticity_multiplier`: Block utilization threshold for fee changes
+
+    **Consensus Parameters:**
+    - `max_gas`: Maximum gas per block (critical for mempool configuration)
 
   </Tab>
 </Tabs>

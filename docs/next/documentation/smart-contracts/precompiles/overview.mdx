@@ -20,6 +20,38 @@ keywords: ['precompiles', 'precompiled contracts', 'cosmos sdk', 'evm', 'smart c
 | **Slashing**     | `0x0000000000000000000000000000000000000806` | Validator slashing and jail management                           | [Details](./slashing)     |
 | **P256**         | `0x0000000000000000000000000000000000000100` | P-256 elliptic curve cryptographic operations                    | [Details](./p256)         |
 
+## Configuration
+
+### Genesis Configuration
+
+Precompiles must be enabled in the genesis file to be available on the network. The `active_static_precompiles` parameter controls which precompiles are activated at network launch.
+
+```json
+{
+  "app_state": {
+    "evm": {
+      "params": {
+        "active_static_precompiles": [
+          "0x0000000000000000000000000000000000000100",  // P256
+          "0x0000000000000000000000000000000000000400",  // Bech32  
+          "0x0000000000000000000000000000000000000800",  // Staking
+          "0x0000000000000000000000000000000000000801",  // Distribution
+          "0x0000000000000000000000000000000000000802",  // ICS20
+          "0x0000000000000000000000000000000000000804",  // Bank
+          "0x0000000000000000000000000000000000000805",  // Governance
+          "0x0000000000000000000000000000000000000806",  // Slashing
+          "0x0000000000000000000000000000000000000807"   // Callbacks
+        ]
+      }
+    }
+  }
+}
+```
+
+<Note>
+For complete genesis configuration including EVM and fee market parameters, see the [Node Configuration](/docs/next/documentation/getting-started/node-configuration#genesis-json) reference.
+</Note>
+
 ## v0.5.0 Breaking Changes
 
 <Warning>
