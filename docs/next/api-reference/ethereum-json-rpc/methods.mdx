@@ -73,8 +73,8 @@ The following namespaces are not implemented in Cosmos EVM but may be present in
 | [`eth_sendTransaction`](#eth_sendtransaction)                                         | Eth       | N          | N      | Not implemented    |
 | [`eth_sendRawTransaction`](#eth_sendrawtransaction)                                   | Eth       | Y          | Y      |                    |
 | [`eth_call`](#eth_call)                                                               | Eth       | Stub       | Y      | Returns "0x"       |
-| [`eth_createAccessList`](#eth_createaccesslist)                                       | Eth       | Y          | Y      | v0.5.0+            |
-| [`eth_estimateGas`](#eth_estimategas)                                                 | Eth       | Y          | Y      | Optimized in v0.5.0+ |
+| [`eth_createAccessList`](#eth_createaccesslist)                                       | Eth       | Y          | Y      | EIP-2930 |
+| [`eth_estimateGas`](#eth_estimategas)                                                 | Eth       | Y          | Y      | Optimized |
 | [`eth_getBlockByNumber`](#eth_getblockbynumber)                                       | Eth       | Y          | Y      |                    |
 | [`eth_getBlockByHash`](#eth_getblockbyhash)                                           | Eth       | Y          | Y      |                    |
 | [`eth_getTransactionByHash`](#eth_gettransactionbyhash)                               | Eth       | Stub       | Y      | Returns null       |
@@ -109,7 +109,7 @@ The following namespaces are not implemented in Cosmos EVM but may be present in
 | `eth_chainId`                                                                         | Eth       | Y          | Y      |                    |
 | `eth_getBlockReceipts`                                                                | Eth       | Stub       | Y      | Returns empty array|
 | [`eth_resend`](#eth_resend)                                                          | Eth       | N          | Y      | Requires nonce param |
-| `eth_createAccessList`                                                                | Eth       | Stub       | Y      | Returns partial data |
+| [`eth_createAccessList`](#eth_createaccesslist)                                       | Eth       | Y          | Y      | EIP-2930 |
 | `eth_blobBaseFee`                                                                     | Eth       | N          | Y      | EIP-4844 not implemented |
 | `eth_fillTransaction`                                                                 | Eth       | N          | Y      | Not implemented    |
 | [`eth_signTypedData`](#eth_signtypeddata)                                            | Eth       | N          | N      | Requires domain param |
@@ -2171,3 +2171,97 @@ txpool.status();
 ```json
 {"jsonrpc":"2.0","id":1,"result":{"pending":"0x0","queued":"0x0"}}
 ```
+
+### `eth_createAccessList`
+
+<Note>
+This method is fully implemented and supports EIP-2930 access list transactions.
+</Note>
+
+Creates an access list for a given transaction. This is useful for optimizing gas costs when calling contracts, as it allows the transaction to specify which storage slots will be accessed, potentially reducing gas costs for those accesses.
+
+The access list contains addresses and storage keys that the transaction plans to access. When included in a transaction, these pre-declared accesses cost less gas.
+
+#### Parameters
+
+1. **Transaction Object** - The transaction call object
+   - `from`: `DATA`, 20 Bytes - (optional) The address the transaction is sent from
+   - `to`: `DATA`, 20 Bytes - The address the transaction is directed to
+   - `gas`: `QUANTITY` - (optional) Integer of the gas provided for the transaction execution
+   - `gasPrice`: `QUANTITY` - (optional) Integer of the gasPrice used for each paid gas
+   - `maxFeePerGas`: `QUANTITY` - (optional) Maximum fee per gas the sender is willing to pay
+   - `maxPriorityFeePerGas`: `QUANTITY` - (optional) Maximum priority fee per gas the sender is willing to pay
+   - `value`: `QUANTITY` - (optional) Integer of the value sent with this transaction
+   - `data`: `DATA` - (optional) Hash of the method signature and encoded parameters
+   - `accessList`: `ARRAY` - (optional) List of addresses and storage keys the transaction plans to access
+
+2. **Block Parameter** - `QUANTITY|TAG` - integer block number, or the string "latest", "earliest" or "pending"
+
+#### Client Examples
+
+Shell HTTP
+
+```shell
+curl -X POST --data '{
+  "jsonrpc":"2.0",
+  "method":"eth_createAccessList",
+  "params":[{
+    "from": "0x8D97689C9818892B700e27F316cc3E41e17fBeb9",
+    "to": "0xd3CdA913deB6f67967B99D67aCDFa1712C293601",
+    "data": "0x70a08231000000000000000000000000d3CdA913deB6f67967B99D67aCDFa1712C293601"
+  }, "latest"],
+  "id":1
+}' -H "Content-Type: application/json" http://localhost:8545
+```
+
+Websocket
+
+```shell
+wscat -c ws://localhost:8546 -x '{
+  "jsonrpc": "2.0", 
+  "id": 1, 
+  "method": "eth_createAccessList", 
+  "params": [{
+    "from": "0x8D97689C9818892B700e27F316cc3E41e17fBeb9",
+    "to": "0xd3CdA913deB6f67967B99D67aCDFa1712C293601",
+    "data": "0x70a08231000000000000000000000000d3CdA913deB6f67967B99D67aCDFa1712C293601"
+  }, "latest"]
+}'
+```
+
+Javascript (web3.js)
+
+```javascript
+web3.eth.createAccessList({
+  from: "0x8D97689C9818892B700e27F316cc3E41e17fBeb9",
+  to: "0xd3CdA913deB6f67967B99D67aCDFa1712C293601",
+  data: "0x70a08231000000000000000000000000d3CdA913deB6f67967B99D67aCDFa1712C293601"
+}, "latest");
+```
+
+#### Result
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "accessList": [
+      {
+        "address": "0xd3CdA913deB6f67967B99D67aCDFa1712C293601",
+        "storageKeys": [
+          "0x0000000000000000000000000000000000000000000000000000000000000001"
+        ]
+      }
+    ],
+    "gasUsed": "0x5208"
+  }
+}
+```
+
+#### Return Values
+
+- `accessList`: `ARRAY` - List of addresses and storage keys used by the transaction
+  - `address`: `DATA`, 20 Bytes - Address accessed by the transaction
+  - `storageKeys`: `ARRAY` - Array of storage keys accessed at this address
+- `gasUsed`: `QUANTITY` - Estimated gas consumed by the transaction with the access list

@@ -92,6 +92,17 @@ At this point, you can modify the configuration files to suit your needs:
 Edit `~/.evmd/config/app.toml`:
 
 ```toml
+# EVM Configuration (required for app-side mempool)
+[evm]
+# Minimum priority fee for mempool (in wei)
+min-tip = 0
+
+# EIP-155 chain ID (separate from Cosmos chain ID)  
+evm-chain-id = 262144
+
+# Maximum gas for eth transactions in check tx mode
+max-tx-gas-wanted = 0
+
 [json-rpc]
 # Enable the JSON-RPC server (disabled by default)
 enable = true
@@ -99,8 +110,14 @@ enable = true
 # Enable transaction indexer for eth_getLogs support
 enable-indexer = true
 
-# Enable common namespaces
+# Enable common namespaces (including txpool for app-side mempool)
 api = "eth,net,web3,txpool,debug"
+
+# Gas and performance caps
+gas-cap = 25000000                    # Gas cap for eth_call/estimateGas
+filter-cap = 200                      # Maximum concurrent filters
+logs-cap = 10000                      # Max results from eth_getLogs
+block-range-cap = 10000               # Max block range for eth_getLogs
 ```
 
 ### Start Your Custom Network
@@ -126,11 +143,9 @@ evmd start > ~/.evmd/node.log 2>&1 &
 
 ### Custom Chain ID and Denom
 
-<Note>
-**v0.5.0 Dynamic Configuration**: Chain parameters can now be configured at runtime without modifying source code. Use CLI flags or configuration files for flexible setup.
-</Note>
+Chain parameters can be configured via CLI flags at runtime or through configuration files.
 
-**Using CLI Flags (Recommended):**
+**Using CLI Flags:**
 ```bash
 # Initialize with custom parameters via CLI flags
 evmd init mychain \
