@@ -1,168 +1,54 @@
 ---
 title: "Overview"
-description: "Understanding the Ethereum Virtual Machine as implemented in the Cosmos SDK"
+description: "Understanding how the EVM module provides Ethereum compatibility within the Cosmos SDK platform"
 icon: "microchip"
 ---
 
-## What is the EVM?
+The Cosmos EVM module implements a complete Ethereum Virtual Machine as a Cosmos SDK module, providing an Ethereum-compatible interface to the underlying Cosmos consensus and infrastructure while enabling access to the broader Cosmos ecosystem.
 
-The Ethereum Virtual Machine (EVM) is a computation engine that executes smart contracts in a deterministic, isolated environment. Every node computes identical results given the same starting state and transaction.
+## Platform Integration
 
-### Core Components
+The EVM module sits atop the Cosmos SDK platform, leveraging its modular architecture:
 
-The EVM operates as a stack-based machine with:
+- **Consensus Layer**: CometBFT provides Byzantine fault-tolerant consensus with instant finality
+- **State Management**: Cosmos SDK's IAVL tree and KVStore handle state persistence
+- **Account System**: Unified account model supporting both Ethereum and Cosmos address formats
+- **Module Ecosystem**: Direct access to staking, governance, bank, and IBC modules through precompiles
 
-- **Virtual ROM**: Read-only memory containing contract bytecode
-- **Machine State**: Volatile memory that resets after each transaction
-  - Program Counter (PC)
-  - Gas meter
-  - Stack (1024 items max, 256-bit words)
-  - Memory (byte-addressable, expandable)
-- **Account Storage**: Persistent key-value store per contract
+## Ethereum Compatibility
 
-## State Model
+The EVM module provides complete Ethereum compatibility, enabling all standard Ethereum tooling and workflows:
 
-### Account Types
+- **Smart Contracts**: Full EVM bytecode execution with identical gas costs and opcode behavior
+- **Transaction Types**: Support for all Ethereum transaction formats including EIP-1559 and EIP-7702
+- **JSON-RPC API**: Complete Ethereum RPC implementation for seamless tool integration
+- **Development Tools**: Works with MetaMask, Hardhat, Foundry, Remix, and all Ethereum development frameworks
 
-The EVM recognizes two types of accounts:
+## Enhanced Features
 
-1. **Externally Owned Accounts (EOAs)**
-   - Controlled by private keys
-   - Can initiate transactions
-   - Contains: nonce, balance
+### Cosmos SDK Benefits
+- **Instant Finality**: Transactions are final after one block (~2 seconds) with no reorganizations
+- **Cross-Chain Integration**: Native IBC support for interacting with other Cosmos chains
+- **Modular Access**: Smart contracts can directly interact with staking, governance, and other Cosmos modules
+- **Enhanced Security**: Byzantine fault-tolerant consensus with stake-based validator selection
 
-2. **Smart Contracts**
-   - Controlled by code
-   - Activated by transactions or calls
-   - Contains: nonce, balance, code hash, storage root
+## Key Differences from Standard Ethereum
 
-### State Transitions
+- **Consensus**: CometBFT instead of proof-of-stake, providing instant finality
+- **State Storage**: IAVL tree and Cosmos SDK KVStore instead of Merkle Patricia Tree  
+- **Fee Distribution**: Base fees distributed to validators instead of burned
+- **Cross-Chain**: Native IBC integration for seamless interchain operations
+- **Module Access**: Smart contracts can directly call Cosmos SDK modules
 
-State transitions occur through transaction execution:
+## Developer Experience
 
-1. Transaction validates (signature, nonce, balance)
-2. EVM instantiates with transaction context
-3. Code executes opcode by opcode
-4. State changes apply if successful
-5. Gas refunds calculated and applied
+Developers can build on Cosmos EVM using familiar Ethereum tools and patterns:
 
-## Cosmos EVM Integration
+- **Standard Tooling**: MetaMask, Hardhat, Foundry, Remix work without modification
+- **Ethereum Libraries**: Web3.js, Ethers.js, and other libraries work seamlessly
+- **Smart Contracts**: Deploy existing Ethereum contracts without changes
+- **Enhanced Capabilities**: Access Cosmos modules and IBC through precompiled contracts
 
-### Architectural Differences
+For detailed technical implementation, see individual concept pages for [transactions](/docs/next/documentation/concepts/transactions), [accounts](/docs/next/documentation/concepts/accounts), [gas and fees](/docs/next/documentation/concepts/gas-and-fees), and [precompiles](/docs/next/documentation/smart-contracts/precompiles).
 
-Traditional Ethereum uses a Merkle Patricia Tree for state, while Cosmos EVM uses:
-
-- **IAVL Tree**: For consensus state storage
-- **KVStore**: For contract code and storage
-- **Dual Account Model**: Cosmos SDK accounts + Ethereum accounts
-
-### Consensus Integration
-
-Instead of Ethereum's proof-of-stake:
-- **CometBFT**: Byzantine fault-tolerant consensus
-- **Instant Finality**: No need for confirmations
-- **IBC Compatible**: Native cross-chain communication
-
-## Smart Contract Execution
-
-### EVM Bytecode
-
-Contracts compile to EVM bytecode - a low-level instruction set:
-
-```
-PUSH1 0x60    // Push 1 byte onto stack
-PUSH1 0x40    // Push another byte
-MSTORE        // Store in memory
-CALLVALUE     // Get msg.value
-DUP1          // Duplicate top stack item
-```
-
-Each opcode has a fixed gas cost reflecting computational complexity.
-
-### Execution Context
-
-When executing, the EVM has access to:
-
-- **Message Context**: sender, value, data, gas
-- **Block Context**: number, timestamp, difficulty
-- **Chain Context**: chainID, coinbase
-
-### Gas Model
-
-Gas serves two purposes:
-1. **Computation Metering**: Prevents infinite loops
-2. **Resource Pricing**: Allocates network resources
-
-Gas costs vary by operation type:
-- Arithmetic: 3-5 gas
-- Storage reads: 200 gas
-- Storage writes: 5,000-20,000 gas
-- Contract creation: 32,000 gas base
-
-## Transaction Types
-
-### Legacy (Pre-EIP-155)
-Simple transactions with:
-- Fixed gas price
-- No replay protection
-- No access lists
-
-### EIP-155 Transactions
-Replay protection features:
-- Chain ID in signature
-- Modified signature verification
-- Fork-specific validation
-
-### EIP-2930 Access Lists
-Access lists provide:
-- Pre-declared state access
-- Reduced gas costs for accessed items
-- Gas cost predictability
-
-### EIP-1559 Dynamic Fees
-Fee model with:
-- Base fee + priority tip structure
-- Dynamic base fee adjustment
-- Fee burning mechanism
-- Predictable fee estimation
-
-## Precompiled Contracts
-
-Precompiles are native implementations of common operations. Native implementation provides significantly better performance than EVM opcodes for cryptographic operations.
-
-### Cosmos Extensions
-Beyond Ethereum's precompiles, Cosmos EVM adds:
-- Native module interactions (staking, governance)
-- IBC operations
-- Cross-chain messaging
-- Bech32 address handling
-
-## State Management
-
-### Journaling System
-The EVM uses journaling for atomic state transitions:
-1. Record each state change
-2. Apply changes optimistically
-3. Revert on failure using journal
-4. Commit on success
-
-### Access Patterns
-State access follows specific patterns:
-- **Cold Access**: First access to account/slot (expensive)
-- **Warm Access**: Subsequent access (cheaper)
-- **Access Lists**: Pre-warm addresses and slots
-
-## Security Considerations
-
-### Isolation Properties
-- **Deterministic Execution**: Same input → same output
-- **Sandboxed Environment**: No system access
-- **Gas Limitations**: Bounded computation
-- **Atomic Transactions**: All or nothing execution
-
-### Attack Vectors and Mitigations
-- **Reentrancy**: Checks-effects-interactions pattern
-- **Integer Overflow**: SafeMath and Solidity 0.8+
-- **Front-running**: Commit-reveal schemes, private mempools
-- **DOS Attacks**: Gas limits, storage gas costs
 

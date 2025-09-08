@@ -275,9 +275,7 @@
                                             {
                                                 "group": "Predeployed Contracts",
                                                 "pages": [
-                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/overview",
-                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/implementation-guide",
-                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/create2",
+                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/overview",                                                    "docs/next/documentation/smart-contracts/predeployed-contracts/create2",
                                                     "docs/next/documentation/smart-contracts/predeployed-contracts/multicall3",
                                                     "docs/next/documentation/smart-contracts/predeployed-contracts/permit2",
                                                     "docs/next/documentation/smart-contracts/predeployed-contracts/safe-factory"

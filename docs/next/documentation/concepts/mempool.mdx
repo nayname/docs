@@ -215,6 +215,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
     AnteHandler:   app.GetAnteHandler(),
     BroadCastTxFn: customBroadcastFunc, // ← NEW: Optional custom broadcast
     BlockGasLimit: 100_000_000,         // ← NEW: Configurable gas limit
+    MinTip:        uint256.NewInt(1000000000), // ← NEW: Minimum tip filter (optional)
 }
 ```
 
@@ -445,6 +446,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
 - If `BlockGasLimit` is set to `0`, defaults to `100_000_000`
 - If `LegacyPoolConfig` is `nil`, uses `legacypool.DefaultConfig`  
 - If `CosmosPoolConfig` is `nil`, uses default priority mempool
+- If `MinTip` is `nil`, no minimum tip enforcement
 - `BroadCastTxFn` is optional (uses default broadcast if nil)
 
 #### Step 5: Initialization Location
@@ -460,6 +462,7 @@ func NewApp(...) *App {
         mempoolConfig := &evmmempool.EVMMempoolConfig{
             AnteHandler:   app.GetAnteHandler(), // Must be set first
             BlockGasLimit: 100_000_000,
+            MinTip:        uint256.NewInt(1000000000), // 1 gwei minimum tip
             // Add custom configs here
         }
         
