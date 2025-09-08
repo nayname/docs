@@ -1,7 +1,6 @@
 ---
 title: "EIP-2935: Historical Block Hash Storage"
 description: "Implementation of EIP-2935 for reliable historical block hash access in smart contracts"
-icon: "clock"
 ---
 
 EIP-2935 provides standardized access to historical block hashes through contract storage, enabling smart contracts to reliably access block hashes beyond the traditional 256-block limit.
@@ -59,7 +58,7 @@ The `history_serve_window` parameter controls how many historical block hashes a
 - **Same opcode behavior:** `BLOCKHASH` queries contract storage
 - **Same gas costs:** Standard SLOAD costs apply (2100 gas for cold access)
 
-### Differences  
+### Differences
 
 - **Configurable window:** Cosmos EVM allows custom `history_serve_window` (vs fixed 8192 in Ethereum)
 - **Instant activation:** Available immediately on upgrade (not block-based activation)
@@ -75,19 +74,19 @@ The `history_serve_window` parameter controls how many historical block hashes a
 pragma solidity ^0.8.0;
 
 contract BlockHashExample {
-    function getRecentBlockHash(uint256 blockNumber) 
-        external 
-        view 
-        returns (bytes32) 
+    function getRecentBlockHash(uint256 blockNumber)
+        external
+        view
+        returns (bytes32)
     {
         // Works for blocks within history_serve_window range
         return blockhash(blockNumber);
     }
-    
+
     function getCurrentBlockNumber() external view returns (uint256) {
         return block.number;
     }
-    
+
     function getHistoricalRange() external view returns (uint256) {
         // Can access block hashes for last 8192 blocks (default)
         return 8192;
@@ -105,13 +104,13 @@ contract VerifiableRandomness {
         uint256 timestamp;
         bool revealed;
     }
-    
+
     mapping(bytes32 => RandomnessCommit) public commits;
-    
+
     function commitRandomness(bytes32 commitment) external {
         // Commit to using future block hash as randomness source
         uint256 revealBlock = block.number + 10; // Reveal 10 blocks later
-        
+
         commits[commitment] = RandomnessCommit({
             blockHash: bytes32(0), // Will be filled during reveal
             blockNumber: revealBlock,
@@ -119,7 +118,7 @@ contract VerifiableRandomness {
             revealed: false
         });
     }
-    
+
     function revealRandomness(
         bytes32 commitment,
         uint256 nonce
@@ -127,21 +126,21 @@ contract VerifiableRandomness {
         RandomnessCommit storage commit = commits[commitment];
         require(!commit.revealed, "Already revealed");
         require(block.number >= commit.blockNumber, "Too early to reveal");
-        
+
         // Get block hash from historical storage (EIP-2935)
         bytes32 blockHash = blockhash(commit.blockNumber);
         require(blockHash != bytes32(0), "Block hash not available");
-        
+
         commit.blockHash = blockHash;
         commit.revealed = true;
-        
+
         // Generate verifiable randomness
         randomness = keccak256(abi.encodePacked(
             blockHash,
             commitment,
             nonce
         ));
-        
+
         return randomness;
     }
 }
@@ -153,20 +152,20 @@ contract VerifiableRandomness {
 contract BlockBasedLogic {
     uint256 public constant EPOCH_LENGTH = 1000; // blocks
     mapping(uint256 => bytes32) public epochSeeds;
-    
+
     function updateEpochSeed() external {
         uint256 currentEpoch = block.number / EPOCH_LENGTH;
-        
+
         if (epochSeeds[currentEpoch] == bytes32(0)) {
             // Use block hash from start of epoch as seed
             uint256 epochStartBlock = currentEpoch * EPOCH_LENGTH;
             bytes32 seedHash = blockhash(epochStartBlock);
-            
+
             require(seedHash != bytes32(0), "Epoch seed block not available");
             epochSeeds[currentEpoch] = seedHash;
         }
     }
-    
+
     function getEpochSeed(uint256 epoch) external view returns (bytes32) {
         return epochSeeds[epoch];
     }
@@ -197,14 +196,14 @@ contract BlockBasedLogic {
 {
   "vm": {
     "params": {
-      "history_serve_window": 1024  
+      "history_serve_window": 1024
     }
   }
 }
 ```
 
 **Use Case:** Resource-constrained nodes or chains prioritizing performance
-**Storage:** ~32KB additional storage (32 bytes × 1024 blocks)  
+**Storage:** ~32KB additional storage (32 bytes × 1024 blocks)
 **Trade-off:** Shorter historical access but better performance
 
 ### Extended History
@@ -245,7 +244,7 @@ blockhash(n) → Returns hash if (block.number - history_serve_window) < n < blo
 The EIP-2935 system contract uses a simple storage mapping:
 
 ```
-Key:   block_number % history_serve_window  
+Key:   block_number % history_serve_window
 Value: block_hash
 ```
 
@@ -279,7 +278,7 @@ The implementation integrates seamlessly with the EVM:
 - **Same opcode behavior:** `BLOCKHASH` queries contract storage
 - **Same gas costs:** Standard SLOAD costs apply
 
-### Differences  
+### Differences
 
 - **Configurable window:** Cosmos EVM allows custom `history_serve_window`
 - **Instant activation:** Available immediately on upgrade (not block-based)
@@ -289,6 +288,6 @@ The implementation integrates seamlessly with the EVM:
 ## References
 
 - **EIP-2935 Specification:** https://eips.ethereum.org/EIPS/eip-2935
-- **Implementation PR:** [cosmos/evm#407](https://github.com/cosmos/evm/pull/407)  
+- **Implementation PR:** [cosmos/evm#407](https://github.com/cosmos/evm/pull/407)
 - **System Contract Address:** `0x0aae40965e6800cd9b1f4b05ff21581047e3f91e`
 - **Related Documentation:** [VM Module Parameters](../cosmos-sdk/modules/vm#parameters)
