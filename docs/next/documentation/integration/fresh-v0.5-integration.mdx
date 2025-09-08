@@ -37,7 +37,7 @@ replace (
 
 ### Key Imports for app.go
 
-```go
+```go Key Imports for app.go expandable
 // EVM-specific imports
 import (
     // EVM ante handlers (updated import path in v0.5.0)
@@ -79,7 +79,7 @@ import (
 
 ### App Struct with Required Fields
 
-```go
+```go App Struct with Required Fields expandable
 // App extends BaseApp with EVM functionality
 type App struct {
     *baseapp.BaseApp
@@ -166,7 +166,7 @@ func NewApp(
 
 ### Store Key Registration
 
-```go
+```go Store Key Registration expandable
 // Add EVM-specific store keys to your existing keys
 keys := storetypes.NewKVStoreKeys(
     // Standard SDK keys...
@@ -189,7 +189,7 @@ tkeys := storetypes.NewTransientStoreKeys(
 
 ### Module Registration
 
-```go
+```go Module Registration expandable
 // Module manager with EVM modules
 app.ModuleManager = module.NewManager(
     // Standard SDK modules...
@@ -213,7 +213,7 @@ app.ModuleManager = module.NewManager(
 
 ### Initialization Order (Critical)
 
-```go
+```go Initialization Order (Critical) expandable
 // 1. Standard SDK keepers first
 app.AccountKeeper = authkeeper.NewAccountKeeper(...)
 app.BankKeeper = bankkeeper.NewKeeper(...)
@@ -284,7 +284,7 @@ app.TransferKeeper = transferkeeper.NewKeeper(
 
 ### Complete Ante Handler Setup
 
-```go
+```go Complete Ante Handler Setup expandable
 func (app *App) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64) {
     options := evmante.HandlerOptions{
         Cdc:                    app.appCodec,
@@ -325,7 +325,7 @@ app.setAnteHandler(app.txConfig, maxGasWanted)
 
 ### Complete Mempool Setup
 
-```go
+```go Complete Mempool Setup expandable
 // In NewApp constructor, AFTER ante handler is set
 if cosmosevmtypes.GetChainConfig() != nil {
     // Get configuration from app.toml and genesis.json
@@ -373,7 +373,7 @@ if cosmosevmtypes.GetChainConfig() != nil {
 
 ### Interface-Based Precompile Setup
 
-```go
+```go Interface-Based Precompile Setup expandable
 // Create precompile options with address codecs
 type Optionals struct {
     AddressCodec       address.Codec
@@ -521,7 +521,7 @@ rootCmd.AddCommand(
 
 ### app.toml EVM Section
 
-```toml
+```toml app.toml EVM Section expandable
 # EVM configuration (v0.5.0)
 [evm]
 # Minimum priority fee for mempool (in wei)
@@ -560,7 +560,7 @@ block-range-cap = 10000
 
 ### genesis.json EVM Parameters
 
-```json
+```json genesis.json EVM Parameters expandable
 {
   "app_state": {
     "evm": {
@@ -642,7 +642,7 @@ go build -v ./cmd/myapp
 
 ### Functionality Testing
 
-```bash
+```bash Functionality Testing expandable
 # Start node
 myappd start
 
@@ -684,7 +684,7 @@ myappd export | jq '.app_state.erc20'
 
 ### Security Settings
 
-```toml
+```toml Security Settings expandable
 [json-rpc]
 # Production security settings
 allow-insecure-unlock = false
@@ -701,7 +701,7 @@ max-tx-gas-wanted = 50000000  # 50M gas
 
 ### Performance Settings
 
-```toml
+```toml Performance Settings expandable
 [json-rpc]
 # Optimize for high load
 gas-cap = 25000000
@@ -752,7 +752,7 @@ error: mempool config must not be nil
 
 **Solution**: Ensure mempool configuration is properly set:
 
-```go
+```go Mempool Configuration Fix expandable
 mempoolConfig := &evmmempool.EVMMempoolConfig{
     AnteHandler:   app.GetAnteHandler(),  // Must be set AFTER ante handler
     BlockGasLimit: blockGasLimit,

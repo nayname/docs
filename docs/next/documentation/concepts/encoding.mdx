@@ -78,7 +78,7 @@ The `x/vm` module handles `MsgEthereumTx` encoding by converting to go-ethereum'
 
 <CodeGroup>
 
-```go TxEncoder
+```go "Transaction Encoding Implementation" expandable
 // TxEncoder overwrites sdk.TxEncoder to support MsgEthereumTx
 func (g txConfig) TxEncoder() sdk.TxEncoder {
   return func(tx sdk.Tx) ([]byte, error) {
@@ -89,9 +89,7 @@ func (g txConfig) TxEncoder() sdk.TxEncoder {
     return g.TxConfig.TxEncoder()(tx)
   }
 }
-```
 
-```go TxDecoder
 // TxDecoder overwrites sdk.TxDecoder to support MsgEthereumTx
 func (g txConfig) TxDecoder() sdk.TxDecoder {
   return func(txBytes []byte) (sdk.Tx, error) {

@@ -91,7 +91,7 @@ At this point, you can modify the configuration files to suit your needs:
 
 Edit `~/.evmd/config/app.toml`:
 
-```toml
+```toml JSON-RPC Configuration expandable
 # EVM Configuration (required for app-side mempool)
 [evm]
 # Minimum priority fee for mempool (in wei)
@@ -146,7 +146,7 @@ evmd start > ~/.evmd/node.log 2>&1 &
 Chain parameters can be configured via CLI flags at runtime or through configuration files.
 
 **Using CLI Flags:**
-```bash
+```bash Custom Chain Initialization expandable
 # Initialize with custom parameters via CLI flags
 evmd init mychain \
   --chain-id custom-evm-1 \
@@ -162,7 +162,7 @@ evmd genesis gentx validator 100000000000000000000ucustom --keyring-backend test
 ```
 
 **Using Configuration File:**
-```toml
+```toml Chain Configuration File expandable
 # Create config/chain.toml
 [chain]
 id = "custom-evm-1"
@@ -174,7 +174,7 @@ decimals = 18
 coin-type = 60
 ```
 
-```bash
+```bash Configuration File Usage expandable
 # Initialize with config file
 evmd init mychain --config /path/to/config
 
@@ -197,7 +197,7 @@ evmd init mychain
 
 For high-performance local development and testing environments:
 
-```toml
+```toml Advanced EVM Mempool Settings expandable
 # In app.toml - Advanced EVM Mempool Settings
 [evm]
 # EVM execution tracer for debugging complex transactions
@@ -214,7 +214,7 @@ evm-chain-id = 1337
 
 ```
 
-```toml
+```toml Advanced JSON-RPC Configuration expandable
 # In app.toml - JSON-RPC Advanced Configuration
 [json-rpc]
 enable = true
@@ -252,7 +252,7 @@ fix-revert-gas-refund-height = 0    # Disable gas refund fix for testing
 
 For rapid development and testing:
 
-```toml
+```toml Development Mode Settings expandable
 # In config.toml - Fast consensus for local development
 [consensus]
 timeout_propose = "500ms"    # Faster block proposal
@@ -299,7 +299,7 @@ evmd validate-genesis ~/.evmd/config/genesis.json
 
 Handle common genesis configuration issues:
 
-```bash
+```bash Genesis Configuration Workarounds expandable
 # Fix common genesis parameter conflicts
 evmd init mynode --chain-id local-1
 
@@ -346,7 +346,7 @@ evmd validate-genesis genesis.json
 
 Use these commands to verify your network setup:
 
-```bash
+```bash Network Validation Commands expandable
 # Check if evmd is running
 ps aux | grep evmd
 

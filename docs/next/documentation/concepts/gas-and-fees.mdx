@@ -112,8 +112,9 @@ Since all transactions are represented as Cosmos SDK transactions, transaction f
 
 ### Detailed Timeline[​](#detailed-timeline "Direct link to Detailed Timeline")
 
+```text "Block Processing Timeline" expandable
 1. Nodes execute the previous block and run the `EndBlock` hook
-   * As part of this hook, the FeeMarket (EIP-1559) module tracks the total `TransientGasWanted` from the transactions on this block. This will be used for the next block’s `BaseFee`.
+   * As part of this hook, the FeeMarket (EIP-1559) module tracks the total `TransientGasWanted` from the transactions on this block. This will be used for the next block's `BaseFee`.
 
 2. Nodes receive transactions for a subsequent block and gossip these transactions to peers
    * These can be sorted and prioritized by the included fee price (using EIP-1559 fee priority mechanics for EVM transactions - [code snippet](https://github.com/cosmos/evm/blob/v0.4.1/ante/evm/mono_decorator.go)), to be included in the next block
@@ -121,7 +122,7 @@ Since all transactions are represented as Cosmos SDK transactions, transaction f
 3. Nodes run `BeginBlock` for the subsequent block
 
    * The FeeMarket module calculates the `BaseFee` ([code snippet](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/abci.go)) to be applied for this block using the total `GasWanted` from the previous block.
-   * The Distribution module [distributes](https://docs.cosmos.network/main/modules/distribution#begin-block) the previous block’s fee rewards to validators and delegators
+   * The Distribution module [distributes](https://docs.cosmos.network/main/modules/distribution#begin-block) the previous block's fee rewards to validators and delegators
 
 4. For each valid transaction that will be included in this block, nodes perform the following:
 
@@ -131,7 +132,7 @@ Since all transactions are represented as Cosmos SDK transactions, transaction f
      2. Verifies the fees provided are greater than the global and local minimum validator values *and* greater than the `BaseFee` calculated
      3. (For Ethereum transactions) Preemptively consumes gas for the EVM transaction
      4. Deducts the transaction fees from the user and transfers them to the `fee_collector` module
-     5. Increments the `TransientGasWanted` in the current block, to be used to calculate the next block’s `BaseFee`
+     5. Increments the `TransientGasWanted` in the current block, to be used to calculate the next block's `BaseFee`
 
    * Then, for standard Cosmos Transactions, nodes:
 
@@ -143,7 +144,8 @@ Since all transactions are represented as Cosmos SDK transactions, transaction f
      1. Execute the transaction and update the state
      2. Calculate the gas used and compare it to the gas supplied, then refund a designated portion of the surplus
 
-5. Nodes run `EndBlock` for this block and store the block’s `GasWanted`
+5. Nodes run `EndBlock` for this block and store the block's `GasWanted`
+```
 
 ## Detailed Mechanics[​](#detailed-mechanics "Direct link to Detailed Mechanics")
 

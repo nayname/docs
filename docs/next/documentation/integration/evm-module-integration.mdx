@@ -51,7 +51,7 @@ replace (
 
 ## Step 1: Update Dependencies
 
-```go
+```go "go.mod Dependencies" expandable
 // go.mod
 require (
     github.com/cosmos/cosmos-sdk v0.53.0
@@ -112,7 +112,7 @@ const BaseDenomUnit int64 = 18
 ```
 
 2. Update the `init()` function:
-```go
+```go "Power Reduction Initialization" expandable
 import (
     "math/big"
     "cosmossdk.io/math"
@@ -144,7 +144,7 @@ The `x/precisebank` module wraps the native `x/bank` module to maintain fraction
 
 **Integration in app.go:**
 
-```go
+```go "PreciseBank Integration" expandable
 // Initialize PreciseBankKeeper
 app.PreciseBankKeeper = precisebankkeeper.NewKeeper(
     appCodec,
@@ -190,7 +190,7 @@ erc20Params.EnableEVMHook = true
 
 Create `app/config.go` to set up global EVM configuration:
 
-```go
+```go "app/config.go - EVM Configuration" expandable
 package app
 
 import (
@@ -269,7 +269,7 @@ func setBaseDenom(ci evmtypes.EvmCoinInfo) error {
 
 Create `app/precompiles.go` to define available precompiled contracts:
 
-```go
+```go "app/precompiles.go - Precompiles Configuration" expandable
 package app
 
 import (
@@ -410,7 +410,7 @@ func NewAvailableStaticPrecompiles(
 
 ### Add EVM Imports
 
-```go
+```go "app.go EVM Imports" expandable
 import (
     // ... other imports
     ante "github.com/your-repo/your-chain/ante"
@@ -489,7 +489,7 @@ txConfig := encodingConfig.TxConfig
 
 ### Add Store Keys
 
-```go
+```go "Store Keys Configuration" expandable
 keys := storetypes.NewKVStoreKeys(
     // ... existing keys
     evmtypes.StoreKey,
@@ -510,7 +510,7 @@ tkeys := storetypes.NewTransientStoreKeys(
 Keepers must be initialized in exact order: FeeMarket → EVM → Erc20 → Transfer
 </Warning>
 
-```go
+```go "Keeper Initialization (Critical Order)" expandable
 // Initialize AuthzKeeper if not already done
 app.AuthzKeeper = authzkeeper.NewKeeper(
     keys[authz.StoreKey],
@@ -607,7 +607,7 @@ app.ModuleManager = module.NewManager(
 
 ### Update Module Ordering
 
-```go
+```go "Module Ordering Configuration" expandable
 // SetOrderBeginBlockers - EVM must come after feemarket
 app.ModuleManager.SetOrderBeginBlockers(
     // ... other modules
@@ -638,7 +638,7 @@ genesisModuleOrder := []string{
 
 ### Update Ante Handler
 
-```go
+```go "Ante Handler Configuration" expandable
 options := ante.HandlerOptions{
     AccountKeeper:          app.AccountKeeper,
     BankKeeper:             app.BankKeeper,
@@ -685,7 +685,7 @@ Create new `ante/` directory in your project root.
 
 ### ante/handler_options.go
 
-```go
+```go "ante/handler_options.go" expandable
 package ante
 
 import (
@@ -743,7 +743,7 @@ func (options HandlerOptions) Validate() error {
 
 ### ante/ante_cosmos.go
 
-```go
+```go "ante/ante_cosmos.go" expandable
 package ante
 
 import (
@@ -805,7 +805,7 @@ func newMonoEVMAnteHandler(options HandlerOptions) sdk.AnteHandler {
 
 ### ante/ante.go
 
-```go
+```go "ante/ante.go" expandable
 package ante
 
 import (
@@ -842,7 +842,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 
 ### Update cmd/appd/commands.go
 
-```go
+```go "cmd/appd/commands.go Updates" expandable
 import (
     // Add imports
     evmcmd "github.com/cosmos/evm/client"
@@ -897,7 +897,7 @@ func initRootCmd(...) {
 
 ### Update cmd/appd/root.go
 
-```go
+```go "cmd/appd/root.go Updates" expandable
 import (
     // ... existing imports
     evmkeyring "github.com/cosmos/evm/crypto/keyring"
@@ -930,7 +930,7 @@ Sign Mode Textual is a new Cosmos SDK signing method that may not be compatible 
 
 ### Option A: Disable Sign Mode Textual (Recommended for pure EVM compatibility)
 
-```go
+```go "Sign Mode Textual Configuration" expandable
 // In app.go
 import (
     "github.com/cosmos/cosmos-sdk/types/tx"
@@ -960,7 +960,7 @@ If your chain requires Sign Mode Textual support, ensure your ante handler and c
 
 ### Build and Run Tests
 
-```bash
+```bash "Testing Commands"
 # Run all unit tests
 make test-all
 
@@ -973,7 +973,7 @@ make test-integration
 
 ### Local Node Testing
 
-```bash
+```bash "Local Node Setup"
 # Copy and adapt the script from Cosmos EVM repo
 curl -O https://raw.githubusercontent.com/cosmos/evm/main/local_node.sh
 chmod +x local_node.sh

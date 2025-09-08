@@ -35,7 +35,7 @@ This formula ensures that the same inputs always produce the same address, enabl
 ### Deploy a Contract
 
 <CodeGroup>
-```javascript Ethers.js
+```javascript "Ethers.js Create2 Contract Deployment" expandable
 import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("YOUR_RPC_URL");
@@ -78,7 +78,7 @@ async function deployWithCreate2() {
 deployWithCreate2();
 ```
 
-```solidity Solidity
+```solidity "Solidity Create2 Deployer Contract" expandable
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -209,7 +209,7 @@ This assembly code:
 
 Choose salts carefully for your use case:
 
-```javascript
+```javascript "Salt Selection Strategies" expandable
 // Sequential salts for multiple instances
 const salt1 = ethers.solidityPacked(["uint256"], [1]);
 const salt2 = ethers.solidityPacked(["uint256"], [2]);
@@ -255,7 +255,7 @@ Common issues and solutions:
 
 Deploy an ERC20 token to the same address across multiple chains:
 
-```javascript
+```javascript "Multi-chain Token Deployment" expandable
 import { ethers } from "ethers";
 
 async function deployTokenMultichain(chains) {

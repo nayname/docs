@@ -41,8 +41,23 @@ The root HD path for EVM-based accounts is `m/44'/60'/0'/0`. It is recommended t
 
 The custom Cosmos EVM [EthAccount](https://github.com/cosmos/evm/blob/v0.4.1/types/account.go#L28-L33) satisfies the `AccountI` interface from the Cosmos SDK auth module and includes additional fields that are required for Ethereum type addresses:
 
-```
-// EthAccountI represents the interface of an EVM compatible accounttype EthAccountI interface {    authtypes.AccountI    // EthAddress returns the ethereum Address representation of the AccAddress    EthAddress() common.Address    // CodeHash is the keccak256 hash of the contract code (if any)    GetCodeHash() common.Hash    // SetCodeHash sets the code hash to the account fields    SetCodeHash(code common.Hash) error    // Type returns the type of Ethereum Account (EOA or Contract)    Type() int8}
+```go "EthAccountI Interface" expandable
+// EthAccountI represents the interface of an EVM compatible account
+type EthAccountI interface {
+    authtypes.AccountI
+    
+    // EthAddress returns the ethereum Address representation of the AccAddress
+    EthAddress() common.Address
+    
+    // CodeHash is the keccak256 hash of the contract code (if any)
+    GetCodeHash() common.Hash
+    
+    // SetCodeHash sets the code hash to the account fields
+    SetCodeHash(code common.Hash) error
+    
+    // Type returns the type of Ethereum Account (EOA or Contract)
+    Type() int8
+}
 ```
 
 **EIP-7702 Support**: Cosmos EVM supports [EIP-7702 code delegation](/docs/next/documentation/evm-compatibility/eip-7702), allowing EOAs to temporarily delegate code execution to smart contracts through the `SetCodeHash` functionality.
@@ -189,7 +204,7 @@ You can query an account address using CLI, gRPC, REST, or JSON-RPC:
 
 <Tabs>
   <Tab title="CLI">
-    ```bash
+    ```bash "Query Account via CLI" expandable
     # NOTE: the --output (-o) flag defines the output format
     appd q auth account $(appd keys show dev0 -a) -o text
 
@@ -214,7 +229,7 @@ You can query an account address using CLI, gRPC, REST, or JSON-RPC:
   </Tab>
 
   <Tab title="JSON-RPC">
-    ```bash
+    ```bash "JSON-RPC Account Queries" expandable
     # List accounts using eth_accounts
     curl -X POST --data '{
       "jsonrpc":"2.0",

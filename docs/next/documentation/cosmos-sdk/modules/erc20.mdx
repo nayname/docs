@@ -229,6 +229,7 @@ interface IWERC20 is IERC20 {
 
 Standard IBC transfer integration ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/erc20/ibc_middleware.go)):
 
+<Expandable title="View IBC middleware integration code">
 ```go
 // Automatic registration and conversion on receive
 OnRecvPacket(packet) {
@@ -250,6 +251,7 @@ OnAcknowledgementPacket(packet, ack) {
     }
 }
 ```
+</Expandable>
 
 **Automatic Registration:**
 - IBC tokens (denoms starting with "ibc/") are automatically registered on first receipt

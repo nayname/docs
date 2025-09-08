@@ -25,6 +25,7 @@ Upgrade handlers are required when:
 
 Upgrade handlers are registered in your app's `RegisterUpgradeHandlers()` method:
 
+<Expandable title="View upgrade handler registration example">
 ```go
 // app/upgrades.go
 package app
@@ -58,6 +59,7 @@ func (app *App) RegisterUpgradeHandlers() {
     )
 }
 ```
+</Expandable>
 
 ### Module Version Management
 

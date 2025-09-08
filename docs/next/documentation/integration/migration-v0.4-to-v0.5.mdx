@@ -110,7 +110,7 @@ All precompile constructors now accept keeper interfaces instead of concrete imp
 
 **New Interface Definitions:**
 
-```go
+```go New Interface Definitions expandable
 // precompiles/common/interfaces.go
 type BankKeeper interface {
     IterateAccountBalances(ctx context.Context, account sdk.AccAddress, cb func(coin sdk.Coin) bool)
@@ -130,7 +130,7 @@ type StakingKeeper interface {
 
 1. **Update Precompile Assembly:**
 
-```diff
+```diff Precompile Assembly Update expandable
 // evmd/precompiles.go or app/precompiles.go
 func NewAvailableStaticPrecompiles(
     // ... other params
@@ -191,7 +191,7 @@ The mempool now uses configuration objects instead of pre-built pools for better
 
 If you use default mempool configuration, minimal changes are needed:
 
-```go
+```go Standard Mempool Setup expandable
 // Existing code continues to work
 mempoolConfig := &evmmempool.EVMMempoolConfig{
     AnteHandler:   app.GetAnteHandler(),
@@ -212,7 +212,7 @@ evmMempool := evmmempool.NewExperimentalEVMMempool(
 
 If you previously built custom pools:
 
-```diff
+```diff Advanced Mempool Configuration expandable
  mempoolConfig := &evmmempool.EVMMempoolConfig{
 -   TxPool:        customTxPool,
 -   CosmosPool:    customCosmosPool,
@@ -286,7 +286,7 @@ The global mempool registry has been removed in favor of direct injection.
 
 1. **Update JSON-RPC Server Initialization:**
 
-```diff
+```diff JSON-RPC Server Update expandable
 // server/start.go or equivalent
 - mempool.SetGlobalEVMMempool(evmMempool)
   
@@ -304,7 +304,7 @@ The global mempool registry has been removed in favor of direct injection.
 
 If you have custom RPC backends:
 
-```diff
+```diff Custom RPC Backend Update expandable
 // Custom RPC backend
 func NewCustomBackend(
     // ... other params
@@ -470,7 +470,7 @@ curl -X POST \
 
 ### Pre-Upgrade Checklist
 
-```bash
+```bash Pre-Upgrade Checklist expandable
 # 1. Backup current state
 evmd export > pre-upgrade-state.json
 
@@ -483,7 +483,7 @@ evmd query erc20 token-pairs > pre-upgrade-token-pairs.json
 
 ### Post-Upgrade Verification
 
-```bash
+```bash Post-Upgrade Verification expandable
 # 1. Verify node starts successfully
 evmd start
 
@@ -507,7 +507,7 @@ cast call --rpc-url http://localhost:8545 \
 
 ### Integration Tests
 
-```go
+```go Integration Test Example expandable
 // Example integration test
 func TestV050Migration(t *testing.T) {
     // Test mempool configuration

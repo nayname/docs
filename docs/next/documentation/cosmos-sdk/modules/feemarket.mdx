@@ -83,7 +83,7 @@ Adjust parameters to achieve specific network behaviors ([params validation](htt
 
 <CodeGroup>
 
-```json Ethereum-Compatible
+```json Ethereum-Compatible expandable
 {
   "no_base_fee": false,
   "base_fee_change_denominator": 8,      // ±12.5% max per block
@@ -97,7 +97,7 @@ Adjust parameters to achieve specific network behaviors ([params validation](htt
 // 100k gas tx: ~0.1 tokens at base, up to 10x during congestion
 ```
 
-```json High-Volume-Stable
+```json High-Volume-Stable expandable
 {
   "no_base_fee": false,
   "base_fee_change_denominator": 16,     // ±6.25% max per block
@@ -111,7 +111,7 @@ Adjust parameters to achieve specific network behaviors ([params validation](htt
 // 100k gas tx: ~0.01 tokens, gradual increases
 ```
 
-```json Aggressive-Anti-Spam
+```json Aggressive-Anti-Spam expandable
 {
   "no_base_fee": false,
   "base_fee_change_denominator": 4,      // ±25% max per block
@@ -160,7 +160,7 @@ The module supports different token decimal configurations:
 
 Parameters can be updated through governance proposals ([msg server](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/msg_server.go)):
 
-```json
+```json Governance Parameter Update expandable
 // MsgUpdateParams structure
 // Source: github.com/cosmos/evm/blob/v0.4.1/proto/cosmos/evm/feemarket/v1/tx.proto
 {
@@ -225,7 +225,7 @@ Examples:
 
 <CodeGroup>
 
-```javascript Wallet-Integration
+```javascript Wallet-Integration expandable
 // Get current base fee from latest block
 const block = await provider.getBlock('latest');
 const baseFee = block.baseFeePerGas;
@@ -245,7 +245,7 @@ const tx = await wallet.sendTransaction({
 });
 ```
 
-```javascript Fee-Monitoring
+```javascript Fee-Monitoring expandable
 // Get current gas price (includes base fee)
 const gasPrice = await provider.send('eth_gasPrice', []);
 console.log('Current gas price:', ethers.formatUnits(gasPrice, 'gwei'), 'gwei');
@@ -318,7 +318,7 @@ The fee market integrates with standard Ethereum JSON-RPC methods ([RPC backend]
     </ParamField>
   </Expandable>
 
-  ```json
+  ```json eth_feeHistory Response expandable
   // Request
   {
     "jsonrpc":"2.0",
@@ -429,7 +429,7 @@ evmd query feemarket block-gas
 
 <CodeGroup>
 
-```proto Query-Parameters
+```proto Query-Parameters expandable
 // Request all module parameters
 // Proto: github.com/cosmos/evm/blob/v0.4.1/proto/cosmos/evm/feemarket/v1/query.proto
 grpcurl -plaintext localhost:9090 feemarket.Query/Params
@@ -476,7 +476,7 @@ grpcurl -plaintext localhost:9090 feemarket.Query/BlockGas
 
 <CodeGroup>
 
-```http Query-Parameters
+```http Query-Parameters expandable
 # REST endpoint for parameters
 # Proto: github.com/cosmos/evm/blob/v0.4.1/proto/cosmos/evm/feemarket/v1/query.proto
 GET /cosmos/feemarket/v1/params
@@ -546,7 +546,7 @@ type GenesisState struct {
 
 At the beginning of each block, the module calculates and sets the new base fee ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/abci.go#L16-L45)):
 
-```go
+```go BeginBlock Implementation expandable
 func (k Keeper) BeginBlock(ctx sdk.Context) error {
     baseFee := k.CalculateBaseFee(ctx)
 
@@ -573,7 +573,7 @@ func (k Keeper) BeginBlock(ctx sdk.Context) error {
 
 At the end of each block, the module updates the gas wanted for base fee calculation ([source](https://github.com/cosmos/evm/blob/v0.4.1/x/feemarket/keeper/abci.go#L47-L92)):
 
-```go
+```go EndBlock Implementation expandable
 func (k Keeper) EndBlock(ctx sdk.Context) error {
     gasWanted := k.GetTransientGasWanted(ctx)
     gasUsed := ctx.BlockGasMeter().GasConsumedToLimit()

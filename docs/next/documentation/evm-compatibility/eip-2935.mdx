@@ -70,7 +70,7 @@ The `history_serve_window` parameter controls how many historical block hashes a
 
 ### Basic Block Hash Access
 
-```solidity
+```solidity Basic Block Hash Access expandable
 pragma solidity ^0.8.0;
 
 contract BlockHashExample {
@@ -96,7 +96,7 @@ contract BlockHashExample {
 
 ### Verifiable Randomness Protocol
 
-```solidity
+```solidity Verifiable Randomness Protocol expandable
 contract VerifiableRandomness {
     struct RandomnessCommit {
         bytes32 blockHash;
@@ -148,7 +148,7 @@ contract VerifiableRandomness {
 
 ### Block-Based State Transitions
 
-```solidity
+```solidity Block-Based State Transitions expandable
 contract BlockBasedLogic {
     uint256 public constant EPOCH_LENGTH = 1000; // blocks
     mapping(uint256 => bytes32) public epochSeeds;
