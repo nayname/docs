@@ -94,6 +94,7 @@ app/
 
 ### constants.go
 
+<Expandable title="View upgrade constants definition">
 ```go
 // app/upgrades/v1_0_0/constants.go
 package v1_0_0
@@ -114,9 +115,11 @@ var Upgrade = upgrades.Upgrade{
     },
 }
 ```
+</Expandable>
 
 ### handler.go
 
+<Expandable title="View upgrade handler implementation">
 ```go
 // app/upgrades/v1_0_0/handler.go
 package v1_0_0
@@ -154,6 +157,7 @@ func CreateUpgradeHandler(
     }
 }
 ```
+</Expandable>
 
 ## Migration Patterns
 
