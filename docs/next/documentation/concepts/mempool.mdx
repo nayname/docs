@@ -2,62 +2,39 @@
 title: "Mempool"
 description: "Design and Rationale"
 icon: "layers"
+tags: ["mempool"]
 ---
 
-<Warning>
-This mempool implementation is **experimental** and under active development. It is intended for testing and evaluation purposes. Use in production environments is **not recommended** without thorough testing and risk assessment.
-Please [report issues](https://github.com/cosmos/evm/issues/new) and submit feedback to help improve stability.
-</Warning>
 
 ## Overview
 
 The EVM mempool is responsible for managing both EVM and Cosmos transactions in a unified pool, enabling Ethereum-compatible transaction flows including out-of-order transactions and nonce gap handling. It serves as a replacement for the default CometBFT FIFO mempool to support Ethereum tooling expectations while maintaining Cosmos SDK compatibility.
 
-## Usage Examples
+## Purpose and Design
 
-The EVM mempool enables seamless interaction with Ethereum tooling and deployment scripts that send multiple transactions in quick succession.
+The EVM mempool serves as a bridge between Ethereum's transaction management model and Cosmos SDK's consensus layer, enabling Ethereum-compatible transaction flows while maintaining the security and finality guarantees of CometBFT consensus.
 
-### Complex Contract Deployments
+### Design Goals
 
-DeFi protocols like Uniswap deploy multiple interdependent contracts in rapid succession. With the EVM mempool, these deployment scripts work without modification:
+**Ethereum Compatibility**: Enable Ethereum tooling to work without modification by supporting:
+- Out-of-order transaction submission
+- Nonce gap handling and automatic promotion
+- Transaction replacement with higher fees
+- Standard txpool RPC methods
 
-```javascript
-// Deploy Uniswap V3 contracts - sends many transactions at once
-const factory = await UniswapV3Factory.deploy();
-const router = await SwapRouter.deploy(factory.address, WETH);
-const quoter = await Quoter.deploy(factory.address, WETH);
-const multicall = await UniswapInterfaceMulticall.deploy();
+**Cosmos Integration**: Maintain compatibility with Cosmos SDK patterns:
+- Unified mempool for both EVM and Cosmos transactions  
+- Fee-based transaction prioritization
+- Integration with existing ante handlers
+- Preservation of consensus finality
 
-// All transactions queue properly even if they arrive out of order
-// The mempool handles nonce gaps automatically
-```
+### Use Cases
 
-### Batch Transaction Submission
+**Complex Contract Deployments**: DeFi protocols like Uniswap deploy multiple interdependent contracts rapidly. The mempool handles these deployment scripts without modification by queuing transactions with nonce gaps until they can be executed in order.
 
-```javascript
-// Ethereum tooling sends multiple transactions
-await wallet.sendTransaction({nonce: 100, ...}); // OK: Immediate execution
-await wallet.sendTransaction({nonce: 101, ...}); // OK: Immediate execution
-await wallet.sendTransaction({nonce: 103, ...}); // OK: Queued locally (gap)
-await wallet.sendTransaction({nonce: 102, ...}); // OK: Fills gap, both execute
-```
+**Batch Transaction Workflows**: Development tools and scripts often submit multiple transactions simultaneously, expecting the network to handle ordering and dependencies automatically.
 
-### Transaction Replacement
-
-```javascript
-// Speed up transaction with same nonce, higher fee
-const tx1 = await wallet.sendTransaction({
-  nonce: 100,
-  gasPrice: parseUnits("20", "gwei")
-});
-
-// Replace with higher fee
-const tx2 = await wallet.sendTransaction({
-  nonce: 100, // Same nonce
-  gasPrice: parseUnits("30", "gwei") // Higher fee
-});
-// tx1 is replaced by tx2
-```
+**Transaction Replacement**: Users can speed up pending transactions by submitting replacement transactions with the same nonce but higher fees, following standard Ethereum patterns.
 
 ## Transaction Flow
 
@@ -74,7 +51,7 @@ The CheckTx handler processes transactions with special handling for nonce gaps 
 **Success Path** - Valid transactions with correct nonces pass through to the Comet mempool for broadcast.
 
 **Nonce Gap Detection** - Transactions with future nonces are intercepted and queued locally:
-```go
+```go CheckTx Nonce Gap Handling expandable
 // From mempool/check_tx.go
 if err != nil {
     // detect if there is a nonce gap error (only returned for EVM transactions)
@@ -217,7 +194,7 @@ For chain developers looking to integrate the mempool into their Cosmos SDK chai
 #### What Changed
 
 **Before v0.5.0 (Pre-built Objects):**
-```go
+```go Before v0.5.0 Configuration expandable
 // Required pre-built pools
 customTxPool := CreateCustomTxPool(...)
 customCosmosPool := CreateCustomCosmosPool(...)
@@ -230,7 +207,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
 ```
 
 **After v0.5.0 (Configuration Objects):**
-```go
+```go After v0.5.0 Configuration expandable
 // Configuration-based approach
 mempoolConfig := &evmmempool.EVMMempoolConfig{
     LegacyPoolConfig: &legacypool.Config{...}, // ← NEW in v0.5.0
@@ -238,6 +215,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
     AnteHandler:   app.GetAnteHandler(),
     BroadCastTxFn: customBroadcastFunc, // ← NEW: Optional custom broadcast
     BlockGasLimit: 100_000_000,         // ← NEW: Configurable gas limit
+    MinTip:        uint256.NewInt(1000000000), // ← NEW: Minimum tip filter (optional)
 }
 ```
 
@@ -259,7 +237,7 @@ v0.5.0 introduces comprehensive configuration options for customizing mempool be
 
 #### Basic Configuration
 
-```go
+```go Basic Mempool Configuration expandable
 // Minimal configuration with defaults
 mempoolConfig := &evmmempool.EVMMempoolConfig{
     AnteHandler:   app.GetAnteHandler(),
@@ -279,7 +257,7 @@ evmMempool := evmmempool.NewExperimentalEVMMempool(
 
 #### Advanced Configuration
 
-```go
+```go Advanced Mempool Configuration expandable
 // Custom configuration for high-throughput chains
 mempoolConfig := &evmmempool.EVMMempoolConfig{
     LegacyPoolConfig: &legacypool.Config{
@@ -309,7 +287,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
 
 #### Custom Priority Functions
 
-```go
+```go Custom Priority Function Example expandable
 // Example: Prioritize governance and staking transactions
 func customPriorityFunction(goCtx context.Context, tx sdk.Tx) math.Int {
     // High priority for governance proposals
@@ -339,7 +317,7 @@ func customPriorityFunction(goCtx context.Context, tx sdk.Tx) math.Int {
 
 #### Custom Broadcast Functions
 
-```go
+```go Custom Broadcast Function Example expandable
 // Example: Rate-limited broadcasting
 func customBroadcastFunction(txs []*ethtypes.Transaction) error {
     for i, tx := range txs {
@@ -363,7 +341,7 @@ func customBroadcastFunction(txs []*ethtypes.Transaction) error {
 
 **Source:** [`mempool/txpool/legacypool/legacypool.go:168-178`](https://github.com/cosmos/evm/blob/main/mempool/txpool/legacypool/legacypool.go#L168-178)
 
-```go
+```go LegacyPoolConfig Structure expandable
 type Config struct {
     // Transaction pool capacity
     AccountSlots uint64 // Executable transactions per account (default: 16)
@@ -390,7 +368,7 @@ type Config struct {
 
 **Source:** Cosmos SDK mempool types
 
-```go
+```go CosmosPoolConfig Structure expandable
 type PriorityNonceMempoolConfig[C comparable] struct {
     TxPriority    TxPriority[C]    // Custom priority calculation function
     OnRead        func(tx sdk.Tx)  // Callback when transaction is read
@@ -410,7 +388,7 @@ type TxPriority[C comparable] struct {
 #### Step 1: Remove Pre-built Pools
 
 **Remove this code:**
-```go
+```go Remove Pre-built Pools expandable
 // Delete these lines from your app.go
 customTxPool := legacypool.New(config, blockchain)
 customCosmosPool := sdkmempool.NewPriorityMempool(priorityConfig)
@@ -424,7 +402,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
 #### Step 2: Add Configuration Objects
 
 **Add this code:**
-```go
+```go Add Configuration Objects expandable
 // Replace with configuration-based approach
 mempoolConfig := &evmmempool.EVMMempoolConfig{
     // Convert custom pool settings to config
@@ -468,12 +446,13 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
 - If `BlockGasLimit` is set to `0`, defaults to `100_000_000`
 - If `LegacyPoolConfig` is `nil`, uses `legacypool.DefaultConfig`  
 - If `CosmosPoolConfig` is `nil`, uses default priority mempool
+- If `MinTip` is `nil`, no minimum tip enforcement
 - `BroadCastTxFn` is optional (uses default broadcast if nil)
 
 #### Step 5: Initialization Location
 
 **Where to Add Configuration:**
-```go
+```go Initialization Location expandable
 // In app/app.go, during NewApp() function
 func NewApp(...) *App {
     // ... other initialization
@@ -483,6 +462,7 @@ func NewApp(...) *App {
         mempoolConfig := &evmmempool.EVMMempoolConfig{
             AnteHandler:   app.GetAnteHandler(), // Must be set first
             BlockGasLimit: 100_000_000,
+            MinTip:        uint256.NewInt(1000000000), // 1 gwei minimum tip
             // Add custom configs here
         }
         
@@ -548,3 +528,7 @@ The mempool maintains transaction state through the unified `ExperimentalEVMMemp
 ## Testing
 
 The mempool behavior can be verified using the test scripts provided in the [cosmos/evm](https://github.com/cosmos/evm) repository. The [`tests/systemtests/Counter/script/SimpleSends.s.sol`](https://github.com/cosmos/evm/blob/v0.4.1/tests/systemtests/Counter/script/SimpleSends.s.sol) script demonstrates typical Ethereum tooling behavior - it sends 10 sequential transactions in a batch, which naturally arrive out of order and create nonce gaps.
+
+## Integration
+
+For step-by-step instructions on integrating the EVM mempool into your chain, see the [EVM Mempool Integration](/docs/next/documentation/integration/mempool-integration) guide.

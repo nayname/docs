@@ -1,6 +1,6 @@
 ---
-title: Node Configuration Guide
-description: Complete reference for configuring Cosmos EVM nodes, JSON-RPC settings, and command-line options
+title: "Node Configuration"
+description: "Complete reference for configuring Cosmos EVM nodes, JSON-RPC settings, and command-line options"
 mode: "wide"
 ---
 
@@ -8,7 +8,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
 
 <Tabs>
 
-  <Tab title="EVM Parameters">
+  <Tab title="EVM">
     EVM execution environment configuration.
 
     <ParamField body="tracer" type="string" default="">
@@ -50,9 +50,20 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
       **Source:** `server/config/config.go:145`
       **Used in:** `x/vm/genesis.go:22`
     </ParamField>
+
+    <ParamField body="min-tip" type="number" default="0">
+      Minimum priority fee (tip) required for transaction inclusion in mempool.
+
+      Transactions with tips below this value may be rejected. Set to 0 to disable filtering.
+
+      **Flag:** `EVMMinTip`
+      **Source:** `config/server_app_options.go:GetMinTip()`
+      **Type:** Converted to `uint256.Int` internally
+    </ParamField>
+
   </Tab>
 
-  <Tab title="JSON-RPC Parameters">
+  <Tab title="JSON-RPC">
     Ethereum JSON-RPC server configuration.
 
     ## Core Settings
@@ -227,203 +238,62 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     </ParamField>
   </Tab>
 
-  <Tab title="TLS Configuration">
-    TLS settings for JSON-RPC server.
-
-    <ParamField body="certificate-path" type="string" default="">
-      Path to TLS certificate `.pem` file.
-
-      Leave empty to disable TLS.
-
-      **Source:** `server/config/config.go:203`
-      **Validation:** `server/config/config.go:342-343`
-    </ParamField>
-
-    <ParamField body="key-path" type="string" default="">
-      Path to TLS private key `.pem` file.
-
-      Leave empty to disable TLS.
-
-      **Source:** `server/config/config.go:205`
-      **Validation:** `server/config/config.go:348-350`
-    </ParamField>
-  </Tab>
-
-  <Tab title="Command-Line Flags">
-    Complete list of EVM-specific command-line flags for `evmd start`.
-
-    ## EVM Flags
-
-    <ParamField body="--evm.tracer" type="string">
-      Set VM execution tracer (`json`, `struct`, `access_list`, `markdown`)
-    </ParamField>
-
-    <ParamField body="--evm.max-tx-gas-wanted" type="number">
-      Maximum gas wanted for each eth tx in CheckTx mode
-    </ParamField>
-
-    <ParamField body="--evm.cache-preimage" type="boolean">
-      Enable SHA3 preimage recording in the VM
-    </ParamField>
-
-    <ParamField body="--evm.evm-chain-id" type="number">
-      EIP-155 replay protection chain ID
-    </ParamField>
-
-    ## JSON-RPC Flags
-
-    <ParamField body="--json-rpc.enable" type="boolean">
-      Enable the JSON-RPC server
-    </ParamField>
-
-    <ParamField body="--json-rpc.api" type="string">
-      JSON-RPC namespaces to enable (comma-separated: `eth,net,web3,txpool,debug,personal,miner`)
-    </ParamField>
-
-    <ParamField body="--json-rpc.address" type="string">
-      HTTP server bind address (default: `127.0.0.1:8545`)
-    </ParamField>
-
-    <ParamField body="--json-rpc.ws-address" type="string">
-      WebSocket server bind address (default: `127.0.0.1:8546`)
-    </ParamField>
-
-    <ParamField body="--json-rpc.ws-origins" type="string">
-      Allowed WebSocket origins (comma-separated)
-    </ParamField>
-
-    <ParamField body="--json-rpc.gas-cap" type="number">
-      Gas cap for eth_call/estimateGas operations
-    </ParamField>
-
-    <ParamField body="--json-rpc.allow-insecure-unlock" type="boolean">
-      Allow insecure account unlocking via HTTP
-    </ParamField>
-
-    <ParamField body="--json-rpc.evm-timeout" type="duration">
-      Global timeout for eth_call operations (e.g., `5s`)
-    </ParamField>
-
-    <ParamField body="--json-rpc.txfee-cap" type="float">
-      Maximum transaction fee cap in ether
-    </ParamField>
-
-    <ParamField body="--json-rpc.filter-cap" type="number">
-      Maximum concurrent filters per connection
-    </ParamField>
-
-    <ParamField body="--json-rpc.logs-cap" type="number">
-      Maximum logs returned from eth_getLogs
-    </ParamField>
-
-    <ParamField body="--json-rpc.block-range-cap" type="number">
-      Maximum block range for eth_getLogs queries
-    </ParamField>
-
-    <ParamField body="--json-rpc.http-timeout" type="duration">
-      HTTP server read/write timeout (e.g., `30s`)
-    </ParamField>
-
-    <ParamField body="--json-rpc.http-idle-timeout" type="duration">
-      HTTP server idle timeout (e.g., `120s`)
-    </ParamField>
-
-    <ParamField body="--json-rpc.allow-unprotected-txs" type="boolean">
-      Allow non-EIP155 signed transactions
-    </ParamField>
-
-    <ParamField body="--json-rpc.max-open-connections" type="number">
-      Maximum simultaneous connections (0 = unlimited)
-    </ParamField>
-
-    <ParamField body="--json-rpc.enable-indexer" type="boolean">
-      Enable EVM transaction indexer
-    </ParamField>
-
-    <ParamField body="--json-rpc.batch-request-limit" type="number">
-      Maximum requests in a batch
-    </ParamField>
-
-    <ParamField body="--json-rpc.batch-response-max-size" type="number">
-      Maximum bytes in batch response
-    </ParamField>
-
-    <ParamField body="--json-rpc.enable-profiling" type="boolean">
-      Enable pprof profiling endpoints
-    </ParamField>
-
-    <ParamField body="--json-rpc.fix-revert-gas-refund-height" type="number">
-      Upgrade height for gas refund fix
-    </ParamField>
-
-    <ParamField body="--metrics" type="boolean">
-      Enable Prometheus metrics for JSON-RPC server
-    </ParamField>
-
-    ## TLS Flags
-
-    <ParamField body="--tls.certificate-path" type="string">
-      Path to TLS certificate `.pem` file
-    </ParamField>
-
-    <ParamField body="--tls.key-path" type="string">
-      Path to TLS private key `.pem` file
-    </ParamField>
-
-    ## Usage Examples
-
-    ### Basic JSON-RPC
-    ```bash
-    evmd start --json-rpc.enable
-    ```
-
-    ### Full Debug Setup
-    ```bash
-    evmd start \
-      --json-rpc.enable \
-      --json-rpc.api eth,net,web3,txpool,debug \
-      --json-rpc.enable-indexer \
-      --json-rpc.enable-profiling \
-      --evm.tracer json \
-      --metrics
-    ```
-
-    ### Production Configuration
-    ```bash
-    evmd start \
-      --json-rpc.enable \
-      --json-rpc.api eth,net,web3 \
-      --json-rpc.enable-indexer \
-      --json-rpc.gas-cap 50000000 \
-      --json-rpc.allow-unprotected-txs=false \
-      --json-rpc.max-open-connections 100 \
-      --evm.max-tx-gas-wanted 40000000
-    ```
-
-    ### TLS Enabled
-    ```bash
-    evmd start \
-      --json-rpc.enable \
-      --tls.certificate-path /path/to/cert.pem \
-      --tls.key-path /path/to/key.pem
-    ```
-
-    ## Flag Priority
-
-    1. Command-line flags (highest)
-    2. Environment variables
-    3. Configuration file (`app.toml`)
-    4. Default values (lowest)
+  <Tab title="Runtime Flags">
+    CLI flags and environment variables for runtime configuration. These parameters can be set via command line or environment variables to override configuration file settings.
 
     <Note>
-      Flag definitions: `server/flags/flags.go`
+    **Context**: These are EVM-specific runtime parameters that complement the standard Cosmos SDK flags. They control chain initialization and runtime behavior specific to EVM functionality.
     </Note>
+
+    <ParamField body="chain-id" type="string" default="local-1">
+      Cosmos SDK chain identifier for transaction signing and network identification.
+
+      **CLI Flag:** `--chain-id`
+      **Environment:** `EVMD_CHAIN_ID`
+      **Usage:** `evmd start --chain-id mychain-1`
+    </ParamField>
+
+    <ParamField body="evm-chain-id" type="number" default="262144">
+      EIP-155 replay protection chain ID for Ethereum compatibility. Must be unique across all EVM networks.
+
+      **CLI Flag:** `--evm.evm-chain-id`
+      **Environment:** `EVMD_EVM_CHAIN_ID`
+      **Usage:** `evmd start --evm.evm-chain-id 9000`
+      **Config Alternative:** Set in `app.toml` under `[evm] evm-chain-id`
+    </ParamField>
+
+    <ParamField body="denom" type="string" default="atest">
+      Base denomination for native token transactions and staking.
+
+      **CLI Flag:** `--denom`
+      **Environment:** `EVMD_DENOM`
+      **Usage:** `evmd init mynode --denom mytoken`
+    </ParamField>
+
+    <ParamField body="min-tip" type="number" default="0">
+      Minimum priority fee (in wei) required for mempool inclusion.
+
+      **CLI Flag:** `--evm.min-tip`
+      **Environment:** `EVMD_EVM_MIN_TIP`
+      **Usage:** `evmd start --evm.min-tip 1000000000`
+      **Config Alternative:** Set in `app.toml` under `[evm] min-tip`
+    </ParamField>
+
+    <ParamField body="max-tx-gas-wanted" type="number" default="0">
+      Maximum gas limit for transactions in CheckTx validation mode.
+
+      **CLI Flag:** `--evm.max-tx-gas-wanted`
+      **Environment:** `EVMD_MAX_TX_GAS_WANTED`
+      **Usage:** `evmd start --evm.max-tx-gas-wanted 50000000`
+      **Config Alternative:** Set in `app.toml` under `[evm] max-tx-gas-wanted`
+    </ParamField>
+
   </Tab>
 
-  <Tab title="Full Configuration">
+  <Tab title="Application Config">
     Complete `app.toml` with EVM-specific sections highlighted.
 
-    ```toml app.toml lines highlight={131-133,135,137-140,142-143,145-146,148-149,151-153,155,157-158,160-161,163-164,166-168,170-172,174-175,177-178,180-181,183-184,186-187,189-190,192-193,195-196,198-199,201-202,204-206,208-210,212-213,215-217,219-220,222-223,225-226,228-229,231-233,235,237-238,240-241}
+    ```toml Complete Application Configuration expandable
     # This is a TOML config file.
     # For more information, see https://github.com/toml-lang/toml
 
@@ -434,7 +304,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     # The minimum gas prices a validator is willing to accept for processing a
     # transaction. A transaction's fees must meet the minimum of any denomination
     # specified in this config (e.g. 0.25token1,0.0001token2).
-    minimum-gas-prices = "0stake"
+    minimum-gas-prices = "0aatom"
 
     # The maximum gas a query coming over rest/grpc may consume.
     # If this is set to zero, the query can consume an unbounded amount of gas.
@@ -452,10 +322,15 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
 
     # HaltHeight contains a non-zero block height at which a node will gracefully
     # halt and shutdown that can be used to assist upgrades and testing.
+    #
+    # Note: Commitment of state will be attempted on the corresponding block.
     halt-height = 0
 
     # HaltTime contains a non-zero minimum block time (in Unix seconds) at which
-    # a node will gracefully halt and shutdown that can be used to assist upgrades and testing.
+    # a node will gracefully halt and shutdown that can be used to assist upgrades
+    # and testing.
+    #
+    # Note: Commitment of state will be attempted on the corresponding block.
     halt-time = 0
 
     # MinRetainBlocks defines the minimum block height offset from the current
@@ -463,6 +338,15 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     # from CometBFT. It is used as part of the process of determining the
     # ResponseCommit.RetainHeight value during ABCI Commit. A value of 0 indicates
     # that no blocks should be pruned.
+    #
+    # This configuration value is only responsible for pruning CometBFT blocks.
+    # It has no bearing on application state pruning which is determined by the
+    # "pruning-*" configurations.
+    #
+    # Note: CometBFT block pruning is dependant on this parameter in conjunction
+    # with the unbonding (safety threshold) period, state pruning and state sync
+    # snapshot parameters to determine the correct minimum value of
+    # ResponseCommit.RetainHeight.
     min-retain-blocks = 0
 
     # InterBlockCache enables inter-block caching.
@@ -470,17 +354,22 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
 
     # IndexEvents defines the set of events in the form {eventType}.{attributeKey},
     # which informs CometBFT what to index. If empty, all events will be indexed.
+    #
+    # Example:
+    # ["message.sender", "message.recipient"]
     index-events = []
 
     # IavlCacheSize set the size of the iavl tree cache (in number of nodes).
-    iavl-cache-size = 10000
+    iavl-cache-size = 781250
 
-    # IAVLDisableFastNode enables or disables the fast node feature of IAVL. 
+    # IAVLDisableFastNode enables or disables the fast node feature of IAVL.
     # Default is false.
     iavl-disable-fastnode = false
 
-    # AppDBBackend defines the type of Database to use for the application and snapshots DBs.
-    app-db-backend = "goleveldb"
+    # AppDBBackend defines the database backend type to use for the application and snapshots DBs.
+    # An empty string indicates that a fallback will be used.
+    # The fallback is the db_backend value set in CometBFT's config.toml.
+    app-db-backend = ""
 
     ###############################################################################
     ###                         Telemetry Configuration                         ###
@@ -494,7 +383,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     # Enabled enables the application telemetry functionality. When enabled,
     # an in-memory sink is also enabled by default. Operators may also enabled
     # other sinks such as Prometheus.
-    enabled = false
+    enabled = true
 
     # Enable prefixing gauge values with hostname.
     enable-hostname = false
@@ -506,11 +395,26 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     enable-service-label = false
 
     # PrometheusRetentionTime, when positive, enables a Prometheus metrics sink.
-    prometheus-retention-time = 0
+    prometheus-retention-time  = 1000000000000
 
     # GlobalLabels defines a global set of name/value label tuples applied to all
     # metrics emitted using the wrapper functions defined in telemetry package.
-    [telemetry.global-labels]
+    #
+    # Example:
+    # [["chain_id", "cosmoshub-1"]]
+    global-labels = [
+    ]
+
+    # MetricsSink defines the type of metrics sink to use.
+    metrics-sink = ""
+
+    # StatsdAddr defines the address of a statsd server to send metrics to.
+    # Only utilized if MetricsSink is set to "statsd" or "dogstatsd".
+    statsd-addr = ""
+
+    # DatadogHostname defines the hostname to use when emitting metrics to
+    # Datadog. Only utilized if MetricsSink is set to "dogstatsd".
+    datadog-hostname = ""
 
     ###############################################################################
     ###                           API Configuration                             ###
@@ -519,7 +423,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     [api]
 
     # Enable defines if the API server should be enabled.
-    enable = false
+    enable = true
 
     # Swagger defines if swagger documentation should automatically be registered.
     swagger = false
@@ -530,7 +434,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     # MaxOpenConnections defines the number of maximum open connections.
     max-open-connections = 1000
 
-    # The maximum number of requests that can be serviced at the same time 
+    # RPCReadTimeout defines the CometBFT RPC read timeout (in seconds).
     rpc-read-timeout = 10
 
     # RPCWriteTimeout defines the CometBFT RPC write timeout (in seconds).
@@ -539,7 +443,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     # RPCMaxBodyBytes defines the CometBFT maximum request body (in bytes).
     rpc-max-body-bytes = 1000000
 
-    # EnabledUnsafeCORS defines if CORS should be enabled (unsafe - use it at your own risk).
+    # EnableUnsafeCORS defines if CORS should be enabled (unsafe - use it at your own risk).
     enabled-unsafe-cors = false
 
     ###############################################################################
@@ -549,10 +453,83 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     [grpc]
 
     # Enable defines if the gRPC server should be enabled.
-    enable = false
+    enable = true
 
     # Address defines the gRPC server address to bind to.
     address = "localhost:9090"
+
+    # MaxRecvMsgSize defines the max message size in bytes the server can receive.
+    # The default value is 10MB.
+    max-recv-msg-size = "10485760"
+
+    # MaxSendMsgSize defines the max message size in bytes the server can send.
+    # The default value is math.MaxInt32.
+    max-send-msg-size = "2147483647"
+
+    ###############################################################################
+    ###                        gRPC Web Configuration                           ###
+    ###############################################################################
+
+    [grpc-web]
+
+    # GRPCWebEnable defines if the gRPC-web should be enabled.
+    # NOTE: gRPC must also be enabled, otherwise, this configuration is a no-op.
+    # NOTE: gRPC-Web uses the same address as the API server.
+    enable = true
+
+    ###############################################################################
+    ###                        State Sync Configuration                         ###
+    ###############################################################################
+
+    # State sync snapshots allow other nodes to rapidly join the network without replaying historical
+    # blocks, instead downloading and applying a snapshot of the application state at a given height.
+    [state-sync]
+
+    # snapshot-interval specifies the block interval at which local state sync snapshots are
+    # taken (0 to disable).
+    snapshot-interval = 0
+
+    # snapshot-keep-recent specifies the number of recent snapshots to keep and serve (0 to keep all).
+    snapshot-keep-recent = 2
+
+    ###############################################################################
+    ###                              State Streaming                            ###
+    ###############################################################################
+
+    # Streaming allows nodes to stream state to external systems.
+    [streaming]
+
+    # streaming.abci specifies the configuration for the ABCI Listener streaming service.
+    [streaming.abci]
+
+    # List of kv store keys to stream out via gRPC.
+    # The store key names MUST match the module's StoreKey name.
+    #
+    # Example:
+    # ["acc", "bank", "gov", "staking", "mint"[,...]]
+    # ["*"] to expose all keys.
+    keys = []
+
+    # The plugin name used for streaming via gRPC.
+    # Streaming is only enabled if this is set.
+    # Supported plugins: abci
+    plugin = ""
+
+    # stop-node-on-err specifies whether to stop the node on message delivery error.
+    stop-node-on-err = true
+
+    ###############################################################################
+    ###                         Mempool                                         ###
+    ###############################################################################
+
+    [mempool]
+    # Setting max-txs to 0 will allow for a unbounded amount of transactions in the mempool.
+    # Setting max_txs to negative 1 (-1) will disable transactions from being inserted into the mempool (no-op mempool).
+    # Setting max_txs to a positive number (> 0) will limit the number of transactions in the mempool, by the specified amount.
+    #
+    # Note, this configuration only applies to SDK built-in app-side mempool
+    # implementations.
+    max-txs = -1
 
     ###############################################################################
     ###                             EVM Configuration                           ###
@@ -574,16 +551,19 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     # EVMChainID is the EIP-155 compatible replay protection chain ID. This is separate from the Cosmos chain ID.
     evm-chain-id = 262144
 
+    # MinTip defines the minimum priority fee for the mempool.
+    min-tip = 0
+
     ###############################################################################
     ###                           JSON RPC Configuration                        ###
     ###############################################################################
 
     [json-rpc]
 
-    # Enable defines if the JSON-RPC server should be enabled.
-    enable = false
+    # Enable defines if the JSONRPC server should be enabled.
+    enable = true
 
-    # EVM RPC HTTP server address to bind to.
+    # Address defines the EVM RPC HTTP server address to bind to.
     address = "127.0.0.1:8545"
 
     # Address defines the EVM WebSocket server address to bind to.
@@ -597,7 +577,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     # Example: "eth,txpool,personal,net,debug,web3"
     api = "eth,net,web3"
 
-    # GasCap sets a cap on gas that can be used in eth_call/estimateGas (0=infinite).
+    # GasCap sets a cap on gas that can be used in eth_call/estimateGas (0=infinite). Default: 25,000,000.
     gas-cap = 25000000
 
     # Allow insecure account unlocking when account-related RPCs are exposed by http
@@ -625,7 +605,7 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     http-timeout = "30s"
 
     # HTTPIdleTimeout is the idle timeout of http json-rpc server.
-    http-idle-timeout = "120s"
+    http-idle-timeout = "2m0s"
 
     # AllowUnprotectedTxs restricts unprotected (non EIP155 signed) transactions to be submitted via
     # the node's RPC when the global parameter is disabled.
@@ -668,13 +648,81 @@ Configure EVM-specific settings in `~/.evmd/config/app.toml`. This guide covers 
     ```
 
     <Note>
-      **Highlighted lines (130-233):** EVM-specific configuration sections added by Cosmos EVM
-      
-      **Standard sections (1-129):** Base Cosmos SDK configuration for consensus, state, API, and telemetry
-      
-      **Template sources:** 
+      **Lines (130-233):** are EVM-specific configuration sections added by Cosmos EVM
+
+      **Lines (1-129):** are Base Cosmos SDK parameters
+
+      **Template sources:**
       - SDK config: `cosmos-sdk/server/config/toml.go`
       - EVM config: `evm/server/config/toml.go:4-116`
     </Note>
+  </Tab>
+
+  <Tab title="Genesis Config">
+    Blockchain initialization parameters set during chain genesis. These EVM-specific parameters configure the initial state and behavior of the EVM module.
+
+    <Note>
+    **Context**: These parameters are set once during chain initialization and typically cannot be changed without governance proposals or network upgrades. They control fundamental EVM behavior and compatibility.
+    </Note>
+
+    ```json Genesis Configuration Example expandable
+    {
+      "chain_id": "mychain-1",
+      "app_state": {
+        "evm": {
+          "params": {
+            "evm_denom": "atest",
+            "history_serve_window": 8192,
+            "active_static_precompiles": [
+              "0x0000000000000000000000000000000000000100",
+              "0x0000000000000000000000000000000000000400",
+              "0x0000000000000000000000000000000000000800",
+              "0x0000000000000000000000000000000000000801",
+              "0x0000000000000000000000000000000000000802",
+              "0x0000000000000000000000000000000000000804",
+              "0x0000000000000000000000000000000000000805"
+            ],
+            "access_control": {
+              "create": {"access_type": "ACCESS_TYPE_PERMISSIONLESS"},
+              "call": {"access_type": "ACCESS_TYPE_PERMISSIONLESS"}
+            }
+          }
+        },
+        "feemarket": {
+          "params": {
+            "no_base_fee": false,
+            "base_fee_change_denominator": 8,
+            "elasticity_multiplier": 2,
+            "base_fee": "1000000000",
+            "min_gas_price": "0",
+            "min_gas_multiplier": "0.5"
+          }
+        }
+      },
+      "consensus": {
+        "params": {
+          "block": {
+            "max_bytes": "22020096",
+            "max_gas": "100000000"
+          }
+        }
+      }
+    }
+    ```
+
+    **EVM-Specific Parameters:**
+    - `evm_denom`: Base denomination for EVM operations and gas payments
+    - `history_serve_window`: Number of historical block hashes to store (EIP-2935)
+    - `active_static_precompiles`: Enabled precompile contract addresses
+    - `access_control`: Permissions for contract creation and execution
+
+    **Fee Market Parameters:**
+    - `base_fee`: Initial EIP-1559 base fee value
+    - `base_fee_change_denominator`: Rate of base fee adjustment
+    - `elasticity_multiplier`: Block utilization threshold for fee changes
+
+    **Consensus Parameters:**
+    - `max_gas`: Maximum gas per block (critical for mempool configuration)
+
   </Tab>
 </Tabs>

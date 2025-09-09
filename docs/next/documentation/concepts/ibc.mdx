@@ -17,7 +17,7 @@ icon: "network"
 The `Packet` is the primary container for cross-chain communication in IBC v2. Each packet may wrap **one or more** application-specific **`Payload`** objects.
 
 <CodeGroup>
-  ```typescript packet.ts
+  ```typescript "IBC v2 Core Data Structures" expandable
   // Main container sent between chains
   interface Packet {
     sourceClientId: bytes;    // Client ID for destination chain (stored on source)
@@ -27,16 +27,15 @@ The `Packet` is the primary container for cross-chain communication in IBC v2. E
     data: Payload[];          // Application payload(s)
   }
 
-// Application-specific data
-interface Payload {
-sourcePort: bytes;  // Sending application identifier
-destPort: bytes;    // Receiving application identifier
-version: string;    // Application version
-encoding: string;   // MIME-type for decoding
-value: bytes;       // Opaque app data
-}
-
-```
+  // Application-specific data
+  interface Payload {
+    sourcePort: bytes;  // Sending application identifier
+    destPort: bytes;    // Receiving application identifier
+    version: string;    // Application version
+    encoding: string;   // MIME-type for decoding
+    value: bytes;       // Opaque app data
+  }
+  ```
 </CodeGroup>
 
 <Info>

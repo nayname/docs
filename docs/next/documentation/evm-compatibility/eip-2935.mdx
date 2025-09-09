@@ -1,7 +1,6 @@
 ---
 title: "EIP-2935: Historical Block Hash Storage"
 description: "Implementation of EIP-2935 for reliable historical block hash access in smart contracts"
-icon: "clock"
 ---
 
 EIP-2935 provides standardized access to historical block hashes through contract storage, enabling smart contracts to reliably access block hashes beyond the traditional 256-block limit.
@@ -50,27 +49,44 @@ The `history_serve_window` parameter controls how many historical block hashes a
 - **Range:** Must be > 0, recommended ≤ 8192
 - **Storage Impact:** Higher values increase storage requirements linearly
 
+## Comparison with Ethereum
+
+### Similarities
+
+- **Same storage contract address:** `0x0aae40965e6800cd9b1f4b05ff21581047e3f91e`
+- **Same storage layout:** Ring buffer using modulo arithmetic
+- **Same opcode behavior:** `BLOCKHASH` queries contract storage
+- **Same gas costs:** Standard SLOAD costs apply (2100 gas for cold access)
+
+### Differences
+
+- **Configurable window:** Cosmos EVM allows custom `history_serve_window` (vs fixed 8192 in Ethereum)
+- **Instant activation:** Available immediately on upgrade (not block-based activation)
+- **No fork logic:** Uses consensus parameter instead of fork activation
+- **Performance tuning:** Can be optimized per chain requirements
+- **Traditional 256-block limit:** Ethereum's original `BLOCKHASH` opcode only provided access to the most recent 256 blocks; EIP-2935 extends this significantly
+
 ## Usage in Smart Contracts
 
 ### Basic Block Hash Access
 
-```solidity
+```solidity Basic Block Hash Access expandable
 pragma solidity ^0.8.0;
 
 contract BlockHashExample {
-    function getRecentBlockHash(uint256 blockNumber) 
-        external 
-        view 
-        returns (bytes32) 
+    function getRecentBlockHash(uint256 blockNumber)
+        external
+        view
+        returns (bytes32)
     {
         // Works for blocks within history_serve_window range
         return blockhash(blockNumber);
     }
-    
+
     function getCurrentBlockNumber() external view returns (uint256) {
         return block.number;
     }
-    
+
     function getHistoricalRange() external view returns (uint256) {
         // Can access block hashes for last 8192 blocks (default)
         return 8192;
@@ -80,7 +96,7 @@ contract BlockHashExample {
 
 ### Verifiable Randomness Protocol
 
-```solidity
+```solidity Verifiable Randomness Protocol expandable
 contract VerifiableRandomness {
     struct RandomnessCommit {
         bytes32 blockHash;
@@ -88,13 +104,13 @@ contract VerifiableRandomness {
         uint256 timestamp;
         bool revealed;
     }
-    
+
     mapping(bytes32 => RandomnessCommit) public commits;
-    
+
     function commitRandomness(bytes32 commitment) external {
         // Commit to using future block hash as randomness source
         uint256 revealBlock = block.number + 10; // Reveal 10 blocks later
-        
+
         commits[commitment] = RandomnessCommit({
             blockHash: bytes32(0), // Will be filled during reveal
             blockNumber: revealBlock,
@@ -102,7 +118,7 @@ contract VerifiableRandomness {
             revealed: false
         });
     }
-    
+
     function revealRandomness(
         bytes32 commitment,
         uint256 nonce
@@ -110,21 +126,21 @@ contract VerifiableRandomness {
         RandomnessCommit storage commit = commits[commitment];
         require(!commit.revealed, "Already revealed");
         require(block.number >= commit.blockNumber, "Too early to reveal");
-        
+
         // Get block hash from historical storage (EIP-2935)
         bytes32 blockHash = blockhash(commit.blockNumber);
         require(blockHash != bytes32(0), "Block hash not available");
-        
+
         commit.blockHash = blockHash;
         commit.revealed = true;
-        
+
         // Generate verifiable randomness
         randomness = keccak256(abi.encodePacked(
             blockHash,
             commitment,
             nonce
         ));
-        
+
         return randomness;
     }
 }
@@ -132,24 +148,24 @@ contract VerifiableRandomness {
 
 ### Block-Based State Transitions
 
-```solidity
+```solidity Block-Based State Transitions expandable
 contract BlockBasedLogic {
     uint256 public constant EPOCH_LENGTH = 1000; // blocks
     mapping(uint256 => bytes32) public epochSeeds;
-    
+
     function updateEpochSeed() external {
         uint256 currentEpoch = block.number / EPOCH_LENGTH;
-        
+
         if (epochSeeds[currentEpoch] == bytes32(0)) {
             // Use block hash from start of epoch as seed
             uint256 epochStartBlock = currentEpoch * EPOCH_LENGTH;
             bytes32 seedHash = blockhash(epochStartBlock);
-            
+
             require(seedHash != bytes32(0), "Epoch seed block not available");
             epochSeeds[currentEpoch] = seedHash;
         }
     }
-    
+
     function getEpochSeed(uint256 epoch) external view returns (bytes32) {
         return epochSeeds[epoch];
     }
@@ -180,14 +196,14 @@ contract BlockBasedLogic {
 {
   "vm": {
     "params": {
-      "history_serve_window": 1024  
+      "history_serve_window": 1024
     }
   }
 }
 ```
 
 **Use Case:** Resource-constrained nodes or chains prioritizing performance
-**Storage:** ~32KB additional storage (32 bytes × 1024 blocks)  
+**Storage:** ~32KB additional storage (32 bytes × 1024 blocks)
 **Trade-off:** Shorter historical access but better performance
 
 ### Extended History
@@ -228,7 +244,7 @@ blockhash(n) → Returns hash if (block.number - history_serve_window) < n < blo
 The EIP-2935 system contract uses a simple storage mapping:
 
 ```
-Key:   block_number % history_serve_window  
+Key:   block_number % history_serve_window
 Value: block_hash
 ```
 
@@ -249,157 +265,6 @@ The implementation integrates seamlessly with the EVM:
 3. **Gas Costs:** Uses standard SLOAD gas costs for historical access
 4. **Compatibility:** Maintains full backward compatibility
 
-## Performance Considerations
-
-### Storage Impact
-
-| history_serve_window | Storage Used | Use Case |
-|---------------------|--------------|----------|
-| 1024 | ~32 KB | Performance optimized |
-| 4096 | ~128 KB | Balanced |
-| 8192 | ~256 KB | Full compatibility (default) |
-| 16384 | ~512 KB | Extended history |
-
-### Gas Costs
-
-```solidity
-// Gas cost for block hash access
-uint256 gasUsed = 2100; // SLOAD gas cost (cold access)
-                       // Same as reading any contract storage
-
-// Multiple access example
-function getMultipleHashes(uint256[] memory blocks) 
-    external 
-    view 
-    returns (bytes32[] memory) 
-{
-    // Each blockhash() call costs 2100 gas
-    // Total: 2100 * blocks.length
-    bytes32[] memory hashes = new bytes32[](blocks.length);
-    for (uint256 i = 0; i < blocks.length; i++) {
-        hashes[i] = blockhash(blocks[i]);
-    }
-    return hashes;
-}
-```
-
-### Performance Recommendations
-
-**For High-Performance Chains:**
-- Use `history_serve_window: 1024` for minimal storage impact
-- Monitor storage growth during operation
-- Consider periodic archival for very long-running chains
-
-**For DeFi/Protocol Chains:**
-- Use default `history_serve_window: 8192` for good balance
-- Enable comprehensive testing of block hash dependent protocols
-- Plan for storage growth in node requirements
-
-**For Maximum Compatibility:**
-- Use `history_serve_window: 16384` for extended protocol support
-- Ensure adequate storage capacity on validator nodes
-- Monitor performance impact during high transaction periods
-
-## Testing and Verification
-
-### Deployment Testing
-
-```bash
-# 1. Deploy test contract
-cast send --rpc-url http://localhost:8545 \
-  --private-key $PRIVATE_KEY \
-  --create \
-  $(cat BlockHashTest.bin)
-
-# 2. Test current block hash access
-cast call --rpc-url http://localhost:8545 \
-  $CONTRACT_ADDRESS \
-  "getCurrentBlockHash()"
-
-# 3. Test historical block hash access
-cast call --rpc-url http://localhost:8545 \
-  $CONTRACT_ADDRESS \
-  "getHistoricalHash(uint256)" \
-  $(($(cast block-number --rpc-url http://localhost:8545) - 100))
-
-# 4. Test boundary conditions
-cast call --rpc-url http://localhost:8545 \
-  $CONTRACT_ADDRESS \
-  "getHistoricalHash(uint256)" \
-  $(($(cast block-number --rpc-url http://localhost:8545) - 9000))
-```
-
-### Integration Testing
-
-```solidity
-contract EIP2935Test {
-    function testHistoryWindow() external view returns (bool) {
-        uint256 currentBlock = block.number;
-        
-        // Should work: recent block within window
-        if (currentBlock > 100) {
-            bytes32 recentHash = blockhash(currentBlock - 100);
-            if (recentHash == bytes32(0)) return false;
-        }
-        
-        // Should fail: block outside window  
-        if (currentBlock > 9000) {
-            bytes32 oldHash = blockhash(currentBlock - 9000);
-            if (oldHash != bytes32(0)) return false; // Should be 0
-        }
-        
-        return true;
-    }
-    
-    function testNonExistentBlock() external view returns (bool) {
-        // Future block should always return 0
-        bytes32 futureHash = blockhash(block.number + 1);
-        return futureHash == bytes32(0);
-    }
-}
-```
-
-## Migration from Pre-EIP-2935
-
-### Existing Contract Compatibility
-
-**Good News:** Existing contracts using `blockhash()` continue working without changes:
-
-```solidity
-// This code works exactly the same before and after EIP-2935
-contract ExistingContract {
-    function randomFromRecentBlock() external view returns (uint256) {
-        // Still works - now with extended range
-        bytes32 hash = blockhash(block.number - 10);
-        return uint256(hash);
-    }
-}
-```
-
-**Enhanced Capability:** Contracts can now access much older blocks:
-
-```solidity
-// New capability in v0.5.0
-contract EnhancedContract {
-    function randomFromOldBlock() external view returns (uint256) {
-        // Now works for blocks up to history_serve_window old
-        bytes32 hash = blockhash(block.number - 1000);
-        require(hash != bytes32(0), "Block too old");
-        return uint256(hash);
-    }
-}
-```
-
-### Parameter Migration
-
-**Genesis Update Required:**
-```bash
-# Add history_serve_window to existing genesis
-jq '.app_state.vm.params.history_serve_window = 8192' genesis.json > genesis-v0.5.0.json
-```
-
-**No Storage Migration:** EIP-2935 starts populating storage from the upgrade block forward. Historical blocks before the upgrade are not retroactively added.
-
 ## Comparison with Ethereum
 
 ### Similarities
@@ -409,7 +274,7 @@ jq '.app_state.vm.params.history_serve_window = 8192' genesis.json > genesis-v0.
 - **Same opcode behavior:** `BLOCKHASH` queries contract storage
 - **Same gas costs:** Standard SLOAD costs apply
 
-### Differences  
+### Differences
 
 - **Configurable window:** Cosmos EVM allows custom `history_serve_window`
 - **Instant activation:** Available immediately on upgrade (not block-based)
@@ -419,6 +284,6 @@ jq '.app_state.vm.params.history_serve_window = 8192' genesis.json > genesis-v0.
 ## References
 
 - **EIP-2935 Specification:** https://eips.ethereum.org/EIPS/eip-2935
-- **Implementation PR:** [cosmos/evm#407](https://github.com/cosmos/evm/pull/407)  
+- **Implementation PR:** [cosmos/evm#407](https://github.com/cosmos/evm/pull/407)
 - **System Contract Address:** `0x0aae40965e6800cd9b1f4b05ff21581047e3f91e`
 - **Related Documentation:** [VM Module Parameters](../cosmos-sdk/modules/vm#parameters)

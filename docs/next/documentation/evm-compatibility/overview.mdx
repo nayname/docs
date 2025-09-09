@@ -17,11 +17,12 @@ Cosmos EVM maintains all critical EVM behaviors that developers expect. The tabl
 
 | Feature | Ethereum Behavior | Cosmos EVM Implementation |  Compatible? |
 |---------|------------------|---------------------------|---------------|
-| **Transaction Ordering** | Gas price + nonce ordering | Fee priority + nonce ordering |  Yes |
+| **Transaction Ordering** | Gas price + nonce ordering | Fee priority + nonce ordering with configurable MinTip |  Yes |
 | **Multiple Txs per Block** | Multiple per account | Multiple per account |  Yes |
-| **Mempool Behavior** | Pending pool for transactions | Standard mempool (experimental 2-tier available) |  Yes |
-| **Nonce Management** | Sequential nonce enforcement | Sequential nonce enforcement |  Yes |
+| **Mempool Behavior** | Pending pool for transactions | ExperimentalEVMMempool with unified EVM/Cosmos pools |  Yes |
+| **Nonce Management** | Sequential nonce enforcement | Sequential nonce enforcement with gap queuing |  Yes |
 | **EIP-1559 (Dynamic Fees)** | Base fee + priority fee | Base fee + priority fee (distributed, not burned) |  Yes |
+| **EIP-7702 (Set Code)** | Account code delegation | Full support with authorization lists |  Yes |
 | **Address Format** | 0x addresses | 0x addresses (+ cosmos1 alias) |  Yes |
 | **Smart Contracts** | EVM bytecode execution | Full EVM bytecode execution |  Yes |
 | **Gas Metering** | Standard gas costs | Standard gas costs |  Yes |

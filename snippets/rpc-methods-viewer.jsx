@@ -181,7 +181,7 @@ export default function RPCMethodsViewerVersionB() {
         { name: "eth_getRawTransactionByBlockHashAndIndex", status: "Stub", description: "Returns raw transaction by block hash and index" },
         { name: "eth_resend", status: "N", description: "Resends transaction with new gas price (requires nonce param)" },
         { name: "eth_fillTransaction", status: "N", description: "Fills missing transaction fields (not implemented)" },
-        { name: "eth_createAccessList", status: "Stub", description: "Creates EIP-2930 access list" },
+        { name: "eth_createAccessList", status: "Y", description: "Creates EIP-2930 access list for transactions" },
         { name: "eth_blobBaseFee", status: "N", description: "Returns blob base fee (EIP-4844 - not implemented)" },
         { name: "eth_getHeaderByHash", status: "Y", description: "Returns block header by hash" },
         { name: "eth_getHeaderByNumber", status: "Y", description: "Returns block header by number" },
@@ -493,6 +493,10 @@ export default function RPCMethodsViewerVersionB() {
     ],
     txpool_contentFrom: [
       { name: 'address', type: 'address', description: 'Address to get transactions from', example: '0x1234567890abcdef1234567890abcdef12345678' }
+    ],
+    eth_createAccessList: [
+      { name: 'callObject', type: 'object', description: 'Transaction call object containing at minimum "from" and "to" addresses', example: '{"from": "0x...", "to": "0x...", "data": "0x..."}' },
+      { name: 'blockNumber', type: 'string', description: 'Block number or tag ("latest", "earliest", "pending")', example: 'latest' }
     ]
   };
 

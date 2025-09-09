@@ -58,7 +58,7 @@ function aggregate3Value(Call3Value[] calldata calls)
 ### Basic Batch Calls
 
 <CodeGroup>
-```javascript Ethers.js
+```javascript "Ethers.js Multiple Token Balance Query" expandable
 import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("YOUR_RPC_URL");
@@ -101,7 +101,7 @@ async function getMultipleBalances(tokenAddress, accounts) {
 }
 ```
 
-```solidity Solidity
+```solidity "Solidity Multi-Token Balance Reader" expandable
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -155,7 +155,7 @@ contract MultiTokenReader {
 
 Combine multiple DeFi operations atomically:
 
-```javascript
+```javascript "Complex DeFi Swap and Stake Operation" expandable
 // Swap and stake in one transaction
 async function swapAndStake(tokenIn, tokenOut, amountIn, poolAddress) {
   const calls = [
@@ -214,7 +214,7 @@ async function getProtocolState(protocol) {
 
 Send native tokens with calls using `aggregate3Value`:
 
-```javascript
+```javascript "Native Token Forwarding with Multicall3" expandable
 const calls = [
   {
     target: weth,
@@ -237,7 +237,7 @@ await multicall.aggregate3Value(calls, {
 
 ### Error Handling Strategies
 
-```javascript
+```javascript "Error Handling Strategies" expandable
 // Strict mode - revert if any call fails
 const strictCalls = calls.map(call => ({
   ...call,

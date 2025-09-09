@@ -160,7 +160,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
 
 **Performance-Aware Priority:** Optimize transaction ordering for specific use cases
 
-```go
+```go Custom Priority Functions expandable
 // MEV-resistant priority function
 func mevResistantPriority(goCtx context.Context, tx sdk.Tx) math.Int {
     // Prioritize based on transaction age instead of just fees
@@ -241,7 +241,7 @@ max-open-connections = 100         # Connection limiting
 
 **Performance Tuning Examples:**
 
-```toml
+```toml Performance Configuration Examples expandable
 # High-performance API server
 [json-rpc]
 batch-request-limit = 5000
@@ -284,7 +284,7 @@ const tx = await contract.complexFunction(arg1, arg2, {
 
 #### DeFi-Focused Chain
 
-```go
+```go DeFi Chain Configuration expandable
 // Optimized for DeFi protocols
 mempoolConfig := &evmmempool.EVMMempoolConfig{
     LegacyPoolConfig: &legacypool.Config{
@@ -303,7 +303,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
 
 #### Gaming Chain
 
-```go
+```go Gaming Chain Configuration expandable
 // Optimized for high transaction volume, low complexity
 mempoolConfig := &evmmempool.EVMMempoolConfig{
     LegacyPoolConfig: &legacypool.Config{
@@ -322,7 +322,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
 
 #### Enterprise/Private Chain
 
-```go
+```go Enterprise Chain Configuration expandable
 // Optimized for predictable, high-value transactions
 mempoolConfig := &evmmempool.EVMMempoolConfig{
     LegacyPoolConfig: &legacypool.Config{
@@ -387,7 +387,7 @@ diff baseline-metrics.txt optimized-metrics.txt
 
 ### Development Environment
 
-```toml
+```toml Development Environment Configuration expandable
 # Optimized for development speed
 [json-rpc]
 evm-timeout = "30s"      # Longer timeout for debugging
@@ -401,7 +401,7 @@ cache-preimage = true    # Enable preimage tracking
 
 ### Production Environment
 
-```toml
+```toml Production Environment Configuration expandable
 # Optimized for production performance and security
 [json-rpc]
 evm-timeout = "3s"              # Fast timeout
@@ -418,7 +418,7 @@ max-tx-gas-wanted = 10000000    # Reasonable ante limit
 
 ### Load Testing
 
-```bash
+```bash Load Testing Commands expandable
 # Test transaction throughput
 for i in {1..1000}; do
   cast send --rpc-url http://localhost:8545 \
@@ -492,7 +492,7 @@ LegacyPoolConfig: &legacypool.Config{
 
 #### Key Metrics to Track
 
-```bash
+```bash Key Performance Metrics expandable
 # Transaction pool health
 txpool_pending_gauge
 txpool_queued_gauge  
@@ -577,7 +577,7 @@ go test -bench=BenchmarkRPC ./rpc/namespaces/ethereum/eth/
 
 ### Load Testing Scripts
 
-```javascript
+```javascript Load Testing Script expandable
 // Ethereum tooling load test
 const { ethers } = require("ethers");
 

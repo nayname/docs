@@ -126,6 +126,7 @@ type AccessControl struct {
     ```
   </Tab>
   <Tab title="Permissioned">
+    <Expandable title="View permissioned configuration">
     ```json
     {
       "evm_denom": "atoken",
@@ -144,6 +145,7 @@ type AccessControl struct {
       "history_serve_window": 4096
     }
     ```
+    </Expandable>
   </Tab>
   <Tab title="High Security">
     ```json
@@ -284,6 +286,7 @@ message MsgUpdateParams {
 
 ### gRPC
 
+<Expandable title="View complete Query service interface">
 ```protobuf
 service Query {
   // Account queries
@@ -313,6 +316,7 @@ service Query {
   rpc GlobalMinGasPrice(QueryGlobalMinGasPriceRequest) returns (QueryGlobalMinGasPriceResponse);
 }
 ```
+</Expandable>
 
 ### CLI
 

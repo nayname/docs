@@ -42,7 +42,7 @@ The factory has a single method that deploys contracts using CREATE2.
 ### Deploy a Safe Wallet
 
 <CodeGroup>
-```javascript Ethers.js
+```javascript "Ethers.js Safe SDK Implementation" expandable
 import { ethers } from "ethers";
 import { SafeFactory } from "@safe-global/safe-core-sdk";
 
@@ -99,7 +99,7 @@ async function deployManually(signer) {
 }
 ```
 
-```solidity Solidity
+```solidity "Solidity Safe Deployer Contract" expandable
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -175,7 +175,7 @@ function predictSafeAddress(owners, threshold, saltNonce) {
 
 ### Deploy with Custom Configuration
 
-```javascript
+```javascript "Deploy Safe with Custom Configuration" expandable
 async function deployCustomSafe(config, signer) {
   const {
     owners,
@@ -228,7 +228,7 @@ async function deployCustomSafe(config, signer) {
 
 Deploy consistent treasury addresses across chains:
 
-```javascript
+```javascript "Deploy Organization Treasury Across Chains" expandable
 async function deployOrgTreasury(orgId, chains) {
   const salt = ethers.id(`org-treasury-${orgId}`);
   const results = {};
@@ -250,7 +250,7 @@ async function deployOrgTreasury(orgId, chains) {
 
 Create wallets that can receive funds before deployment:
 
-```javascript
+```javascript "Counterfactual Safe Class Implementation" expandable
 class CounterfactualSafe {
   constructor(owners, threshold) {
     this.owners = owners;
@@ -290,7 +290,7 @@ class CounterfactualSafe {
 
 Deploy and enable Safe modules:
 
-```javascript
+```javascript "Safe Module Deployment and Configuration" expandable
 // Deploy module via factory
 async function deployModule(moduleCode, salt) {
   const tx = await factory.deploy(moduleCode, salt);
@@ -310,7 +310,7 @@ async function enableModule(safeAddress, moduleAddress, signer) {
 
 Deploy transaction guards for additional security:
 
-```javascript
+```javascript "Deploy and Set Safe Transaction Guard" expandable
 async function deployAndSetGuard(safeAddress, guardCode, signer) {
   // Deploy guard
   const salt = ethers.id(`guard-${safeAddress}`);
@@ -329,7 +329,7 @@ async function deployAndSetGuard(safeAddress, guardCode, signer) {
 
 ### Salt Management
 
-```javascript
+```javascript "Structured Salt Generation Patterns" expandable
 // Structured salt generation
 function generateSalt(context, nonce) {
   return ethers.solidityPackedKeccak256(
@@ -346,7 +346,7 @@ const appSalt = generateSalt(`app-${appId}-${version}`, 0);
 
 ### Version Control
 
-```javascript
+```javascript "Safe Version Management" expandable
 const SAFE_VERSIONS = {
   "1.3.0": "0xd9Db270c1B5E3Bd161E8c8503c55cEABeE709552",
   "1.4.0": "0x41675C099F32341bf84BFc5382aF534df5C7461a",

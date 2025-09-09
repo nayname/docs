@@ -1,13 +1,12 @@
 ---
 title: "EVM Mempool Integration"
 description: "Integrate the EVM mempool with your Cosmos EVM chain"
+tags: ["mempool"]
 ---
-<Danger>
-This mempool is **experimental** and in active development. It is intended for testing and evaluation purposes. Use in production environments is **not recommended** without thorough testing and risk assessment.
-Please [report issues](https://github.com/cosmos/evm/issues/new) and submit feedback to help improve stability.
-</Danger>
 
 ## Overview
+
+This guide provides step-by-step instructions for integrating the EVM mempool into your Cosmos EVM chain. For conceptual information about mempool design and architecture, see the [Mempool Concepts](/docs/next/documentation/concepts/mempool) page.
 
 ### Step 1: Add EVM Mempool to App Struct
 
@@ -33,6 +32,7 @@ The mempool must be initialized **after** the antehandler has been set in the ap
 
 Add the following configuration in your `NewApp` constructor:
 
+<Expandable title="View EVM mempool initialization code">
 ```go
 // Set the EVM priority nonce mempool
 if evmtypes.GetChainConfig() != nil {
@@ -69,9 +69,10 @@ if evmtypes.GetChainConfig() != nil {
     app.SetPrepareProposal(abciProposalHandler.PrepareProposalHandler())
 }
 ```
+</Expandable>
 
 <Warning>
-**v0.5.0 Breaking Change:** The global mempool registry (`SetGlobalEVMMempool`) has been removed. Mempool is now passed directly to the JSON-RPC server during initialization.
+**Breaking Change from v0.4.x:** The global mempool registry (`SetGlobalEVMMempool`) has been removed. Mempool is now passed directly to the JSON-RPC server during initialization.
 </Warning>
 
 ## Configuration Options
@@ -87,7 +88,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
 }
 ```
 
-### Full Configuration Options (v0.5.0+)
+### Full Configuration Options
 
 ```go
 type EVMMempoolConfig struct {

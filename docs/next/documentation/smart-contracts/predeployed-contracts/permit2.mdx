@@ -69,7 +69,7 @@ function permitTransferFrom(
 ### Basic Permit2 Integration
 
 <CodeGroup>
-```javascript Ethers.js
+```javascript "Ethers.js Complete Permit2 Integration" expandable
 import { ethers } from "ethers";
 import { AllowanceProvider, AllowanceTransfer } from "@uniswap/permit2-sdk";
 
@@ -136,7 +136,7 @@ async function transferWithPermit(permit, signature, transferDetails) {
 }
 ```
 
-```solidity Solidity
+```solidity "Solidity Permit2 Integration Contract" expandable
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -198,7 +198,7 @@ contract Permit2Integration {
 
 Handle multiple tokens in one transaction:
 
-```javascript
+```javascript "Batch Token Transfers with Permit2" expandable
 async function batchTransferWithPermit2(transfers, owner, signer) {
   const permits = [];
   const signatures = [];
@@ -231,7 +231,7 @@ async function batchTransferWithPermit2(transfers, owner, signer) {
 
 Enable gasless token approvals using meta-transactions:
 
-```javascript
+```javascript "Gasless Approval via Meta-transactions" expandable
 // User signs permit off-chain
 async function createGaslessPermit(token, spender, amount, signer) {
   const deadline = Math.floor(Date.now() / 1000) + 3600; // 1 hour
@@ -333,7 +333,7 @@ const expirations = {
 
 ### DEX Integration
 
-```solidity
+```solidity "DEX Integration with Permit2" expandable
 contract DEXWithPermit2 {
     function swapWithPermit(
         SwapParams calldata params,
@@ -357,7 +357,7 @@ contract DEXWithPermit2 {
 
 ### Payment Processor
 
-```javascript
+```javascript "Payment Processor with Permit2" expandable
 class PaymentProcessor {
   async processPayment(order, permit, signature) {
     // Verify order details
