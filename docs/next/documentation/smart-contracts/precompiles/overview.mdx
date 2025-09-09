@@ -22,6 +22,34 @@ keywords: ['precompiles', 'precompiled contracts', 'cosmos sdk', 'evm', 'smart c
 
 ## Configuration
 
+Precompiled contracts provide direct, gas-efficient access to native Cosmos SDK functionality from within the EVM. Build powerful hybrid applications that leverage the best of both worlds. This page provides an overview of the available precompiled contracts, each with detailed documentation on its usage, Solidity interface, and ABI.
+
+<Warning>
+  **Critical: Understanding Token Decimals in Precompiles**
+
+  All Cosmos EVM precompile contracts use the **native chain's decimal precision**, not Ethereum's standard 18 decimals (wei).
+
+  **Why this matters:**
+  - Cosmos chains typically use 6 decimals, while Ethereum uses 18
+  - Passing values while assuming conventional Ethereum exponents could cause significant miscalculations
+  - Example: On a 6-decimal chain, passing `1000000000000000000` (1 token in wei) will be interpreted as **1 trillion tokens**
+
+  **Before using any precompile:**
+  1. Check your chain's native token decimal precision
+  2. Convert amounts to match the native token's format
+  3. Never assume 18-decimal precision
+
+  ```solidity
+  // WRONG: Assuming Ethereum's 18 decimals
+  uint256 amount = 1 ether; // 1000000000000000000
+  staking.delegate(validator, amount); // Delegates 1 trillion tokens!
+
+  // CORRECT: Using chain's native 6 decimals
+  uint256 amount = 1000000; // 1 token with 6 decimals
+  staking.delegate(validator, amount); // Delegates 1 token
+  ```
+</Warning>
+
 ### Genesis Configuration
 
 Precompiles must be enabled in the genesis file to be available on the network. The `active_static_precompiles` parameter controls which precompiles are activated at network launch.
@@ -33,7 +61,7 @@ Precompiles must be enabled in the genesis file to be available on the network. 
       "params": {
         "active_static_precompiles": [
           "0x0000000000000000000000000000000000000100",  // P256
-          "0x0000000000000000000000000000000000000400",  // Bech32  
+          "0x0000000000000000000000000000000000000400",  // Bech32
           "0x0000000000000000000000000000000000000800",  // Staking
           "0x0000000000000000000000000000000000000801",  // Distribution
           "0x0000000000000000000000000000000000000802",  // ICS20
@@ -67,7 +95,7 @@ All precompile constructors in v0.5.0 now require keeper interfaces instead of c
 // Concrete keeper types required
 bankPrecompile, err := bankprecompile.NewPrecompile(
     bankKeeper,      // bankkeeper.Keeper concrete type
-    stakingKeeper,   // stakingkeeper.Keeper concrete type  
+    stakingKeeper,   // stakingkeeper.Keeper concrete type
     // ... other keepers
 )
 ```
@@ -110,7 +138,7 @@ func NewCustomPrecompile(
     }, nil
 }
 
-// After (v0.5.0)  
+// After (v0.5.0)
 func NewCustomPrecompile(
     bankKeeper common.BankKeeper,        // Interface instead of concrete type
     stakingKeeper common.StakingKeeper,  // Interface instead of concrete type
@@ -134,7 +162,7 @@ func NewAvailableStaticPrecompiles(
     opts ...Option,
 ) map[common.Address]vm.PrecompiledContract {
     precompiles := make(map[common.Address]vm.PrecompiledContract)
-    
+
     // No casting needed - parameters are already interface types
     bankPrecompile, err := bankprecompile.NewPrecompile(bankKeeper, erc20Keeper)
     if err != nil {
@@ -177,11 +205,11 @@ import "./IStaking.sol";
 contract MyDApp {
     IBank constant bank = IBank(0x0000000000000000000000000000000000000804);
     IStaking constant staking = IStaking(0x0000000000000000000000000000000000000800);
-    
+
     function getBalance(string memory denom) external view returns (uint256) {
         return bank.balances(msg.sender, denom);
     }
-    
+
     function delegateTokens(string memory validatorAddr, uint256 amount) external {
         staking.delegate(msg.sender, validatorAddr, amount);
     }
