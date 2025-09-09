@@ -16,7 +16,7 @@ The module acts as a wrapper around `x/bank`, providing:
 - **18 decimal precision** for EVM (10^18 sub-atomic units)
 - **Backward compatibility** with 6 decimal Cosmos operations
 - **Transparent conversion** between precision levels
-- **Fractional balance tracking** for sub-uatom amounts
+- **Fractional balance tracking** for sub-test amounts
 
 <Note>
   Developed with contributions from the [Kava](https://www.kava.io/) team.
@@ -35,13 +35,13 @@ The module maintains fractional balances and remainder ([source](https://github.
 
 Full balance calculation:
 ```
-aatom_balance = uatom_balance × 10^12 + fractional_balance
+atest_balance = test_balance × 10^12 + fractional_balance
 ```
 
 Where:
-- `uatom_balance`: Stored in x/bank (6 decimals)
+- `test_balance`: Stored in x/bank (6 decimals)
 - `fractional_balance`: Stored in x/precisebank (0 to 10^12-1)
-- `aatom_balance`: Full 18-decimal precision
+- `atest_balance`: Full 18-decimal precision
 
 ## Keeper Interface
 
@@ -66,9 +66,9 @@ type Keeper interface {
 
 ### Extended Coin Support
 
-Automatic handling of "aatom" denomination:
-- Converts between uatom and aatom transparently
-- Maintains fractional balances for sub-uatom amounts
+Automatic handling of "atest" denomination:
+- Converts between test and atest transparently
+- Maintains fractional balances for sub-test amounts
 - Ensures consistency between x/bank and x/precisebank
 
 ## Operations
@@ -80,7 +80,7 @@ Handles both integer and fractional components:
 ```go
 // SendCoins automatically handles precision
 keeper.SendCoins(ctx, from, to, sdk.NewCoins(
-    sdk.NewCoin("aatom", sdk.NewInt(1500000000000)), // 0.0015 uatom
+    sdk.NewCoin("atest", sdk.NewInt(1500000000000)), // 0.0015 test
 ))
 ```
 
@@ -97,7 +97,7 @@ Creates new tokens with proper backing:
 ```go
 // MintCoins with extended precision
 keeper.MintCoins(ctx, moduleName, sdk.NewCoins(
-    sdk.NewCoin("aatom", sdk.NewInt(1000000000000000000)), // 1 uatom
+    sdk.NewCoin("atest", sdk.NewInt(1000000000000000000)), // 1 test
 ))
 ```
 
@@ -113,7 +113,7 @@ Removes tokens from circulation:
 ```go
 // BurnCoins with extended precision
 keeper.BurnCoins(ctx, moduleName, sdk.NewCoins(
-    sdk.NewCoin("aatom", sdk.NewInt(500000000000)),  // 0.0005 uatom
+    sdk.NewCoin("atest", sdk.NewInt(500000000000)),  // 0.0005 test
 ))
 ```
 
@@ -130,7 +130,7 @@ Standard bank events with extended precision amounts:
 
 | Event | Attributes | Description |
 |-------|------------|-------------|
-| `transfer` | `sender`, `recipient`, `amount` | Full aatom amount |
+| `transfer` | `sender`, `recipient`, `amount` | Full atest amount |
 | `coin_spent` | `spender`, `amount` | Extended precision |
 | `coin_received` | `receiver`, `amount` | Extended precision |
 
@@ -170,7 +170,7 @@ service Query {
 evmd query precisebank total-fractional-balances
 
 # Example output:
-# total: "2000000000000aatom"
+# total: "2000000000000atest"
 ```
 
 ```bash Query-Remainder
@@ -178,7 +178,7 @@ evmd query precisebank total-fractional-balances
 evmd query precisebank remainder
 
 # Example output:
-# remainder: "100aatom"
+# remainder: "100atest"
 ```
 
 ```bash Query-Balance
@@ -186,7 +186,7 @@ evmd query precisebank remainder
 evmd query precisebank fractional-balance cosmos1...
 
 # Example output:
-# fractional_balance: "10000aatom"
+# fractional_balance: "10000atest"
 ```
 
 </CodeGroup>
@@ -209,12 +209,12 @@ app.EvmKeeper = evmkeeper.NewKeeper(
 Query extended balances through standard interface:
 
 ```go
-// Automatically handles aatom denomination
-balance := keeper.GetBalance(ctx, addr, "aatom")
+// Automatically handles atest denomination
+balance := keeper.GetBalance(ctx, addr, "atest")
 
 // Transfer with 18 decimal precision
 err := keeper.SendCoins(ctx, from, to, 
-    sdk.NewCoins(sdk.NewCoin("aatom", amount)))
+    sdk.NewCoins(sdk.NewCoin("atest", amount)))
 ```
 
 ## Reserve Account
@@ -222,7 +222,7 @@ err := keeper.SendCoins(ctx, from, to,
 The reserve account maintains backing for fractional balances:
 
 ```
-Reserve_uatom × 10^12 = Σ(all fractional balances) + remainder
+Reserve_test × 10^12 = Σ(all fractional balances) + remainder
 ```
 
 ### Monitoring Reserve
@@ -242,10 +242,10 @@ Critical invariants maintained by the module:
 
 | Invariant | Formula | Description |
 |-----------|---------|-------------|
-| **Supply** | `Total_aatom = Total_uatom × 10^12 - remainder` | Total supply consistency |
+| **Supply** | `Total_atest = Total_test × 10^12 - remainder` | Total supply consistency |
 | **Fractional Range** | `0 ≤ f(n) < 10^12` | Valid fractional bounds |
 | **Reserve Backing** | `Reserve × 10^12 = Σf(n) + r` | Full backing guarantee |
-| **Conservation** | `Δ(Total_aatom) = Δ(Total_uatom × 10^12)` | No creation/destruction |
+| **Conservation** | `Δ(Total_atest) = Δ(Total_test × 10^12)` | No creation/destruction |
 
 ## Best Practices
 
@@ -278,7 +278,7 @@ Critical invariants maintained by the module:
 
 1. **Balance Queries**
    ```javascript
-   // Query in aatom (18 decimals)
+   // Query in atest (18 decimals)
    const balance = await queryClient.precisebank.fractionalBalance({
        address: "cosmos1..."
    });
@@ -287,8 +287,8 @@ Critical invariants maintained by the module:
 2. **Precision Handling**
    ```javascript
    // Convert between precisions
-   const uatomAmount = aatomAmount / BigInt(10**12);
-   const aatomAmount = uatomAmount * BigInt(10**12);
+   const testAmount = atestAmount / BigInt(10**12);
+   const atestAmount = testAmount * BigInt(10**12);
    ```
 
 ## Security Considerations
@@ -332,7 +332,7 @@ Critical invariants maintained by the module:
 | Issue | Cause | Solution |
 |-------|-------|----------|
 | "fractional overflow" | Fractional > 10^12 | Check calculation logic |
-| "insufficient balance" | Including fractional | Verify full aatom balance |
+| "insufficient balance" | Including fractional | Verify full atest balance |
 | "invariant violation" | Supply mismatch | Audit reserve and remainder |
 
 ### Validation Commands
@@ -343,7 +343,7 @@ evmd query precisebank total-fractional-balances
 evmd query precisebank remainder
 
 # Check specific account
-evmd query bank balances cosmos1... --denom uatom
+evmd query bank balances cosmos1... --denom test
 evmd query precisebank fractional-balance cosmos1...
 ```
 

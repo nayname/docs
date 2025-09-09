@@ -36,7 +36,7 @@ Gas costs are approximated and may vary based on token complexity and chain sett
 
 The ERC20 precompile works through a token pair registration system:
 
-1. **Native Cosmos Token**: Each Cosmos SDK denomination (e.g., `uatom`, `stake`) exists as a native token in the bank module
+1. **Native Cosmos Token**: Each Cosmos SDK denomination (e.g., `test`, `atest`) exists as a native token in the bank module
 2. **ERC20 Interface**: A corresponding ERC20 precompile contract provides an interface at a unique address
 3. **Direct Bank Module Access**: The ERC20 interface operates directly on bank module balances - there is no separate ERC20 token state
 4. **Dynamic Addresses**: Each token pair gets its own precompile address when registered
@@ -51,6 +51,28 @@ The precompile address is deterministically generated based on the token denomin
 Returns the total amount of tokens in existence.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ERC20Example {
+    address public immutable tokenContract;
+    
+    constructor(address _tokenContract) {
+        tokenContract = _tokenContract;
+    }
+    
+    function getTotalSupply() external view returns (uint256 totalSupply) {
+        (bool success, bytes memory result) = tokenContract.staticcall(
+            abi.encodeWithSignature("totalSupply()")
+        );
+        
+        require(success, "Total supply query failed");
+        totalSupply = abi.decode(result, (uint256));
+        return totalSupply;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -95,6 +117,33 @@ curl -X POST --data '{
 Returns the token balance of a specified account.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ERC20Example {
+    address public immutable tokenContract;
+    
+    constructor(address _tokenContract) {
+        tokenContract = _tokenContract;
+    }
+    
+    function getBalance(address account) external view returns (uint256 balance) {
+        (bool success, bytes memory result) = tokenContract.staticcall(
+            abi.encodeWithSignature("balanceOf(address)", account)
+        );
+        
+        require(success, "Balance query failed");
+        balance = abi.decode(result, (uint256));
+        return balance;
+    }
+    
+    // Get caller's balance
+    function getMyBalance() external view returns (uint256) {
+        return this.getBalance(msg.sender);
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -137,16 +186,154 @@ curl -X POST --data '{
 ### `transfer`
 Moves tokens from the caller's account to a recipient.
 
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ERC20Example {
+    address public immutable tokenContract;
+    
+    constructor(address _tokenContract) {
+        tokenContract = _tokenContract;
+    }
+    
+    event TokenTransfer(address indexed from, address indexed to, uint256 amount);
+    
+    function transferTokens(address to, uint256 amount) external returns (bool success) {
+        require(to != address(0), "Cannot transfer to zero address");
+        require(amount > 0, "Amount must be positive");
+        
+        (bool callSuccess, bytes memory result) = tokenContract.call(
+            abi.encodeWithSignature("transfer(address,uint256)", to, amount)
+        );
+        
+        require(callSuccess, "Transfer call failed");
+        success = abi.decode(result, (bool));
+        require(success, "Transfer returned false");
+        
+        emit TokenTransfer(msg.sender, to, amount);
+        return success;
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Token transfer requires a signed transaction"
+```
+</CodeGroup>
+
 ### `transferFrom`
 Moves tokens from one account to another using an allowance.
 
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ERC20Example {
+    address public immutable tokenContract;
+    
+    constructor(address _tokenContract) {
+        tokenContract = _tokenContract;
+    }
+    
+    event TokenTransferFrom(address indexed from, address indexed to, uint256 amount, address indexed spender);
+    
+    function transferFromTokens(address from, address to, uint256 amount) external returns (bool success) {
+        require(from != address(0), "Cannot transfer from zero address");
+        require(to != address(0), "Cannot transfer to zero address");
+        require(amount > 0, "Amount must be positive");
+        
+        (bool callSuccess, bytes memory result) = tokenContract.call(
+            abi.encodeWithSignature("transferFrom(address,address,uint256)", from, to, amount)
+        );
+        
+        require(callSuccess, "TransferFrom call failed");
+        success = abi.decode(result, (bool));
+        require(success, "TransferFrom returned false");
+        
+        emit TokenTransferFrom(from, to, amount, msg.sender);
+        return success;
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Token transferFrom requires a signed transaction"
+```
+</CodeGroup>
+
 ### `approve`
 Sets the allowance of a spender over the caller's tokens.
+
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ERC20Example {
+    address public immutable tokenContract;
+    
+    constructor(address _tokenContract) {
+        tokenContract = _tokenContract;
+    }
+    
+    event TokenApproval(address indexed owner, address indexed spender, uint256 amount);
+    
+    function approveSpender(address spender, uint256 amount) external returns (bool success) {
+        require(spender != address(0), "Cannot approve zero address");
+        
+        (bool callSuccess, bytes memory result) = tokenContract.call(
+            abi.encodeWithSignature("approve(address,uint256)", spender, amount)
+        );
+        
+        require(callSuccess, "Approve call failed");
+        success = abi.decode(result, (bool));
+        require(success, "Approve returned false");
+        
+        emit TokenApproval(msg.sender, spender, amount);
+        return success;
+    }
+    
+    // Helper function to approve maximum amount
+    function approveMax(address spender) external returns (bool) {
+        return this.approveSpender(spender, type(uint256).max);
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Token approval requires a signed transaction"
+```
+</CodeGroup>
 
 ### `allowance`
 Returns the remaining number of tokens that a spender is allowed to spend on behalf of an owner.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ERC20Example {
+    address public immutable tokenContract;
+    
+    constructor(address _tokenContract) {
+        tokenContract = _tokenContract;
+    }
+    
+    function checkAllowance(address owner, address spender) external view returns (uint256 allowance) {
+        (bool success, bytes memory result) = tokenContract.staticcall(
+            abi.encodeWithSignature("allowance(address,address)", owner, spender)
+        );
+        
+        require(success, "Allowance query failed");
+        allowance = abi.decode(result, (uint256));
+        return allowance;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -191,6 +378,28 @@ curl -X POST --data '{
 Returns the name of the token.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ERC20Example {
+    address public immutable tokenContract;
+    
+    constructor(address _tokenContract) {
+        tokenContract = _tokenContract;
+    }
+    
+    function getTokenName() external view returns (string memory name) {
+        (bool success, bytes memory result) = tokenContract.staticcall(
+            abi.encodeWithSignature("name()")
+        );
+        
+        require(success, "Name query failed");
+        name = abi.decode(result, (string));
+        return name;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -233,6 +442,28 @@ curl -X POST --data '{
 Returns the symbol of the token.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ERC20Example {
+    address public immutable tokenContract;
+    
+    constructor(address _tokenContract) {
+        tokenContract = _tokenContract;
+    }
+    
+    function getTokenSymbol() external view returns (string memory symbol) {
+        (bool success, bytes memory result) = tokenContract.staticcall(
+            abi.encodeWithSignature("symbol()")
+        );
+        
+        require(success, "Symbol query failed");
+        symbol = abi.decode(result, (string));
+        return symbol;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -275,10 +506,32 @@ curl -X POST --data '{
 Returns the number of decimals used for the token.
 
 <Warning>
-**Decimal Handling**: The ERC20 precompile may need to handle complex decimal conversions between Cosmos native tokens and ERC20 representation. Some Cosmos tokens use 6 decimals (e.g., `uatom`) while ERC20 typically uses 18. Always verify the decimal count for accurate amount calculations.
+**Decimal Handling**: The ERC20 precompile may need to handle complex decimal conversions between Cosmos native tokens and ERC20 representation. Some Cosmos tokens use 6 decimals (e.g., `test`) while ERC20 typically uses 18. Always verify the decimal count for accurate amount calculations.
 </Warning>
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ERC20Example {
+    address public immutable tokenContract;
+    
+    constructor(address _tokenContract) {
+        tokenContract = _tokenContract;
+    }
+    
+    function getTokenDecimals() external view returns (uint8 decimals) {
+        (bool success, bytes memory result) = tokenContract.staticcall(
+            abi.encodeWithSignature("decimals()")
+        );
+        
+        require(success, "Decimals query failed");
+        decimals = abi.decode(result, (uint8));
+        return decimals;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 

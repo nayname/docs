@@ -111,12 +111,12 @@ cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw
 
 ### Address conversion
 
-The `appd debug addr <address>` can be used to convert an address between hex and bech32 formats:
+The `evmd debug addr <address>` can be used to convert an address between hex and bech32 formats:
 
 <CodeGroup>
 
 ```bash Bech32 to Hex
-$ appd debug addr cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw
+$ evmd debug addr cosmos1z3t55m0l9h0eupuz3dp5t5cypyv674jj7mz2jw
 
 Address: [20 87 74 109 255 45 223 158 7 130 139 67 69 211 4 9 25 175 86 82]
 Address (hex): 14574A6DFF2DDF9E07828B4345D3040919AF5652
@@ -125,7 +125,7 @@ Bech32 Val: cosmosvaloper1z3t55m0l9h0eupuz3dp5t5cypyv674jjn4d6nn
 ```
 
 ```bash Hex to Bech32
-$ appd debug addr 14574A6DFF2DDF9E07828B4345D3040919AF5652
+$ evmd debug addr 14574A6DFF2DDF9E07828B4345D3040919AF5652
 
 Address: [20 87 74 109 255 45 223 158 7 130 139 67 69 211 4 9 25 175 86 82]
 Address (hex): 14574A6DFF2DDF9E07828B4345D3040919AF5652
@@ -138,7 +138,7 @@ Bech32 Val: cosmosvaloper1z3t55m0l9h0eupuz3dp5t5cypyv674jjn4d6nn
 ### Key output
 
 <Check>
-  The Cosmos SDK Keyring output (i.e `appd keys`) only supports addresses and public keys in Bech32 format.
+  The Cosmos SDK Keyring output (i.e `evmd keys`) only supports addresses and public keys in Bech32 format.
 </Check>
 
 We can use the `keys show` command with the flag `--bech <type>` to obtain different address formats:
@@ -146,7 +146,7 @@ We can use the `keys show` command with the flag `--bech <type>` to obtain diffe
 <Tabs>
   <Tab title="Account (acc)">
     ```bash
-    $ appd keys show dev0 --bech acc
+    $ evmd keys show dev0 --bech acc
 
     - name: dev0
       type: local
@@ -158,7 +158,7 @@ We can use the `keys show` command with the flag `--bech <type>` to obtain diffe
 
   <Tab title="Validator (val)">
     ```bash
-    $ appd keys show dev0 --bech val
+    $ evmd keys show dev0 --bech val
 
     - name: dev0
       type: local
@@ -170,7 +170,7 @@ We can use the `keys show` command with the flag `--bech <type>` to obtain diffe
 
   <Tab title="Consensus (cons)">
     ```bash
-    $ appd keys show dev0 --bech cons
+    $ evmd keys show dev0 --bech cons
 
     - name: dev0
       type: local
@@ -189,7 +189,7 @@ You can query an account address using CLI, gRPC, REST, or JSON-RPC:
   <Tab title="CLI">
     ```bash
     # NOTE: the --output (-o) flag defines the output format
-    appd q auth account $(appd keys show dev0 -a) -o text
+    evmd q auth account $(evmd keys show dev0 -a) -o text
 
     '@type': /ethermint.types.v1.EthAccount
     base_account:

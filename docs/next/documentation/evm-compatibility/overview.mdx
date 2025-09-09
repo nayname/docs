@@ -1,7 +1,7 @@
 ---
 title: "Overview"
 mode: "wide"
-keywords: ['differences', 'ethereum', 'evm', 'cosmos', 'tendermint', 'consensus', 'finality', 'json-rpc', 'compatibility', 'precompiles', 'ibc', 'mev', 'gas', 'basefee', 'reorganization', 'bft', 'validator', 'staking']
+keywords: ['differences', 'ethereum', 'evm', 'cosmos', ''CometBFT'', 'consensus', 'finality', 'json-rpc', 'compatibility', 'precompiles', 'ibc', 'mev', 'gas', 'basefee', 'reorganization', 'bft', 'validator', 'staking']
 ---
 
 The EVM module provides **developer and end-user Ethereum compatibility** for Cosmos-SDK based chains. All standard / common Ethereum dApps, tools, and workflows work seamlessly while gaining the benefits of Cosmos consensus and interoperability.
@@ -41,7 +41,7 @@ Cosmos EVM maintains all critical EVM behaviors that developers expect. The tabl
 
 ### Faster & Final Transactions
 
-**Instant Finality:** Transactions are final after one block (~2 seconds) thanks to Tendermint BFT consensus. No waiting for confirmations, no reorganizations possible.
+**Instant Finality:** Transactions are final after one block (~2 seconds) thanks to 'CometBFT' BFT consensus. No waiting for confirmations, no reorganizations possible.
 
 **Validator Set:** Fixed validator set with stake-based voting power. Requires 2/3+ stake agreement for consensus.
 
@@ -114,7 +114,7 @@ Unlike with legacy Ethermint, these values are independent.
 
 **Implementation notes:**
 - Some methods return stub values for compatibility (e.g., `eth_gasPrice` returns 0)
-- Mining-related methods are not applicable (Cosmos uses Tendermint consensus)
+- Mining-related methods are not applicable (Cosmos uses 'CometBFT' consensus)
 - `txpool` methods require experimental mempool configuration
 - Debug namespace includes functional tracing and profiling tools
 
@@ -218,7 +218,7 @@ Key breaking changes when migrating:
 -  **Production Ready:** Core EVM implementation is stable and deployed on multiple mainnets
 -  **Enhanced Security:** No reorganization attacks possible due to instant finality
 -  **Byzantine Fault Tolerant:** Requires 2/3+ validator stake for any state changes
--  **Proven Stack:** Built on Cosmos SDK and Tendermint, powering hundreds of chains
+-  **Proven Stack:** Built on Cosmos SDK and 'CometBFT', powering hundreds of chains
 
 ## Resources
 

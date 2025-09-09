@@ -76,7 +76,7 @@ max-open-connections = 0
 rpc-gas-cap = 0
 
 # RPCEVMTimeout sets a timeout used for eth_call queries.
-rpc-evm-timeout = "10s"
+evm-timeout = "10s"
 ```
 </Expandable>
 
@@ -85,7 +85,7 @@ rpc-evm-timeout = "10s"
 Alternatively, enable JSON-RPC when starting the node:
 
 ```bash
-appd start \
+evmd start \
   --json-rpc.enable \
   --json-rpc.address="0.0.0.0:8545" \
   --json-rpc.ws-address="0.0.0.0:8546" \
@@ -166,7 +166,7 @@ Since Cosmos EVM is built with the Cosmos SDK framework and uses CometBFT as it'
 You can start a connection with the Ethereum websocket using the `--json-rpc.ws-address` flag when starting the node (default `"0.0.0.0:8546"`):
 
 ```
-appd start --json-rpc.address="0.0.0.0:8545" --json-rpc.ws-address="0.0.0.0:8546" --json-rpc.api="eth,web3,net,txpool,debug" --json-rpc.enable
+evmd start --json-rpc.address="0.0.0.0:8545" --json-rpc.ws-address="0.0.0.0:8546" --json-rpc.api="eth,web3,net,txpool,debug" --json-rpc.enable
 ```
 
 Then, start a websocket subscription with [`ws`](https://github.com/hashrocket/ws)

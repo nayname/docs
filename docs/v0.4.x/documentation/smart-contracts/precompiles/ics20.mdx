@@ -68,7 +68,7 @@ const contract = new ethers.Contract(precompileAddress, precompileAbi, signer);
 // Transfer parameters
 const sourcePort = "transfer";
 const sourceChannel = "channel-0";
-const token = "uatom"; // or ERC20 token address
+const token = "test"; // or ERC20 token address
 const sender = await signer.getAddress();
 const receiver = "cosmos1..."; // Destination address on target chain
 const timeoutHeight = 0; // 0 for no height timeout
@@ -231,7 +231,7 @@ const precompileAddress = "0x0000000000000000000000000000000000000802";
 const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
 
 // Input: The trace path to hash
-const tracePath = "transfer/channel-0/uatom"; // Placeholder for actual trace path
+const tracePath = "transfer/channel-0/test"; // Placeholder for actual trace path
 
 async function getDenomHash() {
   try {

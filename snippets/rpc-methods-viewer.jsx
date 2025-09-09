@@ -343,48 +343,48 @@ export default function RPCMethodsViewerVersionB() {
       name: "miner",
       color: "gray",
       methods: [
-        { name: "miner_start", status: "N", description: "Starts mining (not applicable - uses Tendermint)" },
-        { name: "miner_stop", status: "N", description: "Stops mining (not applicable - uses Tendermint)" },
-        { name: "miner_setEtherbase", status: "N", description: "Sets etherbase (not applicable - uses Tendermint)" },
-        { name: "miner_setExtra", status: "N", description: "Sets extra data (not applicable - uses Tendermint)" },
-        { name: "miner_setGasPrice", status: "N", description: "Sets gas price (not applicable - uses Tendermint)" },
-        { name: "miner_setGasLimit", status: "N", description: "Sets gas limit (not applicable - uses Tendermint)" },
-        { name: "miner_setRecommitInterval", status: "N", description: "Sets recommit interval (not applicable - uses Tendermint)" },
-        { name: "miner_getHashrate", status: "N", description: "Returns hashrate (not applicable - uses Tendermint)" }
+        { name: "miner_start", status: "N", description: "Starts mining (not applicable - uses 'CometBFT')" },
+        { name: "miner_stop", status: "N", description: "Stops mining (not applicable - uses 'CometBFT')" },
+        { name: "miner_setEtherbase", status: "N", description: "Sets etherbase (not applicable - uses 'CometBFT')" },
+        { name: "miner_setExtra", status: "N", description: "Sets extra data (not applicable - uses 'CometBFT')" },
+        { name: "miner_setGasPrice", status: "N", description: "Sets gas price (not applicable - uses 'CometBFT')" },
+        { name: "miner_setGasLimit", status: "N", description: "Sets gas limit (not applicable - uses 'CometBFT')" },
+        { name: "miner_setRecommitInterval", status: "N", description: "Sets recommit interval (not applicable - uses 'CometBFT')" },
+        { name: "miner_getHashrate", status: "N", description: "Returns hashrate (not applicable - uses 'CometBFT')" }
       ]
     },
     engine: {
       name: "engine",
       color: "pink",
       methods: [
-        { name: "engine_newPayloadV1", status: "N", description: "New payload V1 (not applicable - uses Tendermint)" },
-        { name: "engine_newPayloadV2", status: "N", description: "New payload V2 (not applicable - uses Tendermint)" },
-        { name: "engine_newPayloadV3", status: "N", description: "New payload V3 (not applicable - uses Tendermint)" },
-        { name: "engine_forkchoiceUpdatedV1", status: "N", description: "Fork choice updated V1 (not applicable - uses Tendermint)" },
-        { name: "engine_forkchoiceUpdatedV2", status: "N", description: "Fork choice updated V2 (not applicable - uses Tendermint)" },
-        { name: "engine_forkchoiceUpdatedV3", status: "N", description: "Fork choice updated V3 (not applicable - uses Tendermint)" },
-        { name: "engine_getPayloadV1", status: "N", description: "Get payload V1 (not applicable - uses Tendermint)" },
-        { name: "engine_getPayloadV2", status: "N", description: "Get payload V2 (not applicable - uses Tendermint)" },
-        { name: "engine_getPayloadV3", status: "N", description: "Get payload V3 (not applicable - uses Tendermint)" },
-        { name: "engine_getPayloadBodiesByHashV1", status: "N", description: "Get payload bodies by hash (not applicable - uses Tendermint)" },
-        { name: "engine_getPayloadBodiesByRangeV1", status: "N", description: "Get payload bodies by range (not applicable - uses Tendermint)" },
-        { name: "engine_exchangeTransitionConfigurationV1", status: "N", description: "Exchange transition configuration (not applicable - uses Tendermint)" },
-        { name: "engine_exchangeCapabilities", status: "N", description: "Exchange capabilities (not applicable - uses Tendermint)" },
-        { name: "engine_getBlobsV1", status: "N", description: "Get blobs V1 (not applicable - uses Tendermint)" }
+        { name: "engine_newPayloadV1", status: "N", description: "New payload V1 (not applicable - uses 'CometBFT')" },
+        { name: "engine_newPayloadV2", status: "N", description: "New payload V2 (not applicable - uses 'CometBFT')" },
+        { name: "engine_newPayloadV3", status: "N", description: "New payload V3 (not applicable - uses 'CometBFT')" },
+        { name: "engine_forkchoiceUpdatedV1", status: "N", description: "Fork choice updated V1 (not applicable - uses 'CometBFT')" },
+        { name: "engine_forkchoiceUpdatedV2", status: "N", description: "Fork choice updated V2 (not applicable - uses 'CometBFT')" },
+        { name: "engine_forkchoiceUpdatedV3", status: "N", description: "Fork choice updated V3 (not applicable - uses 'CometBFT')" },
+        { name: "engine_getPayloadV1", status: "N", description: "Get payload V1 (not applicable - uses 'CometBFT')" },
+        { name: "engine_getPayloadV2", status: "N", description: "Get payload V2 (not applicable - uses 'CometBFT')" },
+        { name: "engine_getPayloadV3", status: "N", description: "Get payload V3 (not applicable - uses 'CometBFT')" },
+        { name: "engine_getPayloadBodiesByHashV1", status: "N", description: "Get payload bodies by hash (not applicable - uses 'CometBFT')" },
+        { name: "engine_getPayloadBodiesByRangeV1", status: "N", description: "Get payload bodies by range (not applicable - uses 'CometBFT')" },
+        { name: "engine_exchangeTransitionConfigurationV1", status: "N", description: "Exchange transition configuration (not applicable - uses 'CometBFT')" },
+        { name: "engine_exchangeCapabilities", status: "N", description: "Exchange capabilities (not applicable - uses 'CometBFT')" },
+        { name: "engine_getBlobsV1", status: "N", description: "Get blobs V1 (not applicable - uses 'CometBFT')" }
       ]
     },
     clique: {
       name: "clique",
       color: "teal",
       methods: [
-        { name: "clique_getSnapshot", status: "N", description: "Get snapshot at block (not applicable - uses Tendermint)" },
-        { name: "clique_getSnapshotAtHash", status: "N", description: "Get snapshot at hash (not applicable - uses Tendermint)" },
-        { name: "clique_getSigners", status: "N", description: "Get authorized signers (not applicable - uses Tendermint)" },
-        { name: "clique_getSignersAtHash", status: "N", description: "Get signers at hash (not applicable - uses Tendermint)" },
-        { name: "clique_propose", status: "N", description: "Propose new signer (not applicable - uses Tendermint)" },
-        { name: "clique_discard", status: "N", description: "Discard signer proposal (not applicable - uses Tendermint)" },
-        { name: "clique_status", status: "N", description: "Get clique status (not applicable - uses Tendermint)" },
-        { name: "clique_getSigner", status: "N", description: "Get current signer (not applicable - uses Tendermint)" }
+        { name: "clique_getSnapshot", status: "N", description: "Get snapshot at block (not applicable - uses 'CometBFT')" },
+        { name: "clique_getSnapshotAtHash", status: "N", description: "Get snapshot at hash (not applicable - uses 'CometBFT')" },
+        { name: "clique_getSigners", status: "N", description: "Get authorized signers (not applicable - uses 'CometBFT')" },
+        { name: "clique_getSignersAtHash", status: "N", description: "Get signers at hash (not applicable - uses 'CometBFT')" },
+        { name: "clique_propose", status: "N", description: "Propose new signer (not applicable - uses 'CometBFT')" },
+        { name: "clique_discard", status: "N", description: "Discard signer proposal (not applicable - uses 'CometBFT')" },
+        { name: "clique_status", status: "N", description: "Get clique status (not applicable - uses 'CometBFT')" },
+        { name: "clique_getSigner", status: "N", description: "Get current signer (not applicable - uses 'CometBFT')" }
       ]
     },
     les: {

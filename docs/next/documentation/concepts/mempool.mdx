@@ -306,7 +306,7 @@ func customPriorityFunction(goCtx context.Context, tx sdk.Tx) math.Int {
         return math.ZeroInt()
     }
     
-    fee := feeTx.GetFee().AmountOf("uatom")
+    fee := feeTx.GetFee().AmountOf("test")
     gas := feeTx.GetGas()
     if gas == 0 {
         return fee

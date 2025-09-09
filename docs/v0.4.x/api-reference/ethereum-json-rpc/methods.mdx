@@ -35,15 +35,15 @@ The following namespaces are not implemented in Cosmos EVM but may be present in
   </Accordion>
 
   <Accordion title="miner - Mining Operations (Not Applicable)">
-    The `miner` namespace controls Proof of Work mining operations. Cosmos EVM uses Tendermint Byzantine Fault Tolerant consensus instead of mining.
+    The `miner` namespace controls Proof of Work mining operations. Cosmos EVM uses 'CometBFT' Byzantine Fault Tolerant consensus instead of mining.
   </Accordion>
 
   <Accordion title="engine - Post-Merge Engine API (Not Applicable)">
-    The `engine` namespace implements Ethereum's post-merge Engine API for communication with the consensus layer. Cosmos EVM uses Tendermint consensus instead of the beacon chain.
+    The `engine` namespace implements Ethereum's post-merge Engine API for communication with the consensus layer. Cosmos EVM uses 'CometBFT' consensus instead of the beacon chain.
   </Accordion>
 
   <Accordion title="clique - Proof of Authority (Not Applicable)">
-    The `clique` namespace implements Proof of Authority consensus for private networks. Cosmos EVM uses Tendermint consensus.
+    The `clique` namespace implements Proof of Authority consensus for private networks. Cosmos EVM uses 'CometBFT' consensus.
   </Accordion>
 
   <Accordion title="les - Light Client Protocol (Not Supported)">
@@ -282,10 +282,10 @@ Block Number can be entered as a Hex string, `"earliest"`, `"latest"` or `"pendi
 <Info>
 **EIP-1559 Support**: Cosmos EVM supports EIP-1559 transaction types with `eth_maxPriorityFeePerGas`, though `eth_feeHistory` is not yet implemented.
 
-**Consensus Differences**: Due to using Tendermint BFT consensus instead of Proof of Work/Stake:
+**Consensus Differences**: Due to using 'CometBFT' BFT consensus instead of Proof of Work/Stake:
 * Uncle-related methods always return 0 or null
 * Block reorganizations are not possible
-* Engine API (`engine_*`) is not applicable - Tendermint handles consensus
+* Engine API (`engine_*`) is not applicable - 'CometBFT' handles consensus
 
 **Methods Not Implemented**:
 * `eth_createAccessList` (EIP-2930) - Access list transactions
@@ -298,7 +298,7 @@ Block Number can be entered as a Hex string, `"earliest"`, `"latest"` or `"pendi
 * `debug_getRaw*` methods - Raw data access methods
 * `debug_printBlock` - Block printing utility
 * `trace_*` methods - Advanced tracing features
-* `engine_*` methods - Post-merge Engine API (uses Tendermint instead)
+* `engine_*` methods - Post-merge Engine API (uses 'CometBFT' instead)
 * `admin_*` methods - Node administration
 * `les_*` methods - Light Ethereum Subprotocol
 * `clique_*` methods - Proof of Authority consensus
@@ -947,7 +947,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_coinbase","params":[],"id":1
 Returns whether the client is actively mining new blocks.
 
 <Info>
-Always returns `false` as Cosmos EVM uses Tendermint consensus instead of mining.
+Always returns `false` as Cosmos EVM uses 'CometBFT' consensus instead of mining.
 </Info>
 
 ```shell
@@ -962,7 +962,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_mining","params":[],"id":1}'
 Returns the number of hashes per second that the node is mining with.
 
 <Info>
-Always returns `0x0` as Cosmos EVM uses Tendermint consensus instead of mining.
+Always returns `0x0` as Cosmos EVM uses 'CometBFT' consensus instead of mining.
 </Info>
 
 ```shell
@@ -988,7 +988,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}
 Returns the number of uncles in a block matching the given block hash.
 
 <Info>
-Always returns `0x0` as Cosmos EVM does not have uncles due to using Tendermint consensus.
+Always returns `0x0` as Cosmos EVM does not have uncles due to using 'CometBFT' consensus.
 </Info>
 
 #### Parameters
@@ -1007,7 +1007,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getUncleCountByBlockHash","p
 Returns the number of uncles in a block matching the given block number.
 
 <Info>
-Always returns `0x0` as Cosmos EVM does not have uncles due to using Tendermint consensus.
+Always returns `0x0` as Cosmos EVM does not have uncles due to using 'CometBFT' consensus.
 </Info>
 
 #### Parameters
@@ -1026,7 +1026,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getUncleCountByBlockNumber",
 Returns information about an uncle by block hash and uncle index position.
 
 <Info>
-Always returns `null` as Cosmos EVM does not have uncles due to using Tendermint consensus.
+Always returns `null` as Cosmos EVM does not have uncles due to using 'CometBFT' consensus.
 </Info>
 
 #### Parameters
@@ -1046,7 +1046,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getUncleByBlockHashAndIndex"
 Returns information about an uncle by block number and uncle index position.
 
 <Info>
-Always returns `null` as Cosmos EVM does not have uncles due to using Tendermint consensus.
+Always returns `null` as Cosmos EVM does not have uncles due to using 'CometBFT' consensus.
 </Info>
 
 #### Parameters

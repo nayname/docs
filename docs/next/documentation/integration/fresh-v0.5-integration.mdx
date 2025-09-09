@@ -644,7 +644,7 @@ go build -v ./cmd/myapp
 
 ```bash Functionality Testing expandable
 # Start node
-myappd start
+myevmd start
 
 # Test JSON-RPC connectivity
 curl -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' \
@@ -671,13 +671,13 @@ cast call 0x0000000000000000000000000000000000000804 \
 
 ```bash
 # Verify configuration is loaded correctly
-myappd start --help | grep "evm\."
+myevmd start --help | grep "evm\."
 
 # Check genesis parameters
-myappd export | jq '.app_state.evm.params'
+myevmd export | jq '.app_state.evm.params'
 
 # Verify mempool configuration
-myappd export | jq '.app_state.erc20'
+myevmd export | jq '.app_state.erc20'
 ```
 
 ## Step 12: Production Considerations

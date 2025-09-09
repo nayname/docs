@@ -1,6 +1,6 @@
 ---
 title: "Command Line Interface (CLI)"
-description: "The CLI tool ('appd') provides a full-feature interface for interacting with the blockchain. This includes commands for node operations, key management, querying blockchain state, submitting transactions, and more."
+description: "The CLI tool ('evmd') provides a full-feature interface for interacting with the blockchain. This includes commands for node operations, key management, querying blockchain state, submitting transactions, and more."
 ---
 
 import { footnote } from '/snippets/footnote.mdx'
@@ -8,10 +8,10 @@ import { footnote } from '/snippets/footnote.mdx'
 <Info>
 **Node Requirements**
 
-To use the `query` and `tx` commands, your `appd` node must either:
+To use the `query` and `tx` commands, your `evmd` node must either:
 
 - Be fully synced with the network you're interacting with, OR
-- Be configured to use an external RPC endpoint in `~/.appd/config/client.toml`
+- Be configured to use an external RPC endpoint in `~/.evmd/config/client.toml`
 
 Example client.toml configuration:
 
@@ -39,11 +39,11 @@ These flags are available for all commands:
 |------|-------------|---------|
 | `-b, --broadcast-mode` | Transaction broadcasting mode (sync\|async) | `sync` |
 | `--chain-id` | Specify Chain ID for sending Tx | |
-| `--fees` | Fees to pay along with transaction (e.g., 10ustake) | |
+| `--fees` | Fees to pay along with transaction (e.g., 10atest) | |
 | `--from` | Name or address of private key with which to sign | |
 | `--gas-adjustment` | Adjustment factor to multiply against the estimate returned by tx simulation | `1` |
-| `--gas-prices` | Gas prices to determine the transaction fee (e.g., 10ustake) | |
-| `--home` | Directory for config and data | `~/.appd` |
+| `--gas-prices` | Gas prices to determine the transaction fee (e.g., 10atest) | |
+| `--home` | Directory for config and data | `~/.evmd` |
 | `--keyring-backend` | Select keyring's backend | `os` |
 | `--log_format` | The logging format (json\|plain) | `plain` |
 | `--log_level` | The logging level | `info` |
@@ -60,17 +60,17 @@ These flags are available for all commands:
 
 <CodeGroup>
 ```bash Basic
-appd start
+evmd start
 ```
 
 ```bash "With JSON-RPC"
-appd start \
+evmd start \
   --json-rpc.enable \
   --json-rpc.api eth,net,web3,txpool
 ```
 
 ```bash "Full Configuration"
-appd start \
+evmd start \
   --json-rpc.enable \
   --json-rpc.address 0.0.0.0:8545 \
   --json-rpc.ws-address 0.0.0.0:8546 \
@@ -84,18 +84,18 @@ appd start \
 
 <CodeGroup>
 ```bash "Basic Init"
-appd init my-node --chain-id cosmos-evm-1
+evmd init my-node --chain-id cosmos-evm-1
 ```
 
 ```bash "Custom Settings"
-appd init my-validator \
+evmd init my-validator \
   --chain-id cosmos-evm-1 \
-  --default-denom aatom \
+  --default-denom atest \
   --initial-height 1
 ```
 
 ```bash "Overwrite Existing"
-appd init my-node \
+evmd init my-node \
   --chain-id cosmos-evm-1 \
   --overwrite
 ```
@@ -104,18 +104,18 @@ appd init my-node \
 ### Node Status
 
 ```bash
-appd status
+evmd status
 ```
 
 ### Transaction Indexing
 
 <CodeGroup>
 ```bash "Index Forward"
-appd index-eth-tx forward
+evmd index-eth-tx forward
 ```
 
 ```bash "Index Backward"
-appd index-eth-tx backward
+evmd index-eth-tx backward
 ```
 </CodeGroup>
 
@@ -126,15 +126,15 @@ appd index-eth-tx backward
 
 <CodeGroup>
 ```bash "Create New Key"
-appd keys add my-account
+evmd keys add my-account
 ```
 
 ```bash "Recover from Mnemonic"
-appd keys add my-account --recover
+evmd keys add my-account --recover
 ```
 
 ```bash "Create ETH Key"
-appd keys add my-eth-account \
+evmd keys add my-eth-account \
   --algo eth_secp256k1 \
   --coin-type 60
 ```
@@ -144,23 +144,23 @@ appd keys add my-eth-account \
 
 <CodeGroup>
 ```bash "List All Keys"
-appd keys list
+evmd keys list
 ```
 
 ```bash "Show Key Info"
-appd keys show my-account
+evmd keys show my-account
 ```
 
 ```bash "Show Address Only"
-appd keys show my-account --address
+evmd keys show my-account --address
 ```
 
 ```bash "Export Key"
-appd keys export my-account
+evmd keys export my-account
 ```
 
 ```bash "Import Key"
-appd keys import new-account keyfile.json
+evmd keys import new-account keyfile.json
 ```
 </CodeGroup>
 
@@ -168,11 +168,11 @@ appd keys import new-account keyfile.json
 
 <CodeGroup>
 ```bash "Export ETH Key"
-appd keys unsafe-export-eth-key my-eth-account
+evmd keys unsafe-export-eth-key my-eth-account
 ```
 
 ```bash "Import ETH Key"
-appd keys unsafe-import-eth-key imported-account 0x...
+evmd keys unsafe-import-eth-key imported-account 0x...
 ```
 </CodeGroup>
 
@@ -183,15 +183,15 @@ appd keys unsafe-import-eth-key imported-account 0x...
 
 <CodeGroup>
 ```bash "Account Info"
-appd query evm account 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81
+evmd query evm account 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81
 ```
 
 ```bash "Bank Balance"
-appd query evm balance-bank 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81 aatom
+evmd query evm balance-bank 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81 atest
 ```
 
 ```bash "ERC20 Balance"
-appd query evm balance-erc20 \
+evmd query evm balance-erc20 \
   0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81 \
   0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
 ```
@@ -201,11 +201,11 @@ appd query evm balance-erc20 \
 
 <CodeGroup>
 ```bash "Get Contract Code"
-appd query evm code 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+evmd query evm code 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
 ```
 
 ```bash "Get Storage Value"
-appd query evm storage \
+evmd query evm storage \
   0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 \
   0x0000000000000000000000000000000000000000000000000000000000000001
 ```
@@ -215,11 +215,11 @@ appd query evm storage \
 
 <CodeGroup>
 ```bash "EVM Config"
-appd query evm config
+evmd query evm config
 ```
 
 ```bash "EVM Params"
-appd query evm params
+evmd query evm params
 ```
 </CodeGroup>
 
@@ -227,11 +227,11 @@ appd query evm params
 
 <CodeGroup>
 ```bash "0x to Bech32"
-appd query evm 0x-to-bech32 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81
+evmd query evm 0x-to-bech32 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81
 ```
 
 ```bash "Bech32 to 0x"
-appd query evm bech32-to-0x cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s
+evmd query evm bech32-to-0x cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s
 ```
 </CodeGroup>
 
@@ -242,19 +242,19 @@ appd query evm bech32-to-0x cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s
 
 <CodeGroup>
 ```bash "All Token Pairs"
-appd query erc20 token-pairs
+evmd query erc20 token-pairs
 ```
 
 ```bash "Specific Token Pair"
-appd query erc20 token-pair 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+evmd query erc20 token-pair 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
 ```
 
 ```bash "Query by Denom"
-appd query erc20 token-pair usdc
+evmd query erc20 token-pair usdc
 ```
 
 ```bash "Module Parameters"
-appd query erc20 params
+evmd query erc20 params
 ```
 </CodeGroup>
 
@@ -265,15 +265,15 @@ appd query erc20 params
 
 <CodeGroup>
 ```bash "Current Base Fee"
-appd query feemarket base-fee
+evmd query feemarket base-fee
 ```
 
 ```bash "Block Gas Usage"
-appd query feemarket block-gas
+evmd query feemarket block-gas
 ```
 
 ```bash "Module Parameters"
-appd query feemarket params
+evmd query feemarket params
 ```
 </CodeGroup>
 
@@ -284,11 +284,11 @@ appd query feemarket params
 
 <CodeGroup>
 ```bash "Module Remainder"
-appd query precisebank remainder
+evmd query precisebank remainder
 ```
 
 ```bash "Fractional Balance"
-appd query precisebank fractional-balance cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s
+evmd query precisebank fractional-balance cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s
 ```
 </CodeGroup>
 
@@ -299,15 +299,15 @@ appd query precisebank fractional-balance cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04
 
 <CodeGroup>
 ```bash "All Balances"
-appd query bank balances cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s
+evmd query bank balances cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s
 ```
 
 ```bash "Specific Denom"
-appd query bank balance cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s aatom
+evmd query bank balance cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s atest
 ```
 
 ```bash "Total Supply"
-appd query bank total
+evmd query bank total
 ```
 </CodeGroup>
 
@@ -315,15 +315,15 @@ appd query bank total
 
 <CodeGroup>
 ```bash "All Validators"
-appd query staking validators
+evmd query staking validators
 ```
 
 ```bash "Delegations"
-appd query staking delegations cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s
+evmd query staking delegations cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s
 ```
 
 ```bash "Unbonding"
-appd query staking unbonding-delegations cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s
+evmd query staking unbonding-delegations cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s
 ```
 </CodeGroup>
 
@@ -331,13 +331,13 @@ appd query staking unbonding-delegations cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04s
 
 <CodeGroup>
 ```bash "Delegation Rewards"
-appd query distribution rewards \
+evmd query distribution rewards \
   cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s \
   cosmosvaloper1xyz...
 ```
 
 ```bash "Validator Commission"
-appd query distribution commission cosmosvaloper1xyz...
+evmd query distribution commission cosmosvaloper1xyz...
 ```
 </CodeGroup>
 
@@ -345,15 +345,15 @@ appd query distribution commission cosmosvaloper1xyz...
 
 <CodeGroup>
 ```bash "All Proposals"
-appd query gov proposals
+evmd query gov proposals
 ```
 
 ```bash "Specific Proposal"
-appd query gov proposal 1
+evmd query gov proposal 1
 ```
 
 ```bash "Proposal Votes"
-appd query gov votes 1
+evmd query gov votes 1
 ```
 </CodeGroup>
 
@@ -364,15 +364,15 @@ appd query gov votes 1
 
 <CodeGroup>
 ```bash "Send Transaction"
-appd tx evm send \
+evmd tx evm send \
   my-account \
   0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81 \
-  1000000aatom \
-  --gas-prices 10aatom
+  1000000atest \
+  --gas-prices 10atest
 ```
 
 ```bash "Raw Transaction"
-appd tx evm raw \
+evmd tx evm raw \
   0xf86c0485... \
   --from my-account
 ```
@@ -385,15 +385,15 @@ appd tx evm raw \
 
 <CodeGroup>
 ```bash "Coin to ERC20"
-appd tx erc20 convert-coin \
-  1000000aatom \
+evmd tx erc20 convert-coin \
+  1000000atest \
   0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81 \
   --from my-account \
-  --gas-prices 10aatom
+  --gas-prices 10atest
 ```
 
 ```bash "ERC20 to Coin"
-appd tx erc20 convert-erc20 \
+evmd tx erc20 convert-erc20 \
   0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 \
   1000000 \
   cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s \
@@ -405,13 +405,13 @@ appd tx erc20 convert-erc20 \
 
 <CodeGroup>
 ```bash "Register ERC20"
-appd tx erc20 register-erc20 \
+evmd tx erc20 register-erc20 \
   0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 \
   --from validator
 ```
 
 ```bash "Toggle Conversion"
-appd tx erc20 toggle-conversion \
+evmd tx erc20 toggle-conversion \
   0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 \
   --from validator
 ```
@@ -424,19 +424,19 @@ appd tx erc20 toggle-conversion \
 
 <CodeGroup>
 ```bash "Send Tokens"
-appd tx bank send \
+evmd tx bank send \
   my-account \
   cosmos1abc... \
-  1000000aatom \
-  --gas-prices 10aatom
+  1000000atest \
+  --gas-prices 10atest
 ```
 
 ```bash "Multi-Send"
-appd tx bank multi-send \
+evmd tx bank multi-send \
   my-account \
-  cosmos1abc... 500000aatom \
-  cosmos1xyz... 500000aatom \
-  --gas-prices 10aatom
+  cosmos1abc... 500000atest \
+  cosmos1xyz... 500000atest \
+  --gas-prices 10atest
 ```
 </CodeGroup>
 
@@ -444,25 +444,25 @@ appd tx bank multi-send \
 
 <CodeGroup>
 ```bash "Delegate"
-appd tx staking delegate \
+evmd tx staking delegate \
   cosmosvaloper1abc... \
-  1000000aatom \
+  1000000atest \
   --from my-account \
-  --gas-prices 10aatom
+  --gas-prices 10atest
 ```
 
 ```bash "Unbond"
-appd tx staking unbond \
+evmd tx staking unbond \
   cosmosvaloper1abc... \
-  1000000aatom \
+  1000000atest \
   --from my-account
 ```
 
 ```bash "Redelegate"
-appd tx staking redelegate \
+evmd tx staking redelegate \
   cosmosvaloper1abc... \
   cosmosvaloper1xyz... \
-  1000000aatom \
+  1000000atest \
   --from my-account
 ```
 </CodeGroup>
@@ -471,22 +471,22 @@ appd tx staking redelegate \
 
 <CodeGroup>
 ```bash "Submit Proposal"
-appd tx gov submit-proposal \
+evmd tx gov submit-proposal \
   --title="Upgrade Proposal" \
   --description="Upgrade to v2.0.0" \
   --type="Text" \
-  --deposit="1000000aatom" \
+  --deposit="1000000atest" \
   --from my-account
 ```
 
 ```bash "Vote"
-appd tx gov vote 1 yes \
+evmd tx gov vote 1 yes \
   --from my-account \
-  --gas-prices 10aatom
+  --gas-prices 10atest
 ```
 
 ```bash "Deposit"
-appd tx gov deposit 1 1000000aatom \
+evmd tx gov deposit 1 1000000atest \
   --from my-account
 ```
 </CodeGroup>
@@ -498,20 +498,20 @@ appd tx gov deposit 1 1000000aatom \
 
 <CodeGroup>
 ```bash "Add Account"
-appd genesis add-genesis-account \
+evmd genesis add-genesis-account \
   cosmos1abc... \
-  1000000000aatom
+  1000000000atest
 ```
 
 ```bash "Create GenTx"
-appd genesis gentx \
+evmd genesis gentx \
   my-validator \
-  1000000aatom \
+  1000000atest \
   --chain-id cosmos-evm-1
 ```
 
 ```bash "Collect GenTxs"
-appd genesis collect-gentxs
+evmd genesis collect-gentxs
 ```
 </CodeGroup>
 
@@ -519,15 +519,15 @@ appd genesis collect-gentxs
 
 <CodeGroup>
 ```bash "Show Node ID"
-appd comet show-node-id
+evmd comet show-node-id
 ```
 
 ```bash "Show Validator"
-appd comet show-validator
+evmd comet show-validator
 ```
 
 ```bash "Reset State"
-appd comet unsafe-reset-all
+evmd comet unsafe-reset-all
 ```
 </CodeGroup>
 
@@ -535,15 +535,15 @@ appd comet unsafe-reset-all
 
 <CodeGroup>
 ```bash "Address Info"
-appd debug addr cosmos1abc...
+evmd debug addr cosmos1abc...
 ```
 
 ```bash "Decode Hex"
-appd debug raw-bytes 0xdeadbeef
+evmd debug raw-bytes 0xdeadbeef
 ```
 
 ```bash "Public Key"
-appd debug pubkey '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"...."}'
+evmd debug pubkey '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"...."}'
 ```
 </CodeGroup>
 
@@ -559,7 +559,7 @@ appd debug pubkey '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"...."}'
     <CodeGroup>
     ```bash "Create Account"
     # Create new Cosmos account
-    appd keys add my-account
+    evmd keys add my-account
     
     # Save mnemonic safely!
     # Address will be shown as cosmos1...
@@ -567,23 +567,23 @@ appd debug pubkey '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"...."}'
     
     ```bash "Import ETH Key"
     # Import existing Ethereum private key
-    appd keys unsafe-import-eth-key \
+    evmd keys unsafe-import-eth-key \
       eth-account \
       0x1234567890abcdef...
     
     # Show the imported account
-    appd keys show eth-account
+    evmd keys show eth-account
     ```
     
     ```bash "List & Export"
     # List all accounts
-    appd keys list
+    evmd keys list
     
     # Export account (encrypted)
-    appd keys export my-account > account.backup
+    evmd keys export my-account > account.backup
     
     # Show account address only
-    appd keys show my-account --address
+    evmd keys show my-account --address
     ```
     </CodeGroup>
   </Tab>
@@ -592,35 +592,35 @@ appd debug pubkey '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"...."}'
     <CodeGroup>
     ```bash "Account Info"
     # Query Cosmos account
-    appd query bank balances \
+    evmd query bank balances \
       cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s
     
     # Query EVM account
-    appd query evm account \
+    evmd query evm account \
       0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81
     ```
     
     ```bash "Token Balances"
     # Native token balance
-    appd query bank balance \
+    evmd query bank balance \
       cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s \
-      aatom
+      atest
     
     # ERC20 token balance
-    appd query evm balance-erc20 \
+    evmd query evm balance-erc20 \
       0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81 \
       0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
     ```
     
     ```bash "Network State"
     # Current base fee
-    appd query feemarket base-fee
+    evmd query feemarket base-fee
     
     # Node sync status
-    appd status | jq .sync_info
+    evmd status | jq .sync_info
     
     # Latest block height
-    appd status | jq .sync_info.latest_block_height
+    evmd status | jq .sync_info.latest_block_height
     ```
     </CodeGroup>
   </Tab>
@@ -629,33 +629,33 @@ appd debug pubkey '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"...."}'
     <CodeGroup>
     ```bash "Native Transfer"
     # Send tokens via bank module
-    appd tx bank send \
+    evmd tx bank send \
       my-account \
       cosmos1abc... \
-      1000000aatom \
-      --gas-prices 10aatom \
+      1000000atest \
+      --gas-prices 10atest \
       --gas-adjustment 1.5
     ```
     
     ```bash "EVM Transfer"
     # Send via EVM module
-    appd tx evm send \
+    evmd tx evm send \
       my-account \
       0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81 \
-      1000000aatom \
-      --gas-prices 10aatom
+      1000000atest \
+      --gas-prices 10atest
     ```
     
     ```bash "Token Conversion"
     # Convert native to ERC20
-    appd tx erc20 convert-coin \
-      1000000aatom \
+    evmd tx erc20 convert-coin \
+      1000000atest \
       0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb81 \
       --from my-account \
-      --gas-prices 10aatom
+      --gas-prices 10atest
     
     # Convert ERC20 to native
-    appd tx erc20 convert-erc20 \
+    evmd tx erc20 convert-erc20 \
       0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 \
       1000000 \
       cosmos1wsk4trnzfszs55jlt5ugz76lwl2hp04slh5s5s \
@@ -667,9 +667,9 @@ appd debug pubkey '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"...."}'
 
 ## Configuration
 
-- Configuration directory: `~/.appd/`
+- Configuration directory: `~/.evmd/`
 - Key storage: Managed by the keyring backend (os, file, test)
-- Node configuration: `~/.appd/config/config.toml`
-- App configuration: `~/.appd/config/app.toml`
+- Node configuration: `~/.evmd/config/config.toml`
+- App configuration: `~/.evmd/config/app.toml`
 
 <Info>If you use the `--home` flag upon initializing the light client, the root/config directory will be generated there</Info>

@@ -38,13 +38,13 @@ Unlike wrapped tokens that require contract calls, STRv2 tokens operate at nativ
 A TokenPair links a Cosmos denomination with an ERC20 contract address, establishing the canonical mapping:
 
 ```
-Cosmos Coin (uatom) ←→ TokenPair ←→ ERC20 Contract (0x...)
+Cosmos Coin (test) ←→ TokenPair ←→ ERC20 Contract (0x...)
 ```
 
 ### Origin Types
 
 **Native Cosmos Coins**
-- Start as Cosmos SDK coins (uatom, uosmo, etc.)
+- Start as Cosmos SDK coins (test, uosmo, etc.)
 - Module deploys an ERC20 contract representation
 - Contract owned by module (OWNER_MODULE)
 - Conversions use mint/burn mechanism

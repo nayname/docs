@@ -155,7 +155,7 @@ priorityConfig := sdkmempool.PriorityNonceMempoolConfig[math.Int]{
             }
 
             // Get fee in bond denomination
-            bondDenom := "uatom" // or your chain's bond denom
+            bondDenom := "test" // or your chain's bond denom
             fee := feeTx.GetFee()
             found, coin := fee.Find(bondDenom)
             if !found {

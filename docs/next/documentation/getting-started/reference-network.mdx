@@ -1,0 +1,115 @@
+---
+title: "Reference Network (evmd)"
+description: "Understanding the evmd reference implementation used throughout this documentation for consistent examples and testing"
+icon: "network-wired"
+---
+
+## Overview
+
+Throughout this documentation, you'll notice consistent references to:
+- **Binary name**: `evmd`
+- **Token denominations**: `test` (6 decimals) and `atest` (18 decimals)
+
+This approach provides **concrete, testable examples** that you can immediately try out rather than abstract placeholders.
+
+## The evmd Reference Network
+
+**evmd** is the official Cosmos EVM reference implementation available in the [cosmos/evm](https://github.com/cosmos/evm) repository. It serves as:
+
+1. **Living Documentation**: Every command and example in these docs can be executed directly
+2. **Testing Environment**: Quickly spin up a local network for development and testing
+3. **Integration Reference**: See exactly how EVM modules integrate with Cosmos SDK
+
+### Why Use a Reference Implementation?
+
+All examples are immediately executable:
+```bash
+evmd query bank balances cosmos1... --denom test
+evmd start --chain-id local-1
+evmd keys add alice
+```
+
+No placeholders or generic commands - every example works directly with the evmd reference implementation.
+
+## Token Denomination System
+
+The evmd network uses a clear, consistent token system:
+
+| **Token** | **Decimals** | **Usage** | **Example Amount** |
+|-----------|--------------|-----------|-------------------|
+| `test` | 6 | Native Cosmos operations | `1000000test` = 1 TEST |
+| `atest` | 18 | EVM operations and gas | `1000000000000000000atest` = 1 TEST |
+
+**Key Point**: Both `test` and `atest` represent the same underlying token - just at different decimal precisions. Use `atest` for EVM-related operations and gas fees.
+
+This mirrors real-world Cosmos chains where tokens have both 6-decimal (native) and 18-decimal (EVM) representations.
+
+## Quick Start with evmd
+
+### 1. Get the Binary
+
+```bash
+git clone https://github.com/cosmos/evm.git
+cd evm
+make install
+```
+
+### 2. Initialize Local Network
+
+```bash
+evmd init mynode --chain-id local-1 --default-denom atest
+```
+
+### 3. Create Test Account
+
+```bash
+evmd keys add alice
+evmd genesis add-genesis-account alice 1000000000000atest
+```
+
+### 4. Start the Network
+
+```bash
+evmd start --json-rpc.enable --json-rpc.api eth,web3,net
+```
+
+Now you can execute **every example** from this documentation immediately!
+
+## Documentation Benefits
+
+Using evmd as the reference provides:
+
+###  **Consistency**
+- All CLI examples use the same binary (`evmd`)
+- All token amounts use the same denominations (`test`/`atest`)
+- All commands are copy-pasteable
+
+###  **Testability**
+- Spin up a local network in seconds
+- Test precompiles, transactions, and integrations immediately
+- Validate documentation accuracy against real implementation
+
+###  **Real-World Relevance**
+- Same patterns used by production Cosmos EVM chains
+- Actual module configurations and parameters
+- Working examples of advanced features
+
+## Adapting to Your Chain
+
+When building your own Cosmos EVM chain, the concepts and commands remain the same - just replace the reference values:
+
+- Replace `evmd` with your chain's binary name
+- Replace `test`/`atest` with your token denominations  
+- Replace `local-1` with your chain ID
+
+The documentation patterns work universally across all Cosmos EVM implementations.
+
+## Next Steps
+
+- **Try it out**: [Set up your local evmd network](/docs/next/documentation/getting-started/local-network-setup)
+- **Configure**: [Node configuration options](/docs/next/documentation/getting-started/node-configuration)
+- **Integrate**: [Add EVM to your chain config](/docs/next/documentation/integration/evm-module-integration)
+
+<Info>
+**Pro tip**: Having trouble with an example? The evmd reference network lets you test the exact command from the documentation to verify expected behavior.
+</Info>

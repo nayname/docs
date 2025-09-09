@@ -74,6 +74,96 @@ Initiates a cross-chain token transfer using the IBC protocol.
 </Warning>
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ICS20Example {
+    address constant ICS20_PRECOMPILE = 0x0000000000000000000000000000000000000802;
+    
+    struct Height {
+        uint64 revisionNumber;
+        uint64 revisionHeight;
+    }
+    
+    event IBCTransferInitiated(
+        address indexed sender, 
+        string indexed receiver, 
+        string sourceChannel,
+        string denom,
+        uint256 amount,
+        uint64 sequence
+    );
+    
+    function transfer(
+        string calldata sourceChannel,
+        string calldata denom,
+        uint256 amount,
+        string calldata receiver,
+        uint64 timeoutTimestamp,
+        string calldata memo
+    ) external payable returns (uint64 sequence) {
+        require(bytes(sourceChannel).length > 0, "Source channel required");
+        require(bytes(denom).length > 0, "Denom required");
+        require(amount > 0, "Amount must be greater than 0");
+        require(bytes(receiver).length > 0, "Receiver address required");
+        require(timeoutTimestamp > 0, "Timeout timestamp required");
+        
+        // Default port for ICS20 transfers
+        string memory sourcePort = "transfer";
+        
+        // Disable height-based timeout (using timestamp instead)
+        Height memory timeoutHeight = Height({
+            revisionNumber: 0,
+            revisionHeight: 0
+        });
+        
+        (bool success, bytes memory result) = ICS20_PRECOMPILE.call{value: msg.value}(
+            abi.encodeWithSignature(
+                "transfer(string,string,string,uint256,address,string,tuple(uint64,uint64),uint64,string)",
+                sourcePort,
+                sourceChannel,
+                denom,
+                amount,
+                msg.sender,
+                receiver,
+                timeoutHeight,
+                timeoutTimestamp,
+                memo
+            )
+        );
+        
+        require(success, "IBC transfer failed");
+        sequence = abi.decode(result, (uint64));
+        
+        emit IBCTransferInitiated(msg.sender, receiver, sourceChannel, denom, amount, sequence);
+        return sequence;
+    }
+    
+    // Helper function to calculate timeout (1 hour from now)
+    function calculateTimeout(uint256 durationSeconds) external view returns (uint64) {
+        return uint64((block.timestamp + durationSeconds) * 1e9); // Convert to nanoseconds
+    }
+    
+    // Quick transfer with 1-hour timeout
+    function quickTransfer(
+        string calldata sourceChannel,
+        string calldata denom,
+        uint256 amount,
+        string calldata receiver
+    ) external payable returns (uint64) {
+        uint64 timeoutTimestamp = this.calculateTimeout(3600); // 1 hour
+        return this.transfer{value: msg.value}(
+            sourceChannel,
+            denom,
+            amount,
+            receiver,
+            timeoutTimestamp,
+            ""
+        );
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -91,7 +181,7 @@ const contract = new ethers.Contract(precompileAddress, precompileAbi, signer);
 // Transfer parameters
 const sourcePort = "transfer";
 const sourceChannel = "channel-0";
-const denom = "uatom"; // Token denomination
+const denom = "test"; // Token denomination
 const amount = ethers.parseEther("1.0"); // Amount to transfer
 const sender = await signer.getAddress();
 const receiver = "cosmos1..."; // Destination address on target chain
@@ -137,6 +227,48 @@ echo "IBC transfer requires a signed transaction - use ethers.js or other Web3 l
 Queries denomination information for an IBC token by its hash.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ICS20DenomQuery {
+    address constant ICS20_PRECOMPILE = 0x0000000000000000000000000000000000000802;
+    
+    struct Hop {
+        string portId;
+        string channelId;
+    }
+    
+    struct Denom {
+        string base;
+        Hop[] trace;
+    }
+    
+    function getDenom(string memory hash) external view returns (Denom memory denom) {
+        require(bytes(hash).length > 0, "Hash cannot be empty");
+        
+        (bool success, bytes memory result) = ICS20_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("denom(string)", hash)
+        );
+        
+        require(success, "Failed to get denom");
+        denom = abi.decode(result, (Denom));
+        return denom;
+    }
+    
+    // Helper function to check if a denom is native (no trace)
+    function isNativeDenom(string memory hash) external view returns (bool) {
+        Denom memory denom = this.getDenom(hash);
+        return denom.trace.length == 0;
+    }
+    
+    // Helper function to get the base denomination
+    function getBaseDenom(string memory hash) external view returns (string memory) {
+        Denom memory denom = this.getDenom(hash);
+        return denom.base;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -185,6 +317,86 @@ curl -X POST --data '{
 Retrieves a paginated list of all denomination traces registered on the chain.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ICS20DenomsList {
+    address constant ICS20_PRECOMPILE = 0x0000000000000000000000000000000000000802;
+    
+    struct PageRequest {
+        bytes key;
+        uint64 offset;
+        uint64 limit;
+        bool countTotal;
+        bool reverse;
+    }
+    
+    struct PageResponse {
+        bytes nextKey;
+        uint64 total;
+    }
+    
+    struct Hop {
+        string portId;
+        string channelId;
+    }
+    
+    struct Denom {
+        string base;
+        Hop[] trace;
+    }
+    
+    function getDenoms(PageRequest memory pageRequest) 
+        external 
+        view 
+        returns (Denom[] memory denoms, PageResponse memory pageResponse) 
+    {
+        (bool success, bytes memory result) = ICS20_PRECOMPILE.staticcall(
+            abi.encodeWithSignature(
+                "denoms((bytes,uint64,uint64,bool,bool))",
+                pageRequest
+            )
+        );
+        
+        require(success, "Failed to get denoms");
+        (denoms, pageResponse) = abi.decode(result, (Denom[], PageResponse));
+        return (denoms, pageResponse);
+    }
+    
+    // Helper function to get all IBC denoms (with trace)
+    function getIBCDenoms(uint64 limit) external view returns (Denom[] memory) {
+        PageRequest memory pageRequest = PageRequest({
+            key: "",
+            offset: 0,
+            limit: limit,
+            countTotal: false,
+            reverse: false
+        });
+        
+        (Denom[] memory allDenoms,) = this.getDenoms(pageRequest);
+        
+        // Count IBC denoms (those with trace)
+        uint256 ibcCount = 0;
+        for (uint i = 0; i < allDenoms.length; i++) {
+            if (allDenoms[i].trace.length > 0) {
+                ibcCount++;
+            }
+        }
+        
+        // Filter IBC denoms
+        Denom[] memory ibcDenoms = new Denom[](ibcCount);
+        uint256 index = 0;
+        for (uint i = 0; i < allDenoms.length; i++) {
+            if (allDenoms[i].trace.length > 0) {
+                ibcDenoms[index++] = allDenoms[i];
+            }
+        }
+        
+        return ibcDenoms;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -241,6 +453,53 @@ curl -X POST --data '{
 Computes the hash of a denomination trace path.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ICS20DenomHash {
+    address constant ICS20_PRECOMPILE = 0x0000000000000000000000000000000000000802;
+    
+    function getDenomHash(string memory trace) external view returns (string memory hash) {
+        require(bytes(trace).length > 0, "Trace cannot be empty");
+        
+        (bool success, bytes memory result) = ICS20_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("denomHash(string)", trace)
+        );
+        
+        require(success, "Failed to compute denom hash");
+        hash = abi.decode(result, (string));
+        return hash;
+    }
+    
+    // Helper function to build and hash a trace path
+    function buildAndHashTrace(
+        string memory portId,
+        string memory channelId,
+        string memory baseDenom
+    ) external view returns (string memory) {
+        // Build trace in format: "port/channel/denom"
+        string memory trace = string(abi.encodePacked(
+            portId,
+            "/",
+            channelId,
+            "/",
+            baseDenom
+        ));
+        
+        return this.getDenomHash(trace);
+    }
+    
+    // Helper function to verify if a hash matches a trace
+    function verifyDenomHash(
+        string memory trace,
+        string memory expectedHash
+    ) external view returns (bool) {
+        string memory actualHash = this.getDenomHash(trace);
+        return keccak256(bytes(actualHash)) == keccak256(bytes(expectedHash));
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -255,7 +514,7 @@ const precompileAddress = "0x0000000000000000000000000000000000000802";
 const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
 
 // Input: The trace path to hash
-const tracePath = "transfer/channel-0/uatom"; // Placeholder for actual trace path
+const tracePath = "transfer/channel-0/test"; // Placeholder for actual trace path
 
 async function getDenomHash() {
   try {

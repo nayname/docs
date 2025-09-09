@@ -32,6 +32,82 @@ Both methods use a configurable base gas amount that is set during chain initial
 **Description**: Converts an Ethereum hex address to Cosmos bech32 format using the specified prefix.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Bech32Example {
+    address constant BECH32_PRECOMPILE = 0x0000000000000000000000000000000000000400;
+    
+    interface IBech32 {
+        function hexToBech32(address addr, string memory prefix) external returns (string memory bech32Address);
+        function bech32ToHex(string memory bech32Address) external returns (address addr);
+    }
+    
+    IBech32 public immutable bech32;
+    
+    event AddressConverted(address indexed hexAddress, string bech32Address, string prefix);
+    
+    constructor() {
+        bech32 = IBech32(BECH32_PRECOMPILE);
+    }
+    
+    function hexToBech32(address addr, string calldata prefix) 
+        external 
+        returns (string memory bech32Address) 
+    {
+        require(addr != address(0), "Invalid address");
+        require(bytes(prefix).length > 0, "Prefix cannot be empty");
+        
+        bech32Address = bech32.hexToBech32(addr, prefix);
+        
+        emit AddressConverted(addr, bech32Address, prefix);
+        return bech32Address;
+    }
+    
+    // Convert multiple addresses with the same prefix
+    function batchHexToBech32(address[] calldata addresses, string calldata prefix) 
+        external 
+        returns (string[] memory bech32Addresses) 
+    {
+        bech32Addresses = new string[](addresses.length);
+        
+        for (uint256 i = 0; i < addresses.length; i++) {
+            require(addresses[i] != address(0), "Invalid address in batch");
+            bech32Addresses[i] = bech32.hexToBech32(addresses[i], prefix);
+            emit AddressConverted(addresses[i], bech32Addresses[i], prefix);
+        }
+        
+        return bech32Addresses;
+    }
+    
+    // Get common address formats for a single hex address
+    function getCommonFormats(address addr) 
+        external 
+        returns (
+            string memory cosmosAddr,
+            string memory evmosAddr,
+            string memory osmosisAddr
+        ) 
+    {
+        require(addr != address(0), "Invalid address");
+        
+        cosmosAddr = bech32.hexToBech32(addr, "cosmos");
+        evmosAddr = bech32.hexToBech32(addr, "evmos");
+        osmosisAddr = bech32.hexToBech32(addr, "osmo");
+        
+        return (cosmosAddr, evmosAddr, osmosisAddr);
+    }
+    
+    // Convert caller's address to bech32 format
+    function getMyBech32Address(string calldata prefix) 
+        external 
+        returns (string memory) 
+    {
+        return bech32.hexToBech32(msg.sender, prefix);
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -93,6 +169,99 @@ curl -X POST --data '{
 **Description**: Converts a Cosmos bech32 address to Ethereum hex format.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Bech32Example {
+    address constant BECH32_PRECOMPILE = 0x0000000000000000000000000000000000000400;
+    
+    interface IBech32 {
+        function bech32ToHex(string memory bech32Address) external returns (address addr);
+        function hexToBech32(address addr, string memory prefix) external returns (string memory bech32Address);
+    }
+    
+    IBech32 public immutable bech32;
+    
+    event Bech32Converted(string bech32Address, address indexed hexAddress);
+    
+    constructor() {
+        bech32 = IBech32(BECH32_PRECOMPILE);
+    }
+    
+    function bech32ToHex(string calldata bech32Address) 
+        external 
+        returns (address hexAddress) 
+    {
+        require(bytes(bech32Address).length > 0, "Bech32 address cannot be empty");
+        
+        hexAddress = bech32.bech32ToHex(bech32Address);
+        require(hexAddress != address(0), "Invalid bech32 address");
+        
+        emit Bech32Converted(bech32Address, hexAddress);
+        return hexAddress;
+    }
+    
+    // Convert multiple bech32 addresses to hex format
+    function batchBech32ToHex(string[] calldata bech32Addresses) 
+        external 
+        returns (address[] memory hexAddresses) 
+    {
+        hexAddresses = new address[](bech32Addresses.length);
+        
+        for (uint256 i = 0; i < bech32Addresses.length; i++) {
+            require(bytes(bech32Addresses[i]).length > 0, "Invalid bech32 address");
+            hexAddresses[i] = bech32.bech32ToHex(bech32Addresses[i]);
+            require(hexAddresses[i] != address(0), "Invalid bech32 address in batch");
+            emit Bech32Converted(bech32Addresses[i], hexAddresses[i]);
+        }
+        
+        return hexAddresses;
+    }
+    
+    // Validate address conversion by converting back and forth
+    function validateAddressConversion(address addr, string calldata prefix) 
+        external 
+        returns (bool isValid) 
+    {
+        try bech32.hexToBech32(addr, prefix) returns (string memory bech32Addr) {
+            try bech32.bech32ToHex(bech32Addr) returns (address convertedBack) {
+                isValid = (convertedBack == addr);
+                return isValid;
+            } catch {
+                return false;
+            }
+        } catch {
+            return false;
+        }
+    }
+    
+    // Check if two addresses (hex and bech32) represent the same account
+    function areAddressesEqual(address hexAddr, string calldata bech32Addr) 
+        external 
+        returns (bool isEqual) 
+    {
+        try bech32.bech32ToHex(bech32Addr) returns (address convertedHex) {
+            isEqual = (convertedHex == hexAddr);
+            return isEqual;
+        } catch {
+            return false;
+        }
+    }
+    
+    // Safely convert bech32 to hex with error handling
+    function safeBech32ToHex(string calldata bech32Address) 
+        external 
+        returns (bool success, address hexAddress) 
+    {
+        try bech32.bech32ToHex(bech32Address) returns (address addr) {
+            return (true, addr);
+        } catch {
+            return (false, address(0));
+        }
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 

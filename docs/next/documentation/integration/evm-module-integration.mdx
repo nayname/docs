@@ -26,7 +26,7 @@ Contact [Interchain Labs](https://share-eu1.hsforms.com/2g6yO-PVaRoKj50rUgG4Pjg2
 - Basic knowledge of Go and Cosmos SDK
 
 <Note>
-Throughout this guide, `appd` refers to your chain's binary (e.g., `gaiad`, `dydxd`, etc.).
+Throughout this guide, `evmd` refers to your chain's binary (e.g., `gaiad`, `dydxd`, etc.).
 </Note>
 
 ## Version Compatibility
@@ -840,9 +840,9 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 
 ## Step 9: Update Command Files
 
-### Update cmd/appd/commands.go
+### Update cmd/evmd/commands.go
 
-```go "cmd/appd/commands.go Updates" expandable
+```go "cmd/evmd/commands.go Updates" expandable
 import (
     // Add imports
     evmcmd "github.com/cosmos/evm/client"
@@ -895,9 +895,9 @@ func initRootCmd(...) {
 }
 ```
 
-### Update cmd/appd/root.go
+### Update cmd/evmd/root.go
 
-```go "cmd/appd/root.go Updates" expandable
+```go "cmd/evmd/root.go Updates" expandable
 import (
     // ... existing imports
     evmkeyring "github.com/cosmos/evm/crypto/keyring"
@@ -965,7 +965,7 @@ If your chain requires Sign Mode Textual support, ensure your ante handler and c
 make test-all
 
 # Run EVM-specific tests
-make test-appd
+make test-evmd
 
 # Run integration tests
 make test-integration
@@ -990,7 +990,7 @@ chmod +x local_node.sh
 ### Genesis Validation
 
 ```bash
-appd genesis validate-genesis
+evmd genesis validate-genesis
 ```
 
 ---

@@ -13,7 +13,7 @@ import { footnote } from '/snippets/footnote.mdx'
 | **EVM Chain ID** | `4231` | Network identifier for EVM tooling |
 | **EVM Version** | `Prague` | EVM hard fork compatibility version |
 | **Native Token** | `ATOM` | Staking / gas token |
-| **Denom Exponent** | `6` | Native token has 6 decimal places (`uatom`) |
+| **Denom Exponent** | `6` | Native token has 6 decimal places (`test`) |
 
 ## Public Endpoints
 
@@ -21,7 +21,7 @@ import { footnote } from '/snippets/footnote.mdx'
 |-------------------|----------------------|---------|
 | **EVM JSON-RPC** | `<evm_rpc_url>` | Ethereum-compatible tools (MetaMask, Hardhat, ethers.js) |
 | **EVM RPC WS**   | `wss://devnet-1-evmws.ib.skip.build`   | Streaming real-time, selective data for applications |
-| **Cosmos RPC** | `https://devnet-1-rpc.ib.skip.build` | Tendermint-level interactions (blocks, consensus state) |
+| **Cosmos RPC** | `https://devnet-1-rpc.ib.skip.build` | 'CometBFT'-level interactions (blocks, consensus state) |
 | **Cosmos REST API** | `https://devnet-1-lcd.ib.skip.build` | Query Cosmos SDK modules (bank, staking, etc.) |
 | **gRPC** | `devnet-1-grpc.ib.skip.build:443` | High-performance Protobuf endpoint for back-ends |
 
@@ -145,10 +145,10 @@ evmd keys add recovered --recover --key-type eth_secp256k1
   <Accordion title="Broadcast a Transaction">
     <CodeGroup>
       ```bash Bank Send
-      evmd tx bank send cosmos1... cosmos1... 1000uatom \
+      evmd tx bank send cosmos1... cosmos1... 1000test \
         --node https://devnet-1-rpc.ib.skip.build:443 \
         --chain-id 4321 \
-        --gas auto --fees 500uatom \
+        --gas auto --fees 500test \
         --yes
       ```
 
@@ -156,7 +156,7 @@ evmd keys add recovered --recover --key-type eth_secp256k1
       evmd tx evm raw 0x02e20180010182520894de0b295669a9fd93d5f28d9ec85e40f4cb697bae8080c0808080 \
         --node https://devnet-1-rpc.ib.skip.build:443 \
         --chain-id 4231 \
-        --gas auto --fees 500uatom \
+        --gas auto --fees 500test \
         --yes
       ```
     </CodeGroup>
@@ -166,10 +166,10 @@ evmd keys add recovered --recover --key-type eth_secp256k1
     You can use the `--generate-only` flag to create transaction messages without broadcasting them. This can be useful for finding the correct syntax and creating reusable transaction templates.
 
     ```bash Generate Only Example
-    evmd tx bank send cosmos1... cosmos1... 1000uatom \
+    evmd tx bank send cosmos1... cosmos1... 1000test \
       --node https://devnet-1-rpc.ib.skip.build:443 \
       --chain-id 4321 \
-      --gas auto --fees 500uatom \
+      --gas auto --fees 500test \
       --generate-only | jq
     ```
   </Accordion>
@@ -191,7 +191,7 @@ Basic endpoints:
 
 ### Cosmos RPC
 
-> **For Tendermint-level interactions**
+> **For 'CometBFT'-level interactions**
 
 `https://devnet-1-rpc.ib.skip.build`
 

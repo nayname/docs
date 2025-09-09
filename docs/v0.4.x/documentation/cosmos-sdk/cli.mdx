@@ -1,6 +1,6 @@
 ---
 title: "Command Line Interface (CLI)"
-description: "The CLI tool ('appd') provides a full-feature interface for interacting with the blockchain. This includes commands for node operations, key management, querying blockchain state, submitting transactions, and more."
+description: "The CLI tool ('evmd') provides a full-feature interface for interacting with the blockchain. This includes commands for node operations, key management, querying blockchain state, submitting transactions, and more."
 ---
 
 import { footnote } from '/snippets/footnote.mdx'
@@ -8,10 +8,10 @@ import { footnote } from '/snippets/footnote.mdx'
 <Info>
 **Node Requirements**
 
-To use the `query` and `tx` commands, your `appd` node must either:
+To use the `query` and `tx` commands, your `evmd` node must either:
 
 - Be fully synced with the network you're interacting with, OR
-- Be configured to use an external RPC endpoint in `~/.appd/config/client.toml`
+- Be configured to use an external RPC endpoint in `~/.evmd/config/client.toml`
 
 Example client.toml configuration:
 
@@ -39,11 +39,11 @@ These flags are available for all commands:
 |------|-------------|---------|
 | `-b, --broadcast-mode` | Transaction broadcasting mode (sync\|async) | `sync` |
 | `--chain-id` | Specify Chain ID for sending Tx | |
-| `--fees` | Fees to pay along with transaction (e.g., 10ustake) | |
+| `--fees` | Fees to pay along with transaction (e.g., 10atest) | |
 | `--from` | Name or address of private key with which to sign | |
 | `--gas-adjustment` | Adjustment factor to multiply against the estimate returned by tx simulation | `1` |
-| `--gas-prices` | Gas prices to determine the transaction fee (e.g., 10ustake) | |
-| `--home` | Directory for config and data | `~/.appd` |
+| `--gas-prices` | Gas prices to determine the transaction fee (e.g., 10atest) | |
+| `--home` | Directory for config and data | `~/.evmd` |
 | `--keyring-backend` | Select keyring's backend | `os` |
 | `--log_format` | The logging format (json\|plain) | `plain` |
 | `--log_level` | The logging level | `info` |
@@ -60,7 +60,7 @@ These flags are available for all commands:
 Run the full node.
 
 ```bash
-appd start [flags]
+evmd start [flags]
 ```
 
 Key flags:
@@ -90,8 +90,8 @@ You should only expose the debug endpoint in non production settings as it could
 For more detailed information about specific commands, simply use the `--help` or `-h` flag:
 
 ```bash
-appd [command] --help
-appd [command] [subcommand] --help
+evmd [command] --help
+evmd [command] [subcommand] --help
 ```
 
 #### Initializing the client / Running a node
@@ -101,13 +101,13 @@ Creates validator consensus key, p2p address book file, genesis (replace with th
 # Initialize node
 
 ```bash
-appd init mynode --chain-id my-chain-1
+evmd init mynode --chain-id my-chain-1
 ```
 
 # Start node with JSON-RPC enabled
 
 ```bash
-appd start --json-rpc.enable --json-rpc.api eth,web3,net,txpool,debug
+evmd start --json-rpc.enable --json-rpc.api eth,web3,net,txpool,debug
 ```
 
 # Get node status
@@ -115,7 +115,7 @@ appd start --json-rpc.enable --json-rpc.api eth,web3,net,txpool,debug
 You must be either running the client as part of a netork (or alone, for testing) or have an external RPC configured in `client.toml` first.
 
 ```bash
-appd status
+evmd status
 ```
 
 Returns:
@@ -168,7 +168,7 @@ Returns:
 Index historical Ethereum transactions.
 
 ```bash
-appd index-eth-tx [backward|forward] [flags]
+evmd index-eth-tx [backward|forward] [flags]
 ```
 
 - `backward`: Index from first indexed block to earliest block
@@ -183,7 +183,7 @@ The `keys` command provides keyring management functionality for accounts.
 Add a new key or recover from mnemonic.
 
 ```bash
-appd keys add [name] [flags]
+evmd keys add [name] [flags]
 ```
 
 Flags:
@@ -197,7 +197,7 @@ Flags:
 List all keys in the keyring.
 
 ```bash
-appd keys list [flags]
+evmd keys list [flags]
 ```
 
 #### `keys list-key-types`
@@ -205,7 +205,7 @@ appd keys list [flags]
 List all supported key types.
 
 ```bash
-appd keys list-key-types [flags]
+evmd keys list-key-types [flags]
 ```
 
 #### `keys show`
@@ -213,7 +213,7 @@ appd keys list-key-types [flags]
 Display key information.
 
 ```bash
-appd keys show [name|address] [flags]
+evmd keys show [name|address] [flags]
 ```
 
 #### `keys export`
@@ -221,7 +221,7 @@ appd keys show [name|address] [flags]
 Export a private key.
 
 ```bash
-appd keys export [name] [flags]
+evmd keys export [name] [flags]
 ```
 
 #### `keys import`
@@ -229,7 +229,7 @@ appd keys export [name] [flags]
 Import a private key.
 
 ```bash
-appd keys import [name] [keyfile] [flags]
+evmd keys import [name] [keyfile] [flags]
 ```
 
 #### EVM-specific Key Commands
@@ -239,7 +239,7 @@ appd keys import [name] [keyfile] [flags]
 Export an Ethereum private key (**UNSAFE**).
 
 ```bash
-appd keys unsafe-export-eth-key [name] [flags]
+evmd keys unsafe-export-eth-key [name] [flags]
 ```
 
 ##### `keys unsafe-import-eth-key`
@@ -247,7 +247,7 @@ appd keys unsafe-export-eth-key [name] [flags]
 Import Ethereum private keys into the local keybase (**UNSAFE**).
 
 ```bash
-appd keys unsafe-import-eth-key [name] [pk] [flags]
+evmd keys unsafe-import-eth-key [name] [pk] [flags]
 ```
 
 ### Query Commands
@@ -261,7 +261,7 @@ The `query` (or `q`) command provides read-only access to blockchain data.
 Get account information for an address.
 
 ```bash
-appd query evm account [address] [flags]
+evmd query evm account [address] [flags]
 ```
 
 ##### `query evm balance-bank`
@@ -269,7 +269,7 @@ appd query evm account [address] [flags]
 Get bank balance for a 0x address.
 
 ```bash
-appd query evm balance-bank [0x-address] [denom] [flags]
+evmd query evm balance-bank [0x-address] [denom] [flags]
 ```
 
 ##### `query evm balance-erc20`
@@ -277,7 +277,7 @@ appd query evm balance-bank [0x-address] [denom] [flags]
 Get ERC20 token balance.
 
 ```bash
-appd query evm balance-erc20 [0x-address] [erc20-address] [flags]
+evmd query evm balance-erc20 [0x-address] [erc20-address] [flags]
 ```
 
 ##### `query evm code`
@@ -285,7 +285,7 @@ appd query evm balance-erc20 [0x-address] [erc20-address] [flags]
 Get smart contract code.
 
 ```bash
-appd query evm code [address] [flags]
+evmd query evm code [address] [flags]
 ```
 
 ##### `query evm storage`
@@ -293,7 +293,7 @@ appd query evm code [address] [flags]
 Get storage value at a specific key.
 
 ```bash
-appd query evm storage [address] [key] [flags]
+evmd query evm storage [address] [key] [flags]
 ```
 
 ##### `query evm config`
@@ -301,7 +301,7 @@ appd query evm storage [address] [key] [flags]
 Get EVM configuration values.
 
 ```bash
-appd query evm config [flags]
+evmd query evm config [flags]
 ```
 
 ##### `query evm params`
@@ -309,7 +309,7 @@ appd query evm config [flags]
 Get EVM module parameters.
 
 ```bash
-appd query evm params [flags]
+evmd query evm params [flags]
 ```
 
 ##### Address Conversion
@@ -318,10 +318,10 @@ Convert between Ethereum (0x) and Cosmos (bech32) addresses:
 
 ```bash
 # 0x to bech32
-appd query evm 0x-to-bech32 [0x-address] [flags]
+evmd query evm 0x-to-bech32 [0x-address] [flags]
 
 # bech32 to 0x
-appd query evm bech32-to-0x [bech32-address] [flags]
+evmd query evm bech32-to-0x [bech32-address] [flags]
 ```
 
 #### ERC20 Module Queries
@@ -331,7 +331,7 @@ appd query evm bech32-to-0x [bech32-address] [flags]
 Get all registered token pairs.
 
 ```bash
-appd query erc20 token-pairs [flags]
+evmd query erc20 token-pairs [flags]
 ```
 
 ##### `query erc20 token-pair`
@@ -339,7 +339,7 @@ appd query erc20 token-pairs [flags]
 Get a specific token pair.
 
 ```bash
-appd query erc20 token-pair [token-address-or-denom] [flags]
+evmd query erc20 token-pair [token-address-or-denom] [flags]
 ```
 
 ##### `query erc20 params`
@@ -347,7 +347,7 @@ appd query erc20 token-pair [token-address-or-denom] [flags]
 Get ERC20 module parameters.
 
 ```bash
-appd query erc20 params [flags]
+evmd query erc20 params [flags]
 ```
 
 #### Feemarket Module Queries
@@ -357,7 +357,7 @@ appd query erc20 params [flags]
 Get the base fee at a given height.
 
 ```bash
-appd query feemarket base-fee [flags]
+evmd query feemarket base-fee [flags]
 ```
 
 ##### `query feemarket block-gas`
@@ -365,7 +365,7 @@ appd query feemarket base-fee [flags]
 Get the block gas used at a given height.
 
 ```bash
-appd query feemarket block-gas [flags]
+evmd query feemarket block-gas [flags]
 ```
 
 ##### `query feemarket params`
@@ -373,7 +373,7 @@ appd query feemarket block-gas [flags]
 Get fee market parameters.
 
 ```bash
-appd query feemarket params [flags]
+evmd query feemarket params [flags]
 ```
 
 #### Precisebank Module Queries
@@ -383,7 +383,7 @@ appd query feemarket params [flags]
 Get the remainder amount in the precise bank module.
 
 ```bash
-appd query precisebank remainder [flags]
+evmd query precisebank remainder [flags]
 ```
 
 ##### `query precisebank fractional-balance`
@@ -391,7 +391,7 @@ appd query precisebank remainder [flags]
 Get the fractional balance of an account.
 
 ```bash
-appd query precisebank fractional-balance [address] [flags]
+evmd query precisebank fractional-balance [address] [flags]
 ```
 
 #### Standard Cosmos Queries
@@ -400,49 +400,49 @@ appd query precisebank fractional-balance [address] [flags]
 
 ```bash
 # Get account balances
-appd query bank balances [address] [flags]
+evmd query bank balances [address] [flags]
 
 # Get specific denom balance
-appd query bank balance [address] [denom] [flags]
+evmd query bank balance [address] [denom] [flags]
 
 # Get total supply
-appd query bank total [flags]
+evmd query bank total [flags]
 ```
 
 ##### Staking Module
 
 ```bash
 # Get all validators
-appd query staking validators [flags]
+evmd query staking validators [flags]
 
 # Get delegations for an address
-appd query staking delegations [delegator-address] [flags]
+evmd query staking delegations [delegator-address] [flags]
 
 # Get unbonding delegations
-appd query staking unbonding-delegations [delegator-address] [flags]
+evmd query staking unbonding-delegations [delegator-address] [flags]
 ```
 
 ##### Distribution Module
 
 ```bash
 # Get rewards
-appd query distribution rewards [delegator-address] [validator-address] [flags]
+evmd query distribution rewards [delegator-address] [validator-address] [flags]
 
 # Get commission
-appd query distribution commission [validator-address] [flags]
+evmd query distribution commission [validator-address] [flags]
 ```
 
 ##### Governance Module
 
 ```bash
 # List all proposals
-appd query gov proposals [flags]
+evmd query gov proposals [flags]
 
 # Get specific proposal
-appd query gov proposal [proposal-id] [flags]
+evmd query gov proposal [proposal-id] [flags]
 
 # Get votes on a proposal
-appd query gov votes [proposal-id] [flags]
+evmd query gov votes [proposal-id] [flags]
 ```
 
 ### Transaction Commands
@@ -456,7 +456,7 @@ The `tx` command is used to create and broadcast transactions.
 Send funds between accounts.
 
 ```bash
-appd tx evm send [from] [to] [amount] [flags]
+evmd tx evm send [from] [to] [amount] [flags]
 ```
 
 ##### `tx evm raw`
@@ -464,7 +464,7 @@ appd tx evm send [from] [to] [amount] [flags]
 Build a Cosmos transaction from a raw Ethereum transaction.
 
 ```bash
-appd tx evm raw [hex-encoded-tx] [flags]
+evmd tx evm raw [hex-encoded-tx] [flags]
 ```
 
 #### ERC20 Transactions
@@ -474,7 +474,7 @@ appd tx evm raw [hex-encoded-tx] [flags]
 Convert native Cosmos coins to ERC20 tokens.
 
 ```bash
-appd tx erc20 convert-coin [amount] [receiver] [flags]
+evmd tx erc20 convert-coin [amount] [receiver] [flags]
 ```
 
 ##### `tx erc20 convert-erc20`
@@ -482,7 +482,7 @@ appd tx erc20 convert-coin [amount] [receiver] [flags]
 Convert ERC20 tokens to native Cosmos coins.
 
 ```bash
-appd tx erc20 convert-erc20 [contract-address] [amount] [receiver] [flags]
+evmd tx erc20 convert-erc20 [contract-address] [amount] [receiver] [flags]
 ```
 
 ##### `tx erc20 register-erc20`
@@ -490,7 +490,7 @@ appd tx erc20 convert-erc20 [contract-address] [amount] [receiver] [flags]
 Register native ERC20 tokens (governance only).
 
 ```bash
-appd tx erc20 register-erc20 [contract-address...] [flags]
+evmd tx erc20 register-erc20 [contract-address...] [flags]
 ```
 
 ##### `tx erc20 toggle-conversion`
@@ -498,7 +498,7 @@ appd tx erc20 register-erc20 [contract-address...] [flags]
 Enable or disable token pair conversion (governance only).
 
 ```bash
-appd tx erc20 toggle-conversion [token] [flags]
+evmd tx erc20 toggle-conversion [token] [flags]
 ```
 
 #### Standard Cosmos Transactions
@@ -507,39 +507,39 @@ appd tx erc20 toggle-conversion [token] [flags]
 
 ```bash
 # Send coins
-appd tx bank send [from] [to] [amount] [flags]
+evmd tx bank send [from] [to] [amount] [flags]
 
 # Multi-send
-appd tx bank multi-send [from] [to1] [amount1] [to2] [amount2] ... [flags]
+evmd tx bank multi-send [from] [to1] [amount1] [to2] [amount2] ... [flags]
 ```
 
 ##### Staking Transactions
 
 ```bash
 # Create validator
-appd tx staking create-validator [flags]
+evmd tx staking create-validator [flags]
 
 # Delegate
-appd tx staking delegate [validator-address] [amount] [flags]
+evmd tx staking delegate [validator-address] [amount] [flags]
 
 # Unbond
-appd tx staking unbond [validator-address] [amount] [flags]
+evmd tx staking unbond [validator-address] [amount] [flags]
 
 # Redelegate
-appd tx staking redelegate [src-validator] [dst-validator] [amount] [flags]
+evmd tx staking redelegate [src-validator] [dst-validator] [amount] [flags]
 ```
 
 ##### Governance Transactions
 
 ```bash
 # Submit proposal
-appd tx gov submit-proposal [proposal-type] [flags]
+evmd tx gov submit-proposal [proposal-type] [flags]
 
 # Vote on proposal
-appd tx gov vote [proposal-id] [option] [flags]
+evmd tx gov vote [proposal-id] [option] [flags]
 
 # Deposit on proposal
-appd tx gov deposit [proposal-id] [amount] [flags]
+evmd tx gov deposit [proposal-id] [amount] [flags]
 ```
 
 ### Advanced Commands
@@ -550,13 +550,13 @@ Genesis file manipulation commands.
 
 ```bash
 # Add genesis account
-appd genesis add-genesis-account [address] [coins] [flags]
+evmd genesis add-genesis-account [address] [coins] [flags]
 
 # Collect genesis transactions
-appd genesis collect-gentxs [flags]
+evmd genesis collect-gentxs [flags]
 
 # Generate genesis transaction
-appd genesis gentx [key-name] [amount] [flags]
+evmd genesis gentx [key-name] [amount] [flags]
 ```
 
 #### `comet`
@@ -565,13 +565,13 @@ CometBFT-specific commands.
 
 ```bash
 # Show node ID
-appd comet show-node-id [flags]
+evmd comet show-node-id [flags]
 
 # Show validator info
-appd comet show-validator [flags]
+evmd comet show-validator [flags]
 
 # Reset blockchain state
-appd comet unsafe-reset-all [flags]
+evmd comet unsafe-reset-all [flags]
 ```
 
 #### `debug`
@@ -580,13 +580,13 @@ Debugging utilities.
 
 ```bash
 # Get raw bytes for address
-appd debug addr [address] [flags]
+evmd debug addr [address] [flags]
 
 # Decode raw hex bytes
-appd debug raw-bytes [hex] [flags]
+evmd debug raw-bytes [hex] [flags]
 
 # Convert public key
-appd debug pubkey [pubkey] [flags]
+evmd debug pubkey [pubkey] [flags]
 ```
 
 ## Examples
@@ -595,52 +595,52 @@ appd debug pubkey [pubkey] [flags]
 
 ```bash
 # Create a new account
-appd keys add myaccount
+evmd keys add myaccount
 
 # Import an Ethereum private key
-appd keys unsafe-import-eth-key myethaccount 0x...
+evmd keys unsafe-import-eth-key myethaccount 0x...
 
 # List all accounts
-appd keys list
+evmd keys list
 
 # Show account details
-appd keys show myaccount
+evmd keys show myaccount
 ```
 
 ### Querying blockchain state
 
 ```bash
 # Get account balance
-appd query bank balances cosmos1...
+evmd query bank balances cosmos1...
 
 # Get EVM account info
-appd query evm account 0x...
+evmd query evm account 0x...
 
 # Get ERC20 balance
-appd query evm balance-erc20 0xUserAddress 0xTokenAddress
+evmd query evm balance-erc20 0xUserAddress 0xTokenAddress
 
 # Get base fee
-appd query feemarket base-fee
+evmd query feemarket base-fee
 ```
 
 ### Sending transactions
 
 ```bash
 # Send native tokens
-appd tx bank send myaccount cosmos1... 100ustake --gas-prices 10ustake
+evmd tx bank send myaccount cosmos1... 100atest --gas-prices 10atest
 
 # Send native tokens using EVM message
-appd tx evm send myaccount 0x... 100ustake --gas-prices 10ustake
+evmd tx evm send myaccount 0x... 100atest --gas-prices 10atest
 
 # Convert coins to ERC20
-appd tx erc20 convert-coin 100ustake 0x... --from myaccount
+evmd tx erc20 convert-coin 100atest 0x... --from myaccount
 ```
 
 ## Configuration
 
-- Configuration directory: `~/.appd/`
+- Configuration directory: `~/.evmd/`
 - Key storage: Managed by the keyring backend (os, file, test)
-- Node configuration: `~/.appd/config/config.toml`
-- App configuration: `~/.appd/config/app.toml`
+- Node configuration: `~/.evmd/config/config.toml`
+- App configuration: `~/.evmd/config/app.toml`
 
 <Info>If you use the `--home` flag upon initializing the light client, the root/config directory will be generated there</Info>

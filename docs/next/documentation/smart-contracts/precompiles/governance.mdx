@@ -28,17 +28,333 @@ Gas costs are approximated and may vary based on proposal complexity and chain s
 ### `submitProposal`
 Submits a new governance proposal.
 
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceExample {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    struct Coin {
+        string denom;
+        uint256 amount;
+    }
+    
+    event ProposalSubmitted(address indexed proposer, uint64 indexed proposalId);
+    
+    function submitProposal(bytes calldata jsonProposal, Coin[] calldata initialDeposit) 
+        external 
+        payable 
+        returns (uint64 proposalId) 
+    {
+        require(jsonProposal.length > 0, "Proposal cannot be empty");
+        require(initialDeposit.length > 0, "Initial deposit required");
+        
+        // Call the governance precompile
+        (bool success, bytes memory result) = GOVERNANCE_PRECOMPILE.call(
+            abi.encodeWithSignature(
+                "submitProposal(address,bytes,tuple(string,uint256)[])",
+                msg.sender,
+                jsonProposal,
+                initialDeposit
+            )
+        );
+        
+        require(success, "Proposal submission failed");
+        proposalId = abi.decode(result, (uint64));
+        
+        emit ProposalSubmitted(msg.sender, proposalId);
+        return proposalId;
+    }
+    
+    // Helper function to create a coin struct
+    function createCoin(string memory denom, uint256 amount) external pure returns (Coin memory) {
+        return Coin({denom: denom, amount: amount});
+    }
+}
+```
+</CodeGroup>
+
 ### `vote`
 Casts a single vote on an active proposal.
+
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceExample {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    enum VoteOption {
+        Unspecified,
+        Yes,
+        Abstain,
+        No,
+        NoWithVeto
+    }
+    
+    event VoteCast(address indexed voter, uint64 indexed proposalId, VoteOption option);
+    
+    function vote(uint64 proposalId, VoteOption option, string calldata metadata) external {
+        require(proposalId > 0, "Invalid proposal ID");
+        require(option != VoteOption.Unspecified, "Must specify a vote option");
+        
+        (bool success, bytes memory result) = GOVERNANCE_PRECOMPILE.call(
+            abi.encodeWithSignature(
+                "vote(address,uint64,uint8,string)",
+                msg.sender,
+                proposalId,
+                uint8(option),
+                metadata
+            )
+        );
+        
+        require(success, "Vote failed");
+        bool voteSuccess = abi.decode(result, (bool));
+        require(voteSuccess, "Vote was rejected");
+        
+        emit VoteCast(msg.sender, proposalId, option);
+    }
+    
+    // Convenience function to vote yes
+    function voteYes(uint64 proposalId) external {
+        this.vote(proposalId, VoteOption.Yes, "");
+    }
+    
+    // Convenience function to vote no
+    function voteNo(uint64 proposalId) external {
+        this.vote(proposalId, VoteOption.No, "");
+    }
+}
+```
+</CodeGroup>
 
 ### `voteWeighted`
 Casts a weighted vote, splitting voting power across multiple options.
 
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceWeightedVote {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    enum VoteOption {
+        Unspecified,
+        Yes,
+        Abstain,
+        No,
+        NoWithVeto
+    }
+    
+    struct WeightedVoteOption {
+        VoteOption option;
+        string weight;
+    }
+    
+    event WeightedVoteCast(
+        address indexed voter, 
+        uint64 indexed proposalId, 
+        WeightedVoteOption[] options
+    );
+    
+    function voteWeighted(
+        uint64 proposalId, 
+        WeightedVoteOption[] calldata options, 
+        string calldata metadata
+    ) external returns (bool success) {
+        require(proposalId > 0, "Invalid proposal ID");
+        require(options.length > 0, "Must provide vote options");
+        
+        // Validate that weights sum to 1.0 (represented as "1.000000000000000000")
+        // This is just a basic check - in practice you'd want more robust validation
+        
+        (bool callSuccess, bytes memory result) = GOVERNANCE_PRECOMPILE.call(
+            abi.encodeWithSignature(
+                "voteWeighted(address,uint64,tuple(uint8,string)[],string)",
+                msg.sender,
+                proposalId,
+                options,
+                metadata
+            )
+        );
+        
+        require(callSuccess, "Weighted vote failed");
+        success = abi.decode(result, (bool));
+        require(success, "Weighted vote was rejected");
+        
+        emit WeightedVoteCast(msg.sender, proposalId, options);
+        return success;
+    }
+    
+    // Helper function to create a split vote (e.g., 70% Yes, 30% Abstain)
+    function voteSplit(
+        uint64 proposalId,
+        uint256 yesPercent,
+        uint256 abstainPercent
+    ) external returns (bool) {
+        require(yesPercent + abstainPercent == 100, "Percentages must sum to 100");
+        
+        WeightedVoteOption[] memory options = new WeightedVoteOption[](2);
+        
+        // Convert percentages to decimal weights (e.g., 70% = "0.700000000000000000")
+        options[0] = WeightedVoteOption({
+            option: VoteOption.Yes,
+            weight: string(abi.encodePacked("0.", _padPercentage(yesPercent)))
+        });
+        
+        options[1] = WeightedVoteOption({
+            option: VoteOption.Abstain,
+            weight: string(abi.encodePacked("0.", _padPercentage(abstainPercent)))
+        });
+        
+        return voteWeighted(proposalId, options, "Split vote");
+    }
+    
+    // Helper function to pad percentage to 18 decimal places
+    function _padPercentage(uint256 percent) internal pure returns (string memory) {
+        require(percent <= 100, "Percent cannot exceed 100");
+        
+        if (percent == 100) return "000000000000000000"; // Special case for 100%
+        
+        // This is a simplified version - in practice you'd want more robust decimal handling
+        string memory percentStr = _toString(percent);
+        if (percent < 10) {
+            return string(abi.encodePacked("0", percentStr, "0000000000000000"));
+        } else {
+            return string(abi.encodePacked(percentStr, "0000000000000000"));
+        }
+    }
+    
+    function _toString(uint256 value) internal pure returns (string memory) {
+        if (value == 0) return "0";
+        
+        uint256 temp = value;
+        uint256 digits;
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        bytes memory buffer = new bytes(digits);
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+            value /= 10;
+        }
+        return string(buffer);
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Weighted voting requires a signed transaction"
+```
+</CodeGroup>
+
 ### `deposit`
 Adds funds to a proposal's deposit during the deposit period.
 
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceExample {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    struct Coin {
+        string denom;
+        uint256 amount;
+    }
+    
+    event DepositMade(address indexed depositor, uint64 indexed proposalId, uint256 amount);
+    
+    function deposit(uint64 proposalId, Coin[] calldata amount) external payable {
+        require(proposalId > 0, "Invalid proposal ID");
+        require(amount.length > 0, "Deposit amount required");
+        
+        (bool success, bytes memory result) = GOVERNANCE_PRECOMPILE.call{value: msg.value}(
+            abi.encodeWithSignature(
+                "deposit(address,uint64,tuple(string,uint256)[])",
+                msg.sender,
+                proposalId,
+                amount
+            )
+        );
+        
+        require(success, "Deposit failed");
+        bool depositSuccess = abi.decode(result, (bool));
+        require(depositSuccess, "Deposit was rejected");
+        
+        // Calculate total deposited amount for event
+        uint256 totalAmount = 0;
+        for (uint i = 0; i < amount.length; i++) {
+            totalAmount += amount[i].amount;
+        }
+        
+        emit DepositMade(msg.sender, proposalId, totalAmount);
+    }
+    
+    // Convenience function to deposit native tokens
+    function depositNative(uint64 proposalId, uint256 amount, string memory denom) external payable {
+        require(msg.value >= amount, "Insufficient value sent");
+        
+        Coin[] memory coins = new Coin[](1);
+        coins[0] = Coin({denom: denom, amount: amount});
+        
+        this.deposit{value: amount}(proposalId, coins);
+    }
+}
+```
+</CodeGroup>
+
 ### `cancelProposal`
 Cancels a proposal that is still in its deposit period.
+
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceCancelProposal {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    event ProposalCanceled(address indexed proposer, uint64 indexed proposalId, bool success);
+    
+    function cancelProposal(uint64 proposalId) external returns (bool success) {
+        require(proposalId > 0, "Invalid proposal ID");
+        
+        (bool callSuccess, bytes memory result) = GOVERNANCE_PRECOMPILE.call(
+            abi.encodeWithSignature("cancelProposal(address,uint64)", msg.sender, proposalId)
+        );
+        
+        require(callSuccess, "Cancel proposal call failed");
+        success = abi.decode(result, (bool));
+        
+        emit ProposalCanceled(msg.sender, proposalId, success);
+        return success;
+    }
+    
+    // Function to safely cancel a proposal with additional checks
+    function safeCancelProposal(uint64 proposalId) external returns (bool success) {
+        // First, check if the proposal exists and can be canceled
+        // Note: In practice, you'd want to call getProposal first to verify status
+        
+        success = cancelProposal(proposalId);
+        require(success, "Proposal cancellation failed - check if you're the proposer and proposal is in deposit period");
+        
+        return success;
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Canceling proposals requires a signed transaction"
+```
+</CodeGroup>
 
 ## Query Methods
 
@@ -46,6 +362,60 @@ Cancels a proposal that is still in its deposit period.
 Retrieves detailed information about a specific proposal.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceQueries {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    struct ProposalData {
+        uint64 id;
+        string[] messages;
+        uint32 status;
+        TallyResultData finalTallyResult;
+        uint64 submitTime;
+        uint64 depositEndTime;
+        Coin[] totalDeposit;
+        uint64 votingStartTime;
+        uint64 votingEndTime;
+        string metadata;
+        string title;
+        string summary;
+        address proposer;
+    }
+    
+    struct TallyResultData {
+        string yes;
+        string abstain;
+        string no;
+        string noWithVeto;
+    }
+    
+    struct Coin {
+        string denom;
+        uint256 amount;
+    }
+    
+    function getProposal(uint64 proposalId) external view returns (ProposalData memory proposal) {
+        require(proposalId > 0, "Invalid proposal ID");
+        
+        (bool success, bytes memory result) = GOVERNANCE_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("getProposal(uint64)", proposalId)
+        );
+        
+        require(success, "Failed to get proposal");
+        proposal = abi.decode(result, (ProposalData));
+        return proposal;
+    }
+    
+    // Helper function to check if proposal is in voting period
+    function isProposalInVotingPeriod(uint64 proposalId) external view returns (bool) {
+        ProposalData memory proposal = this.getProposal(proposalId);
+        return proposal.status == 2; // PROPOSAL_STATUS_VOTING_PERIOD
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -98,6 +468,97 @@ curl -X POST --data '{
 Retrieves a filtered and paginated list of proposals.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceProposalsList {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    struct PageRequest {
+        bytes key;
+        uint64 offset;
+        uint64 limit;
+        bool countTotal;
+        bool reverse;
+    }
+    
+    struct PageResponse {
+        bytes nextKey;
+        uint64 total;
+    }
+    
+    struct ProposalData {
+        uint64 id;
+        string[] messages;
+        uint32 status;
+        TallyResultData finalTallyResult;
+        uint64 submitTime;
+        uint64 depositEndTime;
+        Coin[] totalDeposit;
+        uint64 votingStartTime;
+        uint64 votingEndTime;
+        string metadata;
+        string title;
+        string summary;
+        address proposer;
+    }
+    
+    struct TallyResultData {
+        string yes;
+        string abstain;
+        string no;
+        string noWithVeto;
+    }
+    
+    struct Coin {
+        string denom;
+        uint256 amount;
+    }
+    
+    function getProposals(
+        uint32 proposalStatus,
+        address voter,
+        address depositor,
+        PageRequest memory pagination
+    ) external view returns (ProposalData[] memory proposals, PageResponse memory pageResponse) {
+        (bool success, bytes memory result) = GOVERNANCE_PRECOMPILE.staticcall(
+            abi.encodeWithSignature(
+                "getProposals(uint32,address,address,(bytes,uint64,uint64,bool,bool))",
+                proposalStatus,
+                voter,
+                depositor,
+                pagination
+            )
+        );
+        
+        require(success, "Failed to get proposals");
+        (proposals, pageResponse) = abi.decode(result, (ProposalData[], PageResponse));
+        return (proposals, pageResponse);
+    }
+    
+    // Helper function to get all active proposals (in voting period)
+    function getActiveProposals(uint64 limit) external view returns (ProposalData[] memory) {
+        PageRequest memory pagination = PageRequest({
+            key: "",
+            offset: 0,
+            limit: limit,
+            countTotal: true,
+            reverse: false
+        });
+        
+        uint32 votingStatus = 2; // PROPOSAL_STATUS_VOTING_PERIOD
+        (ProposalData[] memory proposals,) = this.getProposals(
+            votingStatus,
+            address(0),
+            address(0),
+            pagination
+        );
+        
+        return proposals;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -159,6 +620,42 @@ curl -X POST --data '{
 Retrieves the current or final vote tally for a proposal.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceTally {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    struct TallyResultData {
+        string yes;
+        string abstain;
+        string no;
+        string noWithVeto;
+    }
+    
+    function getTallyResult(uint64 proposalId) external view returns (TallyResultData memory tallyResult) {
+        require(proposalId > 0, "Invalid proposal ID");
+        
+        (bool success, bytes memory result) = GOVERNANCE_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("getTallyResult(uint64)", proposalId)
+        );
+        
+        require(success, "Failed to get tally result");
+        tallyResult = abi.decode(result, (TallyResultData));
+        return tallyResult;
+    }
+    
+    // Helper function to check if proposal is passing
+    function isProposalPassing(uint64 proposalId) external view returns (bool) {
+        TallyResultData memory tally = this.getTallyResult(proposalId);
+        
+        // Convert string votes to numbers for comparison (simplified)
+        // In production, use proper decimal math libraries
+        return keccak256(bytes(tally.yes)) > keccak256(bytes(tally.no));
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -214,6 +711,56 @@ curl -X POST --data '{
 Retrieves the vote cast by a specific address on a proposal.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceVoteQuery {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    enum VoteOption {
+        Unspecified,
+        Yes,
+        Abstain,
+        No,
+        NoWithVeto
+    }
+    
+    struct WeightedVoteOption {
+        VoteOption option;
+        string weight;
+    }
+    
+    struct WeightedVote {
+        uint64 proposalId;
+        address voter;
+        WeightedVoteOption[] options;
+        string metadata;
+    }
+    
+    function getVote(uint64 proposalId, address voter) external view returns (WeightedVote memory vote) {
+        require(proposalId > 0, "Invalid proposal ID");
+        require(voter != address(0), "Invalid voter address");
+        
+        (bool success, bytes memory result) = GOVERNANCE_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("getVote(uint64,address)", proposalId, voter)
+        );
+        
+        require(success, "Failed to get vote");
+        vote = abi.decode(result, (WeightedVote));
+        return vote;
+    }
+    
+    // Helper function to check if an address has voted
+    function hasVoted(uint64 proposalId, address voter) external view returns (bool) {
+        try this.getVote(proposalId, voter) returns (WeightedVote memory vote) {
+            return vote.options.length > 0;
+        } catch {
+            return false;
+        }
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -265,6 +812,96 @@ curl -X POST --data '{
 Retrieves all votes cast on a proposal, with pagination.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceVotesList {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    struct PageRequest {
+        bytes key;
+        uint64 offset;
+        uint64 limit;
+        bool countTotal;
+        bool reverse;
+    }
+    
+    struct PageResponse {
+        bytes nextKey;
+        uint64 total;
+    }
+    
+    enum VoteOption {
+        Unspecified,
+        Yes,
+        Abstain,
+        No,
+        NoWithVeto
+    }
+    
+    struct WeightedVoteOption {
+        VoteOption option;
+        string weight;
+    }
+    
+    struct WeightedVote {
+        uint64 proposalId;
+        address voter;
+        WeightedVoteOption[] options;
+        string metadata;
+    }
+    
+    function getVotes(
+        uint64 proposalId,
+        PageRequest memory pagination
+    ) external view returns (WeightedVote[] memory votes, PageResponse memory pageResponse) {
+        require(proposalId > 0, "Invalid proposal ID");
+        
+        (bool success, bytes memory result) = GOVERNANCE_PRECOMPILE.staticcall(
+            abi.encodeWithSignature(
+                "getVotes(uint64,(bytes,uint64,uint64,bool,bool))",
+                proposalId,
+                pagination
+            )
+        );
+        
+        require(success, "Failed to get votes");
+        (votes, pageResponse) = abi.decode(result, (WeightedVote[], PageResponse));
+        return (votes, pageResponse);
+    }
+    
+    // Helper function to get all Yes votes
+    function getYesVoters(uint64 proposalId, uint64 limit) external view returns (address[] memory) {
+        PageRequest memory pagination = PageRequest({
+            key: "",
+            offset: 0,
+            limit: limit,
+            countTotal: false,
+            reverse: false
+        });
+        
+        (WeightedVote[] memory votes,) = this.getVotes(proposalId, pagination);
+        
+        uint256 yesCount = 0;
+        for (uint i = 0; i < votes.length; i++) {
+            if (votes[i].options.length > 0 && votes[i].options[0].option == VoteOption.Yes) {
+                yesCount++;
+            }
+        }
+        
+        address[] memory yesVoters = new address[](yesCount);
+        uint256 index = 0;
+        for (uint i = 0; i < votes.length; i++) {
+            if (votes[i].options.length > 0 && votes[i].options[0].option == VoteOption.Yes) {
+                yesVoters[index++] = votes[i].voter;
+            }
+        }
+        
+        return yesVoters;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -323,6 +960,51 @@ curl -X POST --data '{
 Retrieves deposit information for a specific depositor on a proposal.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceDepositQuery {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    struct Coin {
+        string denom;
+        uint256 amount;
+    }
+    
+    struct DepositData {
+        uint64 proposalId;
+        address depositor;
+        Coin[] amount;
+    }
+    
+    function getDeposit(uint64 proposalId, address depositor) external view returns (DepositData memory deposit) {
+        require(proposalId > 0, "Invalid proposal ID");
+        require(depositor != address(0), "Invalid depositor address");
+        
+        (bool success, bytes memory result) = GOVERNANCE_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("getDeposit(uint64,address)", proposalId, depositor)
+        );
+        
+        require(success, "Failed to get deposit");
+        deposit = abi.decode(result, (DepositData));
+        return deposit;
+    }
+    
+    // Helper function to get total deposit amount for a specific denom
+    function getDepositAmount(uint64 proposalId, address depositor, string memory denom) external view returns (uint256) {
+        DepositData memory deposit = this.getDeposit(proposalId, depositor);
+        
+        for (uint i = 0; i < deposit.amount.length; i++) {
+            if (keccak256(bytes(deposit.amount[i].denom)) == keccak256(bytes(denom))) {
+                return deposit.amount[i].amount;
+            }
+        }
+        
+        return 0;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -374,6 +1056,77 @@ curl -X POST --data '{
 Retrieves all deposits made on a proposal, with pagination.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceDepositsList {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    struct PageRequest {
+        bytes key;
+        uint64 offset;
+        uint64 limit;
+        bool countTotal;
+        bool reverse;
+    }
+    
+    struct PageResponse {
+        bytes nextKey;
+        uint64 total;
+    }
+    
+    struct Coin {
+        string denom;
+        uint256 amount;
+    }
+    
+    struct DepositData {
+        uint64 proposalId;
+        address depositor;
+        Coin[] amount;
+    }
+    
+    function getDeposits(
+        uint64 proposalId,
+        PageRequest memory pagination
+    ) external view returns (DepositData[] memory deposits, PageResponse memory pageResponse) {
+        require(proposalId > 0, "Invalid proposal ID");
+        
+        (bool success, bytes memory result) = GOVERNANCE_PRECOMPILE.staticcall(
+            abi.encodeWithSignature(
+                "getDeposits(uint64,(bytes,uint64,uint64,bool,bool))",
+                proposalId,
+                pagination
+            )
+        );
+        
+        require(success, "Failed to get deposits");
+        (deposits, pageResponse) = abi.decode(result, (DepositData[], PageResponse));
+        return (deposits, pageResponse);
+    }
+    
+    // Helper function to get all depositors
+    function getDepositors(uint64 proposalId, uint64 limit) external view returns (address[] memory) {
+        PageRequest memory pagination = PageRequest({
+            key: "",
+            offset: 0,
+            limit: limit,
+            countTotal: false,
+            reverse: false
+        });
+        
+        (DepositData[] memory deposits,) = this.getDeposits(proposalId, pagination);
+        
+        address[] memory depositors = new address[](deposits.length);
+        for (uint i = 0; i < deposits.length; i++) {
+            depositors[i] = deposits[i].depositor;
+        }
+        
+        return depositors;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -432,6 +1185,67 @@ curl -X POST --data '{
 Retrieves current governance parameters.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceParams {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    struct Coin {
+        string denom;
+        uint256 amount;
+    }
+    
+    struct Params {
+        int64 votingPeriod;
+        Coin[] minDeposit;
+        int64 maxDepositPeriod;
+        string quorum;
+        string threshold;
+        string vetoThreshold;
+        string minInitialDepositRatio;
+        string proposalCancelRatio;
+        string proposalCancelDest;
+        int64 expeditedVotingPeriod;
+        string expeditedThreshold;
+        Coin[] expeditedMinDeposit;
+        bool burnVoteQuorum;
+        bool burnProposalDepositPrevote;
+        bool burnVoteVeto;
+        string minDepositRatio;
+    }
+    
+    function getParams() external view returns (Params memory params) {
+        (bool success, bytes memory result) = GOVERNANCE_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("getParams()")
+        );
+        
+        require(success, "Failed to get params");
+        params = abi.decode(result, (Params));
+        return params;
+    }
+    
+    // Helper function to get minimum deposit amount for a specific denom
+    function getMinDepositForDenom(string memory denom) external view returns (uint256) {
+        Params memory params = this.getParams();
+        
+        for (uint i = 0; i < params.minDeposit.length; i++) {
+            if (keccak256(bytes(params.minDeposit[i].denom)) == keccak256(bytes(denom))) {
+                return params.minDeposit[i].amount;
+            }
+        }
+        
+        return 0;
+    }
+    
+    // Helper function to get voting period in seconds
+    function getVotingPeriodSeconds() external view returns (int64) {
+        Params memory params = this.getParams();
+        return params.votingPeriod;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -481,6 +1295,36 @@ curl -X POST --data '{
 Retrieves the current governance constitution.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract GovernanceConstitution {
+    address constant GOVERNANCE_PRECOMPILE = 0x0000000000000000000000000000000000000805;
+    
+    function getConstitution() external view returns (string memory constitution) {
+        (bool success, bytes memory result) = GOVERNANCE_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("getConstitution()")
+        );
+        
+        require(success, "Failed to get constitution");
+        constitution = abi.decode(result, (string));
+        return constitution;
+    }
+    
+    // Helper function to check if constitution is set
+    function hasConstitution() external view returns (bool) {
+        string memory constitution = this.getConstitution();
+        return bytes(constitution).length > 0;
+    }
+    
+    // Helper function to get constitution length
+    function getConstitutionLength() external view returns (uint256) {
+        string memory constitution = this.getConstitution();
+        return bytes(constitution).length;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 

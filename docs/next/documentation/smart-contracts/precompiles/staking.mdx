@@ -28,13 +28,138 @@ Gas costs are approximated and may vary based on the complexity of the staking o
 ### `createValidator`
 Creates a new validator.
 
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract StakingExample {
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    
+    struct Description {
+        string moniker;
+        string identity;
+        string website;
+        string securityContact;
+        string details;
+    }
+    
+    struct CommissionRates {
+        uint256 rate;
+        uint256 maxRate;
+        uint256 maxChangeRate;
+    }
+    
+    event ValidatorCreated(address indexed validatorAddress, string moniker, uint256 value);
+    
+    function createNewValidator(
+        Description calldata description,
+        CommissionRates calldata commissionRates,
+        uint256 minSelfDelegation,
+        string calldata pubkey,
+        uint256 value
+    ) external payable returns (bool success) {
+        require(msg.value >= value, "Insufficient value sent");
+        
+        (bool callSuccess, bytes memory result) = STAKING_PRECOMPILE.call{value: value}(
+            abi.encodeWithSignature(
+                "createValidator((string,string,string,string,string),(uint256,uint256,uint256),uint256,address,string,uint256)",
+                description, commissionRates, minSelfDelegation, msg.sender, pubkey, value
+            )
+        );
+        
+        require(callSuccess, "Create validator failed");
+        success = abi.decode(result, (bool));
+        require(success, "Create validator returned false");
+        
+        emit ValidatorCreated(msg.sender, description.moniker, value);
+        return success;
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Validator creation requires a signed transaction"
+```
+</CodeGroup>
+
 ### `editValidator`
 Edits an existing validator's parameters.
+
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract StakingExample {
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    
+    struct Description {
+        string moniker;
+        string identity;
+        string website;
+        string securityContact;
+        string details;
+    }
+    
+    event ValidatorUpdated(address indexed validatorAddress, string moniker);
+    
+    function updateValidator(
+        Description calldata description,
+        int256 commissionRate,
+        int256 minSelfDelegation
+    ) external returns (bool success) {
+        (bool callSuccess, bytes memory result) = STAKING_PRECOMPILE.call(
+            abi.encodeWithSignature(
+                "editValidator((string,string,string,string,string),address,int256,int256)",
+                description, msg.sender, commissionRate, minSelfDelegation
+            )
+        );
+        
+        require(callSuccess, "Edit validator failed");
+        success = abi.decode(result, (bool));
+        require(success, "Edit validator returned false");
+        
+        emit ValidatorUpdated(msg.sender, description.moniker);
+        return success;
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Validator editing requires a signed transaction"
+```
+</CodeGroup>
 
 ### `delegate`
 Delegates tokens to a validator.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract StakingExample {
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    
+    event DelegationSuccess(address indexed delegator, string indexed validator, uint256 amount);
+    
+    function delegateTokens(string calldata validatorAddress, uint256 amount) external payable {
+        require(msg.value >= amount, "Insufficient value sent");
+        
+        // Call the staking precompile with correct signature
+        (bool success, bytes memory result) = STAKING_PRECOMPILE.call{value: amount}(
+            abi.encodeWithSignature("delegate(address,string,uint256)", msg.sender, validatorAddress, amount)
+        );
+        
+        require(success, "Delegation failed");
+        bool delegationSuccess = abi.decode(result, (bool));
+        require(delegationSuccess, "Delegation returned false");
+        
+        emit DelegationSuccess(msg.sender, validatorAddress, amount);
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -83,11 +208,143 @@ echo "Staking delegation requires a signed transaction - use ethers.js or other 
 ### `undelegate`
 Undelegates tokens from a validator.
 
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract StakingExample {
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    
+    event UndelegationStarted(address indexed delegator, string indexed validator, uint256 amount, int64 completionTime);
+    
+    function undelegateTokens(string calldata validatorAddress, uint256 amount) 
+        external returns (int64 completionTime) {
+        (bool success, bytes memory result) = STAKING_PRECOMPILE.call(
+            abi.encodeWithSignature("undelegate(address,string,uint256)", msg.sender, validatorAddress, amount)
+        );
+        
+        require(success, "Undelegation failed");
+        completionTime = abi.decode(result, (int64));
+        
+        emit UndelegationStarted(msg.sender, validatorAddress, amount, completionTime);
+        return completionTime;
+    }
+    
+    // Helper function to calculate days until completion
+    function getDaysUntilCompletion(int64 completionTime) external view returns (uint256 days) {
+        if (completionTime <= int64(block.timestamp)) {
+            return 0;
+        }
+        return uint256(uint64(completionTime - int64(block.timestamp))) / 86400;
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Undelegation requires a signed transaction"
+```
+</CodeGroup>
+
 ### `redelegate`
 Redelegates tokens from one validator to another.
 
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract StakingExample {
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    
+    event RedelegationStarted(
+        address indexed delegator, 
+        string indexed srcValidator, 
+        string indexed dstValidator, 
+        uint256 amount, 
+        int64 completionTime
+    );
+    
+    function redelegateTokens(
+        string calldata srcValidatorAddress,
+        string calldata dstValidatorAddress,
+        uint256 amount
+    ) external returns (int64 completionTime) {
+        require(bytes(srcValidatorAddress).length > 0, "Source validator cannot be empty");
+        require(bytes(dstValidatorAddress).length > 0, "Destination validator cannot be empty");
+        require(
+            keccak256(bytes(srcValidatorAddress)) != keccak256(bytes(dstValidatorAddress)), 
+            "Cannot redelegate to same validator"
+        );
+        
+        (bool success, bytes memory result) = STAKING_PRECOMPILE.call(
+            abi.encodeWithSignature(
+                "redelegate(address,string,string,uint256)", 
+                msg.sender, srcValidatorAddress, dstValidatorAddress, amount
+            )
+        );
+        
+        require(success, "Redelegation failed");
+        completionTime = abi.decode(result, (int64));
+        
+        emit RedelegationStarted(msg.sender, srcValidatorAddress, dstValidatorAddress, amount, completionTime);
+        return completionTime;
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Redelegation requires a signed transaction"
+```
+</CodeGroup>
+
 ### `cancelUnbondingDelegation`
 Cancels an unbonding delegation.
+
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract StakingExample {
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    
+    event UnbondingCancelled(
+        address indexed delegator, 
+        string indexed validator, 
+        uint256 amount, 
+        uint256 creationHeight
+    );
+    
+    function cancelUnbonding(
+        string calldata validatorAddress,
+        uint256 amount,
+        uint256 creationHeight
+    ) external returns (bool success) {
+        require(creationHeight > 0, "Creation height must be positive");
+        require(amount > 0, "Amount must be positive");
+        
+        (bool callSuccess, bytes memory result) = STAKING_PRECOMPILE.call(
+            abi.encodeWithSignature(
+                "cancelUnbondingDelegation(address,string,uint256,uint256)",
+                msg.sender, validatorAddress, amount, creationHeight
+            )
+        );
+        
+        require(callSuccess, "Cancel unbonding failed");
+        success = abi.decode(result, (bool));
+        require(success, "Cancel unbonding returned false");
+        
+        emit UnbondingCancelled(msg.sender, validatorAddress, amount, creationHeight);
+        return success;
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Cancel unbonding requires a signed transaction"
+```
+</CodeGroup>
 
 ## Query Methods
 
@@ -95,6 +352,38 @@ Cancels an unbonding delegation.
 Queries information about a specific validator.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract StakingExample {
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    
+    struct Validator {
+        string operatorAddress;
+        string consensusPubkey;
+        bool jailed;
+        uint8 status; // BondStatus enum
+        uint256 tokens;
+        uint256 delegatorShares;
+        string description;
+        int64 unbondingHeight;
+        int64 unbondingTime;
+        uint256 commission;
+        uint256 minSelfDelegation;
+    }
+    
+    function getValidator(address validatorAddress) external view returns (Validator memory validator) {
+        (bool success, bytes memory result) = STAKING_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("validator(address)", validatorAddress)
+        );
+        
+        require(success, "Validator query failed");
+        validator = abi.decode(result, (Validator));
+        return validator;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -108,13 +397,19 @@ const provider = new ethers.JsonRpcProvider("<RPC_URL>");
 const precompileAddress = "0x0000000000000000000000000000000000000800";
 const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
 
-// Input
-const validatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder validator address
+// Input - use actual validator address from the network
+const validatorAddress = "0x7cB61D4117AE31a12E393a1Cfa3BaC666481D02E"; // Example validator address
 
 async function getValidator() {
   try {
     const validator = await contract.validator(validatorAddress);
-    console.log("Validator Info:", JSON.stringify(validator, null, 2));
+    console.log("Validator Info:", {
+      operatorAddress: validator.operatorAddress,
+      jailed: validator.jailed,
+      status: validator.status, // 0=Unspecified, 1=Unbonded, 2=Unbonding, 3=Bonded
+      tokens: ethers.formatEther(validator.tokens),
+      delegatorShares: ethers.formatEther(validator.delegatorShares)
+    });
   } catch (error) {
     console.error("Error fetching validator:", error);
   }
@@ -123,14 +418,15 @@ async function getValidator() {
 getValidator();
 ```
 ```bash cURL expandable lines
-# Note: Replace <RPC_URL> and the placeholder validator address with your actual data.
+# Note: Replace <RPC_URL> and the validator address with your actual data.
+# Data is ABI-encoded: validator(address) function selector + padded address parameter
 curl -X POST --data '{
     "jsonrpc": "2.0",
     "method": "eth_call",
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000800",
-            "data": "0x3f33833b00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+            "data": "0x223b3b7a0000000000000000000000007cb61d4117ae31a12e393a1cfa3bac666481d02e"
         },
         "latest"
     ],
@@ -157,7 +453,7 @@ const precompileAddress = "0x0000000000000000000000000000000000000800";
 const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
 
 // Inputs
-const status = "Bonded";
+const status = "BOND_STATUS_BONDED";
 const pagination = {
   key: "0x",
   offset: 0,
@@ -187,7 +483,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000800",
-            "data": "0x5374c43a00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000006426f6e6465640000000000000000000000000000000000000000000000000000"
+            "data": "0x186b2167000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000012424f4e445f5354415455535f424f4e444544000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
@@ -214,8 +510,8 @@ const precompileAddress = "0x0000000000000000000000000000000000000800";
 const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
 
 // Inputs
-const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
-const validatorAddress = "cosmosvaloper1qypqxr72xk6plc6678ll42ephq2lgl7lc7225w"; // Placeholder
+const delegatorAddress = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"; // Example delegator
+const validatorAddress = "cosmosvaloper10jmp6sgh4cc6zt3e8gw05wavvejgr5pw4xyrql"; // Example validator
 
 async function getDelegation() {
   try {
@@ -237,7 +533,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000800",
-            "data": "0x41f33f63000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa9604500000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+            "data": "0x241774e6000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000346636f736d6f7376616c6f70657231306a6d7036736768346363367a743365386777303577617676656a677235707734787972716c00000000000000000000000000"
         },
         "latest"
     ],
@@ -264,8 +560,8 @@ const precompileAddress = "0x0000000000000000000000000000000000000800";
 const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
 
 // Inputs
-const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
-const validatorAddress = "cosmosvaloper1qypqxr72xk6plc6678ll42ephq2lgl7lc7225w"; // Placeholder
+const delegatorAddress = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"; // Example delegator
+const validatorAddress = "cosmosvaloper10jmp6sgh4cc6zt3e8gw05wavvejgr5pw4xyrql"; // Example validator
 
 async function getUnbondingDelegation() {
   try {
@@ -286,7 +582,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000800",
-            "data": "0x813b2933000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa9604500000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000031636f736d6f7376616c6f706572317179707178723732786b36706c63363637386c6c343265706871326c676c376c633732323577000000000000000000000000"
+            "data": "0xa03ffee1000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000346636f736d6f7376616c6f70657231306a6d7036736768346363367a743365386777303577617676656a677235707734787972716c00000000000000000000000000"
         },
         "latest"
     ],
@@ -297,6 +593,73 @@ curl -X POST --data '{
 
 ### `redelegation`
 Queries a specific redelegation.
+
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract StakingExample {
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    
+    struct RedelegationEntry {
+        int64 creationHeight;
+        int64 completionTime;
+        uint256 initialBalance;
+        uint256 sharesDst;
+    }
+    
+    struct RedelegationOutput {
+        string delegatorAddress;
+        string validatorSrcAddress;
+        string validatorDstAddress;
+        RedelegationEntry[] entries;
+    }
+    
+    function getRedelegation(
+        address delegatorAddress,
+        string calldata srcValidatorAddress,
+        string calldata dstValidatorAddress
+    ) external view returns (RedelegationOutput memory redelegation) {
+        (bool success, bytes memory result) = STAKING_PRECOMPILE.staticcall(
+            abi.encodeWithSignature(
+                "redelegation(address,string,string)",
+                delegatorAddress, srcValidatorAddress, dstValidatorAddress
+            )
+        );
+        
+        require(success, "Redelegation query failed");
+        redelegation = abi.decode(result, (RedelegationOutput));
+        return redelegation;
+    }
+    
+    // Check if redelegation is complete
+    function isRedelegationComplete(RedelegationOutput memory redelegation) external view returns (bool) {
+        for (uint i = 0; i < redelegation.entries.length; i++) {
+            if (redelegation.entries[i].completionTime > int64(block.timestamp)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Replace addresses with your actual data
+curl -X POST --data '{
+    "jsonrpc": "2.0",
+    "method": "eth_call",
+    "params": [
+        {
+            "to": "0x0000000000000000000000000000000000000800",
+            "data": "0x..."  # ABI-encoded redelegation(address,string,string) call
+        },
+        "latest"
+    ],
+    "id": 1
+}' -H "Content-Type: application/json" <RPC_URL>
+```
+</CodeGroup>
 
 ### `redelegations`
 Queries redelegations with optional filters.
@@ -316,7 +679,7 @@ const precompileAddress = "0x0000000000000000000000000000000000000800";
 const contract = new ethers.Contract(precompileAddress, precompileAbi, provider);
 
 // Inputs
-const delegatorAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // Placeholder
+const delegatorAddress = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"; // Example delegator
 const srcValidatorAddress = ""; // Empty string for all
 const dstValidatorAddress = ""; // Empty string for all
 const pagination = {
@@ -348,7 +711,7 @@ curl -X POST --data '{
     "params": [
         {
             "to": "0x0000000000000000000000000000000000000800",
-            "data": "0x289e728a000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa9604500000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            "data": "0x10a2851c000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000064000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         },
         "latest"
     ],
@@ -392,9 +755,9 @@ struct Description {
 
 // CommissionRates defines the initial commission rates to be used for a validator
 struct CommissionRates {
-    string rate;
-    string maxRate;
-    string maxChangeRate;
+    uint256 rate;
+    uint256 maxRate;
+    uint256 maxChangeRate;
 }
 
 // Commission defines a commission parameters for a given validator.
@@ -408,13 +771,13 @@ struct Validator {
     string operatorAddress;
     string consensusPubkey;
     bool jailed;
-    uint32 status;
+    uint8 status; // BondStatus enum: 0=Unspecified, 1=Unbonded, 2=Unbonding, 3=Bonded
     uint256 tokens;
-    string delegatorShares;
-    Description description;
+    uint256 delegatorShares;
+    string description;
     int64 unbondingHeight;
-    uint256 unbondingTime;
-    Commission commission;
+    int64 unbondingTime;
+    uint256 commission;
     uint256 minSelfDelegation;
 }
 
@@ -514,19 +877,19 @@ interface StakingI {
     // Transactions
     function createValidator(
         Description calldata description,
-        CommissionRates calldata commission,
+        CommissionRates calldata commissionRates,
         uint256 minSelfDelegation,
-        string calldata validatorAddress,
+        address validatorAddress,
         string calldata pubkey,
-        address value
-    ) external payable returns (bool);
+        uint256 value
+    ) external returns (bool success);
 
     function editValidator(
         Description calldata description,
-        string calldata validatorAddress,
-        uint256 commissionRate,
-        uint256 minSelfDelegation
-    ) external returns (bool);
+        address validatorAddress,
+        int256 commissionRate,
+        int256 minSelfDelegation
+    ) external returns (bool success);
 
     function delegate(
         address delegatorAddress,
@@ -556,7 +919,7 @@ interface StakingI {
 
     // Queries
     function validator(
-        string calldata validatorAddress
+        address validatorAddress
     ) external view returns (Validator memory);
 
     function validators(
@@ -567,7 +930,7 @@ interface StakingI {
     function delegation(
         address delegatorAddress,
         string calldata validatorAddress
-    ) external view returns (uint256);
+    ) external view returns (uint256 shares, Coin memory balance);
 
     function unbondingDelegation(
         address delegatorAddress,
