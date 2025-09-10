@@ -728,7 +728,7 @@ import { ethers } from "ethers";
 
 // ABI definition for the function
 const precompileAbi = [
-  "function validatorSlashes(string memory validatorAddress, uint64 startingHeight, uint64 endingHeight, tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pageRequest) view returns (tuple(uint64 validatorPeriod, tuple(uint256 amount, uint8 precision) fraction)[] slashes, tuple(bytes nextKey, uint64 total) pageResponse)"
+  "function validatorSlashes(string validatorAddress, uint64 startingHeight, uint64 endingHeight, tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pageRequest) view returns (tuple(uint64 validatorPeriod, tuple(uint256 value, uint8 precision) fraction, int64 height)[] slashes, tuple(bytes nextKey, uint64 total) pageResponse)"
 ];
 
 // Provider and contract setup

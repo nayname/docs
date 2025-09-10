@@ -33,9 +33,8 @@ Creates a new validator.
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract StakingExample {
-    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
-    
+// Interface for the Staking precompile
+interface IStaking {
     struct Description {
         string moniker;
         string identity;
@@ -50,30 +49,55 @@ contract StakingExample {
         uint256 maxChangeRate;
     }
     
+    function createValidator(
+        Description memory description,
+        CommissionRates memory commissionRates,
+        uint256 minSelfDelegation,
+        address validatorAddress,
+        string memory pubkey,
+        uint256 value
+    ) external returns (bool success);
+}
+
+contract StakingExample {
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    IStaking public immutable staking;
+    
     event ValidatorCreated(address indexed validatorAddress, string moniker, uint256 value);
     
+    error InvalidInput();
+    error InsufficientValue();
+    error StakingOperationFailed();
+    
+    constructor() {
+        staking = IStaking(STAKING_PRECOMPILE);
+    }
+    
     function createNewValidator(
-        Description calldata description,
-        CommissionRates calldata commissionRates,
+        IStaking.Description calldata description,
+        IStaking.CommissionRates calldata commissionRates,
         uint256 minSelfDelegation,
         string calldata pubkey,
         uint256 value
     ) external payable returns (bool success) {
-        require(msg.value >= value, "Insufficient value sent");
+        if (msg.value < value) revert InsufficientValue();
+        if (bytes(description.moniker).length == 0) revert InvalidInput();
+        if (bytes(pubkey).length == 0) revert InvalidInput();
         
-        (bool callSuccess, bytes memory result) = STAKING_PRECOMPILE.call{value: value}(
-            abi.encodeWithSignature(
-                "createValidator((string,string,string,string,string),(uint256,uint256,uint256),uint256,address,string,uint256)",
-                description, commissionRates, minSelfDelegation, msg.sender, pubkey, value
-            )
-        );
-        
-        require(callSuccess, "Create validator failed");
-        success = abi.decode(result, (bool));
-        require(success, "Create validator returned false");
-        
-        emit ValidatorCreated(msg.sender, description.moniker, value);
-        return success;
+        try staking.createValidator(
+            description, 
+            commissionRates, 
+            minSelfDelegation, 
+            msg.sender, 
+            pubkey, 
+            value
+        ) returns (bool result) {
+            if (!result) revert StakingOperationFailed();
+            emit ValidatorCreated(msg.sender, description.moniker, value);
+            return result;
+        } catch {
+            revert StakingOperationFailed();
+        }
     }
 }
 ```
@@ -91,9 +115,8 @@ Edits an existing validator's parameters.
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract StakingExample {
-    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
-    
+// Interface for the Staking precompile
+interface IStaking {
     struct Description {
         string moniker;
         string identity;
@@ -102,26 +125,40 @@ contract StakingExample {
         string details;
     }
     
+    function editValidator(
+        Description memory description,
+        uint256 commissionRate,
+        uint256 minSelfDelegation
+    ) external returns (bool success);
+}
+
+contract StakingExample {
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    IStaking public immutable staking;
+    
     event ValidatorUpdated(address indexed validatorAddress, string moniker);
     
+    error InvalidInput();
+    error StakingOperationFailed();
+    
+    constructor() {
+        staking = IStaking(STAKING_PRECOMPILE);
+    }
+    
     function updateValidator(
-        Description calldata description,
-        int256 commissionRate,
-        int256 minSelfDelegation
+        IStaking.Description calldata description,
+        uint256 commissionRate,
+        uint256 minSelfDelegation
     ) external returns (bool success) {
-        (bool callSuccess, bytes memory result) = STAKING_PRECOMPILE.call(
-            abi.encodeWithSignature(
-                "editValidator((string,string,string,string,string),address,int256,int256)",
-                description, msg.sender, commissionRate, minSelfDelegation
-            )
-        );
+        if (bytes(description.moniker).length == 0) revert InvalidInput();
         
-        require(callSuccess, "Edit validator failed");
-        success = abi.decode(result, (bool));
-        require(success, "Edit validator returned false");
-        
-        emit ValidatorUpdated(msg.sender, description.moniker);
-        return success;
+        try staking.editValidator(description, commissionRate, minSelfDelegation) returns (bool result) {
+            if (!result) revert StakingOperationFailed();
+            emit ValidatorUpdated(msg.sender, description.moniker);
+            return result;
+        } catch {
+            revert StakingOperationFailed();
+        }
     }
 }
 ```
@@ -139,24 +176,37 @@ Delegates tokens to a validator.
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// Interface for the Staking precompile
+interface IStaking {
+    function delegate(address delegatorAddress, string memory validatorAddress, uint256 amount) external returns (bool success);
+}
+
 contract StakingExample {
     address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    IStaking public immutable staking;
     
     event DelegationSuccess(address indexed delegator, string indexed validator, uint256 amount);
     
+    error InvalidAmount();
+    error InvalidValidator();
+    error StakingOperationFailed();
+    error InsufficientBalance();
+    
+    constructor() {
+        staking = IStaking(STAKING_PRECOMPILE);
+    }
+    
     function delegateTokens(string calldata validatorAddress, uint256 amount) external payable {
-        require(msg.value >= amount, "Insufficient value sent");
+        if (amount == 0) revert InvalidAmount();
+        if (msg.value != amount) revert InsufficientBalance();
+        if (bytes(validatorAddress).length == 0) revert InvalidValidator();
         
-        // Call the staking precompile with correct signature
-        (bool success, bytes memory result) = STAKING_PRECOMPILE.call{value: amount}(
-            abi.encodeWithSignature("delegate(address,string,uint256)", msg.sender, validatorAddress, amount)
-        );
-        
-        require(success, "Delegation failed");
-        bool delegationSuccess = abi.decode(result, (bool));
-        require(delegationSuccess, "Delegation returned false");
-        
-        emit DelegationSuccess(msg.sender, validatorAddress, amount);
+        try staking.delegate(msg.sender, validatorAddress, amount) returns (bool success) {
+            if (!success) revert StakingOperationFailed();
+            emit DelegationSuccess(msg.sender, validatorAddress, amount);
+        } catch {
+            revert StakingOperationFailed();
+        }
     }
 }
 ```
@@ -213,22 +263,37 @@ Undelegates tokens from a validator.
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// Interface for the Staking precompile
+interface IStaking {
+    function beginUnbonding(address delegatorAddress, string memory validatorAddress, uint256 amount) external returns (int64 completionTime);
+}
+
 contract StakingExample {
     address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    IStaking public immutable staking;
     
     event UndelegationStarted(address indexed delegator, string indexed validator, uint256 amount, int64 completionTime);
     
+    error InvalidAmount();
+    error InvalidValidator();
+    error StakingOperationFailed();
+    
+    constructor() {
+        staking = IStaking(STAKING_PRECOMPILE);
+    }
+    
     function undelegateTokens(string calldata validatorAddress, uint256 amount) 
         external returns (int64 completionTime) {
-        (bool success, bytes memory result) = STAKING_PRECOMPILE.call(
-            abi.encodeWithSignature("undelegate(address,string,uint256)", msg.sender, validatorAddress, amount)
-        );
+        if (amount == 0) revert InvalidAmount();
+        if (bytes(validatorAddress).length == 0) revert InvalidValidator();
         
-        require(success, "Undelegation failed");
-        completionTime = abi.decode(result, (int64));
-        
-        emit UndelegationStarted(msg.sender, validatorAddress, amount, completionTime);
-        return completionTime;
+        try staking.beginUnbonding(msg.sender, validatorAddress, amount) returns (int64 completion) {
+            completionTime = completion;
+            emit UndelegationStarted(msg.sender, validatorAddress, amount, completionTime);
+            return completionTime;
+        } catch {
+            revert StakingOperationFailed();
+        }
     }
     
     // Helper function to calculate days until completion
@@ -254,8 +319,19 @@ Redelegates tokens from one validator to another.
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// Interface for the Staking precompile
+interface IStaking {
+    function beginRedelegate(
+        address delegatorAddress,
+        string memory validatorSrcAddress,
+        string memory validatorDstAddress,
+        uint256 amount
+    ) external returns (int64 completionTime);
+}
+
 contract StakingExample {
     address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    IStaking public immutable staking;
     
     event RedelegationStarted(
         address indexed delegator, 
@@ -265,30 +341,35 @@ contract StakingExample {
         int64 completionTime
     );
     
+    error InvalidValidator();
+    error InvalidAmount();
+    error SameValidator();
+    error StakingOperationFailed();
+    
+    constructor() {
+        staking = IStaking(STAKING_PRECOMPILE);
+    }
+    
     function redelegateTokens(
         string calldata srcValidatorAddress,
         string calldata dstValidatorAddress,
         uint256 amount
     ) external returns (int64 completionTime) {
-        require(bytes(srcValidatorAddress).length > 0, "Source validator cannot be empty");
-        require(bytes(dstValidatorAddress).length > 0, "Destination validator cannot be empty");
-        require(
-            keccak256(bytes(srcValidatorAddress)) != keccak256(bytes(dstValidatorAddress)), 
-            "Cannot redelegate to same validator"
-        );
+        if (bytes(srcValidatorAddress).length == 0) revert InvalidValidator();
+        if (bytes(dstValidatorAddress).length == 0) revert InvalidValidator();
+        if (amount == 0) revert InvalidAmount();
+        if (keccak256(bytes(srcValidatorAddress)) == keccak256(bytes(dstValidatorAddress))) {
+            revert SameValidator();
+        }
         
-        (bool success, bytes memory result) = STAKING_PRECOMPILE.call(
-            abi.encodeWithSignature(
-                "redelegate(address,string,string,uint256)", 
-                msg.sender, srcValidatorAddress, dstValidatorAddress, amount
-            )
-        );
-        
-        require(success, "Redelegation failed");
-        completionTime = abi.decode(result, (int64));
-        
-        emit RedelegationStarted(msg.sender, srcValidatorAddress, dstValidatorAddress, amount, completionTime);
-        return completionTime;
+        try staking.beginRedelegate(msg.sender, srcValidatorAddress, dstValidatorAddress, amount) 
+            returns (int64 completion) {
+            completionTime = completion;
+            emit RedelegationStarted(msg.sender, srcValidatorAddress, dstValidatorAddress, amount, completionTime);
+            return completionTime;
+        } catch {
+            revert StakingOperationFailed();
+        }
     }
 }
 ```
@@ -306,37 +387,53 @@ Cancels an unbonding delegation.
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// Interface for the Staking precompile
+interface IStaking {
+    function cancelUnbondingDelegation(
+        address delegatorAddress,
+        string memory validatorAddress,
+        uint256 amount,
+        int64 creationHeight
+    ) external returns (bool success);
+}
+
 contract StakingExample {
     address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    IStaking public immutable staking;
     
     event UnbondingCancelled(
         address indexed delegator, 
         string indexed validator, 
         uint256 amount, 
-        uint256 creationHeight
+        int64 creationHeight
     );
+    
+    error InvalidHeight();
+    error InvalidAmount();
+    error InvalidValidator();
+    error StakingOperationFailed();
+    
+    constructor() {
+        staking = IStaking(STAKING_PRECOMPILE);
+    }
     
     function cancelUnbonding(
         string calldata validatorAddress,
         uint256 amount,
-        uint256 creationHeight
+        int64 creationHeight
     ) external returns (bool success) {
-        require(creationHeight > 0, "Creation height must be positive");
-        require(amount > 0, "Amount must be positive");
+        if (creationHeight <= 0) revert InvalidHeight();
+        if (amount == 0) revert InvalidAmount();
+        if (bytes(validatorAddress).length == 0) revert InvalidValidator();
         
-        (bool callSuccess, bytes memory result) = STAKING_PRECOMPILE.call(
-            abi.encodeWithSignature(
-                "cancelUnbondingDelegation(address,string,uint256,uint256)",
-                msg.sender, validatorAddress, amount, creationHeight
-            )
-        );
-        
-        require(callSuccess, "Cancel unbonding failed");
-        success = abi.decode(result, (bool));
-        require(success, "Cancel unbonding returned false");
-        
-        emit UnbondingCancelled(msg.sender, validatorAddress, amount, creationHeight);
-        return success;
+        try staking.cancelUnbondingDelegation(msg.sender, validatorAddress, amount, creationHeight) 
+            returns (bool result) {
+            if (!result) revert StakingOperationFailed();
+            emit UnbondingCancelled(msg.sender, validatorAddress, amount, creationHeight);
+            return result;
+        } catch {
+            revert StakingOperationFailed();
+        }
     }
 }
 ```
@@ -356,31 +453,50 @@ Queries information about a specific validator.
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract StakingExample {
-    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
-    
+// Interface for the Staking precompile (matches ~/repos/evm ABI)
+interface IStaking {
     struct Validator {
         string operatorAddress;
         string consensusPubkey;
         bool jailed;
-        uint8 status; // BondStatus enum
+        uint8 status;                // BondStatus enum as uint8
         uint256 tokens;
-        uint256 delegatorShares;
-        string description;
+        uint256 delegatorShares;      // uint256
+        string description;           // string, not a nested struct
         int64 unbondingHeight;
-        int64 unbondingTime;
-        uint256 commission;
+        int64 unbondingTime;          // int64
+        uint256 commission;           // uint256
         uint256 minSelfDelegation;
     }
+
+    function validator(address validatorAddress) external view returns (Validator memory);
+}
+
+contract StakingExample {
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    IStaking public immutable staking;
     
-    function getValidator(address validatorAddress) external view returns (Validator memory validator) {
-        (bool success, bytes memory result) = STAKING_PRECOMPILE.staticcall(
-            abi.encodeWithSignature("validator(address)", validatorAddress)
-        );
-        
-        require(success, "Validator query failed");
-        validator = abi.decode(result, (Validator));
+    event ValidatorQueried(address indexed validatorAddress, string operatorAddress, uint256 tokens);
+    
+    constructor() {
+        staking = IStaking(STAKING_PRECOMPILE);
+    }
+    
+    function getValidator(address validatorAddress) external view returns (IStaking.Validator memory validator) {
+        validator = staking.validator(validatorAddress);
         return validator;
+    }
+    
+    function getValidatorInfo(address validatorAddress) 
+        external 
+        returns (string memory operatorAddress, uint256 tokens, bool jailed) {
+        IStaking.Validator memory validator = staking.validator(validatorAddress);
+        operatorAddress = validator.operatorAddress;
+        tokens = validator.tokens;
+        jailed = validator.jailed;
+        
+        emit ValidatorQueried(validatorAddress, operatorAddress, tokens);
+        return (operatorAddress, tokens, jailed);
     }
 }
 ```
@@ -551,7 +667,7 @@ import { ethers } from "ethers";
 
 // ABI definition for the function
 const precompileAbi = [
-  "function unbondingDelegation(address delegatorAddress, string memory validatorAddress) view returns (tuple(address delegatorAddress, string validatorAddress, tuple(uint256 creationHeight, uint256 completionTime, string initialBalance, string balance)[] entries) unbondingDelegation)"
+  "function unbondingDelegation(address delegatorAddress, string validatorAddress) view returns (tuple(string delegatorAddress, string validatorAddress, tuple(int64 creationHeight, int64 completionTime, uint256 initialBalance, uint256 balance, uint64 unbondingId, int64 unbondingOnHoldRefCount)[] entries) unbondingDelegation)"
 ];
 
 // Provider and contract setup
@@ -599,38 +715,79 @@ Queries a specific redelegation.
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract StakingExample {
-    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
-    
+// Interface for the Staking precompile
+interface IStaking {
     struct RedelegationEntry {
         int64 creationHeight;
         int64 completionTime;
         uint256 initialBalance;
         uint256 sharesDst;
+        uint64 unbondingId;
+        int64 unbondingOnHoldRefCount;
     }
     
-    struct RedelegationOutput {
+    struct Redelegation {
         string delegatorAddress;
         string validatorSrcAddress;
         string validatorDstAddress;
         RedelegationEntry[] entries;
     }
     
+    function redelegation(
+        address delegatorAddress,
+        string memory validatorSrcAddress,
+        string memory validatorDstAddress
+    ) external view returns (Redelegation memory);
+}
+
+contract StakingExample {
+    address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000000800;
+    IStaking public immutable staking;
+    
+    event RedelegationQueried(
+        address indexed delegator,
+        string srcValidator,
+        string dstValidator,
+        uint256 entriesCount
+    );
+    
+    constructor() {
+        staking = IStaking(STAKING_PRECOMPILE);
+    }
+    
     function getRedelegation(
         address delegatorAddress,
         string calldata srcValidatorAddress,
         string calldata dstValidatorAddress
-    ) external view returns (RedelegationOutput memory redelegation) {
-        (bool success, bytes memory result) = STAKING_PRECOMPILE.staticcall(
-            abi.encodeWithSignature(
-                "redelegation(address,string,string)",
-                delegatorAddress, srcValidatorAddress, dstValidatorAddress
-            )
+    ) external view returns (IStaking.Redelegation memory redelegation) {
+        redelegation = staking.redelegation(delegatorAddress, srcValidatorAddress, dstValidatorAddress);
+        return redelegation;
+    }
+    
+    function getRedelegationInfo(
+        address delegatorAddress,
+        string calldata srcValidatorAddress,
+        string calldata dstValidatorAddress
+    ) external returns (uint256 entriesCount, bool hasActiveRedelegations) {
+        IStaking.Redelegation memory redelegation = staking.redelegation(
+            delegatorAddress, 
+            srcValidatorAddress, 
+            dstValidatorAddress
         );
         
-        require(success, "Redelegation query failed");
-        redelegation = abi.decode(result, (RedelegationOutput));
-        return redelegation;
+        entriesCount = redelegation.entries.length;
+        hasActiveRedelegations = entriesCount > 0;
+        
+        // Check if any redelegations are still active
+        for (uint256 i = 0; i < redelegation.entries.length; i++) {
+            if (redelegation.entries[i].completionTime > int64(int256(block.timestamp))) {
+                hasActiveRedelegations = true;
+                break;
+            }
+        }
+        
+        emit RedelegationQueried(delegatorAddress, srcValidatorAddress, dstValidatorAddress, entriesCount);
+        return (entriesCount, hasActiveRedelegations);
     }
     
     // Check if redelegation is complete
@@ -670,7 +827,7 @@ import { ethers } from "ethers";
 
 // ABI definition for the function
 const precompileAbi = [
-  "function redelegations(address delegatorAddress, string memory srcValidatorAddress, string memory dstValidatorAddress, tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pageRequest) view returns (tuple(tuple(address delegatorAddress, string validatorSrcAddress, string validatorDstAddress, tuple(uint256 creationHeight, uint256 completionTime, string initialBalance, string sharesDst)[] entries) redelegation, tuple(tuple(uint256 creationHeight, uint256 completionTime, string initialBalance, string sharesDst) redelegationEntry, string balance)[] entries)[] redelegations, tuple(bytes nextKey, uint64 total) pageResponse)"
+  "function redelegations(address delegatorAddress, string srcValidatorAddress, string dstValidatorAddress, tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pageRequest) view returns (tuple(tuple(string delegatorAddress, string validatorSrcAddress, string validatorDstAddress, tuple(int64 creationHeight, int64 completionTime, uint256 initialBalance, uint256 sharesDst)[] entries) redelegation, tuple(tuple(int64 creationHeight, int64 completionTime, uint256 initialBalance, uint256 sharesDst) redelegationEntry, uint256 balance)[] entries)[] redelegations, tuple(bytes nextKey, uint64 total) pageResponse)"
 ];
 
 // Provider and contract setup

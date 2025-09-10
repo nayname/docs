@@ -36,13 +36,14 @@ Both methods use a configurable base gas amount that is set during chain initial
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// Interface for the Bech32 precompile
+interface IBech32 {
+    function hexToBech32(address addr, string memory prefix) external returns (string memory bech32Address);
+    function bech32ToHex(string memory bech32Address) external returns (address addr);
+}
+
 contract Bech32Example {
     address constant BECH32_PRECOMPILE = 0x0000000000000000000000000000000000000400;
-    
-    interface IBech32 {
-        function hexToBech32(address addr, string memory prefix) external returns (string memory bech32Address);
-        function bech32ToHex(string memory bech32Address) external returns (address addr);
-    }
     
     IBech32 public immutable bech32;
     
@@ -173,13 +174,14 @@ curl -X POST --data '{
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// Interface for the Bech32 precompile
+interface IBech32 {
+    function bech32ToHex(string memory bech32Address) external returns (address addr);
+    function hexToBech32(address addr, string memory prefix) external returns (string memory bech32Address);
+}
+
 contract Bech32Example {
     address constant BECH32_PRECOMPILE = 0x0000000000000000000000000000000000000400;
-    
-    interface IBech32 {
-        function bech32ToHex(string memory bech32Address) external returns (address addr);
-        function hexToBech32(address addr, string memory prefix) external returns (string memory bech32Address);
-    }
     
     IBech32 public immutable bech32;
     

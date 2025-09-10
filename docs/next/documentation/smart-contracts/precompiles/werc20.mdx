@@ -433,17 +433,18 @@ This function receives msg.value and immediately sends the coins back to the cal
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// Interface for WERC20 precompile
+interface IWERC20 {
+    event Deposit(address indexed dst, uint256 wad);
+    event Withdrawal(address indexed src, uint256 wad);
+    
+    function deposit() external payable;
+    function withdraw(uint256 wad) external;
+    function balanceOf(address account) external view returns (uint256);
+}
+
 contract WERC20Example {
     address constant WTEST = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-    
-    interface IWERC20 {
-        event Deposit(address indexed dst, uint256 wad);
-        event Withdrawal(address indexed src, uint256 wad);
-        
-        function deposit() external payable;
-        function withdraw(uint256 wad) external;
-        function balanceOf(address account) external view returns (uint256);
-    }
     
     IWERC20 public immutable wtest;
     
