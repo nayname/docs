@@ -17,20 +17,23 @@ The versioning system provides:
 
 ```
 docs/
-├── next/                    # Active development (main)
-│   ├── documentation/       # Current docs being edited
-│   ├── api-reference/
-│   └── changelog/
-│
-├── v0.4.x/                 # Frozen version
-│   ├── .version-frozen     # Marker file with freeze date
-│   ├── .version-metadata.json # Version metadata
-│   ├── documentation/      # Snapshot from docs/next/ at freeze time
-│   ├── api-reference/
-│   └── changelog/
-│
-└── v0.5.0/                 # Another frozen version
-    └── ...
+├── evm/
+│   ├── next/                  # Active development (EVM)
+│   │   ├── documentation/
+│   │   ├── api-reference/
+│   │   └── changelog/
+│   ├── v0.4.x/               # Frozen version (EVM)
+│   │   ├── .version-frozen
+│   │   ├── .version-metadata.json
+│   │   ├── documentation/    # Snapshot from docs/evm/next/
+│   │   ├── api-reference/
+│   │   └── changelog/
+│   └── v0.5.0/
+│       └── ...
+├── sdk/
+│   └── next/                  # Future SDK docs
+└── ibc/
+    └── next/                  # Future IBC docs
 ```
 
 ### Navigation Structure
@@ -41,11 +44,11 @@ docs/
     "versions": [
       {
         "version": "v0.4.x",  // Frozen version
-        "tabs": [...],        // Points to docs/v0.4.x/ paths
+        "tabs": [...],        // Points to docs/evm/v0.4.x/ paths
       },
       {
         "version": "next",    // Active development
-        "tabs": [...],        // Points to docs/next/ paths
+        "tabs": [...],        // Points to docs/evm/next/ paths
       }
     ]
   }
@@ -69,7 +72,7 @@ docs/
 
 ### Freeze a Version
 
-Run the version manager to freeze the current version and start a new one:
+Run the version manager to freeze the current version in a chosen docs subdirectory (e.g., `evm`, `sdk`, `ibc`) and start a new one:
 
 ```bash
 cd scripts/versioning
@@ -78,7 +81,8 @@ npm run freeze
 
 The script will:
 
-1. Prompt for the new development version (e.g., v0.5.0)
+1. Prompt for the docs subdirectory (e.g., `evm`, `sdk`, `ibc`)
+2. Prompt for the new development version (e.g., v0.5.0)
 2. Check/update release notes from cosmos/evm
 3. Create a frozen copy at the current version path
 4. Snapshot EIP data to a Google Sheets tab
@@ -101,7 +105,7 @@ npm run freeze
 
 **What it does:**
 
-- Creates frozen copy of `docs/next/` at version path
+- Creates frozen copy of `docs/<subdir>/next/` at `docs/<subdir>/<version>/`
 - Calls sheets-manager for Google Sheets operations
 - Updates all internal links in frozen version
 - Updates navigation structure and version registry
@@ -138,7 +142,7 @@ npm run release-notes [version|latest]
 
 - Fetches changelog from cosmos/evm repository
 - Parses and converts to Mintlify format
-- Updates release notes file in docs/next/
+- Updates release notes file in `docs/<subdir>/next/`
 
 ### Supporting Scripts
 
@@ -197,13 +201,13 @@ Active development uses it without props (defaults to main sheet):
    - Check/update release notes
 
 2. **Freeze Phase**
-   - Copy `docs/next/` to version directory (e.g., `docs/v0.4.x/`)
+- Copy `docs/<subdir>/next/` to version directory (e.g., `docs/evm/v0.4.x/`)
    - Create Google Sheets tab with version name
    - Copy EIP data to version tab
 
 3. **Update Phase**
    - Generate MDX with sheet tab reference
-   - Update internal links (`/docs/next/` → `/docs/v0.4.x/`)
+- Update internal links (`/docs/evm/next/` → `/docs/evm/v0.4.x/`)
    - Keep snippet imports unchanged (`/snippets/`)
    - Update navigation structure
 
@@ -218,8 +222,8 @@ Active development uses it without props (defaults to main sheet):
 The system handles three types of paths:
 
 1. **Document paths**: Updated to version-specific
-   - Before: `/docs/next/documentation/concepts/accounts`
-   - After: `/docs/v0.4.x/documentation/concepts/accounts`
+   - Before: `/docs/evm/next/documentation/concepts/accounts`
+   - After: `/docs/evm/v0.4.x/documentation/concepts/accounts`
 
 2. **Snippet imports**: Remain unchanged (shared)
    - Always: `/snippets/icons.mdx`
@@ -296,23 +300,21 @@ console.log('✓ Google Sheets API configured');
 
 ```bash
 # Start the version freeze process
-./scripts/versioning/version-manager.sh
+cd scripts/versioning && npm run freeze
 
-# Enter new version when prompted
+# Enter prompts
+Enter the docs subdirectory to version [evm, sdk, ibc]: evm
 Enter the new development version (e.g., v0.5.0): v0.5.0
-
-# Confirm actions
-Proceed with version management? (y/n): y
 ```
 
 ### Update Release Notes Only
 
 ```bash
-# Fetch latest release notes
-./scripts/versioning/refresh-release-notes.sh latest
+# Fetch latest release notes into docs/evm/next
+node scripts/versioning/release-notes.js latest evm
 
-# Or fetch specific version
-./scripts/versioning/refresh-release-notes.sh v0.4.1
+# Or fetch specific release into docs/evm/next
+node scripts/versioning/release-notes.js v0.4.1 evm
 ```
 
 ### Manual Navigation Update
@@ -326,7 +328,7 @@ npm run freeze  # Full workflow includes navigation updates
 
 ### Version Management
 
-- Development happens in `docs/next/` directory
+- Development happens in `docs/<subdir>/next/` directory
 - Frozen versions include `.version-frozen` marker
 - Previous versions can be updated if needed
 
@@ -359,7 +361,7 @@ If you need to remove a test version:
 
 ```bash
 # Remove frozen directory
-rm -rf v0.5.0/
+rm -rf docs/<subdir>/v0.5.0/
 
 # Update versions.json manually or re-run version manager
 
