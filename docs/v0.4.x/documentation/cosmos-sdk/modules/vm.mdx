@@ -16,7 +16,7 @@ The module parameters control EVM behavior and access policies ([source](https:/
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `evm_denom` | string | `"aatom"` | Token denomination for EVM transactions (18 decimals) |
+| `evm_denom` | string | `"atest"` | Token denomination for EVM transactions (18 decimals) |
 | `extra_eips` | []int64 | `[]` | Additional EIPs to activate beyond hard fork defaults |
 | `allow_unprotected_txs` | bool | `false` | Allow non-EIP155 replay-protected transactions |
 | `active_static_precompiles` | []string | `[]` | Activated static precompile addresses |
@@ -30,7 +30,7 @@ Defines the token used for gas and value transfers in EVM:
 - Must be registered in bank module
 - Should have 18 decimal precision
 - Used for all EVM operations (gas, transfers, contracts)
-- Example: `"aatom"`, `"aevmos"`, `"wei"`
+- Example: `"atest"`, `"aevmos"`, `"wei"`
 </Expandable>
 
 <Expandable title="extra_eips">
@@ -69,7 +69,7 @@ type AccessControl struct {
   <Tab title="Ethereum Compatible">
     ```json
     {
-      "evm_denom": "aatom",
+      "evm_denom": "atest",
       "extra_eips": [3855],
       "allow_unprotected_txs": false,
       "active_static_precompiles": [
@@ -455,7 +455,7 @@ finalGasUsed = gasUsed - refund
 2. **Precompile Usage**
    ```solidity
    IBank bank = IBank(0x0000000000000000000000000000000000000804);
-   uint256 balance = bank.balances(msg.sender, "aatom");
+   uint256 balance = bank.balances(msg.sender, "atest");
    ```
 
 ### dApp Integration

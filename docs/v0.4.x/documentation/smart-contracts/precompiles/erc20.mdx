@@ -36,7 +36,7 @@ Gas costs are approximated and may vary based on token complexity and chain sett
 
 The ERC20 precompile works through a token pair mapping system:
 
-1. **Native Cosmos Token**: Each Cosmos SDK denomination (e.g., `uatom`, `stake`) exists as a native token
+1. **Native Cosmos Token**: Each Cosmos SDK denomination (e.g., `test`, `stake`) exists as a native token
 2. **ERC20 Contract**: A corresponding ERC20 precompile contract is created at a unique address
 3. **Bidirectional Conversion**: Tokens can be converted between native and ERC20 representations
 4. **Dynamic Addresses**: Each token pair gets its own precompile address when registered
@@ -275,7 +275,7 @@ curl -X POST --data '{
 Returns the number of decimals used for the token.
 
 <Warning>
-**Decimal Handling**: The ERC20 precompile may need to handle complex decimal conversions between Cosmos native tokens and ERC20 representation. Some Cosmos tokens use 6 decimals (e.g., `uatom`) while ERC20 typically uses 18. Always verify the decimal count for accurate amount calculations.
+**Decimal Handling**: The ERC20 precompile may need to handle complex decimal conversions between Cosmos native tokens and ERC20 representation. Some Cosmos tokens use 6 decimals (e.g., `test`) while ERC20 typically uses 18. Always verify the decimal count for accurate amount calculations.
 </Warning>
 
 <CodeGroup>

@@ -318,13 +318,13 @@ evmd query erc20 params
 evmd query erc20 token-pairs
 
 # Query specific token pair
-evmd query erc20 token-pair uatom
+evmd query erc20 token-pair test
 evmd query erc20 token-pair 0x80b5a32e4f032b2a058b4f29ec95eefeeb87adcd
 ```
 
 ```bash Convert-Tokens
 # Convert Cosmos coin to ERC20
-evmd tx erc20 convert-coin 100uatom 0xReceiverAddress --from mykey
+evmd tx erc20 convert-coin 100test 0xReceiverAddress --from mykey
 
 # Convert ERC20 to Cosmos coin
 evmd tx erc20 convert-erc20 0xTokenAddress 100000000000000000000 cosmos1receiver --from mykey
@@ -364,7 +364,7 @@ await dexRouter.swapExactTokensForTokens(...);
 const packet = {
     sender: "cosmos1...",
     receiver: "0x...",  // EVM address triggers conversion
-    token: { denom: "uatom", amount: "1000000" }
+    token: { denom: "test", amount: "1000000" }
 };
 // Token arrives as ERC20 in receiver's EVM account
 ```
@@ -377,7 +377,7 @@ await client.signAndBroadcast(address, [
     {
         typeUrl: "/cosmos.evm.erc20.v1.MsgConvertCoin",
         value: {
-            coin: { denom: "uatom", amount: "1000000" },
+            coin: { denom: "test", amount: "1000000" },
             receiver: "0xEthereumAddress",
             sender: "cosmos1..."
         }
@@ -439,7 +439,7 @@ await client.signAndBroadcast(address, [
 
 ```bash
 # Check if token is registered
-evmd query erc20 token-pair uatom
+evmd query erc20 token-pair test
 
 # Check module parameters
 evmd query erc20 params

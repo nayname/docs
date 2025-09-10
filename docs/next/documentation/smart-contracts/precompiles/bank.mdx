@@ -28,6 +28,34 @@ The Bank precompile provides ERC20-style access to native Cosmos SDK tokens, ena
 **Description**: Queries all native token balances for a specific account address and returns an array of `Balance` (ERC-20 contract address & amount) structures.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract BankExample {
+    address constant BANK_PRECOMPILE = 0x0000000000000000000000000000000000000804;
+    
+    struct Balance {
+        address contractAddress;
+        uint256 amount;
+    }
+    
+    function getAccountBalances(address account) external view returns (Balance[] memory balances) {
+        (bool success, bytes memory result) = BANK_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("balances(address)", account)
+        );
+        
+        require(success, "Balance query failed");
+        balances = abi.decode(result, (Balance[]));
+        return balances;
+    }
+    
+    // Convenience function to get caller's balances
+    function getMyBalances() external view returns (Balance[] memory balances) {
+        return this.getAccountBalances(msg.sender);
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -87,6 +115,29 @@ curl -X POST --data '{
 **Description**: Queries the total supply of all native tokens in the system. Returns comprehensive supply information for every token registered in the system.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract BankExample {
+    address constant BANK_PRECOMPILE = 0x0000000000000000000000000000000000000804;
+    
+    struct Balance {
+        address contractAddress;
+        uint256 amount;
+    }
+    
+    function getTotalSupply() external view returns (Balance[] memory totalSupply) {
+        (bool success, bytes memory result) = BANK_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("totalSupply()")
+        );
+        
+        require(success, "Total supply query failed");
+        totalSupply = abi.decode(result, (Balance[]));
+        return totalSupply;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 
@@ -142,6 +193,30 @@ curl -X POST --data '{
 **Description**: Queries the total supply of a specific token by providing its ERC20 contract address. More efficient when you need supply information for a single token.
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract BankExample {
+    address constant BANK_PRECOMPILE = 0x0000000000000000000000000000000000000804;
+    
+    function getTokenSupply(address erc20Address) external view returns (uint256 supply) {
+        (bool success, bytes memory result) = BANK_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("supplyOf(address)", erc20Address)
+        );
+        
+        require(success, "Token supply query failed");
+        supply = abi.decode(result, (uint256));
+        return supply;
+    }
+    
+    // Helper function to check if token exists (has supply > 0)
+    function tokenExists(address erc20Address) external view returns (bool) {
+        uint256 supply = this.getTokenSupply(erc20Address);
+        return supply > 0;
+    }
+}
+```
 ```javascript Ethers.js expandable lines
 import { ethers } from "ethers";
 

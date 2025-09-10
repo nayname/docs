@@ -28,6 +28,98 @@ Gas costs are approximated and may vary based on chain settings.
 ### `unjail`
 Allows a validator to unjail themselves after being jailed for downtime.
 
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract SlashingExample {
+    address constant SLASHING_PRECOMPILE = 0x0000000000000000000000000000000000000806;
+    
+    struct SigningInfo {
+        address validatorAddress;
+        int64 startHeight;
+        int64 indexOffset;
+        int64 jailedUntil;
+        bool tombstoned;
+        int64 missedBlocksCounter;
+    }
+    
+    event ValidatorUnjailed(address indexed validator);
+    event ValidatorSlashingInfoQueried(address indexed validator, bool isJailed, bool isTombstoned);
+    
+    function unjailValidator(address validatorAddress) external returns (bool success) {
+        require(validatorAddress != address(0), "Invalid validator address");
+        
+        // Check signing info to prevent unjailing tombstoned validators
+        SigningInfo memory info = this.getValidatorSigningInfo(validatorAddress);
+        require(!info.tombstoned, "Tombstoned validators cannot be unjailed");
+        require(info.jailedUntil > int64(int256(block.timestamp)), "Validator is not jailed");
+        
+        (bool callSuccess, bytes memory result) = SLASHING_PRECOMPILE.call(
+            abi.encodeWithSignature("unjail(address)", validatorAddress)
+        );
+        
+        require(callSuccess, "Unjail call failed");
+        success = abi.decode(result, (bool));
+        require(success, "Unjail operation failed");
+        
+        emit ValidatorUnjailed(validatorAddress);
+        return success;
+    }
+    
+    function getValidatorSigningInfo(address consAddress) 
+        external 
+        view 
+        returns (SigningInfo memory signingInfo) 
+    {
+        (bool success, bytes memory result) = SLASHING_PRECOMPILE.staticcall(
+            abi.encodeWithSignature("getSigningInfo(address)", consAddress)
+        );
+        
+        require(success, "Signing info query failed");
+        signingInfo = abi.decode(result, (SigningInfo));
+        return signingInfo;
+    }
+    
+    function canValidatorBeUnjailed(address consAddress) 
+        external 
+        view 
+        returns (bool canUnjail, string memory reason) 
+    {
+        SigningInfo memory info = this.getValidatorSigningInfo(consAddress);
+        
+        // CRITICAL: Tombstoned validators can NEVER be unjailed
+        if (info.tombstoned) {
+            return (false, "PERMANENT_TOMBSTONE: Validator can never be unjailed due to severe infractions (e.g., double-signing)");
+        }
+        
+        if (info.jailedUntil <= int64(int256(block.timestamp))) {
+            return (false, "Validator is not currently jailed");
+        }
+        
+        return (true, "Validator can be unjailed");
+    }
+    
+    function getValidatorStatus(address consAddress) 
+        external 
+        view 
+        returns (bool isJailed, bool isTombstoned, int64 missedBlocks) 
+    {
+        SigningInfo memory info = this.getValidatorSigningInfo(consAddress);
+        
+        isJailed = info.jailedUntil > int64(int256(block.timestamp));
+        isTombstoned = info.tombstoned;
+        missedBlocks = info.missedBlocksCounter;
+        
+        emit ValidatorSlashingInfoQueried(consAddress, isJailed, isTombstoned);
+        
+        return (isJailed, isTombstoned, missedBlocks);
+    }
+}
+```
+</CodeGroup>
+
 ## Query Methods
 
 ### `getSigningInfo`

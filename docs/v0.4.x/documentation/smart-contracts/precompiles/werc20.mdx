@@ -2,7 +2,7 @@
 title: "WERC20"
 description: "Single token representation: An ERC20 interface for any token"
 icon: "refresh-ccw"
-keywords: ['werc20', 'wrapped token', 'erc20', 'single token representation', 'precompile', 'watom', 'native token', 'bank module', 'cosmos sdk', 'token bridge', 'unified token', 'ibc tokens', 'no-op deposit', 'no-op withdraw']
+keywords: ['werc20', 'wrapped token', 'erc20', 'single token representation', 'precompile', 'wtest', 'native token', 'bank module', 'cosmos sdk', 'token bridge', 'unified token', 'ibc tokens', 'no-op deposit', 'no-op withdraw']
 ---
 
 ## Overview
@@ -103,19 +103,19 @@ This is why `deposit()` and `withdraw()` are no-ops - there's no separate wrappe
 ```javascript
 // User starts with 100 ATOM in bank module
 const atomBalance = await bankPrecompile.balances(userAddress);
-// Returns: [{denom: "uatom", amount: "100000000"}] // 100 ATOM (6 decimals)
+// Returns: [{denom: "test", amount: "100000000"}] // 100 ATOM (6 decimals)
 
-const watomBalance = await watom.balanceOf(userAddress);
+const wtestBalance = await wtest.balanceOf(userAddress);
 // Returns: "100000000" // Same 100 ATOM, accessed via ERC20 interface
 
 // User transfers 50 WATOM via ERC20
-await watom.transfer(recipientAddress, "50000000");
+await wtest.transfer(recipientAddress, "50000000");
 
 // Check balances again
 const newAtomBalance = await bankPrecompile.balances(userAddress);
-// Returns: [{denom: "uatom", amount: "50000000"}] // 50 ATOM remaining
+// Returns: [{denom: "test", amount: "50000000"}] // 50 ATOM remaining
 
-const newWatomBalance = await watom.balanceOf(userAddress);
+const newWatomBalance = await wtest.balanceOf(userAddress);
 // Returns: "50000000" // Same 50 ATOM, both queries return identical values
 ```
 
@@ -133,15 +133,15 @@ Returns the native token balance for a specific account (same as bank module bal
 import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
-const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const wtestAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = ["function balanceOf(address account) view returns (uint256)"];
 
-const watom = new ethers.Contract(watomAddress, werc20Abi, provider);
+const wtest = new ethers.Contract(wtestAddress, werc20Abi, provider);
 
 async function getBalance() {
   try {
     const userAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045";
-    const balance = await watom.balanceOf(userAddress);
+    const balance = await wtest.balanceOf(userAddress);
     console.log("Balance (both ATOM and WATOM):", balance.toString());
   } catch (error) {
     console.error("Error:", error);
@@ -176,17 +176,17 @@ import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
 const signer = new ethers.Wallet("<PRIVATE_KEY>", provider);
-const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const wtestAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = ["function transfer(address to, uint256 amount) returns (bool)"];
 
-const watom = new ethers.Contract(watomAddress, werc20Abi, signer);
+const wtest = new ethers.Contract(wtestAddress, werc20Abi, signer);
 
 async function transferTokens() {
   try {
     const recipientAddress = "0x742d35Cc6634C0532925a3b844Bc9e7595f5b899";
     const amount = ethers.parseUnits("10.0", 6); // 10 ATOM (6 decimals)
 
-    const tx = await watom.transfer(recipientAddress, amount);
+    const tx = await wtest.transfer(recipientAddress, amount);
     const receipt = await tx.wait();
 
     console.log("Transfer successful:", receipt.hash);
@@ -217,14 +217,14 @@ Returns the total supply from the bank module.
 import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
-const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const wtestAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = ["function totalSupply() view returns (uint256)"];
 
-const watom = new ethers.Contract(watomAddress, werc20Abi, provider);
+const wtest = new ethers.Contract(wtestAddress, werc20Abi, provider);
 
 async function getTotalSupply() {
   try {
-    const supply = await watom.totalSupply();
+    const supply = await wtest.totalSupply();
     console.log("Total Supply:", supply.toString());
   } catch (error) {
     console.error("Error:", error);
@@ -259,14 +259,14 @@ import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
 const signer = new ethers.Wallet("<PRIVATE_KEY>", provider);
-const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const wtestAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = [
   "function approve(address spender, uint256 amount) returns (bool)",
   "function allowance(address owner, address spender) view returns (uint256)",
   "function transferFrom(address from, address to, uint256 amount) returns (bool)"
 ];
 
-const watom = new ethers.Contract(watomAddress, werc20Abi, signer);
+const wtest = new ethers.Contract(wtestAddress, werc20Abi, signer);
 
 async function approveAndTransfer() {
   try {
@@ -274,15 +274,15 @@ async function approveAndTransfer() {
     const amount = ethers.parseUnits("50.0", 6); // 50 ATOM
 
     // Approve spending
-    const approveTx = await watom.approve(spenderAddress, amount);
+    const approveTx = await wtest.approve(spenderAddress, amount);
     await approveTx.wait();
 
     // Check allowance
-    const allowance = await watom.allowance(signer.address, spenderAddress);
+    const allowance = await wtest.allowance(signer.address, spenderAddress);
     console.log("Allowance:", allowance.toString());
 
     // Transfer from (would be called by spender)
-    // const transferTx = await watom.transferFrom(ownerAddress, recipientAddress, amount);
+    // const transferTx = await wtest.transferFrom(ownerAddress, recipientAddress, amount);
   } catch (error) {
     console.error("Error:", error);
   }
@@ -298,21 +298,21 @@ Token metadata (e.g., "Wrapped ATOM", "WATOM", 6).
 import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
-const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const wtestAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = [
   "function name() view returns (string)",
   "function symbol() view returns (string)",
   "function decimals() view returns (uint8)"
 ];
 
-const watom = new ethers.Contract(watomAddress, werc20Abi, provider);
+const wtest = new ethers.Contract(wtestAddress, werc20Abi, provider);
 
 async function getTokenInfo() {
   try {
     const [name, symbol, decimals] = await Promise.all([
-      watom.name(),
-      watom.symbol(),
-      watom.decimals()
+      wtest.name(),
+      wtest.symbol(),
+      wtest.decimals()
     ]);
     console.log(`Token: ${name} (${symbol}) - ${decimals} decimals`);
   } catch (error) {
@@ -388,8 +388,8 @@ This function does nothing because ATOM and WATOM are the same token. Your nativ
 contract LiquidityPool {
     IERC20 public immutable WATOM;
 
-    constructor(address _watom) {
-        WATOM = IERC20(_watom);
+    constructor(address _wtest) {
+        WATOM = IERC20(_wtest);
     }
 
     function addLiquidity(uint256 amount) external {
@@ -416,10 +416,10 @@ contract LiquidityPool {
 async function verifyBalanceConsistency(userAddress) {
     // Query via bank precompile (native interface)
     const bankBalance = await bankContract.balances(userAddress);
-    const atomAmount = bankBalance.find(b => b.denom === "uatom")?.amount || "0";
+    const atomAmount = bankBalance.find(b => b.denom === "test")?.amount || "0";
 
     // Query via WERC20 precompile (ERC20 interface)
-    const watomAmount = await watom.balanceOf(userAddress);
+    const wtestAmount = await wtest.balanceOf(userAddress);
 
     // These will always be equal since the ERC20 balance is just
     // an abstracted bank module balance query

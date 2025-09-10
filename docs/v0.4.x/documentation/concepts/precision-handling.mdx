@@ -8,7 +8,7 @@ icon: "calculator"
 
 Cosmos SDK and Ethereum use different decimal precisions for their native tokens:
 
-- **Cosmos SDK**: 6 decimals (1 ATOM = 10^6 uatom)
+- **Cosmos SDK**: 6 decimals (1 ATOM = 10^6 test)
 - **Ethereum**: 18 decimals (1 ETH = 10^18 wei)
 
 This 12-decimal difference creates challenges when bridging the two ecosystems. Simply scaling values would lose precision or create rounding errors.
@@ -30,22 +30,22 @@ a(n) = b(n) × C + f(n)
 ```
 
 Where:
-- `a(n)` = Total balance in 18-decimal units (aatom)
-- `b(n)` = Integer balance in 6-decimal units (uatom)
+- `a(n)` = Total balance in 18-decimal units (atest)
+- `b(n)` = Integer balance in 6-decimal units (test)
 - `f(n)` = Fractional balance (remainder)
 - `C` = Conversion factor (10^12)
 - Constraint: `0 ≤ f(n) < C`
 
 ### Example Decomposition
 
-Consider a balance of 1,234,567,890,123,456,789 aatom:
+Consider a balance of 1,234,567,890,123,456,789 atest:
 
 ```
 1,234,567,890,123,456,789 = 1,234,567 × 10^12 + 890,123,456,789
 
 Where:
-- b(n) = 1,234,567 uatom (stored in bank)
-- f(n) = 890,123,456,789 aatom (stored in precisebank)
+- b(n) = 1,234,567 test (stored in bank)
+- f(n) = 890,123,456,789 atest (stored in precisebank)
 - Total = 1.234567890123456789 ATOM
 ```
 
@@ -65,7 +65,7 @@ b(R) × C = Σf(n) + r
 ```
 
 Where:
-- `b(R)` = Reserve balance in uatom
+- `b(R)` = Reserve balance in test
 - `Σf(n)` = Sum of all account fractional balances
 - `r` = Remainder (fractional amount not in circulation)
 - Constraint: `0 ≤ r < C`
@@ -74,10 +74,10 @@ Where:
 
 This ensures the fundamental invariant:
 ```
-Total_aatom = Total_uatom × 10^12 - remainder
+Total_atest = Total_test × 10^12 - remainder
 ```
 
-The remainder represents sub-uatom amounts that exist in the system but aren't assigned to any specific account.
+The remainder represents sub-test amounts that exist in the system but aren't assigned to any specific account.
 
 ## Operation Algorithms
 
@@ -158,32 +158,32 @@ The system manages three precision levels:
 | Unit | Precision | Decimals | Usage |
 |------|-----------|----------|-------|
 | **ATOM** | 10^0 | 0 | Human display |
-| **uatom** | 10^-6 | 6 | Cosmos native |
-| **aatom** | 10^-18 | 18 | EVM native |
+| **test** | 10^-6 | 6 | Cosmos native |
+| **atest** | 10^-18 | 18 | EVM native |
 
 ### Conversion Examples
 
 ```
-1 ATOM = 1,000,000 uatom = 1,000,000,000,000,000,000 aatom
-0.000001 ATOM = 1 uatom = 1,000,000,000,000 aatom
-0.000000000000000001 ATOM = 0.000000000001 uatom = 1 aatom
+1 ATOM = 1,000,000 test = 1,000,000,000,000,000,000 atest
+0.000001 ATOM = 1 test = 1,000,000,000,000 atest
+0.000000000000000001 ATOM = 0.000000000001 test = 1 atest
 ```
 
 ## Edge Cases and Limits
 
 ### Minimum Transferable Amount
-- **In Cosmos**: 1 uatom (0.000001 ATOM)
-- **In EVM**: 1 aatom (0.000000000000000001 ATOM)
+- **In Cosmos**: 1 test (0.000001 ATOM)
+- **In EVM**: 1 atest (0.000000000000000001 ATOM)
 
 ### Maximum Precision
-- **Cosmos operations**: Limited to uatom granularity
-- **EVM operations**: Full aatom precision
+- **Cosmos operations**: Limited to test granularity
+- **EVM operations**: Full atest precision
 - **Cross-system**: Automatic precision handling
 
 ### Dust Amounts
-Amounts smaller than 1 uatom but larger than 0 aatom:
+Amounts smaller than 1 test but larger than 0 atest:
 - Tracked in fractional balances
-- Accumulate until reaching 1 uatom
+- Accumulate until reaching 1 test
 - Never lost or rounded away
 
 ## Implementation Strategy
@@ -212,7 +212,7 @@ This single multiplication and addition reconstructs the full 18-decimal balance
 ## Why This Matters
 
 ### For Users
-- **No precision loss**: Every aatom is accounted for
+- **No precision loss**: Every atest is accounted for
 - **Seamless experience**: Automatic handling across systems
 - **Fair transactions**: No rounding advantages or disadvantages
 
@@ -233,7 +233,7 @@ This single multiplication and addition reconstructs the full 18-decimal balance
 // Naive approach - loses precision
 evmAmount = cosmosAmount * 10^12
 ```
-**Problems**: Loses sub-uatom amounts, rounding errors accumulate
+**Problems**: Loses sub-test amounts, rounding errors accumulate
 
 ### Fixed-Point Arithmetic
 ```
@@ -245,8 +245,8 @@ amount = FixedPoint{mantissa: 123456, exponent: -18}
 ### Separate Balances
 ```
 // Maintain two separate balance systems
-cosmosBalance: 1000000 uatom
-evmBalance: 1000000000000000000 aatom
+cosmosBalance: 1000000 test
+evmBalance: 1000000000000000000 atest
 ```
 **Problems**: Synchronization issues, double accounting, complexity
 

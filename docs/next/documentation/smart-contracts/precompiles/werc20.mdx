@@ -2,7 +2,7 @@
 title: "WERC20"
 description: "Single token representation: An ERC20 interface for any token"
 icon: "refresh-ccw"
-keywords: ['werc20', 'wrapped token', 'erc20', 'single token representation', 'precompile', 'watom', 'native token', 'bank module', 'cosmos sdk', 'token bridge', 'unified token', 'ibc tokens', 'no-op deposit', 'no-op withdraw']
+keywords: ['werc20', 'wrapped token', 'erc20', 'single token representation', 'precompile', 'wtest', 'native token', 'bank module', 'cosmos sdk', 'token bridge', 'unified token', 'ibc tokens', 'no-op deposit', 'no-op withdraw']
 ---
 
 ## Overview
@@ -10,13 +10,13 @@ keywords: ['werc20', 'wrapped token', 'erc20', 'single token representation', 'p
 The WERC20 precompile provides a standard ERC20 interface to native Cosmos tokens through Cosmos EVM's **[Single Token Representation](/docs/next/documentation/concepts/single-token-representation)** architecture.
 Unlike traditional wrapped tokens that are functionally two separate tokens with unique individual properties and behaviors, Cosmos EVM's WERC20 logic gives smart contracts direct access to native bank module balances through familiar ERC20 methods.
 
-**Key Concept**: ATOM and WATOM are not separate tokens—they are two different interfaces to the same token stored in the bank module.
-Native Cosmos tokens (including ATOM and all IBC tokens) exist in both wrapped and unwrapped states at all times, allowing developers to choose the interaction method that best fits their use case:
+**Key Concept**: TEST and WTEST are not separate tokens—they are two different interfaces to the same token stored in the bank module.
+Native Cosmos tokens (including TEST and all IBC tokens) exist in both wrapped and unwrapped states at all times, allowing developers to choose the interaction method that best fits their use case:
 - Use it normally through Cosmos bank send (unwrapped state)
 - Use it like you would normally use ether or 'wei' on the EVM (native value transfers)
-- Use it as ERC20 WATOM with the contract address below (wrapped state)
+- Use it as ERC20 WTEST with the contract address below (wrapped state)
 
-**WATOM Contract Address**: `0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE`
+**WTEST Contract Address**: `0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE`
 **Precompile Type**: Dynamic (unique address per wrapped token)
 **Related Module**: x/bank (via ERC20 module integration)
 
@@ -72,7 +72,7 @@ func (k Keeper) ERC20BalanceOf(account common.Address) *big.Int {
 
 ### Deposit/Withdraw Implementation Details
 
-Since ATOM and WATOM provide different interfaces to the same bank module token, deposit/withdraw functions exist for WETH interface compatibility:
+Since TEST and WTEST provide different interfaces to the same bank module token, deposit/withdraw functions exist for WETH interface compatibility:
 
 ```solidity
 // These functions exist for WETH interface compatibility
@@ -103,22 +103,22 @@ This is why `deposit()` and `withdraw()` are no-ops - there's no separate wrappe
 ### Real-World Example
 
 ```javascript
-// User starts with 100 ATOM in bank module
-const atomBalance = await bankPrecompile.balances(userAddress);
-// Returns: [{denom: "uatom", amount: "100000000"}] // 100 ATOM (6 decimals)
+// User starts with 100 TEST in bank module
+const testBalance = await bankPrecompile.balances(userAddress);
+// Returns: [{denom: "atest", amount: "100000000000000000000"}] // 100 TEST (18 decimals)
 
-const watomBalance = await watom.balanceOf(userAddress);
-// Returns: "100000000" // Same 100 ATOM, accessed via ERC20 interface
+const wtestBalance = await wtest.balanceOf(userAddress);
+// Returns: "100000000000000000000" // Same 100 TEST, accessed via ERC20 interface
 
-// User transfers 50 WATOM via ERC20
-await watom.transfer(recipientAddress, "50000000");
+// User transfers 50 WTEST via ERC20
+await wtest.transfer(recipientAddress, "50000000000000000000");
 
 // Check balances again
-const newAtomBalance = await bankPrecompile.balances(userAddress);
-// Returns: [{denom: "uatom", amount: "50000000"}] // 50 ATOM remaining
+const newTestBalance = await bankPrecompile.balances(userAddress);
+// Returns: [{denom: "atest", amount: "50000000000000000000"}] // 50 TEST (18 decimals) remaining
 
-const newWatomBalance = await watom.balanceOf(userAddress);
-// Returns: "50000000" // Same 50 ATOM, both queries return identical values
+const newWtestBalance = await wtest.balanceOf(userAddress);
+// Returns: "50000000000000000000" // Same 50 TEST, both queries return identical values
 ```
 
 ## Methods
@@ -135,16 +135,16 @@ Returns the native token balance for a specific account (same as bank module bal
 import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
-const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const wtestAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = ["function balanceOf(address account) view returns (uint256)"];
 
-const watom = new ethers.Contract(watomAddress, werc20Abi, provider);
+const wtest = new ethers.Contract(wtestAddress, werc20Abi, provider);
 
 async function getBalance() {
   try {
     const userAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045";
-    const balance = await watom.balanceOf(userAddress);
-    console.log("Balance (both ATOM and WATOM):", balance.toString());
+    const balance = await wtest.balanceOf(userAddress);
+    console.log("Balance (both TEST and WTEST):", balance.toString());
   } catch (error) {
     console.error("Error:", error);
   }
@@ -173,22 +173,74 @@ curl -X POST <RPC_URL> \
 Transfers tokens using the bank module (identical to native Cosmos transfer).
 
 <CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+contract WERC20Example {
+    // WTEST contract address
+    address constant WTEST = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+    IERC20 public immutable wtest;
+    
+    event TokensTransferred(address indexed from, address indexed to, uint256 amount);
+    
+    constructor() {
+        wtest = IERC20(WTEST);
+    }
+    
+    function transferWTEST(address to, uint256 amount) external returns (bool) {
+        require(to != address(0), "Invalid recipient");
+        require(amount > 0, "Amount must be greater than 0");
+        
+        // This directly moves tokens in the bank module
+        // No wrapping/unwrapping - same underlying token balance
+        bool success = wtest.transfer(to, amount);
+        require(success, "Transfer failed");
+        
+        emit TokensTransferred(msg.sender, to, amount);
+        return true;
+    }
+    
+    function transferFromWTEST(address from, address to, uint256 amount) external returns (bool) {
+        require(from != address(0) && to != address(0), "Invalid addresses");
+        require(amount > 0, "Amount must be greater than 0");
+        
+        bool success = wtest.transferFrom(from, to, amount);
+        require(success, "Transfer from failed");
+        
+        emit TokensTransferred(from, to, amount);
+        return true;
+    }
+    
+    // Batch transfer example
+    function batchTransfer(address[] calldata recipients, uint256[] calldata amounts) external {
+        require(recipients.length == amounts.length, "Arrays length mismatch");
+        
+        for (uint256 i = 0; i < recipients.length; i++) {
+            wtest.transferFrom(msg.sender, recipients[i], amounts[i]);
+            emit TokensTransferred(msg.sender, recipients[i], amounts[i]);
+        }
+    }
+}
+```
 ```javascript Ethers.js
 import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
 const signer = new ethers.Wallet("<PRIVATE_KEY>", provider);
-const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const wtestAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = ["function transfer(address to, uint256 amount) returns (bool)"];
 
-const watom = new ethers.Contract(watomAddress, werc20Abi, signer);
+const wtest = new ethers.Contract(wtestAddress, werc20Abi, signer);
 
 async function transferTokens() {
   try {
     const recipientAddress = "0x742d35Cc6634C0532925a3b844Bc9e7595f5b899";
-    const amount = ethers.parseUnits("10.0", 6); // 10 ATOM (6 decimals)
+    const amount = ethers.parseUnits("10.0", 18); // 10 TEST (18 decimals)
 
-    const tx = await watom.transfer(recipientAddress, amount);
+    const tx = await wtest.transfer(recipientAddress, amount);
     const receipt = await tx.wait();
 
     console.log("Transfer successful:", receipt.hash);
@@ -219,14 +271,14 @@ Returns the total supply from the bank module.
 import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
-const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const wtestAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = ["function totalSupply() view returns (uint256)"];
 
-const watom = new ethers.Contract(watomAddress, werc20Abi, provider);
+const wtest = new ethers.Contract(wtestAddress, werc20Abi, provider);
 
 async function getTotalSupply() {
   try {
-    const supply = await watom.totalSupply();
+    const supply = await wtest.totalSupply();
     console.log("Total Supply:", supply.toString());
   } catch (error) {
     console.error("Error:", error);
@@ -261,30 +313,30 @@ import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
 const signer = new ethers.Wallet("<PRIVATE_KEY>", provider);
-const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const wtestAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = [
   "function approve(address spender, uint256 amount) returns (bool)",
   "function allowance(address owner, address spender) view returns (uint256)",
   "function transferFrom(address from, address to, uint256 amount) returns (bool)"
 ];
 
-const watom = new ethers.Contract(watomAddress, werc20Abi, signer);
+const wtest = new ethers.Contract(wtestAddress, werc20Abi, signer);
 
 async function approveAndTransfer() {
   try {
     const spenderAddress = "0x742d35Cc6634C0532925a3b844Bc9e7595f5b899";
-    const amount = ethers.parseUnits("50.0", 6); // 50 ATOM
+    const amount = ethers.parseUnits("50.0", 18); // 50 TEST (18 decimals)
 
     // Approve spending
-    const approveTx = await watom.approve(spenderAddress, amount);
+    const approveTx = await wtest.approve(spenderAddress, amount);
     await approveTx.wait();
 
     // Check allowance
-    const allowance = await watom.allowance(signer.address, spenderAddress);
+    const allowance = await wtest.allowance(signer.address, spenderAddress);
     console.log("Allowance:", allowance.toString());
 
     // Transfer from (would be called by spender)
-    // const transferTx = await watom.transferFrom(ownerAddress, recipientAddress, amount);
+    // const transferTx = await wtest.transferFrom(ownerAddress, recipientAddress, amount);
   } catch (error) {
     console.error("Error:", error);
   }
@@ -293,28 +345,28 @@ async function approveAndTransfer() {
 </CodeGroup>
 
 ### `name` / `symbol` / `decimals`
-Token metadata (e.g., "Wrapped ATOM", "WATOM", 6).
+Token metadata (e.g., "Wrapped Test", "WTEST", 18).
 
 <CodeGroup>
 ```javascript Ethers.js
 import { ethers } from "ethers";
 
 const provider = new ethers.JsonRpcProvider("<RPC_URL>");
-const watomAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const wtestAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const werc20Abi = [
   "function name() view returns (string)",
   "function symbol() view returns (string)",
   "function decimals() view returns (uint8)"
 ];
 
-const watom = new ethers.Contract(watomAddress, werc20Abi, provider);
+const wtest = new ethers.Contract(wtestAddress, werc20Abi, provider);
 
 async function getTokenInfo() {
   try {
     const [name, symbol, decimals] = await Promise.all([
-      watom.name(),
-      watom.symbol(),
-      watom.decimals()
+      wtest.name(),
+      wtest.symbol(),
+      wtest.decimals()
     ]);
     console.log(`Token: ${name} (${symbol}) - ${decimals} decimals`);
   } catch (error) {
@@ -373,14 +425,96 @@ These methods exist for WETH interface compatibility:
 **WETH compatibility function** - Handles payable deposits for interface compatibility.
 
 <Info>
-This function receives msg.value and immediately sends the coins back to the caller via the bank module, then emits a Deposit event. Since WATOM and ATOM are the same underlying bank module token, no actual wrapping occurs - your balance is simply accessible through both native and ERC20 interfaces.
+This function receives msg.value and immediately sends the coins back to the caller via the bank module, then emits a Deposit event. Since WTEST and TEST are the same underlying bank module token, no actual wrapping occurs - your balance is simply accessible through both native and ERC20 interfaces.
 </Info>
+
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+// Interface for WERC20 precompile
+interface IWERC20 {
+    event Deposit(address indexed dst, uint256 wad);
+    event Withdrawal(address indexed src, uint256 wad);
+    
+    function deposit() external payable;
+    function withdraw(uint256 wad) external;
+    function balanceOf(address account) external view returns (uint256);
+}
+
+contract WERC20Example {
+    address constant WTEST = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+    
+    IWERC20 public immutable wtest;
+    
+    constructor() {
+        wtest = IWERC20(WTEST);
+    }
+    
+    function depositToWTEST() external payable {
+        require(msg.value > 0, "Must send tokens to deposit");
+        
+        // Get balance before deposit
+        uint256 balanceBefore = wtest.balanceOf(msg.sender);
+        
+        // WERC20 deposit is a no-op for compatibility
+        // Your native token balance is immediately accessible as WTEST
+        wtest.deposit{value: msg.value}();
+        
+        // Verify balance is now accessible via WTEST interface
+        uint256 balanceAfter = wtest.balanceOf(msg.sender);
+        
+        // Both TEST and WTEST balances reflect the same bank module amount
+        // No actual wrapping occurred - same token, different interface
+        require(balanceAfter >= balanceBefore, "Deposit processed");
+    }
+    
+    function withdrawFromWTEST(uint256 amount) external {
+        require(amount > 0, "Amount must be greater than 0");
+        require(wtest.balanceOf(msg.sender) >= amount, "Insufficient balance");
+        
+        // WERC20 withdraw is a no-op that emits event for compatibility
+        // Your bank balance remains accessible as both native TEST and WTEST
+        wtest.withdraw(amount);
+        
+        // Tokens are still in bank module and accessible both ways
+    }
+    
+    // Helper function to demonstrate balance consistency
+    function checkBalanceConsistency(address user) external view returns (
+        uint256 wtestBalance,
+        string memory explanation
+    ) {
+        wtestBalance = wtest.balanceOf(user);
+        explanation = "This WTEST balance equals the user's native TEST balance in bank module";
+        
+        return (wtestBalance, explanation);
+    }
+    
+    // Example DeFi integration showing no wrapping needed
+    function addLiquidityWithDeposit() external payable {
+        require(msg.value > 0, "Must send tokens");
+        
+        // Deposit via WERC20 interface (compatibility no-op)
+        wtest.deposit{value: msg.value}();
+        
+        // Your tokens are now accessible as WTEST for DeFi protocols
+        // No additional steps needed - same token, ERC20 interface available
+        uint256 availableForDeFi = wtest.balanceOf(msg.sender);
+        
+        // Use in DeFi protocols immediately
+        // wtest.transfer(defiProtocolAddress, availableForDeFi);
+    }
+}
+```
+</CodeGroup>
 
 ### `withdraw`
 **No-op function** - Included for interface compatibility with WETH contracts.
 
 <Info>
-This function only emits a Withdrawal event but performs no actual token movement. Since WATOM and ATOM are the same underlying bank module token, your native token balance is always directly accessible without any unwrapping process.
+This function only emits a Withdrawal event but performs no actual token movement. Since WTEST and TEST are the same underlying bank module token, your native token balance is always directly accessible without any unwrapping process.
 </Info>
 
 ## Usage Examples
@@ -388,15 +522,15 @@ This function only emits a Withdrawal event but performs no actual token movemen
 ### DeFi Integration Example
 ```solidity
 contract LiquidityPool {
-    IERC20 public immutable WATOM;
+    IERC20 public immutable WTEST;
 
-    constructor(address _watom) {
-        WATOM = IERC20(_watom);
+    constructor(address _wtest) {
+        WTEST = IERC20(_wtest);
     }
 
     function addLiquidity(uint256 amount) external {
         // This transfers from the user's bank balance
-        WATOM.transferFrom(msg.sender, address(this), amount);
+        WTEST.transferFrom(msg.sender, address(this), amount);
 
         // Pool now has tokens in its bank balance
         // No wrapping/unwrapping needed - it's all the same token!
@@ -404,10 +538,10 @@ contract LiquidityPool {
 
     function removeLiquidity(uint256 amount) external {
         // This transfers back to user's bank balance
-        WATOM.transfer(msg.sender, amount);
+        WTEST.transfer(msg.sender, amount);
 
-        // User can now use these tokens as native ATOM
-        // or continue using WATOM interface - both access same balance
+        // User can now use these tokens as native TEST
+        // or continue using WTEST interface - both access same balance
     }
 }
 ```
@@ -418,14 +552,14 @@ contract LiquidityPool {
 async function verifyBalanceConsistency(userAddress) {
     // Query via bank precompile (native interface)
     const bankBalance = await bankContract.balances(userAddress);
-    const atomAmount = bankBalance.find(b => b.denom === "uatom")?.amount || "0";
+    const testAmount = bankBalance.find(b => b.denom === "test")?.amount || "0";
 
     // Query via WERC20 precompile (ERC20 interface)
-    const watomAmount = await watom.balanceOf(userAddress);
+    const wtestAmount = await wtest.balanceOf(userAddress);
 
     // These will always be equal since the ERC20 balance is just
     // an abstracted bank module balance query
-    console.log(`Consistent balance: ${atomAmount} (both ATOM and WATOM)`);
+    console.log(`Consistent balance: ${testAmount} (both TEST and WTEST)`);
 }
 ```
 

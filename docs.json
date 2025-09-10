@@ -190,6 +190,7 @@
                                         "group": "Getting Started",
                                         "pages": [
                                             "docs/next/documentation/getting-started/index",
+                                            "docs/next/documentation/getting-started/reference-network",
                                             "docs/next/documentation/getting-started/faq",
                                             "docs/next/documentation/getting-started/development-environment",
                                             "docs/next/documentation/getting-started/local-network-setup",

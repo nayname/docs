@@ -44,20 +44,285 @@ Claims staking rewards from multiple validators.
 The `maxRetrieve` parameter limits the number of validators from which to claim rewards in a single transaction. This prevents excessive gas consumption when a delegator has rewards from many validators.
 </Info>
 
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract DistributionClaimRewards {
+    address constant DISTRIBUTION_PRECOMPILE = 0x0000000000000000000000000000000000000801;
+    
+    event RewardsClaimed(address indexed delegator, uint256 maxRetrieve, bool success);
+    
+    function claimRewards(uint32 maxRetrieve) external returns (bool success) {
+        (bool callSuccess, bytes memory result) = DISTRIBUTION_PRECOMPILE.call(
+            abi.encodeWithSignature("claimRewards(address,uint32)", msg.sender, maxRetrieve)
+        );
+        
+        require(callSuccess, "Claim rewards call failed");
+        success = abi.decode(result, (bool));
+        
+        emit RewardsClaimed(msg.sender, maxRetrieve, success);
+        return success;
+    }
+    
+    function claimAllRewards() external returns (bool success) {
+        // Use a high maxRetrieve value to claim from all validators
+        return claimRewards(100);
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Claiming rewards requires a signed transaction"
+```
+</CodeGroup>
+
 ### withdrawDelegatorRewards
 Withdraws staking rewards from a single, specific validator.
+
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract DistributionExample {
+    address constant DISTRIBUTION_PRECOMPILE = 0x0000000000000000000000000000000000000801;
+    
+    struct Coin {
+        string denom;
+        uint256 amount;
+    }
+    
+    event RewardsWithdrawn(address indexed delegator, string indexed validator, uint256 amount);
+    
+    function withdrawRewards(string calldata validatorAddress) external returns (Coin[] memory amount) {
+        (bool success, bytes memory result) = DISTRIBUTION_PRECOMPILE.call(
+            abi.encodeWithSignature("withdrawDelegatorRewards(address,string)", msg.sender, validatorAddress)
+        );
+        
+        require(success, "Withdraw rewards failed");
+        amount = abi.decode(result, (Coin[]));
+        
+        uint256 totalAmount = 0;
+        for (uint i = 0; i < amount.length; i++) {
+            totalAmount += amount[i].amount;
+        }
+        emit RewardsWithdrawn(msg.sender, validatorAddress, totalAmount);
+        
+        return amount;
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Reward withdrawal requires a signed transaction"
+```
+</CodeGroup>
 
 ### setWithdrawAddress
 Sets or changes the withdrawal address for receiving staking rewards.
 
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract DistributionSetWithdrawAddress {
+    address constant DISTRIBUTION_PRECOMPILE = 0x0000000000000000000000000000000000000801;
+    
+    event WithdrawAddressSet(address indexed delegator, string withdrawerAddress, bool success);
+    
+    function setWithdrawAddress(string calldata withdrawerAddress) external returns (bool success) {
+        (bool callSuccess, bytes memory result) = DISTRIBUTION_PRECOMPILE.call(
+            abi.encodeWithSignature("setWithdrawAddress(address,string)", msg.sender, withdrawerAddress)
+        );
+        
+        require(callSuccess, "Set withdraw address call failed");
+        success = abi.decode(result, (bool));
+        
+        emit WithdrawAddressSet(msg.sender, withdrawerAddress, success);
+        return success;
+    }
+    
+    function resetWithdrawAddress() external returns (bool success) {
+        // Reset to delegator's own address by converting msg.sender to bech32
+        // Note: In practice, you'd need to convert the EVM address to bech32 format
+        string memory selfAddress = "art1..."; // This would be the bech32 equivalent
+        return setWithdrawAddress(selfAddress);
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Setting withdraw address requires a signed transaction"
+```
+</CodeGroup>
+
 ### withdrawValidatorCommission
 Withdraws a validator's accumulated commission rewards.
+
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract DistributionWithdrawCommission {
+    address constant DISTRIBUTION_PRECOMPILE = 0x0000000000000000000000000000000000000801;
+    
+    struct Coin {
+        string denom;
+        uint256 amount;
+    }
+    
+    event ValidatorCommissionWithdrawn(string indexed validatorAddress, uint256 totalAmount);
+    
+    function withdrawValidatorCommission(string calldata validatorAddress) external returns (Coin[] memory amount) {
+        (bool success, bytes memory result) = DISTRIBUTION_PRECOMPILE.call(
+            abi.encodeWithSignature("withdrawValidatorCommission(string)", validatorAddress)
+        );
+        
+        require(success, "Withdraw validator commission failed");
+        amount = abi.decode(result, (Coin[]));
+        
+        uint256 totalAmount = 0;
+        for (uint i = 0; i < amount.length; i++) {
+            totalAmount += amount[i].amount;
+        }
+        emit ValidatorCommissionWithdrawn(validatorAddress, totalAmount);
+        
+        return amount;
+    }
+    
+    // Helper function for validator operators to withdraw their own commission
+    function withdrawMyCommission(string calldata myValidatorAddress) external returns (Coin[] memory) {
+        return withdrawValidatorCommission(myValidatorAddress);
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Withdrawing validator commission requires a signed transaction"
+```
+</CodeGroup>
 
 ### fundCommunityPool
 Sends tokens directly to the community pool.
 
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract DistributionFundCommunityPool {
+    address constant DISTRIBUTION_PRECOMPILE = 0x0000000000000000000000000000000000000801;
+    
+    struct Coin {
+        string denom;
+        uint256 amount;
+    }
+    
+    event CommunityPoolFunded(address indexed depositor, string denom, uint256 amount, bool success);
+    
+    function fundCommunityPool(Coin[] calldata amount) external returns (bool success) {
+        (bool callSuccess, bytes memory result) = DISTRIBUTION_PRECOMPILE.call(
+            abi.encodeWithSignature("fundCommunityPool(address,(string,uint256)[])", msg.sender, amount)
+        );
+        
+        require(callSuccess, "Fund community pool call failed");
+        success = abi.decode(result, (bool));
+        
+        // Emit events for each coin funded
+        for (uint i = 0; i < amount.length; i++) {
+            emit CommunityPoolFunded(msg.sender, amount[i].denom, amount[i].amount, success);
+        }
+        
+        return success;
+    }
+    
+    function fundCommunityPoolSingleCoin(string calldata denom, uint256 amount) external returns (bool success) {
+        Coin[] memory coins = new Coin[](1);
+        coins[0] = Coin(denom, amount);
+        return fundCommunityPool(coins);
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Funding community pool requires a signed transaction"
+```
+</CodeGroup>
+
 ### depositValidatorRewardsPool
 Deposits tokens into a specific validator's rewards pool.
+
+<CodeGroup>
+```solidity Solidity expandable lines
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract DistributionDepositValidatorRewards {
+    address constant DISTRIBUTION_PRECOMPILE = 0x0000000000000000000000000000000000000801;
+    
+    struct Coin {
+        string denom;
+        uint256 amount;
+    }
+    
+    event ValidatorRewardsPoolDeposited(
+        address indexed depositor, 
+        string indexed validatorAddress, 
+        string denom, 
+        uint256 amount, 
+        bool success
+    );
+    
+    function depositValidatorRewardsPool(
+        string calldata validatorAddress,
+        Coin[] calldata amount
+    ) external returns (bool success) {
+        (bool callSuccess, bytes memory result) = DISTRIBUTION_PRECOMPILE.call(
+            abi.encodeWithSignature(
+                "depositValidatorRewardsPool(address,string,(string,uint256)[])", 
+                msg.sender, 
+                validatorAddress, 
+                amount
+            )
+        );
+        
+        require(callSuccess, "Deposit validator rewards pool call failed");
+        success = abi.decode(result, (bool));
+        
+        // Emit events for each coin deposited
+        for (uint i = 0; i < amount.length; i++) {
+            emit ValidatorRewardsPoolDeposited(
+                msg.sender, 
+                validatorAddress, 
+                amount[i].denom, 
+                amount[i].amount, 
+                success
+            );
+        }
+        
+        return success;
+    }
+    
+    function depositSingleCoinToValidator(
+        string calldata validatorAddress,
+        string calldata denom, 
+        uint256 amount
+    ) external returns (bool success) {
+        Coin[] memory coins = new Coin[](1);
+        coins[0] = Coin(denom, amount);
+        return depositValidatorRewardsPool(validatorAddress, coins);
+    }
+}
+```
+```bash cURL expandable lines
+# Note: Transaction methods require signatures - use ethers.js or other Web3 library
+echo "Depositing to validator rewards pool requires a signed transaction"
+```
+</CodeGroup>
 
 ## Query Methods
 
@@ -463,7 +728,7 @@ import { ethers } from "ethers";
 
 // ABI definition for the function
 const precompileAbi = [
-  "function validatorSlashes(string memory validatorAddress, uint64 startingHeight, uint64 endingHeight, tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pageRequest) view returns (tuple(uint64 validatorPeriod, tuple(uint256 amount, uint8 precision) fraction)[] slashes, tuple(bytes nextKey, uint64 total) pageResponse)"
+  "function validatorSlashes(string validatorAddress, uint64 startingHeight, uint64 endingHeight, tuple(bytes key, uint64 offset, uint64 limit, bool countTotal, bool reverse) pageRequest) view returns (tuple(uint64 validatorPeriod, tuple(uint256 value, uint8 precision) fraction, int64 height)[] slashes, tuple(bytes nextKey, uint64 total) pageResponse)"
 ];
 
 // Provider and contract setup
