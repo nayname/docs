@@ -34,20 +34,7 @@
       "vscode"
     ]
   },
-  "redirects": [
-    {
-      "source": "/v0.53/learn",
-      "destination": "/docs/sdk/v0.53/learn"
-    },
-    {
-      "source": "/v0.50/learn",
-      "destination": "/docs/sdk/v0.50/learn"
-    },
-    {
-      "source": "/v0.47/learn",
-      "destination": "/docs/sdk/v0.47/learn"
-    }
-  ],
+  "redirects": [],
   "navigation": {
     "dropdowns": [
       {
