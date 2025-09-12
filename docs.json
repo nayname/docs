@@ -43,6 +43,7 @@
     "dropdowns": [
       {
         "dropdown": "EVM",
+        "icon": "book-open-text",
         "versions": [
           {
             "version": "next",
@@ -349,6 +350,7 @@
       },
       {
         "dropdown": "SDK",
+        "icon": "book-open-text",
         "versions": [
           {
             "version": "v0.53",
@@ -1299,6 +1301,7 @@
       },
       {
         "dropdown": "IBC",
+        "icon": "book-open-text",
         "versions": [
           {
             "version": "next",
