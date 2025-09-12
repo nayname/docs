@@ -1,13 +1,13 @@
 # Documentation Versioning System
 
-This directory contains the unified versioning system for Cosmos EVM documentation. it automates the process of freezing documentation versions while maintaining snapshots of dynamic data like EIP compatibility tables.
+This directory contains the unified versioning system for Cosmos documentation across multiple products (EVM, SDK, IBC). It automates the process of freezing documentation versions while maintaining product‑specific assets (e.g., EVM EIP compatibility tables).
 
 ## Overview
 
 The versioning system provides:
 
 - **Version snapshots** - Frozen versions preserve the state of documentation at release time
-- **Google Sheets integration** - EIP compatibility data is snapshotted via Google Sheets tabs
+- **Google Sheets integration (EVM only)** - EIP compatibility data is snapshotted via Google Sheets tabs
 - **Automated workflow** - Single command to freeze current version and prepare for next release
 - **Mintlify compatibility** - Works within Mintlify's MDX compiler constraints
 
@@ -101,7 +101,7 @@ Each product can be versioned independently. The version manager auto-detects th
 
 ### Freeze a Version
 
-Run the version manager to freeze the current version in a chosen docs subdirectory (e.g., `evm`, `sdk`, `ibc`) and start a new one:
+Run the version manager to freeze the current version in a chosen docs subdirectory (e.g., `evm`, `sdk`, `ibc`) and start a new one. The flow is fully interactive by default:
 
 ```bash
 cd scripts/versioning
@@ -110,15 +110,25 @@ npm run freeze
 
 The script will:
 
-1. Prompt for the docs subdirectory (e.g., `evm`, `sdk`, `ibc`)
-2. Determine the version to freeze from `versions.json` for that product, or prompt
-3. Prompt for the new development version (e.g., `v0.5.0` or `v0.5.x`)
-4. Check/update release notes (for EVM)
-5. Create a frozen copy at `docs/<subdir>/<version>/`
-6. If release notes for the target version are missing, they are auto-fetched from the product repo and written to `docs/<subdir>/next/changelog/release-notes.mdx`
-7. Snapshot EIP data to a Google Sheets tab (EVM only)
-8. Update navigation and versions registry
+1. Prompt for the product (based on folders under `docs/`)
+2. Show the product’s entry from `versions.json` (versions, defaultVersion, nextDev)
+3. Prompt for the freeze version (e.g., `v0.5.0`, `v0.5.x`)
+4. Prompt for the new development version
+5. Check/update release notes for that product; if missing, auto‑fetch from GitHub
+6. Create a frozen copy at `docs/<subdir>/<version>/`
+7. Snapshot EIP data to a Google Sheets tab and generate versioned EIP reference (EVM only)
+8. Update navigation (clone `next` entry to `<version>`) and versions registry (per‑product)
 9. Create metadata files
+
+Non‑interactive:
+
+```bash
+NON_INTERACTIVE=1 \
+  SUBDIR=evm \
+  CURRENT_VERSION=v0.5.0 \
+  NEW_VERSION=v0.6.0 \
+  npm run freeze
+```
 
 ## Scripts Reference
 
@@ -137,7 +147,7 @@ npm run freeze
 **What it does:**
 
 - Creates frozen copy of `docs/<subdir>/next/` at `docs/<subdir>/<version>/`
-- Calls sheets-manager for Google Sheets operations
+- Calls sheets-manager for Google Sheets operations (EVM only)
 - Updates all internal links in frozen version
 - Updates navigation structure and version registry
 - Creates version metadata files
@@ -171,7 +181,7 @@ npm run release-notes [version|latest] [evm|sdk|ibc]
 
 **What it does:**
 
-- Fetches changelog from the product's GitHub repository
+- Fetches changelog from the product's GitHub repository (auto-detects `CHANGELOG.md`/variants)
 - Parses and converts to Mintlify format
 - Updates release notes file in `docs/<subdir>/next/`
 
@@ -236,16 +246,15 @@ Active development uses it without props (defaults to main sheet):
    - Pick product subdirectory (`evm`, `sdk`, `ibc`)
    - Determine current version to freeze from `versions.json` for that product (or prompt)
    - Prompt for new development version
-   - Check/update release notes
+   - Check/update release notes (auto‑fetch when missing)
 
 2. **Freeze Phase**
-- Copy `docs/<subdir>/next/` to version directory (e.g., `docs/evm/v0.4.x/`)
-   - Create Google Sheets tab with version name
-   - Copy EIP data to version tab
+   - Copy `docs/<subdir>/next/` to version directory (e.g., `docs/evm/v0.4.x/`)
+   - (EVM only) Create Google Sheets tab with version name and copy EIP data
 
 3. **Update Phase**
-   - Generate MDX with sheet tab reference
-- Update internal links (`/docs/evm/next/` → `/docs/evm/v0.4.x/`)
+   - (EVM only) Generate MDX with sheet tab reference
+   - Update internal links (`/docs/<subdir>/next/` → `/docs/<subdir>/<version>/`)
    - Keep snippet imports unchanged (`/snippets/`)
    - Update navigation structure
 
