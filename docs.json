@@ -34,6 +34,11 @@
       "vscode"
     ]
   },
+  "redirects": [
+    { "source": "/v0.53/learn", "destination": "/docs/sdk/v0.53/learn" },
+    { "source": "/v0.50/learn", "destination": "/docs/sdk/v0.50/learn" },
+    { "source": "/v0.47/learn", "destination": "/docs/sdk/v0.47/learn" }
+  ],
   "navigation": {
     "dropdowns": [
       {
@@ -346,12 +351,946 @@
         "dropdown": "SDK",
         "versions": [
           {
-            "version": "next",
+            "version": "v0.53",
             "tabs": [
               {
-                "tab": "Documentation",
-                "pages": [
-                  "docs/sdk/next/index"
+                "tab": "Learn",
+                "groups": [
+                  { "group": "Learn", "pages": ["docs/sdk/v0.53/learn"] },
+                  {
+                    "group": "Introduction",
+                    "pages": [
+                      "docs/sdk/v0.53/learn/intro/overview",
+                      "docs/sdk/v0.53/learn/intro/why-app-specific",
+                      "docs/sdk/v0.53/learn/intro/sdk-app-architecture",
+                      "docs/sdk/v0.53/learn/intro/sdk-design"
+                    ]
+                  },
+                  {
+                    "group": "Beginner",
+                    "pages": [
+                      "docs/sdk/v0.53/learn/beginner/app-anatomy",
+                      "docs/sdk/v0.53/learn/beginner/tx-lifecycle",
+                      "docs/sdk/v0.53/learn/beginner/query-lifecycle",
+                      "docs/sdk/v0.53/learn/beginner/accounts",
+                      "docs/sdk/v0.53/learn/beginner/gas-fees"
+                    ]
+                  },
+                  {
+                    "group": "Advanced",
+                    "pages": [
+                      "docs/sdk/v0.53/learn/advanced/baseapp",
+                      "docs/sdk/v0.53/learn/advanced/transactions",
+                      "docs/sdk/v0.53/learn/advanced/context",
+                      "docs/sdk/v0.53/learn/advanced/node",
+                      "docs/sdk/v0.53/learn/advanced/store",
+                      "docs/sdk/v0.53/learn/advanced/encoding",
+                      "docs/sdk/v0.53/learn/advanced/grpc_rest",
+                      "docs/sdk/v0.53/learn/advanced/cli",
+                      "docs/sdk/v0.53/learn/advanced/events",
+                      "docs/sdk/v0.53/learn/advanced/telemetry",
+                      "docs/sdk/v0.53/learn/advanced/ocap",
+                      "docs/sdk/v0.53/learn/advanced/runtx_middleware",
+                      "docs/sdk/v0.53/learn/advanced/simulation",
+                      "docs/sdk/v0.53/learn/advanced/proto-docs",
+                      "docs/sdk/v0.53/learn/advanced/upgrade",
+                      "docs/sdk/v0.53/learn/advanced/config",
+                      "docs/sdk/v0.53/learn/advanced/autocli"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "Build",
+                "groups": [
+                  { "group": "Build", "pages": ["docs/sdk/v0.53/build"] },
+                  {
+                    "group": "Building Apps",
+                    "pages": [
+                      "docs/sdk/v0.53/build/building-apps/app-go",
+                      "docs/sdk/v0.53/build/building-apps/runtime",
+                      "docs/sdk/v0.53/build/building-apps/app-go-di",
+                      "docs/sdk/v0.53/build/building-apps/app-mempool",
+                      "docs/sdk/v0.53/build/building-apps/app-upgrade",
+                      "docs/sdk/v0.53/build/building-apps/vote-extensions",
+                      "docs/sdk/v0.53/build/building-apps/app-testnet"
+                    ]
+                  },
+                  {
+                    "group": "Building Modules",
+                    "pages": [
+                      "docs/sdk/v0.53/build/building-modules/module-manager",
+                      "docs/sdk/v0.53/build/building-modules/messages-and-queries",
+                      "docs/sdk/v0.53/build/building-modules/msg-services",
+                      "docs/sdk/v0.53/build/building-modules/query-services",
+                      "docs/sdk/v0.53/build/building-modules/protobuf-annotations",
+                      "docs/sdk/v0.53/build/building-modules/beginblock-endblock",
+                      "docs/sdk/v0.53/build/building-modules/keeper",
+                      "docs/sdk/v0.53/build/building-modules/invariants",
+                      "docs/sdk/v0.53/build/building-modules/genesis",
+                      "docs/sdk/v0.53/build/building-modules/module-interfaces",
+                      "docs/sdk/v0.53/build/building-modules/structure",
+                      "docs/sdk/v0.53/build/building-modules/errors",
+                      "docs/sdk/v0.53/build/building-modules/upgrade",
+                      "docs/sdk/v0.53/build/building-modules/simulator",
+                      "docs/sdk/v0.53/build/building-modules/depinject",
+                      "docs/sdk/v0.53/build/building-modules/testing",
+                      "docs/sdk/v0.53/build/building-modules/preblock"
+                    ]
+                  },
+                  {
+                    "group": "ABCI",
+                    "pages": [
+                      "docs/sdk/v0.53/build/abci/introduction",
+                      "docs/sdk/v0.53/build/abci/prepare-proposal",
+                      "docs/sdk/v0.53/build/abci/process-proposal",
+                      "docs/sdk/v0.53/build/abci/vote-extensions",
+                      "docs/sdk/v0.53/build/abci/checktx"
+                    ]
+                  },
+                  {
+                    "group": "Modules",
+                    "pages": [
+                      "docs/sdk/v0.53/build/modules",
+                      {
+                        "group": "x/auth",
+                        "pages": [
+                          "docs/sdk/v0.53/build/modules/auth",
+                          "docs/sdk/v0.53/build/modules/auth/vesting",
+                          "docs/sdk/v0.53/build/modules/auth/tx"
+                        ]
+                      },
+                      "docs/sdk/v0.53/build/modules/authz",
+                      "docs/sdk/v0.53/build/modules/bank",
+                      "docs/sdk/v0.53/build/modules/consensus",
+                      "docs/sdk/v0.53/build/modules/crisis",
+                      "docs/sdk/v0.53/build/modules/distribution",
+                      "docs/sdk/v0.53/build/modules/epochs",
+                      "docs/sdk/v0.53/build/modules/evidence",
+                      "docs/sdk/v0.53/build/modules/feegrant",
+                      "docs/sdk/v0.53/build/modules/gov",
+                      "docs/sdk/v0.53/build/modules/group",
+                      "docs/sdk/v0.53/build/modules/mint",
+                      "docs/sdk/v0.53/build/modules/nft",
+                      "docs/sdk/v0.53/build/modules/params",
+                      "docs/sdk/v0.53/build/modules/protocolpool",
+                      "docs/sdk/v0.53/build/modules/slashing",
+                      "docs/sdk/v0.53/build/modules/staking",
+                      "docs/sdk/v0.53/build/modules/upgrade",
+                      "docs/sdk/v0.53/build/modules/circuit",
+                      "docs/sdk/v0.53/build/modules/genutil"
+                    ]
+                  },
+                  {
+                    "group": "Migrations",
+                    "pages": [
+                      "docs/sdk/v0.53/build/migrations/intro",
+                      "docs/sdk/v0.53/build/migrations/upgrade-reference",
+                      "docs/sdk/v0.53/build/migrations/upgrade-guide"
+                    ]
+                  },
+                  {
+                    "group": "Packages",
+                    "pages": [
+                      "docs/sdk/v0.53/build/packages",
+                      "docs/sdk/v0.53/build/packages/depinject",
+                      "docs/sdk/v0.53/build/packages/collections"
+                    ]
+                  },
+                  {
+                    "group": "Tooling",
+                    "pages": [
+                      "docs/sdk/v0.53/build/tooling",
+                      "docs/sdk/v0.53/build/tooling/protobuf",
+                      "docs/sdk/v0.53/build/tooling/cosmovisor",
+                      "docs/sdk/v0.53/build/tooling/confix"
+                    ]
+                  },
+                  {
+                    "group": "ADRs",
+                    "pages": [
+                      "docs/sdk/v0.53/build/architecture",
+                      "docs/sdk/v0.53/build/architecture/PROCESS",
+                      "docs/sdk/v0.53/build/architecture/adr-002-docs-structure",
+                      "docs/sdk/v0.53/build/architecture/adr-003-dynamic-capability-store",
+                      "docs/sdk/v0.53/build/architecture/adr-004-split-denomination-keys",
+                      "docs/sdk/v0.53/build/architecture/adr-006-secret-store-replacement",
+                      "docs/sdk/v0.53/build/architecture/adr-007-specialization-groups",
+                      "docs/sdk/v0.53/build/architecture/adr-008-dCERT-group",
+                      "docs/sdk/v0.53/build/architecture/adr-009-evidence-module",
+                      "docs/sdk/v0.53/build/architecture/adr-010-modular-antehandler",
+                      "docs/sdk/v0.53/build/architecture/adr-011-generalize-genesis-accounts",
+                      "docs/sdk/v0.53/build/architecture/adr-012-state-accessors",
+                      "docs/sdk/v0.53/build/architecture/adr-013-metrics",
+                      "docs/sdk/v0.53/build/architecture/adr-014-proportional-slashing",
+                      "docs/sdk/v0.53/build/architecture/adr-016-validator-consensus-key-rotation",
+                      "docs/sdk/v0.53/build/architecture/adr-017-historical-header-module",
+                      "docs/sdk/v0.53/build/architecture/adr-018-extendable-voting-period",
+                      "docs/sdk/v0.53/build/architecture/adr-019-protobuf-state-encoding",
+                      "docs/sdk/v0.53/build/architecture/adr-020-protobuf-transaction-encoding",
+                      "docs/sdk/v0.53/build/architecture/adr-021-protobuf-query-encoding",
+                      "docs/sdk/v0.53/build/architecture/adr-022-custom-panic-handling",
+                      "docs/sdk/v0.53/build/architecture/adr-023-protobuf-naming",
+                      "docs/sdk/v0.53/build/architecture/adr-024-coin-metadata",
+                      "docs/sdk/v0.53/build/architecture/adr-027-deterministic-protobuf-serialization",
+                      "docs/sdk/v0.53/build/architecture/adr-028-public-key-addresses",
+                      "docs/sdk/v0.53/build/architecture/adr-029-fee-grant-module",
+                      "docs/sdk/v0.53/build/architecture/adr-030-authz-module",
+                      "docs/sdk/v0.53/build/architecture/adr-031-msg-service",
+                      "docs/sdk/v0.53/build/architecture/adr-032-typed-events",
+                      "docs/sdk/v0.53/build/architecture/adr-033-protobuf-inter-module-comm",
+                      "docs/sdk/v0.53/build/architecture/adr-034-account-rekeying",
+                      "docs/sdk/v0.53/build/architecture/adr-035-rosetta-api-support",
+                      "docs/sdk/v0.53/build/architecture/adr-036-arbitrary-signature",
+                      "docs/sdk/v0.53/build/architecture/adr-037-gov-split-vote",
+                      "docs/sdk/v0.53/build/architecture/adr-038-state-listening",
+                      "docs/sdk/v0.53/build/architecture/adr-039-epoched-staking",
+                      "docs/sdk/v0.53/build/architecture/adr-040-storage-and-smt-state-commitments",
+                      "docs/sdk/v0.53/build/architecture/adr-041-in-place-store-migrations",
+                      "docs/sdk/v0.53/build/architecture/adr-042-group-module",
+                      "docs/sdk/v0.53/build/architecture/adr-043-nft-module",
+                      "docs/sdk/v0.53/build/architecture/adr-044-protobuf-updates-guidelines",
+                      "docs/sdk/v0.53/build/architecture/adr-045-check-delivertx-middlewares",
+                      "docs/sdk/v0.53/build/architecture/adr-046-module-params",
+                      "docs/sdk/v0.53/build/architecture/adr-047-extend-upgrade-plan",
+                      "docs/sdk/v0.53/build/architecture/adr-048-consensus-fees",
+                      "docs/sdk/v0.53/build/architecture/adr-049-state-sync-hooks",
+                      "docs/sdk/v0.53/build/architecture/adr-050-sign-mode-textual-annex1",
+                      "docs/sdk/v0.53/build/architecture/adr-050-sign-mode-textual-annex2",
+                      "docs/sdk/v0.53/build/architecture/adr-050-sign-mode-textual",
+                      "docs/sdk/v0.53/build/architecture/adr-053-go-module-refactoring",
+                      "docs/sdk/v0.53/build/architecture/adr-054-semver-compatible-modules",
+                      "docs/sdk/v0.53/build/architecture/adr-055-orm",
+                      "docs/sdk/v0.53/build/architecture/adr-057-app-wiring",
+                      "docs/sdk/v0.53/build/architecture/adr-058-auto-generated-cli",
+                      "docs/sdk/v0.53/build/architecture/adr-059-test-scopes",
+                      "docs/sdk/v0.53/build/architecture/adr-060-abci-1.0",
+                      "docs/sdk/v0.53/build/architecture/adr-061-liquid-staking",
+                      "docs/sdk/v0.53/build/architecture/adr-062-collections-state-layer",
+                      "docs/sdk/v0.53/build/architecture/adr-063-core-module-api",
+                      "docs/sdk/v0.53/build/architecture/adr-064-abci-2.0",
+                      "docs/sdk/v0.53/build/architecture/adr-065-store-v2",
+                      "docs/sdk/v0.53/build/architecture/adr-068-preblock",
+                      "docs/sdk/v0.53/build/architecture/adr-070-unordered-account",
+                      "docs/sdk/v0.53/build/architecture/adr-076-tx-malleability",
+                      "docs/sdk/v0.53/build/architecture/adr-template"
+                    ]
+                  },
+                  {
+                    "group": "RFC",
+                    "pages": [
+                      "docs/sdk/v0.53/build/rfc",
+                      "docs/sdk/v0.53/build/rfc/PROCESS",
+                      "docs/sdk/v0.53/build/rfc/rfc-001-tx-validation",
+                      "docs/sdk/v0.53/build/rfc/rfc-template"
+                    ]
+                  },
+                  {
+                    "group": "Specifications",
+                    "pages": [
+                      "docs/sdk/v0.53/build/spec",
+                      "docs/sdk/v0.53/build/spec/SPEC_MODULE",
+                      "docs/sdk/v0.53/build/spec/SPEC_STANDARD",
+                      {
+                        "group": "Addresses spec",
+                        "pages": [
+                          "docs/sdk/v0.53/build/spec/addresses",
+                          "docs/sdk/v0.53/build/spec/addresses/bech32"
+                        ]
+                      },
+                      {
+                        "group": "Store",
+                        "pages": [
+                          "docs/sdk/v0.53/build/spec/store",
+                          "docs/sdk/v0.53/build/spec/store/interblock-cache"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "User Guides",
+                "groups": [
+                  { "group": "User Guides", "pages": ["docs/sdk/v0.53/user"] },
+                  {
+                    "group": "Running a Node, API and CLI",
+                    "pages": [
+                      "docs/sdk/v0.53/user/run-node/keyring",
+                      "docs/sdk/v0.53/user/run-node/run-node",
+                      "docs/sdk/v0.53/user/run-node/interact-node",
+                      "docs/sdk/v0.53/user/run-node/txs",
+                      "docs/sdk/v0.53/user/run-node/run-testnet",
+                      "docs/sdk/v0.53/user/run-node/run-production"
+                    ]
+                  },
+                  { "group": "User", "pages": ["docs/sdk/v0.53/user"] }
+                ]
+              },
+              {
+                "tab": "Tutorials",
+                "groups": [
+                  { "group": "Tutorials", "pages": ["docs/sdk/v0.53/tutorials"] },
+                  {
+                    "group": "Vote Extensions Tutorials",
+                    "pages": [
+                      {
+                        "group": "Mitigating Auction Front-Running Tutorial",
+                        "pages": [
+                          "docs/sdk/v0.53/tutorials/vote-extensions/auction-frontrunning/getting-started",
+                          "docs/sdk/v0.53/tutorials/vote-extensions/auction-frontrunning/understanding-frontrunning",
+                          "docs/sdk/v0.53/tutorials/vote-extensions/auction-frontrunning/mitigating-front-running-with-vote-extensions",
+                          "docs/sdk/v0.53/tutorials/vote-extensions/auction-frontrunning/mitigating-front-running-with-vote-extesions",
+                          "docs/sdk/v0.53/tutorials/vote-extensions/auction-frontrunning/demo-of-mitigating-front-running"
+                        ]
+                      },
+                      {
+                        "group": "Oracle Tutorial",
+                        "pages": [
+                          "docs/sdk/v0.53/tutorials/vote-extensions/oracle/getting-started",
+                          "docs/sdk/v0.53/tutorials/vote-extensions/oracle/what-is-an-oracle",
+                          "docs/sdk/v0.53/tutorials/vote-extensions/oracle/implementing-vote-extensions",
+                          "docs/sdk/v0.53/tutorials/vote-extensions/oracle/testing-oracle"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Transaction Tutorials",
+                    "pages": [
+                      "docs/sdk/v0.53/tutorials/transactions/building-a-transaction"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "version": "v0.50",
+            "tabs": [
+              {
+                "tab": "Learn",
+                "groups": [
+                  { "group": "Learn", "pages": ["docs/sdk/v0.50/learn"] },
+                  {
+                    "group": "Introduction",
+                    "pages": [
+                      "docs/sdk/v0.50/learn/intro/overview",
+                      "docs/sdk/v0.50/learn/intro/why-app-specific",
+                      "docs/sdk/v0.50/learn/intro/sdk-app-architecture",
+                      "docs/sdk/v0.50/learn/intro/sdk-design"
+                    ]
+                  },
+                  {
+                    "group": "Beginner",
+                    "pages": [
+                      "docs/sdk/v0.50/learn/beginner/app-anatomy",
+                      "docs/sdk/v0.50/learn/beginner/tx-lifecycle",
+                      "docs/sdk/v0.50/learn/beginner/query-lifecycle",
+                      "docs/sdk/v0.50/learn/beginner/accounts",
+                      "docs/sdk/v0.50/learn/beginner/gas-fees"
+                    ]
+                  },
+                  {
+                    "group": "Advanced",
+                    "pages": [
+                      "docs/sdk/v0.50/learn/advanced/baseapp",
+                      "docs/sdk/v0.50/learn/advanced/transactions",
+                      "docs/sdk/v0.50/learn/advanced/context",
+                      "docs/sdk/v0.50/learn/advanced/node",
+                      "docs/sdk/v0.50/learn/advanced/store",
+                      "docs/sdk/v0.50/learn/advanced/encoding",
+                      "docs/sdk/v0.50/learn/advanced/grpc_rest",
+                      "docs/sdk/v0.50/learn/advanced/cli",
+                      "docs/sdk/v0.50/learn/advanced/events",
+                      "docs/sdk/v0.50/learn/advanced/telemetry",
+                      "docs/sdk/v0.50/learn/advanced/ocap",
+                      "docs/sdk/v0.50/learn/advanced/runtx_middleware",
+                      "docs/sdk/v0.50/learn/advanced/simulation",
+                      "docs/sdk/v0.50/learn/advanced/proto-docs",
+                      "docs/sdk/v0.50/learn/advanced/upgrade",
+                      "docs/sdk/v0.50/learn/advanced/config",
+                      "docs/sdk/v0.50/learn/advanced/autocli"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "Build",
+                "groups": [
+                  { "group": "Build", "pages": ["docs/sdk/v0.50/build"] },
+                  {
+                    "group": "Building Apps",
+                    "pages": [
+                      "docs/sdk/v0.50/build/building-apps/app-go",
+                      "docs/sdk/v0.50/build/building-apps/runtime",
+                      "docs/sdk/v0.50/build/building-apps/app-go-di",
+                      "docs/sdk/v0.50/build/building-apps/app-mempool",
+                      "docs/sdk/v0.50/build/building-apps/app-upgrade",
+                      "docs/sdk/v0.50/build/building-apps/vote-extensions",
+                      "docs/sdk/v0.50/build/building-apps/app-testnet"
+                    ]
+                  },
+                  {
+                    "group": "Building Modules",
+                    "pages": [
+                      "docs/sdk/v0.50/build/building-modules/module-manager",
+                      "docs/sdk/v0.50/build/building-modules/messages-and-queries",
+                      "docs/sdk/v0.50/build/building-modules/msg-services",
+                      "docs/sdk/v0.50/build/building-modules/query-services",
+                      "docs/sdk/v0.50/build/building-modules/protobuf-annotations",
+                      "docs/sdk/v0.50/build/building-modules/beginblock-endblock",
+                      "docs/sdk/v0.50/build/building-modules/keeper",
+                      "docs/sdk/v0.50/build/building-modules/invariants",
+                      "docs/sdk/v0.50/build/building-modules/genesis",
+                      "docs/sdk/v0.50/build/building-modules/module-interfaces",
+                      "docs/sdk/v0.50/build/building-modules/structure",
+                      "docs/sdk/v0.50/build/building-modules/errors",
+                      "docs/sdk/v0.50/build/building-modules/upgrade",
+                      "docs/sdk/v0.50/build/building-modules/simulator",
+                      "docs/sdk/v0.50/build/building-modules/depinject",
+                      "docs/sdk/v0.50/build/building-modules/testing",
+                      "docs/sdk/v0.50/build/building-modules/preblock"
+                    ]
+                  },
+                  {
+                    "group": "ABCI",
+                    "pages": [
+                      "docs/sdk/v0.50/build/abci/introduction",
+                      "docs/sdk/v0.50/build/abci/prepare-proposal",
+                      "docs/sdk/v0.50/build/abci/process-proposal",
+                      "docs/sdk/v0.50/build/abci/vote-extensions",
+                      "docs/sdk/v0.50/build/abci/checktx"
+                    ]
+                  },
+                  {
+                    "group": "Modules",
+                    "pages": [
+                      "docs/sdk/v0.50/build/modules",
+                      {
+                        "group": "x/auth",
+                        "pages": [
+                          "docs/sdk/v0.50/build/modules/auth",
+                          "docs/sdk/v0.50/build/modules/auth/vesting",
+                          "docs/sdk/v0.50/build/modules/auth/tx"
+                        ]
+                      },
+                      "docs/sdk/v0.50/build/modules/authz",
+                      "docs/sdk/v0.50/build/modules/bank",
+                      "docs/sdk/v0.50/build/modules/consensus",
+                      "docs/sdk/v0.50/build/modules/crisis",
+                      "docs/sdk/v0.50/build/modules/distribution",
+                      "docs/sdk/v0.50/build/modules/epochs",
+                      "docs/sdk/v0.50/build/modules/evidence",
+                      "docs/sdk/v0.50/build/modules/feegrant",
+                      "docs/sdk/v0.50/build/modules/gov",
+                      "docs/sdk/v0.50/build/modules/group",
+                      "docs/sdk/v0.50/build/modules/mint",
+                      "docs/sdk/v0.50/build/modules/nft",
+                      "docs/sdk/v0.50/build/modules/params",
+                      "docs/sdk/v0.50/build/modules/protocolpool",
+                      "docs/sdk/v0.50/build/modules/slashing",
+                      "docs/sdk/v0.50/build/modules/staking",
+                      "docs/sdk/v0.50/build/modules/upgrade",
+                      "docs/sdk/v0.50/build/modules/circuit",
+                      "docs/sdk/v0.50/build/modules/genutil"
+                    ]
+                  },
+                  {
+                    "group": "Migrations",
+                    "pages": [
+                      "docs/sdk/v0.50/build/migrations/intro",
+                      "docs/sdk/v0.50/build/migrations/upgrade-reference",
+                      "docs/sdk/v0.50/build/migrations/upgrade-guide"
+                    ]
+                  },
+                  {
+                    "group": "Packages",
+                    "pages": [
+                      "docs/sdk/v0.50/build/packages",
+                      "docs/sdk/v0.50/build/packages/depinject",
+                      "docs/sdk/v0.50/build/packages/collections"
+                    ]
+                  },
+                  {
+                    "group": "Tooling",
+                    "pages": [
+                      "docs/sdk/v0.50/build/tooling",
+                      "docs/sdk/v0.50/build/tooling/protobuf",
+                      "docs/sdk/v0.50/build/tooling/cosmovisor",
+                      "docs/sdk/v0.50/build/tooling/confix"
+                    ]
+                  },
+                  {
+                    "group": "ADRs",
+                    "pages": [
+                      "docs/sdk/v0.50/build/architecture",
+                      "docs/sdk/v0.50/build/architecture/PROCESS",
+                      "docs/sdk/v0.50/build/architecture/adr-002-docs-structure",
+                      "docs/sdk/v0.50/build/architecture/adr-003-dynamic-capability-store",
+                      "docs/sdk/v0.50/build/architecture/adr-004-split-denomination-keys",
+                      "docs/sdk/v0.50/build/architecture/adr-006-secret-store-replacement",
+                      "docs/sdk/v0.50/build/architecture/adr-007-specialization-groups",
+                      "docs/sdk/v0.50/build/architecture/adr-008-dCERT-group",
+                      "docs/sdk/v0.50/build/architecture/adr-009-evidence-module",
+                      "docs/sdk/v0.50/build/architecture/adr-010-modular-antehandler",
+                      "docs/sdk/v0.50/build/architecture/adr-011-generalize-genesis-accounts",
+                      "docs/sdk/v0.50/build/architecture/adr-012-state-accessors",
+                      "docs/sdk/v0.50/build/architecture/adr-013-metrics",
+                      "docs/sdk/v0.50/build/architecture/adr-014-proportional-slashing",
+                      "docs/sdk/v0.50/build/architecture/adr-016-validator-consensus-key-rotation",
+                      "docs/sdk/v0.50/build/architecture/adr-017-historical-header-module",
+                      "docs/sdk/v0.50/build/architecture/adr-018-extendable-voting-period",
+                      "docs/sdk/v0.50/build/architecture/adr-019-protobuf-state-encoding",
+                      "docs/sdk/v0.50/build/architecture/adr-020-protobuf-transaction-encoding",
+                      "docs/sdk/v0.50/build/architecture/adr-021-protobuf-query-encoding",
+                      "docs/sdk/v0.50/build/architecture/adr-022-custom-panic-handling",
+                      "docs/sdk/v0.50/build/architecture/adr-023-protobuf-naming",
+                      "docs/sdk/v0.50/build/architecture/adr-024-coin-metadata",
+                      "docs/sdk/v0.50/build/architecture/adr-027-deterministic-protobuf-serialization",
+                      "docs/sdk/v0.50/build/architecture/adr-028-public-key-addresses",
+                      "docs/sdk/v0.50/build/architecture/adr-029-fee-grant-module",
+                      "docs/sdk/v0.50/build/architecture/adr-030-authz-module",
+                      "docs/sdk/v0.50/build/architecture/adr-031-msg-service",
+                      "docs/sdk/v0.50/build/architecture/adr-032-typed-events",
+                      "docs/sdk/v0.50/build/architecture/adr-033-protobuf-inter-module-comm",
+                      "docs/sdk/v0.50/build/architecture/adr-034-account-rekeying",
+                      "docs/sdk/v0.50/build/architecture/adr-035-rosetta-api-support",
+                      "docs/sdk/v0.50/build/architecture/adr-036-arbitrary-signature",
+                      "docs/sdk/v0.50/build/architecture/adr-037-gov-split-vote",
+                      "docs/sdk/v0.50/build/architecture/adr-038-state-listening",
+                      "docs/sdk/v0.50/build/architecture/adr-039-epoched-staking",
+                      "docs/sdk/v0.50/build/architecture/adr-040-storage-and-smt-state-commitments",
+                      "docs/sdk/v0.50/build/architecture/adr-041-in-place-store-migrations",
+                      "docs/sdk/v0.50/build/architecture/adr-042-group-module",
+                      "docs/sdk/v0.50/build/architecture/adr-043-nft-module",
+                      "docs/sdk/v0.50/build/architecture/adr-044-protobuf-updates-guidelines",
+                      "docs/sdk/v0.50/build/architecture/adr-045-check-delivertx-middlewares",
+                      "docs/sdk/v0.50/build/architecture/adr-046-module-params",
+                      "docs/sdk/v0.50/build/architecture/adr-047-extend-upgrade-plan",
+                      "docs/sdk/v0.50/build/architecture/adr-048-consensus-fees",
+                      "docs/sdk/v0.50/build/architecture/adr-049-state-sync-hooks",
+                      "docs/sdk/v0.50/build/architecture/adr-050-sign-mode-textual-annex1",
+                      "docs/sdk/v0.50/build/architecture/adr-050-sign-mode-textual-annex2",
+                      "docs/sdk/v0.50/build/architecture/adr-050-sign-mode-textual",
+                      "docs/sdk/v0.50/build/architecture/adr-053-go-module-refactoring",
+                      "docs/sdk/v0.50/build/architecture/adr-054-semver-compatible-modules",
+                      "docs/sdk/v0.50/build/architecture/adr-055-orm",
+                      "docs/sdk/v0.50/build/architecture/adr-057-app-wiring",
+                      "docs/sdk/v0.50/build/architecture/adr-058-auto-generated-cli",
+                      "docs/sdk/v0.50/build/architecture/adr-059-test-scopes",
+                      "docs/sdk/v0.50/build/architecture/adr-060-abci-1.0",
+                      "docs/sdk/v0.50/build/architecture/adr-061-liquid-staking",
+                      "docs/sdk/v0.50/build/architecture/adr-062-collections-state-layer",
+                      "docs/sdk/v0.50/build/architecture/adr-063-core-module-api",
+                      "docs/sdk/v0.50/build/architecture/adr-064-abci-2.0",
+                      "docs/sdk/v0.50/build/architecture/adr-065-store-v2",
+                      "docs/sdk/v0.50/build/architecture/adr-068-preblock",
+                      "docs/sdk/v0.50/build/architecture/adr-070-unordered-account",
+                      "docs/sdk/v0.50/build/architecture/adr-076-tx-malleability",
+                      "docs/sdk/v0.50/build/architecture/adr-template"
+                    ]
+                  },
+                  {
+                    "group": "RFC",
+                    "pages": [
+                      "docs/sdk/v0.50/build/rfc",
+                      "docs/sdk/v0.50/build/rfc/PROCESS",
+                      "docs/sdk/v0.50/build/rfc/rfc-001-tx-validation",
+                      "docs/sdk/v0.50/build/rfc/rfc-template"
+                    ]
+                  },
+                  {
+                    "group": "Specifications",
+                    "pages": [
+                      "docs/sdk/v0.50/build/spec",
+                      "docs/sdk/v0.50/build/spec/SPEC_MODULE",
+                      "docs/sdk/v0.50/build/spec/SPEC_STANDARD",
+                      {
+                        "group": "Addresses spec",
+                        "pages": [
+                          "docs/sdk/v0.50/build/spec/addresses",
+                          "docs/sdk/v0.50/build/spec/addresses/bech32"
+                        ]
+                      },
+                      {
+                        "group": "Store",
+                        "pages": [
+                          "docs/sdk/v0.50/build/spec/store",
+                          "docs/sdk/v0.50/build/spec/store/interblock-cache"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "User Guides",
+                "groups": [
+                  { "group": "User Guides", "pages": ["docs/sdk/v0.50/user"] },
+                  {
+                    "group": "Running a Node, API and CLI",
+                    "pages": [
+                      "docs/sdk/v0.50/user/run-node/keyring",
+                      "docs/sdk/v0.50/user/run-node/run-node",
+                      "docs/sdk/v0.50/user/run-node/interact-node",
+                      "docs/sdk/v0.50/user/run-node/txs",
+                      "docs/sdk/v0.50/user/run-node/run-testnet",
+                      "docs/sdk/v0.50/user/run-node/run-production"
+                    ]
+                  },
+                  { "group": "User", "pages": ["docs/sdk/v0.50/user"] }
+                ]
+              },
+              {
+                "tab": "Tutorials",
+                "groups": [
+                  { "group": "Tutorials", "pages": ["docs/sdk/v0.50/tutorials"] },
+                  {
+                    "group": "Vote Extensions Tutorials",
+                    "pages": [
+                      {
+                        "group": "Mitigating Auction Front-Running Tutorial",
+                        "pages": [
+                          "docs/sdk/v0.50/tutorials/vote-extensions/auction-frontrunning/getting-started",
+                          "docs/sdk/v0.50/tutorials/vote-extensions/auction-frontrunning/understanding-frontrunning",
+                          "docs/sdk/v0.50/tutorials/vote-extensions/auction-frontrunning/mitigating-front-running-with-vote-extensions",
+                          "docs/sdk/v0.50/tutorials/vote-extensions/auction-frontrunning/mitigating-front-running-with-vote-extesions",
+                          "docs/sdk/v0.50/tutorials/vote-extensions/auction-frontrunning/demo-of-mitigating-front-running"
+                        ]
+                      },
+                      {
+                        "group": "Oracle Tutorial",
+                        "pages": [
+                          "docs/sdk/v0.50/tutorials/vote-extensions/oracle/getting-started",
+                          "docs/sdk/v0.50/tutorials/vote-extensions/oracle/what-is-an-oracle",
+                          "docs/sdk/v0.50/tutorials/vote-extensions/oracle/implementing-vote-extensions",
+                          "docs/sdk/v0.50/tutorials/vote-extensions/oracle/testing-oracle"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Transaction Tutorials",
+                    "pages": [
+                      "docs/sdk/v0.50/tutorials/transactions/building-a-transaction"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "version": "v0.47",
+            "tabs": [
+              {
+                "tab": "Learn",
+                "groups": [
+                  { "group": "Learn", "pages": ["docs/sdk/v0.47/learn"] },
+                  {
+                    "group": "Introduction",
+                    "pages": [
+                      "docs/sdk/v0.47/learn/intro/overview",
+                      "docs/sdk/v0.47/learn/intro/why-app-specific",
+                      "docs/sdk/v0.47/learn/intro/sdk-app-architecture",
+                      "docs/sdk/v0.47/learn/intro/sdk-design"
+                    ]
+                  },
+                  {
+                    "group": "Beginner",
+                    "pages": [
+                      "docs/sdk/v0.47/learn/beginner/app-anatomy",
+                      "docs/sdk/v0.47/learn/beginner/tx-lifecycle",
+                      "docs/sdk/v0.47/learn/beginner/query-lifecycle",
+                      "docs/sdk/v0.47/learn/beginner/accounts",
+                      "docs/sdk/v0.47/learn/beginner/gas-fees"
+                    ]
+                  },
+                  {
+                    "group": "Advanced",
+                    "pages": [
+                      "docs/sdk/v0.47/learn/advanced/baseapp",
+                      "docs/sdk/v0.47/learn/advanced/transactions",
+                      "docs/sdk/v0.47/learn/advanced/context",
+                      "docs/sdk/v0.47/learn/advanced/node",
+                      "docs/sdk/v0.47/learn/advanced/store",
+                      "docs/sdk/v0.47/learn/advanced/encoding",
+                      "docs/sdk/v0.47/learn/advanced/grpc_rest",
+                      "docs/sdk/v0.47/learn/advanced/cli",
+                      "docs/sdk/v0.47/learn/advanced/events",
+                      "docs/sdk/v0.47/learn/advanced/telemetry",
+                      "docs/sdk/v0.47/learn/advanced/ocap",
+                      "docs/sdk/v0.47/learn/advanced/runtx_middleware",
+                      "docs/sdk/v0.47/learn/advanced/simulation",
+                      "docs/sdk/v0.47/learn/advanced/proto-docs",
+                      "docs/sdk/v0.47/learn/advanced/upgrade",
+                      "docs/sdk/v0.47/learn/advanced/config",
+                      "docs/sdk/v0.47/learn/advanced/autocli"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "Build",
+                "groups": [
+                  { "group": "Build", "pages": ["docs/sdk/v0.47/build"] },
+                  {
+                    "group": "Building Apps",
+                    "pages": [
+                      "docs/sdk/v0.47/build/building-apps/app-go",
+                      "docs/sdk/v0.47/build/building-apps/runtime",
+                      "docs/sdk/v0.47/build/building-apps/app-go-di",
+                      "docs/sdk/v0.47/build/building-apps/app-mempool",
+                      "docs/sdk/v0.47/build/building-apps/app-upgrade",
+                      "docs/sdk/v0.47/build/building-apps/vote-extensions",
+                      "docs/sdk/v0.47/build/building-apps/app-testnet"
+                    ]
+                  },
+                  {
+                    "group": "Building Modules",
+                    "pages": [
+                      "docs/sdk/v0.47/build/building-modules/module-manager",
+                      "docs/sdk/v0.47/build/building-modules/messages-and-queries",
+                      "docs/sdk/v0.47/build/building-modules/msg-services",
+                      "docs/sdk/v0.47/build/building-modules/query-services",
+                      "docs/sdk/v0.47/build/building-modules/protobuf-annotations",
+                      "docs/sdk/v0.47/build/building-modules/beginblock-endblock",
+                      "docs/sdk/v0.47/build/building-modules/keeper",
+                      "docs/sdk/v0.47/build/building-modules/invariants",
+                      "docs/sdk/v0.47/build/building-modules/genesis",
+                      "docs/sdk/v0.47/build/building-modules/module-interfaces",
+                      "docs/sdk/v0.47/build/building-modules/structure",
+                      "docs/sdk/v0.47/build/building-modules/errors",
+                      "docs/sdk/v0.47/build/building-modules/upgrade",
+                      "docs/sdk/v0.47/build/building-modules/simulator",
+                      "docs/sdk/v0.47/build/building-modules/depinject",
+                      "docs/sdk/v0.47/build/building-modules/testing",
+                      "docs/sdk/v0.47/build/building-modules/preblock"
+                    ]
+                  },
+                  {
+                    "group": "ABCI",
+                    "pages": [
+                      "docs/sdk/v0.47/build/abci/introduction",
+                      "docs/sdk/v0.47/build/abci/prepare-proposal",
+                      "docs/sdk/v0.47/build/abci/process-proposal",
+                      "docs/sdk/v0.47/build/abci/vote-extensions",
+                      "docs/sdk/v0.47/build/abci/checktx"
+                    ]
+                  },
+                  {
+                    "group": "Modules",
+                    "pages": [
+                      "docs/sdk/v0.47/build/modules",
+                      {
+                        "group": "x/auth",
+                        "pages": [
+                          "docs/sdk/v0.47/build/modules/auth",
+                          "docs/sdk/v0.47/build/modules/auth/vesting",
+                          "docs/sdk/v0.47/build/modules/auth/tx"
+                        ]
+                      },
+                      "docs/sdk/v0.47/build/modules/authz",
+                      "docs/sdk/v0.47/build/modules/bank",
+                      "docs/sdk/v0.47/build/modules/consensus",
+                      "docs/sdk/v0.47/build/modules/crisis",
+                      "docs/sdk/v0.47/build/modules/distribution",
+                      "docs/sdk/v0.47/build/modules/epochs",
+                      "docs/sdk/v0.47/build/modules/evidence",
+                      "docs/sdk/v0.47/build/modules/feegrant",
+                      "docs/sdk/v0.47/build/modules/gov",
+                      "docs/sdk/v0.47/build/modules/group",
+                      "docs/sdk/v0.47/build/modules/mint",
+                      "docs/sdk/v0.47/build/modules/nft",
+                      "docs/sdk/v0.47/build/modules/params",
+                      "docs/sdk/v0.47/build/modules/protocolpool",
+                      "docs/sdk/v0.47/build/modules/slashing",
+                      "docs/sdk/v0.47/build/modules/staking",
+                      "docs/sdk/v0.47/build/modules/upgrade",
+                      "docs/sdk/v0.47/build/modules/circuit",
+                      "docs/sdk/v0.47/build/modules/genutil"
+                    ]
+                  },
+                  {
+                    "group": "Migrations",
+                    "pages": [
+                      "docs/sdk/v0.47/build/migrations/intro",
+                      "docs/sdk/v0.47/build/migrations/upgrade-reference",
+                      "docs/sdk/v0.47/build/migrations/upgrade-guide"
+                    ]
+                  },
+                  {
+                    "group": "Packages",
+                    "pages": [
+                      "docs/sdk/v0.47/build/packages",
+                      "docs/sdk/v0.47/build/packages/depinject",
+                      "docs/sdk/v0.47/build/packages/collections"
+                    ]
+                  },
+                  {
+                    "group": "Tooling",
+                    "pages": [
+                      "docs/sdk/v0.47/build/tooling",
+                      "docs/sdk/v0.47/build/tooling/protobuf",
+                      "docs/sdk/v0.47/build/tooling/cosmovisor",
+                      "docs/sdk/v0.47/build/tooling/confix"
+                    ]
+                  },
+                  {
+                    "group": "ADRs",
+                    "pages": [
+                      "docs/sdk/v0.47/build/architecture",
+                      "docs/sdk/v0.47/build/architecture/PROCESS",
+                      "docs/sdk/v0.47/build/architecture/adr-002-docs-structure",
+                      "docs/sdk/v0.47/build/architecture/adr-003-dynamic-capability-store",
+                      "docs/sdk/v0.47/build/architecture/adr-004-split-denomination-keys",
+                      "docs/sdk/v0.47/build/architecture/adr-006-secret-store-replacement",
+                      "docs/sdk/v0.47/build/architecture/adr-007-specialization-groups",
+                      "docs/sdk/v0.47/build/architecture/adr-008-dCERT-group",
+                      "docs/sdk/v0.47/build/architecture/adr-009-evidence-module",
+                      "docs/sdk/v0.47/build/architecture/adr-010-modular-antehandler",
+                      "docs/sdk/v0.47/build/architecture/adr-011-generalize-genesis-accounts",
+                      "docs/sdk/v0.47/build/architecture/adr-012-state-accessors",
+                      "docs/sdk/v0.47/build/architecture/adr-013-metrics",
+                      "docs/sdk/v0.47/build/architecture/adr-014-proportional-slashing",
+                      "docs/sdk/v0.47/build/architecture/adr-016-validator-consensus-key-rotation",
+                      "docs/sdk/v0.47/build/architecture/adr-017-historical-header-module",
+                      "docs/sdk/v0.47/build/architecture/adr-018-extendable-voting-period",
+                      "docs/sdk/v0.47/build/architecture/adr-019-protobuf-state-encoding",
+                      "docs/sdk/v0.47/build/architecture/adr-020-protobuf-transaction-encoding",
+                      "docs/sdk/v0.47/build/architecture/adr-021-protobuf-query-encoding",
+                      "docs/sdk/v0.47/build/architecture/adr-022-custom-panic-handling",
+                      "docs/sdk/v0.47/build/architecture/adr-023-protobuf-naming",
+                      "docs/sdk/v0.47/build/architecture/adr-024-coin-metadata",
+                      "docs/sdk/v0.47/build/architecture/adr-027-deterministic-protobuf-serialization",
+                      "docs/sdk/v0.47/build/architecture/adr-028-public-key-addresses",
+                      "docs/sdk/v0.47/build/architecture/adr-029-fee-grant-module",
+                      "docs/sdk/v0.47/build/architecture/adr-030-authz-module",
+                      "docs/sdk/v0.47/build/architecture/adr-031-msg-service",
+                      "docs/sdk/v0.47/build/architecture/adr-032-typed-events",
+                      "docs/sdk/v0.47/build/architecture/adr-033-protobuf-inter-module-comm",
+                      "docs/sdk/v0.47/build/architecture/adr-034-account-rekeying",
+                      "docs/sdk/v0.47/build/architecture/adr-035-rosetta-api-support",
+                      "docs/sdk/v0.47/build/architecture/adr-036-arbitrary-signature",
+                      "docs/sdk/v0.47/build/architecture/adr-037-gov-split-vote",
+                      "docs/sdk/v0.47/build/architecture/adr-038-state-listening",
+                      "docs/sdk/v0.47/build/architecture/adr-039-epoched-staking",
+                      "docs/sdk/v0.47/build/architecture/adr-040-storage-and-smt-state-commitments",
+                      "docs/sdk/v0.47/build/architecture/adr-041-in-place-store-migrations",
+                      "docs/sdk/v0.47/build/architecture/adr-042-group-module",
+                      "docs/sdk/v0.47/build/architecture/adr-043-nft-module",
+                      "docs/sdk/v0.47/build/architecture/adr-044-protobuf-updates-guidelines",
+                      "docs/sdk/v0.47/build/architecture/adr-045-check-delivertx-middlewares",
+                      "docs/sdk/v0.47/build/architecture/adr-046-module-params",
+                      "docs/sdk/v0.47/build/architecture/adr-047-extend-upgrade-plan",
+                      "docs/sdk/v0.47/build/architecture/adr-048-consensus-fees",
+                      "docs/sdk/v0.47/build/architecture/adr-049-state-sync-hooks",
+                      "docs/sdk/v0.47/build/architecture/adr-050-sign-mode-textual-annex1",
+                      "docs/sdk/v0.47/build/architecture/adr-050-sign-mode-textual-annex2",
+                      "docs/sdk/v0.47/build/architecture/adr-050-sign-mode-textual",
+                      "docs/sdk/v0.47/build/architecture/adr-053-go-module-refactoring",
+                      "docs/sdk/v0.47/build/architecture/adr-054-semver-compatible-modules",
+                      "docs/sdk/v0.47/build/architecture/adr-055-orm",
+                      "docs/sdk/v0.47/build/architecture/adr-057-app-wiring",
+                      "docs/sdk/v0.47/build/architecture/adr-058-auto-generated-cli",
+                      "docs/sdk/v0.47/build/architecture/adr-059-test-scopes",
+                      "docs/sdk/v0.47/build/architecture/adr-060-abci-1.0",
+                      "docs/sdk/v0.47/build/architecture/adr-061-liquid-staking",
+                      "docs/sdk/v0.47/build/architecture/adr-062-collections-state-layer",
+                      "docs/sdk/v0.47/build/architecture/adr-063-core-module-api",
+                      "docs/sdk/v0.47/build/architecture/adr-064-abci-2.0",
+                      "docs/sdk/v0.47/build/architecture/adr-065-store-v2",
+                      "docs/sdk/v0.47/build/architecture/adr-068-preblock",
+                      "docs/sdk/v0.47/build/architecture/adr-070-unordered-account",
+                      "docs/sdk/v0.47/build/architecture/adr-076-tx-malleability",
+                      "docs/sdk/v0.47/build/architecture/adr-template"
+                    ]
+                  },
+                  {
+                    "group": "RFC",
+                    "pages": [
+                      "docs/sdk/v0.47/build/rfc",
+                      "docs/sdk/v0.47/build/rfc/PROCESS",
+                      "docs/sdk/v0.47/build/rfc/rfc-001-tx-validation",
+                      "docs/sdk/v0.47/build/rfc/rfc-template"
+                    ]
+                  },
+                  {
+                    "group": "Specifications",
+                    "pages": [
+                      "docs/sdk/v0.47/build/spec",
+                      "docs/sdk/v0.47/build/spec/SPEC_MODULE",
+                      "docs/sdk/v0.47/build/spec/SPEC_STANDARD",
+                      {
+                        "group": "Addresses spec",
+                        "pages": [
+                          "docs/sdk/v0.47/build/spec/addresses",
+                          "docs/sdk/v0.47/build/spec/addresses/bech32"
+                        ]
+                      },
+                      {
+                        "group": "Store",
+                        "pages": [
+                          "docs/sdk/v0.47/build/spec/store",
+                          "docs/sdk/v0.47/build/spec/store/interblock-cache"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "User Guides",
+                "groups": [
+                  { "group": "User Guides", "pages": ["docs/sdk/v0.47/user"] },
+                  {
+                    "group": "Running a Node, API and CLI",
+                    "pages": [
+                      "docs/sdk/v0.47/user/run-node/keyring",
+                      "docs/sdk/v0.47/user/run-node/run-node",
+                      "docs/sdk/v0.47/user/run-node/interact-node",
+                      "docs/sdk/v0.47/user/run-node/txs",
+                      "docs/sdk/v0.47/user/run-node/run-testnet",
+                      "docs/sdk/v0.47/user/run-node/run-production"
+                    ]
+                  },
+                  { "group": "User", "pages": ["docs/sdk/v0.47/user"] }
+                ]
+              },
+              {
+                "tab": "Tutorials",
+                "groups": [
+                  { "group": "Tutorials", "pages": ["docs/sdk/v0.47/tutorials"] },
+                  {
+                    "group": "Vote Extensions Tutorials",
+                    "pages": [
+                      {
+                        "group": "Mitigating Auction Front-Running Tutorial",
+                        "pages": [
+                          "docs/sdk/v0.47/tutorials/vote-extensions/auction-frontrunning/getting-started",
+                          "docs/sdk/v0.47/tutorials/vote-extensions/auction-frontrunning/understanding-frontrunning",
+                          "docs/sdk/v0.47/tutorials/vote-extensions/auction-frontrunning/mitigating-front-running-with-vote-extensions",
+                          "docs/sdk/v0.47/tutorials/vote-extensions/auction-frontrunning/mitigating-front-running-with-vote-extesions",
+                          "docs/sdk/v0.47/tutorials/vote-extensions/auction-frontrunning/demo-of-mitigating-front-running"
+                        ]
+                      },
+                      {
+                        "group": "Oracle Tutorial",
+                        "pages": [
+                          "docs/sdk/v0.47/tutorials/vote-extensions/oracle/getting-started",
+                          "docs/sdk/v0.47/tutorials/vote-extensions/oracle/what-is-an-oracle",
+                          "docs/sdk/v0.47/tutorials/vote-extensions/oracle/implementing-vote-extensions",
+                          "docs/sdk/v0.47/tutorials/vote-extensions/oracle/testing-oracle"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Transaction Tutorials",
+                    "pages": [
+                      "docs/sdk/v0.47/tutorials/transactions/building-a-transaction"
+                    ]
+                  }
                 ]
               }
             ]
