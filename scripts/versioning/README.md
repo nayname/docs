@@ -115,9 +115,10 @@ The script will:
 3. Prompt for the new development version (e.g., `v0.5.0` or `v0.5.x`)
 4. Check/update release notes (for EVM)
 5. Create a frozen copy at `docs/<subdir>/<version>/`
-6. Snapshot EIP data to a Google Sheets tab (EVM only)
-7. Update navigation and versions registry
-8. Create metadata files
+6. If release notes for the target version are missing, they are auto-fetched from the product repo and written to `docs/<subdir>/next/changelog/release-notes.mdx`
+7. Snapshot EIP data to a Google Sheets tab (EVM only)
+8. Update navigation and versions registry
+9. Create metadata files
 
 ## Scripts Reference
 
@@ -165,14 +166,20 @@ Standalone changelog and release notes management.
 **Usage:**
 
 ```bash
-npm run release-notes [version|latest]
+npm run release-notes [version|latest] [evm|sdk|ibc]
 ```
 
 **What it does:**
 
-- Fetches changelog from cosmos/evm repository
+- Fetches changelog from the product's GitHub repository
 - Parses and converts to Mintlify format
 - Updates release notes file in `docs/<subdir>/next/`
+
+**Sources:**
+
+- evm → `cosmos/evm`
+- sdk → `cosmos/cosmos-sdk`
+- ibc → `cosmos/ibc-go`
 
 ### Supporting Scripts
 
@@ -266,14 +273,14 @@ The system handles three types of paths:
 
 The system works within Mintlify's MDX compiler limitations:
 
-### What Works 
+### What Works
 
 - Component imports from `/snippets/`
 - Props passed to components
 - Standard MDX syntax
 - HTML comments for metadata
 
-### What Doesn't Work 
+### What Doesn't Work
 
 - Inline component definitions
 - Dynamic imports
