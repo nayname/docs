@@ -38,22 +38,51 @@ docs/
 
 ### Navigation Structure
 
+Docs now use product-specific dropdowns with per-product versions:
+
 ```json
 {
   "navigation": {
-    "versions": [
+    "dropdowns": [
       {
-        "version": "v0.4.x",  // Frozen version
-        "tabs": [...],        // Points to docs/evm/v0.4.x/ paths
+        "dropdown": "EVM",
+        "versions": [
+          { "version": "next", "tabs": [/* docs/evm/next/... */] },
+          { "version": "v0.4.x", "tabs": [/* docs/evm/v0.4.x/... */] }
+        ]
       },
       {
-        "version": "next",    // Active development
-        "tabs": [...],        // Points to docs/evm/next/ paths
+        "dropdown": "SDK",
+        "versions": [
+          { "version": "v0.53", "tabs": [/* docs/sdk/v0.53/... */] }
+        ]
       }
     ]
   }
 }
 ```
+
+### Versions Registry
+
+The top-level `versions.json` now tracks versions per product (subdirectory under `docs/`). Example:
+
+```json
+{
+  "products": {
+    "evm": {
+      "versions": ["next", "v0.4.x"],
+      "defaultVersion": "next",
+      "nextDev": "v0.5.0"
+    },
+    "sdk": {
+      "versions": ["next", "v0.53", "v0.50", "v0.47"],
+      "defaultVersion": "v0.53"
+    }
+  }
+}
+```
+
+Each product can be versioned independently. The version manager auto-detects the freeze version for the selected product from this file; if not found, it prompts for one. The `nextDev` field is advisory and records the next development version label.
 
 ## Quick Start
 
@@ -82,12 +111,13 @@ npm run freeze
 The script will:
 
 1. Prompt for the docs subdirectory (e.g., `evm`, `sdk`, `ibc`)
-2. Prompt for the new development version (e.g., v0.5.0)
-2. Check/update release notes from cosmos/evm
-3. Create a frozen copy at the current version path
-4. Snapshot EIP data to a Google Sheets tab
-5. Update navigation and version registry
-6. Set up the new development version
+2. Determine the version to freeze from `versions.json` for that product, or prompt
+3. Prompt for the new development version (e.g., `v0.5.0` or `v0.5.x`)
+4. Check/update release notes (for EVM)
+5. Create a frozen copy at `docs/<subdir>/<version>/`
+6. Snapshot EIP data to a Google Sheets tab (EVM only)
+7. Update navigation and versions registry
+8. Create metadata files
 
 ## Scripts Reference
 
@@ -196,7 +226,8 @@ Active development uses it without props (defaults to main sheet):
 ### Version Freeze Process
 
 1. **Preparation Phase**
-   - Determine current version from versions.json
+   - Pick product subdirectory (`evm`, `sdk`, `ibc`)
+   - Determine current version to freeze from `versions.json` for that product (or prompt)
    - Prompt for new development version
    - Check/update release notes
 
@@ -214,8 +245,8 @@ Active development uses it without props (defaults to main sheet):
 4. **Finalization Phase**
    - Create `.version-frozen` marker
    - Create `.version-metadata.json`
-   - Register new development version
-   - Update default version
+   - Register per-product versions in `versions.json`
+   - Record next development version label per product
 
 ### Path Management
 
@@ -363,7 +394,7 @@ If you need to remove a test version:
 # Remove frozen directory
 rm -rf docs/<subdir>/v0.5.0/
 
-# Update versions.json manually or re-run version manager
+# Update per-product entries in versions.json or re-run version manager
 
 # Remove navigation entry (manual edit of docs.json)
 # Remove Google Sheets tab (manual via Google Sheets UI)
