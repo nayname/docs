@@ -227,9 +227,9 @@ If you previously built custom pools:
 +           MinValue: math.ZeroInt(),
 +       },
 +   },
-    AnteHandler:      app.GetAnteHandler(),
-    BroadCastTxFn:    customBroadcastFunc, // optional
-    BlockGasLimit:    100_000_000,
+   AnteHandler:      app.GetAnteHandler(),
+   BroadcastTxFn:    customBroadcastFunc, // optional
+   BlockGasLimit:    100_000_000,
  }
 ```
 
@@ -279,7 +279,7 @@ func (d MyCustomDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
   - `LegacyPoolConfig` (configure legacy EVM txpool behavior)
   - `CosmosPoolConfig` (configure Cosmos `PriorityNonceMempool` behavior)
   - `BlockGasLimit` (required; `0` uses fallback `100_000_000`)
-  - `BroadCastTxFn` (optional callback; defaults to broadcasting via `clientCtx`)
+  - `BroadcastTxFn` (optional callback; defaults to broadcasting via `clientCtx`)
   - `MinTip` (optional minimum tip for EVM selection)
 
 ---

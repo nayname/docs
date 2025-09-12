@@ -25,7 +25,7 @@ This guide is for **fresh integration** of Cosmos EVM v0.5.0 into new chains. Fo
 ```go
 require (
     github.com/cosmos/cosmos-sdk v0.53.4
-    github.com/cosmos/ibc-go/v10 v10.2.0
+    github.com/cosmos/ibc-go/v10 v10.3.0
     github.com/cosmos/evm v0.5.0
 )
 
@@ -43,14 +43,14 @@ import (
     // EVM ante handlers (updated import path in v0.5.0)
     evmante "github.com/cosmos/evm/ante"
     cosmosevmante "github.com/cosmos/evm/ante/evm"
-    
+
     // Configuration
     evmconfig "github.com/cosmos/evm/config"
     srvflags "github.com/cosmos/evm/server/flags"
-    
+
     // Mempool (new in v0.5.0)
     evmmempool "github.com/cosmos/evm/mempool"
-    
+
     // Modules
     "github.com/cosmos/evm/x/erc20"
     erc20keeper "github.com/cosmos/evm/x/erc20/keeper"
@@ -63,14 +63,14 @@ import (
     "github.com/cosmos/evm/x/vm"
     evmkeeper "github.com/cosmos/evm/x/vm/keeper"
     evmtypes "github.com/cosmos/evm/x/vm/types"
-    
+
     // Override IBC transfer for ERC20 support
     "github.com/cosmos/evm/x/ibc/transfer"
     transferkeeper "github.com/cosmos/evm/x/ibc/transfer/keeper"
-    
+
     // Server interface
     evmserver "github.com/cosmos/evm/server"
-    
+
     "github.com/ethereum/go-ethereum/common"
 )
 ```
@@ -89,11 +89,11 @@ type App struct {
     appCodec          codec.Codec
     interfaceRegistry types.InterfaceRegistry
     txConfig          client.TxConfig
-    
+
     // REQUIRED: Client context for EVM operations
     clientCtx client.Context
-    
-    // REQUIRED: Pending transaction listeners for mempool integration  
+
+    // REQUIRED: Pending transaction listeners for mempool integration
     pendingTxListeners []evmante.PendingTxListener
 
     // Store keys
@@ -116,7 +116,7 @@ type App struct {
     Erc20Keeper       erc20keeper.Keeper
     PreciseBankKeeper precisebankkeeper.Keeper  // Critical for 18-decimal precision
     TransferKeeper    transferkeeper.Keeper     // EVM-enhanced IBC transfer
-    
+
     // REQUIRED: EVM mempool (new in v0.5.0)
     EVMMempool *evmmempool.ExperimentalEVMMempool
 
@@ -173,7 +173,7 @@ keys := storetypes.NewKVStoreKeys(
     authtypes.StoreKey,
     banktypes.StoreKey,
     // ... other standard keys
-    
+
     // REQUIRED: EVM module store keys
     evmtypes.StoreKey,
     feemarkettypes.StoreKey,
@@ -196,11 +196,11 @@ app.ModuleManager = module.NewManager(
     auth.NewAppModule(appCodec, app.AccountKeeper, ...),
     bank.NewAppModule(appCodec, app.BankKeeper, ...),
     // ... other standard modules
-    
+
     // IBC modules (use EVM-enhanced transfer)
     ibc.NewAppModule(app.IBCKeeper),
     transferModule,  // EVM-enhanced, not standard IBC transfer
-    
+
     // REQUIRED: EVM modules in dependency order
     vm.NewAppModule(app.EVMKeeper, app.AccountKeeper, app.AccountKeeper.AddressCodec()),
     feemarket.NewAppModule(app.FeeMarketKeeper),
@@ -297,13 +297,13 @@ func (app *App) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64) {
         FeeMarketKeeper:        app.FeeMarketKeeper,
         SignModeHandler:        txConfig.SignModeHandler(),
         SigGasConsumer:         evmante.SigVerificationGasConsumer,
-        
+
         // v0.5.0 new parameters
         MaxTxGasWanted:    maxGasWanted,      // From app.toml evm.max-tx-gas-wanted
         TxFeeChecker:      cosmosevmante.NewDynamicFeeChecker(app.FeeMarketKeeper),
         PendingTxListener: app.onPendingTx,   // Required for mempool integration
     }
-    
+
     if err := options.Validate(); err != nil {
         panic(fmt.Sprintf("ante handler options validation failed: %v", err))
     }
@@ -353,7 +353,7 @@ if cosmosevmtypes.GetChainConfig() != nil {
 
     // REQUIRED: Replace BaseApp mempool
     app.SetMempool(evmMempool)
-    
+
     // REQUIRED: Set custom CheckTx handler
     checkTxHandler := evmmempool.NewCheckTxHandler(evmMempool)
     app.SetCheckTxHandler(checkTxHandler)
@@ -416,7 +416,7 @@ func NewAvailableStaticPrecompiles(
     }
     precompiles[bankPrecompile.Address()] = bankPrecompile
 
-    // Distribution precompile  
+    // Distribution precompile
     distributionPrecompile, err := distprecompile.NewPrecompile(
         cmn.DistributionKeeper(distributionKeeper),
         cdc,
@@ -527,7 +527,7 @@ rootCmd.AddCommand(
 # Minimum priority fee for mempool (in wei)
 min-tip = 0
 
-# Maximum gas for eth transactions in check tx mode  
+# Maximum gas for eth transactions in check tx mode
 max-tx-gas-wanted = 0
 
 # EIP-155 chain ID (separate from Cosmos chain ID)
@@ -549,7 +549,7 @@ ws-address = "127.0.0.1:8546"
 enable-indexer = true
 
 # API namespaces (txpool requires mempool)
-api = ["eth","net","web3","txpool","debug"]
+api = "eth,net,web3,txpool,debug"
 
 # Performance settings
 gas-cap = 25000000
@@ -771,7 +771,7 @@ error: eth_createAccessList not found
 ```toml
 [json-rpc]
 enable-indexer = true
-api = ["eth","net","web3","txpool"]
+api = "eth,net,web3,txpool"
 ```
 
 ## Integration Checklist

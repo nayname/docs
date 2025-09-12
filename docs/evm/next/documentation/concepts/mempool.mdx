@@ -213,7 +213,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
     LegacyPoolConfig: &legacypool.Config{...}, // ← NEW in v0.5.0
     CosmosPoolConfig: &sdkmempool.PriorityNonceMempoolConfig{...}, // ← NEW in v0.5.0
     AnteHandler:   app.GetAnteHandler(),
-    BroadCastTxFn: customBroadcastFunc, // ← NEW: Optional custom broadcast
+    BroadcastTxFn: customBroadcastFunc, // ← NEW: Optional custom broadcast
     BlockGasLimit: 100_000_000,         // ← NEW: Configurable gas limit
     MinTip:        uint256.NewInt(1000000000), // ← NEW: Minimum tip filter (optional)
 }
@@ -280,7 +280,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
         },
     },
     AnteHandler:   app.GetAnteHandler(),
-    BroadCastTxFn: customBroadcastFunction, // Optional custom broadcast logic
+    BroadcastTxFn: customBroadcastFunction, // Optional custom broadcast logic
     BlockGasLimit: 200_000_000,             // Custom block gas limit
 }
 ```
@@ -447,7 +447,7 @@ mempoolConfig := &evmmempool.EVMMempoolConfig{
 - If `LegacyPoolConfig` is `nil`, uses `legacypool.DefaultConfig`  
 - If `CosmosPoolConfig` is `nil`, uses default priority mempool
 - If `MinTip` is `nil`, no minimum tip enforcement
-- `BroadCastTxFn` is optional (uses default broadcast if nil)
+- `BroadcastTxFn` is optional (uses default broadcast if nil)
 
 #### Step 5: Initialization Location
 

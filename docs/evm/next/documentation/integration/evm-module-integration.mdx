@@ -39,7 +39,7 @@ These version numbers may change as development continues. Check [github.com/cos
 ```go
 require (
     github.com/cosmos/cosmos-sdk v0.53.0
-    github.com/cosmos/ibc-go/v10 v10.2.0
+    github.com/cosmos/ibc-go/v10 v10.3.0
     github.com/cosmos/evm v0.5.0
 )
 
@@ -59,7 +59,7 @@ require (
 
     // for IBC functionality in EVM
     github.com/cosmos/ibc-go/modules/capability v1.0.1
-    github.com/cosmos/ibc-go/v10 v10.2.0
+    github.com/cosmos/ibc-go/v10 v10.3.0
 )
 ```
 
@@ -435,7 +435,7 @@ import (
     // Replace default transfer with EVM's extended transfer module
     transfer "github.com/cosmos/evm/x/ibc/transfer"
     ibctransferkeeper "github.com/cosmos/evm/x/ibc/transfer/keeper"
-    ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+    ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
 
     // Add authz for precompiles
     authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
@@ -933,14 +933,13 @@ Sign Mode Textual is a new Cosmos SDK signing method that may not be compatible 
 ```go "Sign Mode Textual Configuration" expandable
 // In app.go
 import (
-    "github.com/cosmos/cosmos-sdk/types/tx"
-    "github.com/cosmos/cosmos-sdk/x/auth/tx"
+    authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 )
 
 // ... in NewChainApp, where you set up your txConfig:
-txConfig := tx.NewTxConfigWithOptions(
+txConfig := authtx.NewTxConfigWithOptions(
     appCodec,
-    tx.ConfigOptions{
+    authtx.ConfigOptions{
         // Remove SignMode_SIGN_MODE_TEXTUAL from enabled sign modes
         EnabledSignModes: []signing.SignMode{
             signing.SignMode_SIGN_MODE_DIRECT,

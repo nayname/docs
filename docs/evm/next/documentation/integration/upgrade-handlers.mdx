@@ -48,7 +48,7 @@ func (app *App) RegisterUpgradeHandlers() {
             // Run module migrations
             migrations, err := app.ModuleManager.RunMigrations(ctx, app.configurator, fromVM)
             if err != nil {
-                return vm, err
+                return nil, err
             }
 
             // Add custom migration logic here

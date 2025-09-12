@@ -525,7 +525,7 @@ block_processing_time: > 2s
 
 ```go
 // Implement custom broadcast function for performance
-BroadCastTxFn: func(txs []*ethtypes.Transaction) error {
+BroadcastTxFn: func(txs []*ethtypes.Transaction) error {
     // Batch broadcast for efficiency
     return batchBroadcastTransactions(txs, batchSize=50)
 }
