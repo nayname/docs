@@ -17,18 +17,18 @@ docs/.cache/
 
 # Logs
 
-npm-debug.log\*
-yarn-debug.log\*
-yarn-error.log\*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # OS files
 
-.DS\_Store
+.DS_Store
 Thumbs.db
 
 # Environment files
 
-.env\*
+.env*
 
 # IDE / Editor files
 
@@ -64,8 +64,21 @@ docs/logs/
 logs/
 dist/
 build/
+
+# --- allow SDK docs build/ dirs (override rule above) ---
+!docs/sdk/v0.53/build/
+!docs/sdk/v0.53/build/**
+!docs/sdk/v0.50/build/
+!docs/sdk/v0.50/build/**
+!docs/sdk/v0.47/build/
+!docs/sdk/v0.47/build/**
+# --------------------------------------------------------
+
 .yarn/
+# Keep most scripts ignored, but include versioning tools
 scripts/*
+!scripts/versioning/
+!scripts/versioning/**
 tests/*
 .ingress/
 CLAUDE.md
