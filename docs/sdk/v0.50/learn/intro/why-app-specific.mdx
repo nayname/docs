@@ -1,21 +1,33 @@
 ---
-title: "Application-Specific Blockchains"
-description: "Version: v0.50"
+title: Application-Specific Blockchains
 ---
 
 <Note>
-  This document explains what application-specific blockchains are, and why developers would want to build one as opposed to writing Smart Contracts.
+**Synopsis**
+This document explains what application-specific blockchains are, and why developers would want to build one as opposed to writing Smart Contracts.
 </Note>
 
-## What are application-specific blockchains[​](#what-are-application-specific-blockchains "Direct link to What are application-specific blockchains")
+## What are application-specific blockchains
 
 Application-specific blockchains are blockchains customized to operate a single application. Instead of building a decentralized application on top of an underlying blockchain like Ethereum, developers build their own blockchain from the ground up. This means building a full-node client, a light-client, and all the necessary interfaces (CLI, REST, ...) to interact with the nodes.
 
-```
-                ^  +-------------------------------+  ^                |  |                               |  |   Built with Cosmos SDK                |  |  State-machine = Application  |  |                |  |                               |  v                |  +-------------------------------+                |  |                               |  ^Blockchain node |  |           Consensus           |  |                |  |                               |  |                |  +-------------------------------+  |   CometBFT                |  |                               |  |                |  |           Networking          |  |                |  |                               |  |                v  +-------------------------------+  v
+```text expandable
+                ^  +-------------------------------+  ^
+                |  |                               |  |   Built with Cosmos SDK
+                |  |  State-machine = Application  |  |
+                |  |                               |  v
+                |  +-------------------------------+
+                |  |                               |  ^
+Blockchain node |  |           Consensus           |  |
+                |  |                               |  |
+                |  +-------------------------------+  |   CometBFT
+                |  |                               |  |
+                |  |           Networking          |  |
+                |  |                               |  |
+                v  +-------------------------------+  v
 ```
 
-## What are the shortcomings of Smart Contracts[​](#what-are-the-shortcomings-of-smart-contracts "Direct link to What are the shortcomings of Smart Contracts")
+## What are the shortcomings of Smart Contracts
 
 Virtual-machine blockchains like Ethereum addressed the demand for more programmability back in 2014. At the time, the options available for building decentralized applications were quite limited. Most developers would build on top of the complex and limited Bitcoin scripting language, or fork the Bitcoin codebase which was hard to work with and customize.
 
@@ -27,9 +39,9 @@ Virtual-machine blockchains came in with a new value proposition. Their state-ma
 
 Application-Specific Blockchains are designed to address these shortcomings.
 
-## Application-Specific Blockchains Benefits[​](#application-specific-blockchains-benefits "Direct link to Application-Specific Blockchains Benefits")
+## Application-Specific Blockchains Benefits
 
-### Flexibility[​](#flexibility "Direct link to Flexibility")
+### Flexibility
 
 Application-specific blockchains give maximum flexibility to developers:
 
@@ -47,7 +59,7 @@ Application-specific blockchains give maximum flexibility to developers:
 
 The list above contains a few examples that show how much flexibility application-specific blockchains give to developers. The goal of Cosmos and the Cosmos SDK is to make developer tooling as generic and composable as possible, so that each part of the stack can be forked, tweaked and improved without losing compatibility. As the community grows, more alternatives for each of the core building blocks will emerge, giving more options to developers.
 
-### Performance[​](#performance "Direct link to Performance")
+### Performance
 
 Decentralized applications built with Smart Contracts are inherently capped in performance by the underlying environment. For a decentralized application to optimise performance, it needs to be built as an application-specific blockchain. Next are some of the benefits an application-specific blockchain brings in terms of performance:
 
@@ -55,7 +67,7 @@ Decentralized applications built with Smart Contracts are inherently capped in p
 * An application-specific blockchain only operates a single application, so that the application does not compete with others for computation and storage. This is the opposite of most non-sharded virtual-machine blockchains today, where smart contracts all compete for computation and storage.
 * Even if a virtual-machine blockchain offered application-based sharding coupled with an efficient consensus algorithm, performance would still be limited by the virtual-machine itself. The real throughput bottleneck is the state-machine, and requiring transactions to be interpreted by a virtual-machine significantly increases the computational complexity of processing them.
 
-### Security[​](#security "Direct link to Security")
+### Security
 
 Security is hard to quantify, and greatly varies from platform to platform. That said here are some important benefits an application-specific blockchain can bring in terms of security:
 
@@ -63,7 +75,7 @@ Security is hard to quantify, and greatly varies from platform to platform. That
 * Developers are not constrained by the cryptographic functions made available by the underlying virtual-machines. They can use their own custom cryptography, and rely on well-audited crypto libraries.
 * Developers do not have to worry about potential bugs or exploitable mechanisms in the underlying virtual-machine, making it easier to reason about the security of the application.
 
-### Sovereignty[​](#sovereignty "Direct link to Sovereignty")
+### Sovereignty
 
 One of the major benefits of application-specific blockchains is sovereignty. A decentralized application is an ecosystem that involves many actors: users, developers, third-party services, and more. When developers build on virtual-machine blockchain where many decentralized applications coexist, the community of the application is different than the community of the underlying blockchain, and the latter supersedes the former in the governance process. If there is a bug or if a new feature is needed, stakeholders of the application have very little leeway to upgrade the code. If the community of the underlying blockchain refuses to act, nothing can happen.
 

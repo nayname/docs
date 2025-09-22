@@ -1,17 +1,20 @@
 ---
-title: "PreBlocker"
-description: "Version: v0.53"
+title: PreBlocker
 ---
 
 <Note>
-  `PreBlocker` is optional method module developers can implement in their module. They will be triggered before [`BeginBlock`](/v0.53/learn/advanced/baseapp#beginblock).
+**Synopsis**
+`PreBlocker` is optional method module developers can implement in their module. They will be triggered before [`BeginBlock`](/docs/sdk/v0.50//learn/advanced/baseapp#beginblock).
 </Note>
 
 <Note>
-  * [Module Manager](/v0.53/build/building-modules/module-manager)
+**Pre-requisite Readings**
+
+* [Module Manager](/docs/sdk/v0.50/module-manager)
+
 </Note>
 
-## PreBlocker[​](#preblocker-1 "Direct link to PreBlocker")
+## PreBlocker
 
 There are two semantics around the new lifecycle method:
 
@@ -25,3 +28,5 @@ app.finalizeBlockState.ctx = app.finalizeBlockState.ctx.WithConsensusParams(app.
 ```
 
 The new ctx must be passed to all the other lifecycle methods.
+
+{/* TODO: leaving this here to update docs with core api changes */}

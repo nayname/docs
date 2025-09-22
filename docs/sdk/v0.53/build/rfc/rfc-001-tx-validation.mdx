@@ -1,13 +1,13 @@
 ---
-title: "RFC 001: Transaction Validation"
-description: "Version: v0.53"
+title: 'RFC 001: Transaction Validation'
+description: '2023-03-12: Proposed'
 ---
 
-## Changelog[​](#changelog "Direct link to Changelog")
+## Changelog
 
 * 2023-03-12: Proposed
 
-## Background[​](#background "Direct link to Background")
+## Background
 
 Transation Validation is crucial to a functioning state machine. Within the Cosmos SDK there are two validation flows, one is outside the message server and the other within. The flow outside of the message server is the `ValidateBasic` function. It is called in the antehandler on both `CheckTx` and `DeliverTx`. There is an overhead and sometimes duplication of validation within these two flows. This extra validation provides an additional check before entering the mempool.
 
@@ -15,7 +15,7 @@ With the deprecation of [`GetSigners`](https://github.com/cosmos/cosmos-sdk/issu
 
 With the separation of CometBFT and Cosmos-SDK, there is a lack of control of what transactions get broadcasted and included in a block. This extra validation in the antehandler is meant to help in this case. In most cases the transaction is or should be simulated against a node for validation. With this flow transactions will be treated the same.
 
-## Proposal[​](#proposal "Direct link to Proposal")
+## Proposal
 
 The acceptance of this RFC would move validation within `ValidateBasic` to the message server in modules, update tutorials and docs to remove mention of using `ValidateBasic` in favour of handling all validation for a message where it is executed.
 
@@ -23,6 +23,6 @@ We can and will still support the `Validatebasic` function for users and provide
 
 > Note: This is how messages are handled in VMs like Ethereum and CosmWasm.
 
-### Consequences[​](#consequences "Direct link to Consequences")
+### Consequences
 
 The consequence of updating the transaction flow is that transaction that may have failed before with the `ValidateBasic` flow will now be included in a block and fees charged.

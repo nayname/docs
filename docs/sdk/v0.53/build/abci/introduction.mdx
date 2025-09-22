@@ -1,9 +1,13 @@
 ---
-title: "Introduction"
-description: "Version: v0.53"
+title: Introduction
+description: >-
+  ABCI, Application Blockchain Interface is the interface between CometBFT and
+  the application. More information about ABCI can be found here. CometBFT
+  version 0.38 included a new version of ABCI (called ABCI 2.0) which added
+  several new methods.
 ---
 
-## What is ABCI?[​](#what-is-abci "Direct link to What is ABCI?")
+## What is ABCI?
 
 ABCI, Application Blockchain Interface is the interface between CometBFT and the application. More information about ABCI can be found [here](https://docs.cometbft.com/v0.38/spec/abci/). CometBFT version 0.38 included a new version of ABCI (called ABCI 2.0) which added several new methods.
 
@@ -15,9 +19,9 @@ The 5 methods introduced in ABCI 2.0 are:
 * `VerifyVoteExtension`
 * `FinalizeBlock`
 
-## The Flow[​](#the-flow "Direct link to The Flow")
+## The Flow
 
-## PrepareProposal[​](#prepareproposal "Direct link to PrepareProposal")
+## PrepareProposal
 
 Based on validator voting power, CometBFT chooses a block proposer and calls `PrepareProposal` on the block proposer's application (Cosmos SDK). The selected block proposer is responsible for collecting outstanding transactions from the mempool, adhering to the application's specifications. The application can enforce custom transaction ordering and incorporate additional transactions, potentially generated from vote extensions in the previous block.
 
@@ -29,13 +33,13 @@ After creating the proposal, the proposer returns it to CometBFT.
 
 PrepareProposal CAN be non-deterministic.
 
-## ProcessProposal[​](#processproposal "Direct link to ProcessProposal")
+## ProcessProposal
 
 This method allows validators to perform application-specific checks on the block proposal and is called on all validators. This is an important step in the consensus process, as it ensures that the block is valid and meets the requirements of the application. For example, validators could check that the block contains all the required transactions or that the block does not create any invalid state transitions.
 
 The implementation of `ProcessProposal` MUST be deterministic.
 
-## ExtendVote and VerifyVoteExtensions[​](#extendvote-and-verifyvoteextensions "Direct link to ExtendVote and VerifyVoteExtensions")
+## ExtendVote and VerifyVoteExtensions
 
 These methods allow applications to extend the voting process by requiring validators to perform additional actions beyond simply validating blocks.
 
@@ -47,6 +51,6 @@ Additionally, applications must keep the vote extension data concise as it can d
 
 `VerifyVoteExtensions` MUST be deterministic.
 
-## FinalizeBlock[​](#finalizeblock "Direct link to FinalizeBlock")
+## FinalizeBlock
 
 `FinalizeBlock` is then called and is responsible for updating the state of the blockchain and making the block available to users.

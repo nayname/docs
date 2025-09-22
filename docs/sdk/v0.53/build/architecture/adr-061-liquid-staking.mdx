@@ -1,21 +1,21 @@
 ---
-title: "ADR ADR-061: Liquid Staking"
-description: "Version: v0.53"
+title: 'ADR ADR-061: Liquid Staking'
+description: '2022-09-10: Initial Draft (@zmanian)'
 ---
 
-## Changelog[​](#changelog "Direct link to Changelog")
+## Changelog
 
 * 2022-09-10: Initial Draft (@zmanian)
 
-## Status[​](#status "Direct link to Status")
+## Status
 
 ACCEPTED
 
-## Abstract[​](#abstract "Direct link to Abstract")
+## Abstract
 
 Add a semi-fungible liquid staking primitive to the default Cosmos SDK staking module. This upgrades proof of stake to enable safe designs with lower overall monetary issuance and integration with numerous liquid staking protocols like Stride, Persistence, Quicksilver, Lido etc.
 
-## Context[​](#context "Direct link to Context")
+## Context
 
 The original release of the Cosmos Hub featured the implementation of a ground breaking proof of stake mechanism featuring delegation, slashing, in protocol reward distribution and adaptive issuance. This design was state of the art for 2016 and has been deployed without major changes by many L1 blockchains.
 
@@ -29,7 +29,7 @@ It's also important to note that Interchain Accounts are available in the defaul
 
 These changes to the staking module have been in development for more than a year and have seen substantial industry adoption who plan to build staking UX. The internal economics at Informal team has also done a review of the impacts of these changes and this review led to the development of the exempt delegation system. This system provides governance with a tuneable parameter for modulating the risks of principal agent problem called the exemption factor.
 
-## Decision[​](#decision "Direct link to Decision")
+## Decision
 
 We implement the semi-fungible liquid staking system and exemption factor system within the cosmos sdk. Though registered as fungible assets, these tokenized shares have extremely limited fungibility, only among the specific delegation record that was created when shares were tokenized. These assets can be used for OTC trades but composability with DeFi is limited. The primary expected use case is improving the user experience of liquid staking providers.
 
@@ -41,7 +41,7 @@ When shares are tokenized, the underlying shares are transferred to a module acc
 
 There is no longer a mechanism to override the validators vote for TokenizedShares.
 
-### `MsgTokenizeShares`[​](#msgtokenizeshares "Direct link to msgtokenizeshares")
+### `MsgTokenizeShares`
 
 The MsgTokenizeShares message is used to create tokenize delegated tokens. This message can be executed by any delegator who has positive amount of delegation and after execution the specific amount of delegation disappear from the account and share tokens are provided. Share tokens are denominated in the validator and record id of the underlying delegation.
 
@@ -55,28 +55,28 @@ The total amount of outstanding tokenized shares for the validator is checked ag
 
 MsgTokenizeSharesResponse provides the number of tokens generated and their denom.
 
-### `MsgRedeemTokensforShares`[​](#msgredeemtokensforshares "Direct link to msgredeemtokensforshares")
+### `MsgRedeemTokensforShares`
 
 The MsgRedeemTokensforShares message is used to redeem the delegation from share tokens. This message can be executed by any user who owns share tokens. After execution delegations will appear to the user.
 
-### `MsgTransferTokenizeShareRecord`[​](#msgtransfertokenizesharerecord "Direct link to msgtransfertokenizesharerecord")
+### `MsgTransferTokenizeShareRecord`
 
 The MsgTransferTokenizeShareRecord message is used to transfer the ownership of rewards generated from the tokenized amount of delegation. The tokenize share record is created when a user tokenize his/her delegation and deleted when the full amount of share tokens are redeemed.
 
 This is designed to work with liquid staking designs that do not redeem the tokenized shares and may instead want to keep the shares tokenized.
 
-### `MsgExemptDelegation`[​](#msgexemptdelegation "Direct link to msgexemptdelegation")
+### `MsgExemptDelegation`
 
 The MsgExemptDelegation message is used to exempt a delegation to a validator. If the exemption factor is greater than 0, this will allow more delegation shares to be issued from the validator.
 
 This design allows the chain to force an amount of self-delegation by validators participating in liquid staking schemes.
 
-## Consequences[​](#consequences "Direct link to Consequences")
+## Consequences
 
-### Backwards Compatibility[​](#backwards-compatibility "Direct link to Backwards Compatibility")
+### Backwards Compatibility
 
 By setting the exemption factor to zero, this module works like legacy staking. The only substantial change is the removal of min-self-bond and without any tokenized shares, there is no incentive to exempt delegation.
 
-### Positive[​](#positive "Direct link to Positive")
+### Positive
 
 This approach should enable integration with liquid staking providers and improved user experience. It provides a pathway to security under non-exponential issuance policies in the baseline staking module.
