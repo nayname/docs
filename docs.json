@@ -42,7 +42,6 @@
     "dropdowns": [
       {
         "dropdown": "EVM",
-        "icon": "book-open-text",
         "versions": [
           {
             "version": "v0.4.x",
