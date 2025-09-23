@@ -1003,7 +1003,7 @@
                           {
                             "group": "x/auth",
                             "pages": [
-                              "docs/sdk/v0.47/build/modules/authr",
+                              "docs/sdk/v0.47/build/modules/auth/aut",
                               "docs/sdk/v0.47/build/modules/auth/vesting",
                               "docs/sdk/v0.47/build/modules/auth/tx"
                             ]
