@@ -460,7 +460,7 @@
                       {
                         "group": "Modules",
                         "pages": [
-                          "docs/sdk/v0.53/build/modules",
+                          "docs/sdk/v0.53/build/modules/modules",
                           {
                             "group": "x/auth",
                             "pages": [
