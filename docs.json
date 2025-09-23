@@ -464,7 +464,7 @@
                           {
                             "group": "x/auth",
                             "pages": [
-                              "docs/sdk/v0.53/build/modules/auth",
+                              "docs/sdk/v0.53/build/modules/auth/auth",
                               "docs/sdk/v0.53/build/modules/auth/vesting",
                               "docs/sdk/v0.53/build/modules/auth/tx"
                             ]
