@@ -999,34 +999,34 @@
                       {
                         "group": "Modules",
                         "pages": [
-                          "docs/sdk/v0.47/build/modules",
+                          "docs/sdk/v0.47/build/modules/modul",
                           {
                             "group": "x/auth",
                             "pages": [
-                              "docs/sdk/v0.47/build/modules/auth",
+                              "docs/sdk/v0.47/build/modules/authr",
                               "docs/sdk/v0.47/build/modules/auth/vesting",
                               "docs/sdk/v0.47/build/modules/auth/tx"
                             ]
                           },
-                          "docs/sdk/v0.47/build/modules/authz",
-                          "docs/sdk/v0.47/build/modules/bank",
-                          "docs/sdk/v0.47/build/modules/consensus",
-                          "docs/sdk/v0.47/build/modules/crisis",
-                          "docs/sdk/v0.47/build/modules/distribution",
-                          "docs/sdk/v0.47/build/modules/epochs",
-                          "docs/sdk/v0.47/build/modules/evidence",
-                          "docs/sdk/v0.47/build/modules/feegrant",
-                          "docs/sdk/v0.47/build/modules/gov",
-                          "docs/sdk/v0.47/build/modules/group",
-                          "docs/sdk/v0.47/build/modules/mint",
-                          "docs/sdk/v0.47/build/modules/nft",
-                          "docs/sdk/v0.47/build/modules/params",
-                          "docs/sdk/v0.47/build/modules/protocolpool",
-                          "docs/sdk/v0.47/build/modules/slashing",
-                          "docs/sdk/v0.47/build/modules/staking",
-                          "docs/sdk/v0.47/build/modules/upgrade",
-                          "docs/sdk/v0.47/build/modules/circuit",
-                          "docs/sdk/v0.47/build/modules/genutil"
+                          "docs/sdk/v0.47/build/modules/authz/README",
+                          "docs/sdk/v0.47/build/modules/bank/README",
+                          "docs/sdk/v0.47/build/modules/consensus/README",
+                          "docs/sdk/v0.47/build/modules/crisis/README",
+                          "docs/sdk/v0.47/build/modules/distribution/README",
+                          "docs/sdk/v0.47/build/modules/epochs/README",
+                          "docs/sdk/v0.47/build/modules/evidence/README",
+                          "docs/sdk/v0.47/build/modules/feegrant/README",
+                          "docs/sdk/v0.47/build/modules/gov/README",
+                          "docs/sdk/v0.47/build/modules/group/README",
+                          "docs/sdk/v0.47/build/modules/mint/README",
+                          "docs/sdk/v0.47/build/modules/nft/README",
+                          "docs/sdk/v0.47/build/modules/params/README",
+                          "docs/sdk/v0.47/build/modules/protocolpool/README",
+                          "docs/sdk/v0.47/build/modules/slashing/README",
+                          "docs/sdk/v0.47/build/modules/staking/README",
+                          "docs/sdk/v0.47/build/modules/upgrade/README",
+                          "docs/sdk/v0.47/build/modules/circuit/README",
+                          "docs/sdk/v0.47/build/modules/genutil/README"
                         ]
                       },
                       {
@@ -1164,268 +1164,9 @@
             "version": "next",
             "tabs": [
               {
-                "tab": "Learn",
-                "groups": [
-                  {
-                    "group": "Learn",
-                    "pages": [
-                      "docs/sdk/next/learn",
-                      {
-                        "group": "Introduction",
-                        "pages": [
-                          "docs/sdk/next/learn/intro/overview",
-                          "docs/sdk/next/learn/intro/why-app-specific",
-                          "docs/sdk/next/learn/intro/sdk-app-architecture",
-                          "docs/sdk/next/learn/intro/sdk-design"
-                        ]
-                      },
-                      {
-                        "group": "Beginner",
-                        "pages": [
-                          "docs/sdk/next/learn/beginner/app-anatomy",
-                          "docs/sdk/next/learn/beginner/tx-lifecycle",
-                          "docs/sdk/next/learn/beginner/query-lifecycle",
-                          "docs/sdk/next/learn/beginner/accounts",
-                          "docs/sdk/next/learn/beginner/gas-fees"
-                        ]
-                      },
-                      {
-                        "group": "Advanced",
-                        "pages": [
-                          "docs/sdk/next/learn/advanced/baseapp",
-                          "docs/sdk/next/learn/advanced/transactions",
-                          "docs/sdk/next/learn/advanced/context",
-                          "docs/sdk/next/learn/advanced/node",
-                          "docs/sdk/next/learn/advanced/store",
-                          "docs/sdk/next/learn/advanced/encoding",
-                          "docs/sdk/next/learn/advanced/grpc_rest",
-                          "docs/sdk/next/learn/advanced/cli",
-                          "docs/sdk/next/learn/advanced/events",
-                          "docs/sdk/next/learn/advanced/telemetry",
-                          "docs/sdk/next/learn/advanced/ocap",
-                          "docs/sdk/next/learn/advanced/runtx_middleware",
-                          "docs/sdk/next/learn/advanced/simulation",
-                          "docs/sdk/next/learn/advanced/proto-docs",
-                          "docs/sdk/next/learn/advanced/upgrade",
-                          "docs/sdk/next/learn/advanced/config",
-                          "docs/sdk/next/learn/advanced/autocli"
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Build",
-                "groups": [
-                  {
-                    "group": "Build",
-                    "pages": [
-                      "docs/sdk/next/build",
-                      {
-                        "group": "Building Apps",
-                        "pages": [
-                          "docs/sdk/next/build/building-apps/app-go",
-                          "docs/sdk/next/build/building-apps/runtime",
-                          "docs/sdk/next/build/building-apps/app-go-di",
-                          "docs/sdk/next/build/building-apps/app-mempool",
-                          "docs/sdk/next/build/building-apps/app-upgrade",
-                          "docs/sdk/next/build/building-apps/vote-extensions",
-                          "docs/sdk/next/build/building-apps/app-testnet"
-                        ]
-                      },
-                      {
-                        "group": "Building Modules",
-                        "pages": [
-                          "docs/sdk/next/build/building-modules/module-manager",
-                          "docs/sdk/next/build/building-modules/messages-and-queries",
-                          "docs/sdk/next/build/building-modules/msg-services",
-                          "docs/sdk/next/build/building-modules/query-services",
-                          "docs/sdk/next/build/building-modules/protobuf-annotations",
-                          "docs/sdk/next/build/building-modules/beginblock-endblock",
-                          "docs/sdk/next/build/building-modules/keeper",
-                          "docs/sdk/next/build/building-modules/invariants",
-                          "docs/sdk/next/build/building-modules/genesis",
-                          "docs/sdk/next/build/building-modules/module-interfaces",
-                          "docs/sdk/next/build/building-modules/structure",
-                          "docs/sdk/next/build/building-modules/errors",
-                          "docs/sdk/next/build/building-modules/upgrade",
-                          "docs/sdk/next/build/building-modules/simulator",
-                          "docs/sdk/next/build/building-modules/depinject",
-                          "docs/sdk/next/build/building-modules/testing",
-                          "docs/sdk/next/build/building-modules/preblock"
-                        ]
-                      },
-                      {
-                        "group": "ABCI",
-                        "pages": [
-                          "docs/sdk/next/build/abci/introduction",
-                          "docs/sdk/next/build/abci/prepare-proposal",
-                          "docs/sdk/next/build/abci/process-proposal",
-                          "docs/sdk/next/build/abci/vote-extensions",
-                          "docs/sdk/next/build/abci/checktx"
-                        ]
-                      },
-                      {
-                        "group": "Modules",
-                        "pages": [
-                          "docs/sdk/next/build/modules",
-                          {
-                            "group": "x/auth",
-                            "pages": [
-                              "docs/sdk/next/build/modules/auth",
-                              "docs/sdk/next/build/modules/auth/vesting",
-                              "docs/sdk/next/build/modules/auth/tx"
-                            ]
-                          },
-                          "docs/sdk/next/build/modules/authz",
-                          "docs/sdk/next/build/modules/bank",
-                          "docs/sdk/next/build/modules/consensus",
-                          "docs/sdk/next/build/modules/crisis",
-                          "docs/sdk/next/build/modules/distribution",
-                          "docs/sdk/next/build/modules/epochs",
-                          "docs/sdk/next/build/modules/evidence",
-                          "docs/sdk/next/build/modules/feegrant",
-                          "docs/sdk/next/build/modules/gov",
-                          "docs/sdk/next/build/modules/group",
-                          "docs/sdk/next/build/modules/mint",
-                          "docs/sdk/next/build/modules/nft",
-                          "docs/sdk/next/build/modules/params",
-                          "docs/sdk/next/build/modules/protocolpool",
-                          "docs/sdk/next/build/modules/slashing",
-                          "docs/sdk/next/build/modules/staking",
-                          "docs/sdk/next/build/modules/upgrade",
-                          "docs/sdk/next/build/modules/circuit",
-                          "docs/sdk/next/build/modules/genutil"
-                        ]
-                      },
-                      {
-                        "group": "Migrations",
-                        "pages": [
-                          "docs/sdk/next/build/migrations/intro",
-                          "docs/sdk/next/build/migrations/upgrade-reference",
-                          "docs/sdk/next/build/migrations/upgrade-guide"
-                        ]
-                      },
-                      {
-                        "group": "Packages",
-                        "pages": [
-                          "docs/sdk/next/build/packages",
-                          "docs/sdk/next/build/packages/depinject",
-                          "docs/sdk/next/build/packages/collections"
-                        ]
-                      },
-                      {
-                        "group": "Tooling",
-                        "pages": [
-                          "docs/sdk/next/build/tooling",
-                          "docs/sdk/next/build/tooling/protobuf",
-                          "docs/sdk/next/build/tooling/cosmovisor",
-                          "docs/sdk/next/build/tooling/confix"
-                        ]
-                      },
-                      {
-                        "group": "RFC",
-                        "pages": [
-                          "docs/sdk/next/build/rfc",
-                          "docs/sdk/next/build/rfc/PROCESS",
-                          "docs/sdk/next/build/rfc/rfc-001-tx-validation",
-                          "docs/sdk/next/build/rfc/rfc-template"
-                        ]
-                      },
-                      {
-                        "group": "Specifications",
-                        "pages": [
-                          "docs/sdk/next/build/spec",
-                          "docs/sdk/next/build/spec/SPEC_MODULE",
-                          "docs/sdk/next/build/spec/SPEC_STANDARD",
-                          {
-                            "group": "Addresses spec",
-                            "pages": [
-                              "docs/sdk/next/build/spec/addresses",
-                              "docs/sdk/next/build/spec/addresses/bech32"
-                            ]
-                          },
-                          {
-                            "group": "Store",
-                            "pages": [
-                              "docs/sdk/next/build/spec/store",
-                              "docs/sdk/next/build/spec/store/interblock-cache"
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "User Guides",
-                "groups": [
-                  {
-                    "group": "User Guides",
-                    "pages": [
-                      "docs/sdk/next/user",
-                      {
-                        "group": "Running a Node, API and CLI",
-                        "pages": [
-                          "docs/sdk/next/user/run-node/keyring",
-                          "docs/sdk/next/user/run-node/run-node",
-                          "docs/sdk/next/user/run-node/interact-node",
-                          "docs/sdk/next/user/run-node/txs",
-                          "docs/sdk/next/user/run-node/run-testnet",
-                          "docs/sdk/next/user/run-node/run-production"
-                        ]
-                      },
-                      {
-                        "group": "User",
-                        "pages": [
-                          "docs/sdk/next/user"
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Tutorials",
-                "groups": [
-                  {
-                    "group": "Tutorials",
-                    "pages": [
-                      "docs/sdk/next/tutorials",
-                      {
-                        "group": "Vote Extensions Tutorials",
-                        "pages": [
-                          {
-                            "group": "Mitigating Auction Front-Running Tutorial",
-                            "pages": [
-                              "docs/sdk/next/tutorials/vote-extensions/auction-frontrunning/getting-started",
-                              "docs/sdk/next/tutorials/vote-extensions/auction-frontrunning/understanding-frontrunning",
-                              "docs/sdk/next/tutorials/vote-extensions/auction-frontrunning/mitigating-front-running-with-vote-extensions",
-                              "docs/sdk/next/tutorials/vote-extensions/auction-frontrunning/mitigating-front-running-with-vote-extesions",
-                              "docs/sdk/next/tutorials/vote-extensions/auction-frontrunning/demo-of-mitigating-front-running"
-                            ]
-                          },
-                          {
-                            "group": "Oracle Tutorial",
-                            "pages": [
-                              "docs/sdk/next/tutorials/vote-extensions/oracle/getting-started",
-                              "docs/sdk/next/tutorials/vote-extensions/oracle/what-is-an-oracle",
-                              "docs/sdk/next/tutorials/vote-extensions/oracle/implementing-vote-extensions",
-                              "docs/sdk/next/tutorials/vote-extensions/oracle/testing-oracle"
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        "group": "Transaction Tutorials",
-                        "pages": [
-                          "docs/sdk/next/tutorials/transactions/building-a-transaction"
-                        ]
-                      }
-                    ]
-                  }
+                "tab": "Coming Soon",
+                "pages": [
+                  "docs/sdk/next/coming-soon"
                 ]
               }
             ]
