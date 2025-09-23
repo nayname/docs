@@ -687,8 +687,7 @@
                         "group": "Building Apps",
                         "pages": [
                           "docs/sdk/v0.50/build/building-apps/app-go",
-                          "docs/sdk/v0.50/build/building-apps/runtime",
-                          "docs/sdk/v0.50/build/building-apps/app-go-di",
+                          "docs/sdk/v0.50/build/building-apps/app-go-v2",
                           "docs/sdk/v0.50/build/building-apps/app-mempool",
                           "docs/sdk/v0.50/build/building-apps/app-upgrade",
                           "docs/sdk/v0.50/build/building-apps/vote-extensions",
