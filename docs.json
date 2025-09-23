@@ -730,7 +730,7 @@
                       {
                         "group": "Modules",
                         "pages": [
-                          "docs/sdk/v0.50/build/modules/modules",
+                          "docs/sdk/v0.50/build/modules/module",
                           {
                             "group": "x/auth",
                             "pages": [
