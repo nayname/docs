@@ -1249,47 +1249,6 @@
                     ]
                   }
                 ]
-              },
-              {
-                "tab": "Tutorials",
-                "groups": [
-                  {
-                    "group": "Tutorials",
-                    "pages": [
-                      "docs/sdk/v0.47/tutorials",
-                      {
-                        "group": "Vote Extensions Tutorials",
-                        "pages": [
-                          {
-                            "group": "Mitigating Auction Front-Running Tutorial",
-                            "pages": [
-                              "docs/sdk/v0.47/tutorials/vote-extensions/auction-frontrunning/getting-started",
-                              "docs/sdk/v0.47/tutorials/vote-extensions/auction-frontrunning/understanding-frontrunning",
-                              "docs/sdk/v0.47/tutorials/vote-extensions/auction-frontrunning/mitigating-front-running-with-vote-extensions",
-                              "docs/sdk/v0.47/tutorials/vote-extensions/auction-frontrunning/mitigating-front-running-with-vote-extesions",
-                              "docs/sdk/v0.47/tutorials/vote-extensions/auction-frontrunning/demo-of-mitigating-front-running"
-                            ]
-                          },
-                          {
-                            "group": "Oracle Tutorial",
-                            "pages": [
-                              "docs/sdk/v0.47/tutorials/vote-extensions/oracle/getting-started",
-                              "docs/sdk/v0.47/tutorials/vote-extensions/oracle/what-is-an-oracle",
-                              "docs/sdk/v0.47/tutorials/vote-extensions/oracle/implementing-vote-extensions",
-                              "docs/sdk/v0.47/tutorials/vote-extensions/oracle/testing-oracle"
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        "group": "Transaction Tutorials",
-                        "pages": [
-                          "docs/sdk/v0.47/tutorials/transactions/building-a-transaction"
-                        ]
-                      }
-                    ]
-                  }
-                ]
               }
             ]
           },
