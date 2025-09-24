@@ -937,8 +937,7 @@
                           "docs/sdk/v0.47/learn/advanced/simulation",
                           "docs/sdk/v0.47/learn/advanced/proto-docs",
                           "docs/sdk/v0.47/learn/advanced/upgrade",
-                          "docs/sdk/v0.47/learn/advanced/config",
-                          "docs/sdk/v0.47/learn/advanced/autocli"
+                          "docs/sdk/v0.47/learn/advanced/config"
                         ]
                       }
                     ]
