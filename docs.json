@@ -942,14 +942,14 @@
                           {
                             "group": "Addresses spec",
                             "pages": [
-                              "docs/sdk/v0.50/build/spec/addresses",
+                              "docs/sdk/v0.50/build/spec/addresses/addresses",
                               "docs/sdk/v0.50/build/spec/addresses/bech32"
                             ]
                           },
                           {
                             "group": "Store",
                             "pages": [
-                              "docs/sdk/v0.50/build/spec/store",
+                              "docs/sdk/v0.50/build/spec/store/store",
                               "docs/sdk/v0.50/build/spec/store/interblock-cache"
                             ]
                           }
@@ -1275,14 +1275,14 @@
                           {
                             "group": "Addresses spec",
                             "pages": [
-                              "docs/sdk/v0.47/build/spec/addresses",
+                              "docs/sdk/v0.47/build/spec/addresses/addresses",
                               "docs/sdk/v0.47/build/spec/addresses/bech32"
                             ]
                           },
                           {
                             "group": "Store",
                             "pages": [
-                              "docs/sdk/v0.47/build/spec/store",
+                              "docs/sdk/v0.47/build/spec/store/store",
                               "docs/sdk/v0.47/build/spec/store/interblock-cache"
                             ]
                           }
