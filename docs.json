@@ -1280,10 +1280,10 @@
                             ]
                           },
                           {
-                            "group": "Store",
+                            "group": "Cosmos ICS",
                             "pages": [
-                              "docs/sdk/v0.47/build/spec/store/store",
-                              "docs/sdk/v0.47/build/spec/store/interblock-cache"
+                              "docs/sdk/v0.47/build/spec/ics/ics",
+                              "docs/sdk/v0.47/build/spec/ics/ics-030-signed-messages"
                             ]
                           }
                         ]
