@@ -900,6 +900,7 @@
                     "group": "Learn",
                     "pages": [
                       "docs/sdk/v0.47/learn",
+                      "docs/sdk/v0.47/learn/glossary",
                       {
                         "group": "Introduction",
                         "pages": [
