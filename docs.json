@@ -603,14 +603,14 @@
                           {
                             "group": "Addresses spec",
                             "pages": [
-                              "docs/sdk/v0.53/build/spec/addresses",
+                              "docs/sdk/v0.53/build/spec/addresses/addresses",
                               "docs/sdk/v0.53/build/spec/addresses/bech32"
                             ]
                           },
                           {
                             "group": "Store",
                             "pages": [
-                              "docs/sdk/v0.53/build/spec/store",
+                              "docs/sdk/v0.53/build/spec/store/store",
                               "docs/sdk/v0.53/build/spec/store/interblock-cache"
                             ]
                           }
