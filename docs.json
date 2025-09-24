@@ -983,7 +983,7 @@
                       {
                         "group": "Beginner",
                         "pages": [
-                          "docs/sdk/v0.47/learn/beginner/app-anatomy",
+                          "docs/sdk/v0.47/learn/beginner/overview-app",
                           "docs/sdk/v0.47/learn/beginner/tx-lifecycle",
                           "docs/sdk/v0.47/learn/beginner/query-lifecycle",
                           "docs/sdk/v0.47/learn/beginner/accounts",
