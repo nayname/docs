@@ -1183,7 +1183,9 @@
                       {
                         "group": "Tooling",
                         "pages": [
-                          "docs/sdk/v0.47/build/tooling",
+                          "docs/sdk/v0.47/build/tooling/tooling",
+                          "docs/sdk/v0.47/build/tooling/autocli",
+                          "docs/sdk/v0.47/build/tooling/hubl",
                           "docs/sdk/v0.47/build/tooling/protobuf",
                           "docs/sdk/v0.47/build/tooling/cosmovisor",
                           "docs/sdk/v0.47/build/tooling/confix"
