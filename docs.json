@@ -1107,7 +1107,6 @@
                           "docs/sdk/v0.47/build/building-modules/messages-and-queries",
                           "docs/sdk/v0.47/build/building-modules/msg-services",
                           "docs/sdk/v0.47/build/building-modules/query-services",
-                          "docs/sdk/v0.47/build/building-modules/protobuf-annotations",
                           "docs/sdk/v0.47/build/building-modules/beginblock-endblock",
                           "docs/sdk/v0.47/build/building-modules/keeper",
                           "docs/sdk/v0.47/build/building-modules/invariants",
@@ -1118,22 +1117,12 @@
                           "docs/sdk/v0.47/build/building-modules/upgrade",
                           "docs/sdk/v0.47/build/building-modules/simulator",
                           "docs/sdk/v0.47/build/building-modules/depinject",
-                          "docs/sdk/v0.47/build/building-modules/testing",
-                          "docs/sdk/v0.47/build/building-modules/preblock"
+                          "docs/sdk/v0.47/build/building-modules/testing"
                         ]
                       },
+
                       {
-                        "group": "ABCI",
-                        "pages": [
-                          "docs/sdk/v0.47/build/abci/introduction",
-                          "docs/sdk/v0.47/build/abci/prepare-proposal",
-                          "docs/sdk/v0.47/build/abci/process-proposal",
-                          "docs/sdk/v0.47/build/abci/vote-extensions",
-                          "docs/sdk/v0.47/build/abci/checktx"
-                        ]
-                      },
-                      {
-                        "group": "Modules",
+                        "group": "List of SDK Modules",
                         "pages": [
                           "docs/sdk/v0.47/build/modules/modul",
                           {
@@ -1164,11 +1153,10 @@
                         ]
                       },
                       {
-                        "group": "Migrations",
+                        "group": "SDK Migrations",
                         "pages": [
                           "docs/sdk/v0.47/build/migrations/intro",
-                          "docs/sdk/v0.47/build/migrations/upgrade-reference",
-                          "docs/sdk/v0.47/build/migrations/upgrade-guide"
+                          "docs/sdk/v0.47/build/migrations/upgrading"
                         ]
                       },
                       {
@@ -1198,10 +1186,10 @@
                           "docs/sdk/v0.47/build/architecture/adr-template",
                           "docs/sdk/v0.47/build/architecture/adr-002-docs-structure",
                           "docs/sdk/v0.47/build/architecture/adr-003-dynamic-capability-store",
-                          "docs/sdk/v0.47/build/architecture/adr-004-proto-denomination-keys",
+                          "docs/sdk/v0.47/build/architecture/adr-004-split-denomination-keys",
                           "docs/sdk/v0.47/build/architecture/adr-006-secret-store-replacement",
                           "docs/sdk/v0.47/build/architecture/adr-007-specialization-groups",
-                          "docs/sdk/v0.47/build/architecture/adr-008-dcert-group",
+                          "docs/sdk/v0.47/build/architecture/adr-008-dCERT-group",
                           "docs/sdk/v0.47/build/architecture/adr-009-evidence-module",
                           "docs/sdk/v0.47/build/architecture/adr-010-modular-antehandler",
                           "docs/sdk/v0.47/build/architecture/adr-011-generalize-genesis-accounts",
@@ -1210,7 +1198,7 @@
                           "docs/sdk/v0.47/build/architecture/adr-014-proportional-slashing",
                           "docs/sdk/v0.47/build/architecture/adr-016-validator-consensus-key-rotation",
                           "docs/sdk/v0.47/build/architecture/adr-017-historical-header-module",
-                          "docs/sdk/v0.47/build/architecture/adr-018-xenablable-voting-period",
+                          "docs/sdk/v0.47/build/architecture/adr-018-extendable-voting-period",
                           "docs/sdk/v0.47/build/architecture/adr-019-protobuf-state-encoding",
                           "docs/sdk/v0.47/build/architecture/adr-020-protobuf-transaction-encoding",
                           "docs/sdk/v0.47/build/architecture/adr-021-protobuf-query-encoding",
@@ -1259,7 +1247,7 @@
                       },
                       
                       {
-                        "group": "RFC",
+                        "group": "RFCs",
                         "pages": [
                           "docs/sdk/v0.47/build/rfc",
                           "docs/sdk/v0.47/build/rfc/PROCESS",
@@ -1270,7 +1258,6 @@
                       {
                         "group": "Specifications",
                         "pages": [
-                          "docs/sdk/v0.47/build/spec",
                           "docs/sdk/v0.47/build/spec/SPEC_MODULE",
                           "docs/sdk/v0.47/build/spec/SPEC_STANDARD",
                           {
