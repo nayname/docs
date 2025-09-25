@@ -792,8 +792,7 @@
                           "docs/sdk/v0.50/build/abci/introduction",
                           "docs/sdk/v0.50/build/abci/prepare-proposal",
                           "docs/sdk/v0.50/build/abci/process-proposal",
-                          "docs/sdk/v0.50/build/abci/vote-extensions",
-                          "docs/sdk/v0.50/build/abci/checktx"
+                          "docs/sdk/v0.50/build/abci/vote-extensions"
                         ]
                       },
                       {
@@ -862,7 +861,7 @@
                           "docs/sdk/v0.50/build/architecture/adr-004-split-denomination-keys",
                           "docs/sdk/v0.50/build/architecture/adr-006-secret-store-replacement",
                           "docs/sdk/v0.50/build/architecture/adr-007-specialization-groups",
-                          "docs/sdk/v0.50/build/architecture/adr-008-dcert-group",
+                          "docs/sdk/v0.50/build/architecture/adr-008-dCERT-group",
                           "docs/sdk/v0.50/build/architecture/adr-009-evidence-module",
                           "docs/sdk/v0.50/build/architecture/adr-010-modular-antehandler",
                           "docs/sdk/v0.50/build/architecture/adr-011-generalize-genesis-accounts",
