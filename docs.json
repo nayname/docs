@@ -637,12 +637,6 @@
                           "docs/sdk/v0.53/user/run-node/run-testnet",
                           "docs/sdk/v0.53/user/run-node/run-production"
                         ]
-                      },
-                      {
-                        "group": "User",
-                        "pages": [
-                          "docs/sdk/v0.53/user"
-                        ]
                       }
                     ]
                   }
@@ -974,12 +968,6 @@
                           "docs/sdk/v0.50/user/run-node/txs",
                           "docs/sdk/v0.50/user/run-node/run-testnet",
                           "docs/sdk/v0.50/user/run-node/run-production"
-                        ]
-                      },
-                      {
-                        "group": "User",
-                        "pages": [
-                          "docs/sdk/v0.50/user"
                         ]
                       }
                     ]
