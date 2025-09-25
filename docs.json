@@ -1294,16 +1294,13 @@
                           "docs/sdk/v0.47/user/run-node/run-node",
                           "docs/sdk/v0.47/user/run-node/interact-node",
                           "docs/sdk/v0.47/user/run-node/txs",
+                          "docs/sdk/v0.47/user/run-node/rosetta",
                           "docs/sdk/v0.47/user/run-node/run-testnet",
+                          "docs/sdk/v0.47/user/run-node/multisig-guide",
                           "docs/sdk/v0.47/user/run-node/run-production"
                         ]
-                      },
-                      {
-                        "group": "User",
-                        "pages": [
-                          "docs/sdk/v0.47/user"
-                        ]
                       }
+
                     ]
                   }
                 ]
