@@ -644,7 +644,7 @@
                 "tab": "Tutorials",
                 "groups": [
                   {
-                    "group": "Cosmos SDKs",
+                    "group": "Cosmos SDK",
                     "pages": [
                       "docs/sdk/v0.53/tutorials",
                       {
