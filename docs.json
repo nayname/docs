@@ -426,6 +426,7 @@
                       {
                         "group": "Building Modules",
                         "pages": [
+                          "docs/sdk/v0.53/build/building-modules/intro",
                           "docs/sdk/v0.53/build/building-modules/module-manager",
                           "docs/sdk/v0.53/build/building-modules/messages-and-queries",
                           "docs/sdk/v0.53/build/building-modules/msg-services",
@@ -759,6 +760,7 @@
                       {
                         "group": "Building Modules",
                         "pages": [
+                          "docs/sdk/v0.50/build/building-modules/intro",
                           "docs/sdk/v0.50/build/building-modules/module-manager",
                           "docs/sdk/v0.50/build/building-modules/messages-and-queries",
                           "docs/sdk/v0.50/build/building-modules/msg-services",
@@ -1090,6 +1092,7 @@
                       {
                         "group": "Building Modules",
                         "pages": [
+                          "docs/sdk/v0.47/build/building-modules/intro",
                           "docs/sdk/v0.47/build/building-modules/module-manager",
                           "docs/sdk/v0.47/build/building-modules/messages-and-queries",
                           "docs/sdk/v0.47/build/building-modules/msg-services",
