@@ -10,7 +10,7 @@ title: Messages and Queries
 <Note>
 **Pre-requisite Readings**
 
-* [Introduction to Cosmos SDK Modules](/docs/sdk/v0.50/intro)
+* [Introduction to Cosmos SDK Modules](/docs/sdk/v0.50/build/building-modules/intro)
 
 </Note>
 
@@ -18,7 +18,7 @@ title: Messages and Queries
 
 `Msg`s are objects whose end-goal is to trigger state-transitions. They are wrapped in [transactions](/docs/sdk/v0.50//learn/advanced/transactions), which may contain one or more of them.
 
-When a transaction is relayed from the underlying consensus engine to the Cosmos SDK application, it is first decoded by [`BaseApp`](/docs/sdk/v0.50//learn/advanced/baseapp). Then, each message contained in the transaction is extracted and routed to the appropriate module via `BaseApp`'s `MsgServiceRouter` so that it can be processed by the module's [`Msg` service](/docs/sdk/v0.50/msg-services). For a more detailed explanation of the lifecycle of a transaction, click [here](/docs/sdk/v0.50//learn/beginner/tx-lifecycle).
+When a transaction is relayed from the underlying consensus engine to the Cosmos SDK application, it is first decoded by [`BaseApp`](/docs/sdk/v0.50//learn/advanced/baseapp). Then, each message contained in the transaction is extracted and routed to the appropriate module via `BaseApp`'s `MsgServiceRouter` so that it can be processed by the module's [`Msg` service](/docs/sdk/v0.50/build/building-modules/msg-services). For a more detailed explanation of the lifecycle of a transaction, click [here](/docs/sdk/v0.50//learn/beginner/tx-lifecycle).
 
 ### `Msg` Services
 
@@ -201,7 +201,7 @@ return ""
 ```
 
 Signers from the `GetSigners()` call is automated via a protobuf annotation.
-Read more about the signer field [here](/docs/sdk/v0.50/protobuf-annotations).
+Read more about the signer field [here](/docs/sdk/v0.50/build/building-modules/protobuf-annotations).
 
 ```protobuf
 // Reference: https://github.com/cosmos/cosmos-sdk/blob/e6848d99b55a65d014375b295bdd7f9641aac95e/proto/cosmos/bank/v1beta1/tx.proto#L40
@@ -246,10 +246,10 @@ func init() {
 
 The Cosmos SDK uses Protobuf definitions to generate client and server code:
 
-* `MsgServer` interface defines the server API for the `Msg` service and its implementation is described as part of the [`Msg` services](/docs/sdk/v0.50/msg-services) documentation.
+* `MsgServer` interface defines the server API for the `Msg` service and its implementation is described as part of the [`Msg` services](/docs/sdk/v0.50/build/building-modules/msg-services) documentation.
 * Structures are generated for all RPC request and response types.
 
-A `RegisterMsgServer` method is also generated and should be used to register the module's `MsgServer` implementation in `RegisterServices` method from the [`AppModule` interface](/docs/sdk/v0.50/module-manager#appmodule).
+A `RegisterMsgServer` method is also generated and should be used to register the module's `MsgServer` implementation in `RegisterServices` method from the [`AppModule` interface](/docs/sdk/v0.50/build/building-modules/module-manager#appmodule).
 
 In order for clients (CLI and gRPC-gateway) to have these URLs registered, the Cosmos SDK provides the function `RegisterMsgServiceDesc(registry codectypes.InterfaceRegistry, sd *grpc.ServiceDesc)` that should be called inside module's [`RegisterInterfaces`](module-manager#appmodulebasic) method, using the proto-generated `&_Msg_serviceDesc` as `*grpc.ServiceDesc` argument.
 
@@ -269,7 +269,7 @@ Here's an example of such a `Query` service definition:
 
 As `proto.Message`s, generated `Response` types implement by default `String()` method of [`fmt.Stringer`](https://pkg.go.dev/fmt#Stringer).
 
-A `RegisterQueryServer` method is also generated and should be used to register the module's query server in the `RegisterServices` method from the [`AppModule` interface](/docs/sdk/v0.50/module-manager#appmodule).
+A `RegisterQueryServer` method is also generated and should be used to register the module's query server in the `RegisterServices` method from the [`AppModule` interface](/docs/sdk/v0.50/build/building-modules/module-manager#appmodule).
 
 ### Store Queries
 
