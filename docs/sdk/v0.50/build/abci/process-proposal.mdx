@@ -358,7 +358,7 @@ sdk.VerifyVoteExtensionHandler {
 ```
 
 Like `PrepareProposal` this implementation is the default and can be modified by
-the application developer in [`app.go`](/docs/sdk/v0.50/app-go-v2). If you decide to implement
+the application developer in [`app.go`](/docs/sdk/v0.50/build/building-apps/app-go-v2). If you decide to implement
 your own `ProcessProposal` handler, you must be sure to ensure that the transactions
 provided in the proposal DO NOT exceed the maximum block gas and `maxtxbytes` (if set).
 

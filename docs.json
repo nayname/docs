@@ -844,7 +844,8 @@
                           "docs/sdk/v0.50/build/tooling",
                           "docs/sdk/v0.50/build/tooling/protobuf",
                           "docs/sdk/v0.50/build/tooling/cosmovisor",
-                          "docs/sdk/v0.50/build/tooling/confix"
+                          "docs/sdk/v0.50/build/tooling/confix",
+                          "docs/sdk/v0.50/build/tooling/hubl"
                         ]
                       },
                       {
@@ -967,7 +968,8 @@
                           "docs/sdk/v0.50/user/run-node/interact-node",
                           "docs/sdk/v0.50/user/run-node/txs",
                           "docs/sdk/v0.50/user/run-node/run-testnet",
-                          "docs/sdk/v0.50/user/run-node/run-production"
+                          "docs/sdk/v0.50/user/run-node/run-production",
+                          "docs/sdk/v0.50/user/run-node/rosetta"
                         ]
                       }
                     ]
@@ -1154,7 +1156,8 @@
                         "pages": [
                           "docs/sdk/v0.47/build/packages",
                           "docs/sdk/v0.47/build/packages/depinject",
-                          "docs/sdk/v0.47/build/packages/collections"
+                          "docs/sdk/v0.47/build/packages/collections",
+                          "docs/sdk/v0.47/build/packages/orm"
                         ]
                       },
                       {
@@ -1165,7 +1168,8 @@
                           "docs/sdk/v0.47/build/tooling/hubl",
                           "docs/sdk/v0.47/build/tooling/protobuf",
                           "docs/sdk/v0.47/build/tooling/cosmovisor",
-                          "docs/sdk/v0.47/build/tooling/confix"
+                          "docs/sdk/v0.47/build/tooling/confix",
+                          "docs/sdk/v0.47/build/tooling/depinject"
                         ]
                       },
                       {

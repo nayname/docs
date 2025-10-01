@@ -8,9 +8,9 @@ description: >-
 ## Table of Contents
 
 * [Getting Started](#overview-of-the-project)
-* [Understanding Front-Running](/docs/sdk/v0.50/understanding-frontrunning)
-* [Mitigating Front-running with Vote Extensions](/docs/sdk/v0.50/mitigating-front-running-with-vote-extesions)
-* [Demo of Mitigating Front-Running](/docs/sdk/v0.50/demo-of-mitigating-front-running)
+* [Understanding Front-Running](docs/sdk/v0.50/tutorials/vote-extensions/auction-frontrunning/understanding-frontrunning)
+* [Mitigating Front-running with Vote Extensions](/docs/sdk/v0.50/tutorials/vote-extensions/auction-frontrunning/mitigating-front-running-with-vote-extensions)
+* [Demo of Mitigating Front-Running](/docs/sdk/v0.50/tutorials/vote-extensions/auction-frontrunning/mitigating-front-running-with-vote-extesions)
 
 ## Getting Started
 
@@ -30,15 +30,15 @@ The tutorial will guide you through using the Cosmos SDK to mitigate front-runni
 
 Vote extensions is arbitrary information which can be inserted into a block. This feature is part of ABCI 2.0, which is available for use in the SDK 0.50 release and part of the 0.38 CometBFT release.
 
-More information about vote extensions can be seen [here](https://docs.cosmos.network/main/build/abci/vote-extensions).
+More information about vote extensions can be seen [here](/docs/sdk/v0.50/build/abci/vote-extensions).
 
 ## Requirements and Setup
 
 Before diving into the advanced tutorial on auction front-running simulation, ensure you meet the following requirements:
 
 * [Golang >1.21.5](https://golang.org/doc/install) installed
-* Familiarity with the concepts of front-running and MEV, as detailed in [Understanding Front-Running](/docs/sdk/v0.50/understanding-frontrunning)
-* Understanding of Vote Extensions as described [here](https://docs.cosmos.network/main/build/abci/vote-extensions)
+* Familiarity with the concepts of front-running and MEV, as detailed in [Understanding Front-Running](docs/sdk/v0.50/tutorials/vote-extensions/auction-frontrunning/understanding-frontrunning)
+* Understanding of Vote Extensions as described [here](/docs/sdk/v0.50/build/abci/vote-extensions)
 
 You will also need a foundational blockchain to build upon coupled with your own module. The `tutorials/base` directory has the necessary blockchain code to start your custom project with the Cosmos SDK. For the module, you can use the `auction` module provided in the `tutorials/auction/x/auction` directory as a reference but please be aware that all of the code needed to implement vote extensions is already implemented in this module.
 
