@@ -16,14 +16,21 @@ export const CosmosIcon = ({ size = 24, color = "currentColor", className = "" }
   </svg>
 )
 
-export const EthereumIcon = ({ size = 24, color = "#627EEA" }) => (
-  <svg width={size} height={size} viewBox="0 0 256 417" fill="none">
+export const EthereumIcon = ({ size = 24, color = "#627EEA", className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 256 417"
+    fill="none"
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <path d="M127.961 0L125.343 9.066v283.296l2.618 2.617 127.962-75.638L127.961 0z" fill={color}/>
-    <path d="M127.961 0L0 219.341l127.961 75.638V157.724L127.961 0z" fill={color} fillOpacity="0.8"/>
+    <path d="M127.961 0L0 219.341l127.961 75.638V157.724L127.961 0z" fill={color} fillOpacity="0.6"/>
     <path d="M127.961 312.187L126.386 314.154v98.29l1.575 4.6L256 236.587l-128.039 75.6z" fill={color}/>
-    <path d="M127.961 417.044v-104.857L0 236.587l127.961 180.457z" fill={color} fillOpacity="0.8"/>
-    <path d="M127.961 295.979l127.962-76.638-127.962-58.022v134.66z" fill={color} fillOpacity="0.8"/>
-    <path d="M0 219.341l127.961 76.638V161.319L0 219.341z" fill={color} fillOpacity="0.6"/>
+    <path d="M127.961 417.044v-104.857L0 236.587l127.961 180.457z" fill={color} fillOpacity="0.6"/>
+    <path d="M127.961 295.979l127.962-76.638-127.962-58.022v134.66z" fill={color} fillOpacity="0.45"/>
+    <path d="M0 219.341l127.961 76.638V161.319L0 219.341z" fill={color} fillOpacity="0.45"/>
   </svg>
 )
 
@@ -374,5 +381,38 @@ export const CSharpIcon = ({ size = 24, color = "currentColor", className = "" }
     <rect x="3" y="3" width="18" height="18" rx="2" fill="#953DAC"/>
     <path d="M8 8c-2.2 0-4 1.8-4 4s1.8 4 4 4c1.4 0 2.7-.8 3.4-2H9.6c-.4.6-1 1-1.6 1-1.1 0-2-.9-2-2s.9-2 2-2c.6 0 1.2.3 1.6 1h1.8c-.7-1.2-2-2-3.4-2z" fill="white"/>
     <path d="M14 9h1v2h2v1h-2v2h2v1h-2v2h-1v-2h-2v-1h2v-2h-2v-1h2V9z" fill="white"/>
+  </svg>
+);
+
+export const EthereumOutlineIcon = ({ size = 24, color = "currentColor", className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <line x1="12" y1="2" x2="6" y2="12" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="12" y1="2" x2="18" y2="12" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="12" y1="2" x2="12" y2="16" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="6" y1="12" x2="12" y2="16" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="18" y1="12" x2="12" y2="16" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="6" y1="12" x2="12" y2="22" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="12" y1="22" x2="18" y2="12" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+);
+
+export const CosmosOutlineIcon = ({ size = 24, color = "currentColor", className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="12" cy="12" r="2" stroke={color} strokeWidth="2" fill="transparent"/>
+    <ellipse cx="12" cy="12" rx="8" ry="3" stroke={color} strokeWidth="2" fill="transparent"/>
+    <ellipse cx="12" cy="12" rx="8" ry="3" transform="rotate(60 12 12)" stroke={color} strokeWidth="2" fill="transparent"/>
+    <ellipse cx="12" cy="12" rx="8" ry="3" transform="rotate(120 12 12)" stroke={color} strokeWidth="2" fill="transparent"/>
   </svg>
 );

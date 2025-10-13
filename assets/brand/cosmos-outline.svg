@@ -1,0 +1,12 @@
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    circle, ellipse { stroke: #000000; }
+    @media (prefers-color-scheme: dark) {
+      circle, ellipse { stroke: #cccccc; }
+    }
+  </style>
+  <circle cx="12" cy="12" r="2" stroke-width="2" fill="transparent"/>
+  <ellipse cx="12" cy="12" rx="8" ry="3" stroke-width="2" fill="transparent"/>
+  <ellipse cx="12" cy="12" rx="8" ry="3" transform="rotate(60 12 12)" stroke-width="2" fill="transparent"/>
+  <ellipse cx="12" cy="12" rx="8" ry="3" transform="rotate(120 12 12)" stroke-width="2" fill="transparent"/>
+</svg>
